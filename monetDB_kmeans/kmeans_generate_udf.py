@@ -1,13 +1,13 @@
 from datetime import datetime
 from tqdm import tqdm
 
-lines = 1000
-columns = 1000
-data_path='/home/gabi/influx/dataset/synth_1K.txt'
+lines = 1000000
+columns = 100
+data_path='/home/gabi/influx/dataset/synth_1M.txt'
 
 
 
-udf_template_path = '/home/gabi/monetdb/code2/cd_udf_template.sql'
+udf_template_path = '/home/gabi/monetdb/code2/kmeans_udf_template.sql'
 tmp_data_path = '/home/gabi/monetdb/code2/data.csv'
 udf_path = '/home/gabi/monetdb/code2/udf.sql'
 start_time=1583000000
