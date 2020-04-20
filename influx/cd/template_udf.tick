@@ -2,9 +2,9 @@ dbrp "master"."autogen"
 
 batch
         |query('SELECT * FROM "master"."autogen"."puncte"')
-                .every(2m)
-                .period(50d)
-        @kmeans()
+                .every(<tick_time>)
+                .period(200d)
+        @cd()
 
 //output the result from kmeans into influxdb
 

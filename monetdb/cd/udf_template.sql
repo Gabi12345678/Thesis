@@ -1,9 +1,9 @@
 DROP TABLE IF EXISTS datapoints;
-DROP TABLE IF EXISTS clusters;
+DROP TABLE IF EXISTS matrixr;
 DROP FUNCTION cluster_alg;
 
-CREATE TABLE datapoints (time TIMESTAMP, <types>);
-CREATE TABLE clusters (time TIMESTAMP, <types>);
+CREATE TABLE datapoints (time TIMESTAMP, <column_types>);
+CREATE TABLE matrixr (<column_types>);
 
 CREATE OR REPLACE FUNCTION get_time() RETURNS FLOAT
 LANGUAGE PYTHON
@@ -16,7 +16,7 @@ CREATE OR REPLACE FUNCTION get_size() RETURNS INTEGER
 LANGUAGE PYTHON
 {
         import os
-        def get_size(start_path = '/home/gabi/monetdb/test_farm'):
+        def get_size(start_path = '<db_dir>'):
                 total_size = 0
                 for dirpath, dirnames, filenames in os.walk(start_path):
                         for f in filenames:
@@ -28,22 +28,21 @@ LANGUAGE PYTHON
         return get_size()
 };
 
-CREATE OR REPLACE FUNCTION cluster_alg(time TIMESTAMP, <types>) RETURNS TABLE(time TIMESTAMP, <types>)
+CREATE OR REPLACE FUNCTION cluster_alg(time TIMESTAMP, <column_types>) RETURNS TABLE(<column_types>)
 LANGUAGE PYTHON
 {
         import sys
         import numpy as np
-        sys.path.append('/home/gabi/monetdb/code2/')
-        import kmeans
-
-        cluster_count = 10
+        sys.path.append('<implementation_path>')
+        import cd_ssv
 
         matrix = np.array([<column_names>]).T
-        [<column_names>] = kmeans.kmeans(matrix, cluster_count, 20).T
+        n = matrix.shape[0]
+        m = matrix.shape[1]
 
-        time = time[:cluster_count]
+        matrix_l, matrix_r, z = cd_ssv.CD(matrix, n, m)
 
-        return [time, <column_names>]
+        return matrix_r
 };
 
 DECLARE lines INTEGER;
@@ -59,7 +58,7 @@ DECLARE final_time FLOAT;
 
 SET initial_size =  get_size();
 SET initial_time = get_time();
-COPY INTO datapoints FROM '/home/gabi/monetdb/code2/data.csv' USING DELIMITERS ',','\n';
+COPY INTO datapoints FROM '<data_file>' USING DELIMITERS ',','\n';
 SET final_time = get_time();
 SET final_size = get_size();
 
@@ -73,12 +72,12 @@ SELECT
 
 
 -- KMeans *******************************************************************************************
-DECLARE initial_time_kmeans FLOAT;
-DECLARE final_time_kmeans FLOAT;
+DECLARE initial_time_cd FLOAT;
+DECLARE final_time_cd FLOAT;
 
-SET initial_time_kmeans = get_time();
-INSERT INTO clusters SELECT * FROM cluster_alg( (SELECT * FROM datapoints) );
-SET final_time_kmeans = get_time();
+SET initial_time_cd = get_time();
+INSERT INTO matrixr SELECT * FROM cluster_alg( (SELECT * FROM datapoints) );
+SET final_time_cd = get_time();
 
-SELECT final_time_kmeans - initial_time_kmeans as Time_seconds;
+SELECT final_time_cd - initial_time_cd as Time_seconds;
 -- KMeans *******************************************************************************************

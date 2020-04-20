@@ -8,7 +8,7 @@ def kmeans(datapoints, clusters_count, iterations):
         lines = datapoints.shape[0]
         columns = datapoints.shape[1]
 
-        clusters = np.asarray( random.sample(datapoints, clusters_count) )
+        clusters = np.asarray( random.sample(list(datapoints), clusters_count) )
         for t in range(iterations):
                 sum_clusters = np.zeros([clusters_count, columns])
                 count_clusters = np.zeros([clusters_count])
