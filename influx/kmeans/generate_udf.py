@@ -4,15 +4,17 @@ from tqdm import tqdm
 from influxdb import InfluxDBClient
 import argparse
 import os
+import time
+import socket
+import sys
 
 # Arguments
 parser = argparse.ArgumentParser(description = 'Script to run K-Means in Influx')
 parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../dataset/synth_1K.txt')
-parser.add_argument('--lines', nargs='*', type=int, required=True,
-        help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 10 20 --columns 2 4" will try (10, 2), (10, 4), (20, 2), (20, 4)')
-parser.add_argument('--columns', nargs='*', type=int, required=True,
-        help='list of integers representing the number of columns to try out. Used together with --lines. For example "--lines 10 20 --columns 2 4" will try (10, 2), (10, 4), (20, 2), (20, 4)')
-parser.add_argument('--tick_time', nargs='?', type=str, help="Time interval at which to run the UDF. This has to be strictly larger than the actual running time to not start a second Kmeans in the meantime.", default="10s")
+parser.add_argument('--lines', nargs='*', type=int, default=[100],
+        help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 4" will try (20, 4)')
+parser.add_argument('--columns', nargs='*', type=int, default=[100],
+        help='list of integers representing the number of columns to try out. Used together with --lines. For example "--lines 20 --columns 4" will try (20, 4)')
 parser.add_argument('--start_time', nargs='?', type=int, help = "Epoch time in second for the first measurement. All others will be 10 seconds apart", default=1583000000)
 
 args = parser.parse_args()
@@ -27,10 +29,21 @@ args.kapacitor_config_path = os.path.abspath('kapacitor.config')
 args.kmeans_handler_template_path = os.path.abspath('template_kmeans_handler.py')
 args.kmeans_handler_path = os.path.abspath('kmeans_handler.py')
 args.influxd_path = os.path.abspath('../influxdb-1.7.10-1/usr/bin/influxd')
-args.tick_template_path = os.path.abspath('template_udf.tick')
 args.tick_path = os.path.abspath('udf.tick')
 args.implementation_path = os.path.abspath('../../kmeans')
 args.kapacitor_library = os.path.abspath('../kapacitor-master/udf/agent/py')
+args.output_file = os.path.abspath('time.txt')
+
+# Function to get database storage roon
+def get_size(start_path = args.db_directory):
+        total_size = 0
+        for dirpath, dirnames, filenames in os.walk(start_path):
+                for f in filenames:
+                        fp = os.path.join(dirpath, f)
+                        # skip if it is symbolic link
+                        if not os.path.islink(fp):
+                                total_size += os.path.getsize(fp)
+        return total_size
 
 def generate_from_template(template_path, file_path, changes):
         f = open(template_path, "r")
@@ -45,37 +58,30 @@ def generate_from_template(template_path, file_path, changes):
 
 generate_from_template(template_path = args.kapacitor_config_template_path, file_path = args.kapacitor_config_path,
                         changes = [("<handler_path>", args.kmeans_handler_path), ("<home_path>", args.home_path)])
-generate_from_template(template_path = args.tick_template_path, file_path = args.tick_path,
-                        changes = [("<tick_time>", args.tick_time)])
 generate_from_template(template_path = args.kmeans_handler_template_path, file_path = args.kmeans_handler_path,
-                        changes = [("<implementation>", args.implementation_path), ("<kapacitor_library>", args.kapacitor_library)])
+                        changes = [("<implementation>", args.implementation_path), ("<kapacitor_library>", args.kapacitor_library), ("<output_file>", args.output_file)])
 
-influx = subprocess.Popen([args.influxd_path], stdout = subprocess.DEVNULL, stderr = subprocess.PIPE)
-for line in influx.stderr:
-        if 'Listening on HTTP' in str(line):
-                print("Influx is ready to receive data")
-                influx_devnull = subprocess.Popen(["cat"], stdin = influx.stderr, stdout = subprocess.DEVNULL)
-                break
+influx = subprocess.Popen([args.influxd_path], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+while True:
+        try:
+                subprocess.check_output("curl localhost:8086", shell=True, stderr = subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+                print("Influx is not yet ready. Checking again in 10 seconds.")
+                time.sleep(10)
+                continue
+        break
+print("Influx is ready to accept data.")
+kapacitor = subprocess.Popen([args.kapacitord_path, "-config", args.kapacitor_config_path], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+while True:
+        try:
+                subprocess.check_output("curl localhost:9092", shell=True, stderr = subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+                print("Kapacitor is not yet ready. Checking again in 10 seconds.")
+                time.sleep(10)
+                continue
+        break
+print("Kapacitor is ready to accept data.")
 
-kapacitor = subprocess.Popen([args.kapacitord_path, "-config", args.kapacitor_config_path], stdout = subprocess.DEVNULL, stderr = subprocess.PIPE)
-for l in kapacitor.stderr:
-        if 'starting HTTP service' in str(l):
-                print("Kapacitor is ready to receive data")
-                kapacitor_udf = subprocess.Popen(["grep", "udf:"], stdin = kapacitor.stderr, stdout = subprocess.PIPE)
-                break
-subprocess.run([args.kapacitor_path, "disable", "udf"])
-
-# Function to get database storage roon
-def get_size(start_path = args.db_directory):
-        total_size = 0
-        for dirpath, dirnames, filenames in os.walk(start_path):
-                for f in filenames:
-                        fp = os.path.join(dirpath, f)
-                        # skip if it is symbolic link
-                        if not os.path.islink(fp):
-                                total_size += os.path.getsize(fp)
-        return total_size
-        
 for line in args.lines:
         for column in args.columns:
                 print("Running UDF for (" + str(line) + ", " + str(column) + ")")
@@ -108,24 +114,22 @@ for line in args.lines:
 
                 print("Memory in bytes: ", final_size - initial_size)
                 print("Memory in megabytes: ", float(final_size - initial_size) / 1024.0 / 1024.0)
-                print("Througput: ", line / seconds)
+                print("Throughput tps: ", line / seconds)
+                print("Throughput vps: ", line * column / seconds)
 
-
-                subprocess.run([args.kapacitor_path, "define", "udf", "-tick", args.tick_path])
+                subprocess.run([args.kapacitor_path, "define", "udf", "-tick", "udf.tick"])
                 subprocess.run([args.kapacitor_path, "enable", "udf"])
-                for l in kapacitor_udf.stdout:
-                        print(l)
-                        if 'Total time' in str(l):
-                                break
-                subprocess.run([args.kapacitor_path, "disable", "udf"])
+                subprocess.run([args.kapacitor_path, "delete", "replays", "udf-replay"])
+                subprocess.run([args.kapacitor_path, "delete", "recordings", "udf-recording"])
 
+                subprocess.run([args.kapacitor_path, "record", "batch", "-past", "200d", "-recording-id", "udf-recording", "-task", "udf"])
+                subprocess.run([args.kapacitor_path, "replay", "-recording", "udf-recording", "-replay-id", "udf-replay", "-task", "udf"])
 
+print("Terminating kapacitor")
 kapacitor.terminate()
-kapacitor_udf.terminate()
 
+print("Terminating influx")
 influx.terminate()
-influx_devnull.terminate()
 
 subprocess.run(["rm", args.kapacitor_config_path])
-subprocess.run(["rm", args.tick_path])
 subprocess.run(["rm", args.kmeans_handler_path])

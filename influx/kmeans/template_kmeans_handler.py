@@ -88,7 +88,9 @@ class KMeansHandler(Handler):
     self.agent.write_response(response)
     logger.info("end batch")
     self.final_time = datetime.now()
-    logger.info("Total time: " + str((self.final_time - self.initial_time).total_seconds()))
+
+    output_file = open("<output_file>", "a")
+    output_file.write(str(self.matrix.shape) + " -- " + str((self.final_time - self.initial_time).total_seconds()) + "\n")
 
 if __name__ == '__main__':
   agent = Agent()

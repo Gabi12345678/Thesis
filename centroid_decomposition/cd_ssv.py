@@ -77,7 +77,10 @@ def CD(x, n, m):
             z[:, [i]] = SSV(x, n, m)
         else:
             z[:, [i]] = SSV_init(x, n, m)
-        R[:, [i]] = np.dot(np.transpose(x), z[:, [i]]) / LA.norm(np.dot(np.transpose(x), z[:, [i]]))
+        norm  = LA.norm(np.dot(np.transpose(x), z[:, [i]]))
+        if norm <= 0.0:
+            break
+        R[:, [i]] = np.dot(np.transpose(x), z[:, [i]]) / norm
         L[:, i] = np.dot(x, R[:, i])
         x = x - np.dot(L[:, [i]], np.transpose(R[:, [i]]))
     return L, R, z

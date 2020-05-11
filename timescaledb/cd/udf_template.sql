@@ -94,4 +94,3 @@ BEGIN
         RAISE NOTICE 'CentroidDecomposition time seconds = %', delta;
 END;
 $centroid_decomposition$
-                                                                      

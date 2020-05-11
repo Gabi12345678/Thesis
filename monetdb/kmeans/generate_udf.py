@@ -3,14 +3,13 @@ from tqdm import tqdm
 import argparse
 import os
 
-
-parser = argparse.ArgumentParser(description = 'Script to run K-Means in TimescaleDB')
-parser.add_argument('--file', nargs=1, type=str, help='path to the dataset file', default='../../dataset/synth_1K.txt')
-parser.add_argument('--lines', nargs='*', type=int, required=True,
-        help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 10 20 --columns 2 4" will try (10, 2), (10, 4), (20, 2), (20, 4)')
-parser.add_argument('--columns', nargs='*', type=int, required=True,
-        help='list of integers representing the number of columns to try out. Used together with --lines. For example "--lines 10 20 --columns 2 4" will try (10, 2), (10, 4), (20, 2), (20, 4)')
-parser.add_argument('--start_time', nargs=1, type=int,
+parser = argparse.ArgumentParser(description = 'Script to run K-Means in MonetDB')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../dataset/synth_1K.txt')
+parser.add_argument('--lines', nargs='*', type=int, default = [100],
+        help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 10 --columns 4" will try (10, 4)')
+parser.add_argument('--columns', nargs='*', type=int, default = [100],
+        help='list of integers representing the number of columns to try out. Used together with --lines. For example "--lines 20 --columns 4" will try (20, 4)')
+parser.add_argument('--start_time', nargs='?', type=int,
         help='epoch time of the first datasample. All others will be set at 10 second intervals',
         default=1583000000)
 args = parser.parse_args()
@@ -19,6 +18,7 @@ args.file = os.path.abspath(args.file)
 args.udf_template = os.path.abspath('udf_template.sql')
 args.implementation_path = os.path.abspath('../../kmeans')
 args.db_dir = os.path.abspath('../test_farm/')
+args.output_path = os.path.abspath('output_clusters.csv')
 
 for lines in args.lines:
         for columns in args.columns:
@@ -49,10 +49,11 @@ for lines in args.lines:
                                   .replace("<columns>", str(columns))
                                   .replace("<data_file>", args.file + ".csv")
                                   .replace("<db_dir>", args.db_dir)
-                                  .replace("<implementation_path>", args.implementation_path) )
+                                  .replace("<implementation_path>", args.implementation_path)
+                                  .replace("<output_path>", args.output_path) )
                 f.close()
                 g.close()
 
                 os.system("mclient -p54321 -d mydb " + args.udf_template + ".sql")
                 os.system("rm " + args.udf_template + ".sql")
-                os.system("rm " + args.file + ".csv")
+#                os.system("rm " + args.file + ".csv")

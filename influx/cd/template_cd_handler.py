@@ -54,7 +54,7 @@ class CentroidDecompositionHandler(Handler):
       current_point[v] = point.fieldsDouble["dim"+str(v)]
     self.datapoints.append(current_point)
 
-def end_batch(self, end_req):
+  def end_batch(self, end_req):
     response = udf_pb2.Response()
     #send back a begin batch to kapacitor
     response.begin.CopyFrom(self.begin_req)
@@ -86,7 +86,8 @@ def end_batch(self, end_req):
     response.end.CopyFrom(end_req)
     self.agent.write_response(response)
 
-    logger.info("Total time: " + str(t))
+    output_file = open("<output_file>", "a")
+    output_file.write(str(matrix.shape) + " -- " + str((end_time - start_time).total_seconds()) + "\n")
 
 if __name__ == '__main__':
   agent = Agent()
@@ -97,4 +98,3 @@ if __name__ == '__main__':
   agent.start()
   agent.wait()
   logger.info('CentroidDecomposition agent finished')
-

@@ -11,6 +11,6 @@ First, `cd` into the directory of the script. Then simply run the script.
 
 Example of script run:
 ```sh
-python3 generate_udf --file ../../synth_1M.txt --lines 100 1000 --columns 10 50
+python3 generate_udf --file ../../synth_1M.txt --lines 100 --columns 50
 ```
-This will run the UDF with all possible combination of lines and columns: (100, 10), (100, 50), (1000, 10), (1000, 50).
+This will run the UDF with all possible combination of lines and columns: (100, 50).
