@@ -5,7 +5,7 @@
 The install script can be used to download the data files. This script is called from the top-level install script, so only do this if something happened with the files.
 
 ```bash
-	$ sh install.sh
+$ sh install.sh
 ```
 
 ## Synthetic files
