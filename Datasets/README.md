@@ -1,5 +1,6 @@
 # Datasets
 
+___
 ## Install
 
 The install script can be used to download the data files. This script is called from the top-level install script, so only do this if something happened with the files.
@@ -8,6 +9,7 @@ The install script can be used to download the data files. This script is called
 $ sh install.sh
 ```
 
+___
 ## Synthetic files
 
 The directory contains two data files with synthetic data.

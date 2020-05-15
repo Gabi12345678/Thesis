@@ -1,5 +1,6 @@
 # Databases
 
+___
 ## Directory structure
 
 A directory was created for each of the databases analysed. Each of these directories contains the following:
@@ -25,6 +26,7 @@ $ cd <database_directory>
 $ python3 generate_udf.py
 ```
 
+___
 ## Examples
 
 ### Installing
