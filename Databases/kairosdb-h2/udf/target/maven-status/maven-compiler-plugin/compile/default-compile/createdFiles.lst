@@ -1,0 +1,6 @@
+master/UdfModule.class
+master/KMeansAggregator.class
+master/CDAggregator.class
+master/NumpyDataPointGroup$TagOnlyDataPointGroup.class
+master/RecovAggregator.class
+master/NumpyDataPointGroup.class

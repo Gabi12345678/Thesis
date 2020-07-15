@@ -20,3 +20,11 @@ cd ..
 cd timescaledb
 sh install.sh
 cd ..
+
+cd graphite
+sh install.sh
+cd ..
+
+cd kairosdb-h2
+sh install.sh
+cd ..
