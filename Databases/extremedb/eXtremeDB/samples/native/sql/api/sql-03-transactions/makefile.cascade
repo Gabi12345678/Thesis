@@ -1,0 +1,8 @@
+-include $(call mco_makefile_file, \
+mursiw/makefile.project.mursiw \
+mursiw2/makefile.project.mursiw2 \
+mvcc/makefile.project.mvcc \
+persistent/makefile.project.persistent \
+ph2commit/makefile.project.ph2commit \
+vtable/makefile.project.vtable \
+)

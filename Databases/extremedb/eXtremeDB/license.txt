@@ -1,0 +1,127 @@
+McObject EVALUATION LICENSE AGREEMENT
+
+READ CAREFULLY BEFORE YOU INSTALL THE SOFTWARE MEDIA 
+
+If you install the software media, you agree to the terms of this McObject 
+Evaluation License Agreement.
+
+McObject LLC will not grant you a license to evaluate the software in the media 
+package(s) unless you agree to all of the terms of this Agreement.  If you do 
+not accept the terms of this Agreement, promptly destroy the software media 
+package(s).  McObject does not accept contrary terms in Purchase or Sales 
+Orders.
+
+1.	PARTIES TO THE LICENSE.  This is a legal agreement between you (the 
+"Development Entity" as defined below) and McObject LLC, a Washington Limited 
+Liability Company ("McObject").
+
+2.	SUBJECT MATTER OF THE LICENSE.  This Agreement is a novation of all 
+prior agreements and representations between McObject and you regarding all 
+McObject copyrighted software in your possession for evaluation, including the 
+contents of the media package(s), earlier releases of the software, all 
+accompanying written materials, and prior written agreements whether contained 
+in manuals, sealed media package(s) or otherwise (hereafter referred to as 
+"Products").
+
+3.	NO LICENSE TO DEVELOP APPLICATION PROGRAM.  McObject grants you a limited,
+non-exclusive, nonassignable, nontransferable right to evaluate the 
+Products enclosed in the software media package(s) in source code form (if 
+supplied or in your possession) and object code form for a period of 60 days 
+beginning from the Effective Date of this Agreement.
+
+4.	LICENSE TO MODIFY SOURCE.  You may modify and compile the Product 
+source code, if supplied for evaluation by McObject, provided you do not delete 
+copyright notices.  All modified versions are part of the licensed Products, 
+subject to this Agreement and the property of McObject.  You must deliver to 
+McObject on written request copies of all modifications of, partial replacements 
+of, and extensions to McObject source code.  McObject does not support modified 
+source code.  You may not compile the source code for use with an operating 
+system other than the target operating system for the source code package you 
+received from McObject.
+
+5.	NO LICENSE TO DISTRIBUTE.  You may not distribute an Application Program 
+that includes the McObject Product.  Distribute means the reproduction for 
+installation, whether for commercial resale, not-for-profit, internal use, or 
+any other use other than to evaluate the McObject software.
+
+6.	OTHER RESTRICTIONS.  These licenses are personal to you, the Development 
+Entity.  The Development Entity may be an individual or organization.  It may be 
+a division or subsidiary of a larger organization or the affiliate of a smaller 
+organization.  In any event, McObject grants this license only to the 
+Development Entity.  You may not use, distribute, or transfer the Products 
+except as allowed by this license.  You may not sell, assign, sublicense, lease, 
+or otherwise transfer any part of this license.  A sale of a majority of your 
+Development Entity is deemed a transfer.  You may not retain copies, even of 
+prior versions of the Products, on termination of this license.  Your 
+obligations under this Agreement survive any substitution or termination of the 
+licenses granted by this Agreement.
+
+7.	OWNERSHIP AND COPYRIGHT.  McObject LLC or its suppliers own the 
+Product(s).  National copyright laws and international treaty provisions 
+protect them.  The Products contain proprietary information.  You must protect 
+the Products like any other copyrighted material and keep the source code in 
+strict confidence, ensuring that anyone with access to the Products refrains 
+from unauthorized reproduction, use or disclosure.  
+
+8.	TERMS AND TERMINATION.  You may terminate this license by returning or 
+destroying all copies of the Product in your control and notifying McObject in 
+writing.  This license, including your right to evaluate the Products, will 
+terminate automatically if you infringe McObject copyrights or breach this 
+Agreement.  McObject may suspend or terminate this license if you fail to pay 
+any amount due McObject or any McObject subsidiary.  McObject may suspend or 
+terminate this license, with 30 days prior notice and opportunity to cure, if 
+you fail to pay any amount due any McObject distributor or dealer.  
+
+9. 	LIMITED WARRANTY.  McObject disclaims all warranties, either expressed or 
+implied, including but not limited to implied warranties of merchantability and 
+fitness for a particular purpose, and all other remedies for breach of the above 
+warranty.  You assume all risks with respect to accuracy, adequacy, quality, 
+reliability, and performance of the Products.  All implied warranties which may 
+not be disclaimed are limited to 30 days.  Some jurisdictions do not allow 
+limitations on duration of implied warranties, so the above limitation may not 
+apply to you.  This limited warranty gives you specific legal rights.  You may 
+have other rights, different from the warranty given by McObject.
+
+10. 	NO LIABILITY FOR CONSEQUENTIAL DAMAGES.  In no event will McObject, 
+its resellers, or suppliers be liable for consequential damages (including, 
+without limitation, damages for loss of business profits, business 
+interruption, loss of business information, or other pecuniary loss) arising 
+out of the use of or inability to use the Products, whether in an action based 
+on contract or tort, including negligence or strict liability, even if you 
+advise McObject of the possibility of such damages.  McObject's total 
+liability under this Agreement is limited in the aggregate to amounts you paid 
+for this Product and license.
+
+11. 	TECHNICAL SUPPORT.  Technical support by email and telephone is available 
+on a first-come, first-served basis during the evaluation period.
+
+12. 	U.S. GOVERNMENT RESTRICTED RIGHTS.  The Products under this Agreement are 
+commercial computer software programs and documentation developed exclusively at 
+private expense.  If Products are acquired by or on behalf of the Department of 
+Defense, use, disclosure, modification, distribution, and reproduction are subject 
+to the standard limitations and restrictions set forth in the body of this 
+Agreement, and as permitted by DFAR 227.7202-1.  If Products are acquired by other 
+U.S. Government agencies or on their behalf, the Products are furnished with 
+Limited and Restricted Rights as otherwise set forth herein, or as set forth in 
+FAR 52.227-19(b)(1)and(2) as may be required.
+
+13. 	SEVERABILITY.  Whenever possible, each provision of this Agreement 
+must be interpreted so as to be valid under applicable law.  If any provision 
+is invalid, the remaining provisions remain enforceable. 
+
+14. 	DISPUTES.  The laws of the State of Washington, U.S.A., without regard 
+to its conflicts of law rules, control this Agreement, and the United Nations 
+Convention on the International Sale of Goods does not apply.  It is 
+enforceable by McObject or its distributors and dealers.  Disputes will be 
+finally resolved in arbitration, before one arbitrator, under American 
+Arbitration Association Commercial Arbitration Rules and conducted in Seattle, 
+Washington, U.S.A., or under the UNCITRAL Rules of Arbitration in Stockholm, 
+Sweden, at McObject's option.  If conducted in Sweden, the arbitration will be 
+conducted in English, and administered by the Stockholm Chamber of Commerce.  
+The prevailing party in any action related to an alleged infringement of 
+McObject proprietary rights is entitled to recover its costs and expenses, 
+including reasonable attorneys' fees.  You consent to personal jurisdiction in 
+the federal and state courts in the State of Washington, U.S.A.  A prevailing 
+party may enter judgment on an arbitral award in any court having jurisdiction.
+These provisions will survive the termination of this Agreement, regardless of 
+the cause of termination.

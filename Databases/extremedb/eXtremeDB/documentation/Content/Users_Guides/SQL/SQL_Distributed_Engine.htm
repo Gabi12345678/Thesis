@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Using the eXtremeSQL Distributed SQL Engine</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Using the <i>e</i>X<i>treme</i>SQL Distributed SQL Engine</h1>
+            <blockquote>
+                <p>The <i>e</i>X<i>treme</i>SQL <i>Distributed</i> SQL <i>Engine</i> provides limited support for the database sharding architecture for <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> installations.  Why is it limited? Most full-blown distributed database engines (such as the one found in Oracle for example) normally create an execution plan based on the query tree and data distribution statistics (or other knowledge of how the data is distributed between shards), that contains “map-reduce” style operations. The <i>e</i>X<i>treme</i>SQL distributed engine merely executes the query on every node over that node's shard, and consolidates the result sets received from multiple nodes when possible (the consolidation of the results is referred to as <i>merge</i>). </p>
+                <p>Sometimes merging the result sets is simply impossible, as it is for example for calculating an average. More often, the engine does not have enough information to make sure that the combined result set is correct. The <i>Distributed</i> SQL Engine takes the most optimistic approach -- it always assumes that the application distributed data between shards and created the SQL query to avoid merging problems. </p>
+                <p>Yet with the understanding of the engine's limitations, many application's will benefit from using the distributed engine and improve their overall database access performance dramatically.</p>
+                <p>The <i>Distributed</i> SQL Engine sends a query to one of the network nodes, or broadcasts queries to all nodes. A node is specified through the query prefix. In order to control the distribution of data, the application must either load data to each shard locally, or specify the node ID (number) in the <code>insert</code> statements. For example:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    10:insert into T values (...)
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>Also the application can explicitly use the current node ID in the <code>select</code> condition when selecting out records that are inserted on the specific node (<code>%#</code> indicates the current node ID, and <code>%@</code> the number of shards). For example:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    insert into hist_cpvehicleid_jj
+        select * from foreign table (path='/home/usr/shea2.csv', skip=1)
+            as hist_cpvehicleid_jj
+        where mod(hashcode(fstr_vechileid), %#)=%@;
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>If none of those methods are used, the <i>Distributed</i> SQL Engine broadcasts the insert on all nodes. The following query types are supported:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    select * from T;
+            
+    &#160;
+    *:select * from T;   -- similar to the above, run the statement on all nodes
+    &#160;
+    N:select * from T;   -- execute the statement on the node N (nodes are enumerated from 1)
+&#160;
+    ?:select * from T;   -- execute the statement on any node. SQL picks up the node 
+                    in the round-robin fashion, thus implementing a simple 
+                    load-balancing scheme
+                    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>Note that, normally, the <code>select</code>, <code>update</code> and <code>delete</code>  statements are executed on all nodes, while the <code>insert</code> statement adds a record to only one of the shards. Once the query has been executed and the result set is created on each node, the <i>Distributed</i> SQL Engine collects the resulting data sets from all nodes. If the query contains an aggregation or sort clause, or <code>sequence</code> functions (statistical functions operating on fields of type <code>sequence</code>), then the result sets are merged.</p>
+                <p>The following diagram illustrates data flow implemented by the <i>Distributed</i> SQL Engine. Note that the rectangles -- <code>shard1</code>,<code>shard2</code>, <code>shard3</code>, <code>client1</code> and <code>client2</code>, can be placed on the physical different hosts or on the same host, or in any combination. For example <code>shard1</code>, <code>shard2</code>, <code>client1</code> on one physical node and <code>shard3</code> and <code>client2</code> on another physical node.</p>
+                <p>
+                    <img src="../../Resources/Images/SQL_3.PNG" />
+                </p>
+                <p>&#160;</p>
+                <h2>Aggregates</h2>
+                <p>The <i>Distributed</i> SQL Engine currently supports the following aggregates:</p>
+                <ul>
+                    <li value="1"><![CDATA[	]]><code>COUNT</code></li>
+                    <li value="2"><![CDATA[	]]><code>MIN</code></li>
+                    <li value="3"><![CDATA[	]]><code>MAX</code></li>
+                    <li value="4"><![CDATA[	]]><code>SUM </code>(aggregate operand is a column) with or without a '<code>group by</code>' clause</li>
+                </ul>
+                <p>The engine does not currently support:</p>
+                <ul>
+                    <li value="1">	Merging aggregates with the <code>DISTINCT</code> qualifier;</li>
+                    <li value="2">	Aggregates over complex expressions (such as <code>X+Y</code>), except if the <code>sort</code> by or <code>group by</code> columns are included into the result set or the <code>select</code> statement;</li>
+                </ul>
+                <blockquote>
+                    <p>For instance (using <code>Metatable</code> as an example):</p>
+                </blockquote>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    select Metatable.*,FieldNo+FieldSize as ns from Metatable order by ns;
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <blockquote>
+                    <p>or</p>
+                </blockquote>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    select T.*,x+y as xy from T order by xy;
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <ul>
+                    <li value="1">	Aggregates over hash (<code>seq_hash_aggregate_*</code>), except for two scenarios:<ol><li value="1"><p>when the data that the hash table is built over belongs to a single shard (exchange in the example below):</p></li></ol></li>
+                </ul>
+                <blockquote>
+                    <blockquote>
+                        <div class="code-block"><pre>&#160;
+    select seq_hash_agg_sum(price,exchange) from Quote;
+    &#160;</pre>
+                        </div>
+                    </blockquote>
+                </blockquote>
+                <blockquote>
+                    <ol start="2">
+                        <li value="2">	if the sequence is converted into a horizontal representation -- <code>flattened</code>, the query can run regardless of the data distribution:</li>
+                    </ol>
+                </blockquote>
+                <blockquote>
+                    <blockquote>
+                        <div class="code-block"><pre>    &#160;
+    select flattened  seq_hash_agg_sum(price,exchange) from Quote;
+    &#160;</pre>
+                        </div>
+                    </blockquote>
+                </blockquote>
+                <ul>
+                    <li value="1">	The <code>AVG</code> aggregate. Unless the groups from different nodes do not overlap. For example the following layout is supported:</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>&#160;
+    Node1:
+    Symbol Price
+    AAA      10.0
+    AAA      12.0
+    AAA       9.0
+    BBB      11.0
+    BBB      10.0
+    BBB      10.0
+    &#160;
+    Node2:
+    Symbol Price
+    CCC       8.0
+    CCC       7.0
+    CCC      10.0
+    DDD     15.0
+    DDD     14.0
+    DDD     13.0
+    &#160;
+    select avg(Price) from Quote group by Symbol;
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>Other examples of valid and invalid statements are:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    select * from T;
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <blockquote>
+                    <p><span style="color: #3cb371;">Supported; the results are concatenated.</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select * from T order by y;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; sort results from all nodes</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select * from T order by x+y;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #dc143c;">Complex expressions are not currently supported</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select sum(x) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; the aggregated results are merged</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select avg(x) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #dc143c;">Merge of AVG aggregate is not currently supported</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select y,sum(x) from T group by y;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; groups and aggregates are merged</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select sum(x) from T group by y;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; note that the 'group by' columns must be included in the "from" list</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select sum(x*2) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #dc143c;">Complex expressions are not currently supported</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select ifnull(sum(x), 0) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; aggregate results are merged</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select seq_sum(x) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; results are merged</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select seq_hash_agg_sum(x,y) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #dc143c;">Merge of the hash aggregates are not currently supported</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select flattened seq_hash_agg_sum(x,y) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; sorted, split in groups and aggregated</span>
+                    </p>
+                </blockquote>
+                <h2>Importing data</h2>
+                <p>The <i>Distributed</i> SQL <i>Engine</i> supports definition for a <i>sharding condition</i> when data is imported from a <code>CSV</code> file or through application code. Sharding of <code>CSV</code> imported data is specified through the following SQL statement:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    select from foreign table (path='csv-file', skip=n) as PatternTable where distribution-condition
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>The distribution-condition contains:</p>
+                <ul>
+                    <li value="1">an <code>insert-into-select</code> statement,</li>
+                    <li value="2">a <code>from</code> clause specifying the CSV filename,</li>
+                    <li value="3">an <code>as</code> expression specifying the table to insert into,</li>
+                    <li value="4">and a <code>where</code> clause specifying the destination node.</li>
+                </ul>
+                <p>As mentioned above, the Distributed SQL Engine also supports special <code>"%@" and "%#"</code> pseudo-parameters. The first corresponds to the node number (zero based); the second is used to specify the total number of nodes. For example:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    echo "insert into table_name
+        select * from foreign table (path='table_name_file.csv', skip=1) as table_name
+        where mod(instrument_sid/$chunk_size,%#)=%@;" &gt; loadrisk.sql
+    ./xsql.sh loadrisk.sql
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>The <code>xsql.sh</code> script invokes the <i>Distributed</i> SQL <i>Engine</i> as follows:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    xsql @node1 @node2 ... @nodeN $@
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>An application can read input data from a stream (a socket in the example below) or any other source, and insert it into the database through a code fragment similar to the following:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    table_name tb;
+    socket_read(s, &amp;tb);
+    engine.execute("insert into table_name(starttime, endtime, 
+                    book1, book2, instrument_sid)
+                values (%l,%l,%s,%s,%l)", 
+                    tb.starttime, tb.endtime, 
+                    tb.book1, tb.book2, tb.instrument_sid);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>The following code fragment would add a sharding condition to the application's code:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    char sql[MAX_SQL_STMT_LEN];
+    table_name tb;
+    socket_read(s, &amp;tb);
+    sprintf(sql, "%d:insert into table_name (starttime,endtime,book1,book2,instrument_sid)
+    values (%%l,%%l,%%s,%%s,%%l)", tb.instrument_sid%n_nodes);
+    engine.execute(sql, tb.starttime, tb.endtime, tb.book1, tb.book2, tb.instrument_sid);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <h2>&#160;</h2>
+                <h2><a name="kanchor202"></a>Adding Shards at Runtime</h2>
+                <p>Sometime it may be necessary to add a shard to an existing distributed network. For example, to go from 3 shards to 4. To do so all clients need to re-connect to the 4 shards. This necessitates closing the <i>Distributed</i> SQL Engine that is connected to the 3 shards and reconnect to all 4.</p>
+                <p>Moving or rebalancing the data is the application’s responsibility as there is no right way of automatically redistributing data across shards. Essentially it is necessary to pull data to a client and redistribute from that client.</p>
+                <p>One approach is to use a file to output data to. For example, output data from an <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> client to an external file:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;format CSV
+    XSQL&gt;output mytable.csv
+    SELECT * FROM MYTABLE
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>Now the file <code>mytable.csv</code> is copied to all shards and inserted into the appropriate table(s):</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;INSERT INTO MYTABLE from select * from foreign table (path='mytable.csv') where ...
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>Another possible approach is to use the following semantics to select data from the table <code>T</code> located on node 1 and insert it to the table T on the node 2:</p>
+                <div class="code-block"><pre>    &#160;
+    XSQL&gt;create table foo(i integer, s varchar);
+    XSQL&gt;1:insert into foo values (1, 'one');
+    XSQL&gt;1:insert into foo values (2, 'two');
+    XSQL&gt;select * from foo;
+    i        s
+    ----------------------------------------------------------------------
+    1        one
+    2        two
+    Selected records:2
+    XSQL&gt;1:select * from foo;
+    i        s
+    ----------------------------------------------------------------------
+    1        one
+    2        two
+    Selected records:2
+    XSQL&gt;2:select * from foo;
+    i        s
+    ----------------------------------------------------------------------
+    Selected records:0
+    &#160;</pre>
+                </div>
+                <p>Now a new object is inserted into table <i>foo</i> on node2, then the contents of table <i>foo</i> on node1 are inserted on node 2 using the “<code>1&gt;2</code>” syntax and the results are displayed, first the aggregate from both nodes, then from the individual nodes:</p>
+                <div class="code-block"><pre>    &#160;
+    XSQL&gt;2:insert into foo values (3, 'three');
+    XSQL&gt;1&gt;2:select * from foo;
+    XSQL&gt;select * from foo;
+    i        s
+    ----------------------------------------------------------------------
+    1        one
+    2        two
+    3        three
+    1        one
+    2        two
+    &#160;
+    Selected records:5
+    XSQL&gt;1:select * from foo;
+    i        s
+    ----------------------------------------------------------------------
+    1        one
+    2        two
+    &#160;
+    Selected records:2
+    XSQL&gt;2:select * from foo;
+    i        s
+    ----------------------------------------------------------------------
+    3        three
+    1        one
+    2        two
+    &#160;</pre>
+                </div>
+                <h2>A Note on Conditions for Sharding</h2>
+                <p>In order for applications to benefit from the horizontal partitioning of data (i.e. sharding) a few conditions should normally be met. First, the data itself ought to be large enough for the search algorithms to benefit from the reduced data size. Search algorithms integrated with the database runtime are very smart in that they employ indexes to minimize I/O. Generally speaking, even for a simple <code>tree</code> lookup to benefit from the reduced data sets, the data sets have to be on the order of tens of gigabytes. The performance of a simple <code>hash</code> index algorithm is even less dependent on the database size.</p>
+                <p>Second, the underlying hardware should provide the means to handle access to shards in parallel. Normally that means that access to each shard is handled by its own CPU core and that the I/O channels for each shard are separated (for example the shards are physically located on different machines). This way the lookup on each shard is truly executed in parallel. If shards are created on the same host, to achieve best results the number of shards should normally be equal to the number of real (not hyper-threaded) CPU cores and the storage media is organized in a <code>RAID</code> type of layout.</p>
+                <p>Sharding is not without cost. Although it is theoretically possible to utilize sharding from the native <i>e</i>X<i>treme</i>DB APIs, in practice this is almost never done. The reason is that it is extremely difficult for applications to combine the result sets received from shards correctly and efficiently. The <i>Distributed</i> SQL Engine implements this functionality by creating execution plans, i.e. algorithms that are an integral part of the engine itself. Furthermore, the <i>Distributed</i> SQL Engine is capable of executing a large subset of SQL queries, but it is not the entire set of SQL that can be run against a local database. For example, for the <i>Distributed</i> SQL Engine to execute <code>JOIN</code> operations, the data must be organized in a certain way that may require duplicating some data on all shards. Often the memory or media overhead imposed by the <i>Distributed</i> SQL Engine is quite large. Systems that have a lot of resources to spare to improve search performance are normally server-type setups with a large number of CPU cores, tens or even hundreds of gigabytes of memory and distributed physical I/O subsystems.</p>
+                <p>The <i>Distributed</i> SQL Engine requires additional system resources such as memory, semaphores, etc., to provide efficient access to a distributed database. Those resources are normally not available in embedded environments. In our experience applications that run in the context of INTEGRITY OS, VxWorks OS on ARM or embedded MIPS CPUs or similar resource constrained setups never benefit from using distributed SQL. If a careful analysis of specific embedded system constraints and application requirements determines that the <i>Distributed</i> SQL Engine is desired, a custom distribution package can be built on request.</p>
+                <p>&#160;</p>
+                <h2>Support for Different Host Languages</h2>
+                <p>In addition to C and C++, the  <i>Distributed</i> SQL Engine can be used from Java, C# and Python.</p>
+                <h3>Java</h3>
+                <p>To create a Distributed connection in Java, simply instantiate a <i>SqlRemoteConnection</i> object by invoking the following constructor overload:</p>
+                <div class="code-block"><pre>&#160;
+    /**
+    * Constructor of the distributed database connection.
+    * @param nodes database nodes (each entry should have format "ADDRESS:PORT")
+    */
+    public SqlRemoteConnection(String[] nodes, int maxAttempts) 
+    {
+        engine = openDistributed(nodes);
+    }
+    &#160;</pre>
+                </div>
+                <p>For example, the following code snippet opens the <i>Distributed</i> SQL Engine for sharding on two nodes:</p>
+                <div class="code-block"><pre>&#160;
+    static String [] nodes = new String[]{"localhost:40000", "localhost:40001"};
+    SqlRemoteConnection con = new SqlRemoteConnection(nodes);
+    &#160;</pre>
+                </div>
+                <p>Note, that runtime initialization is done in the <i>Database</i> class constructor, so a <i>Database</i> object must be created even if not used.</p>
+                <h3>C# (.Net)</h3>
+                <p>To create a Distributed connection in C#, simply instantiate a <i>SqlRemoteConnection</i> object by invoking the following constructor overload:</p>
+                <div class="code-block"><pre>&#160;
+    /**
+    * Constructor of the distributed database connection.
+    * @param nodes database nodes (each entry should have format "ADDRESS:PORT")
+    */
+    public SqlRemoteConnection(String[] nodes) 
+    {
+        engine = OpenDistributed(nodes);
+    }
+    &#160;</pre>
+                </div>
+                <p>For example, the following code snippet opens the <i>Distributed</i> SQL Engine for sharding on two nodes:</p>
+                <div class="code-block"><pre>&#160;
+    static String [] nodes = new String[]{"localhost:40000", "localhost:40001"};
+    SqlRemoteConnection con = new SqlRemoteConnection(nodes);
+    &#160;</pre>
+                </div>
+                <p>Note, that runtime initialization is done in the <i>Database</i> class constructor, so a <i>Database</i> object must be created even if not used.</p>
+                <h3>Python</h3>
+                <p>To create a Distributed connection using Python, open the module method connect with a <code>tuple</code> as the first argument. For example:</p>
+                <div class="code-block"><pre>&#160;
+    con = exdb.connect(('node1:5001', 'node2:5001', 'node3:5001'))
+    &#160;</pre>
+                </div>
+                <p>Also one can create a SQL server using the Python wrapper. For example:</p>
+                <div class="code-block"><pre>&#160;
+    conn = exdb.connect("dbname")
+    # pass engine, port and protocol buffer size. 
+    # Note that 64K is not enough if sequences are used
+    server = exdb.SqlServer(conn.engine, 50000, 64*1024)  
+    server.start()    # Non-blocking call
+    ...               # Do something else or just wait
+    server.stop()     # Stop server
+    conn.close()
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2>Using sharding with xSQL</h2>
+                <p>To illustrate using the Distributed SQL Engine with <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>, consider the following database schema (created via SQL):</p>
+                <div class="code-block"><pre>&#160;
+    create table Orders (
+        orderId int primary key,
+        product string,
+        customer string,
+        price double,
+        volume doulbe
+    )
+    &#160;</pre>
+                </div>
+                <p>And the following CSV data in file <code>order.csv</code>:</p>
+                <div class="code-block"><pre>&#160;
+    orderId|product|customer|price|volume
+    1|A|james|10.0|100
+    2|B|bob|50.0|200
+    3|A|paul|11.0|300
+    4|C|paul|100.0|150
+    5|B|bob|52.0|100
+    6|B|bob|49.0|500
+    7|A|james|11.0|100
+    8|C|paul|105.0|300
+    9|A|bob|12.0|400
+    10|C|james|90.0|200
+    &#160;</pre>
+                </div>
+                <h3>Create SQL servers</h3>
+                <p>First, to create several databases and run SQL server on them, we use command-line parameters for <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> as follows to create three instances of an in-memory database with size of <code>10 Mb</code> and start the SQL server listening on ports <code>10001</code>, <code>10002</code> and <code>10003</code>:</p>
+                <div class="code-block"><pre>&#160;
+    ./xsql -size 10m -p 10001
+    ./xsql -size 10m -p 10002
+    ./xsql -size 10m -p 10003
+    &#160;</pre>
+                </div>
+                <p>Now we can connect to all three servers using the Distributed SQL engine as <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> accepts the addresses of the servers as command-line options:</p>
+                <div class="code-block"><pre>&#160;
+    ./xsql @127.0.0.1:10001 @127.0.0.1:10002 @127.0.0.1:10003
+    &#160;</pre>
+                </div>
+                <p>Alternatively, we could specify the server addresses in a config file (<code>client.cfg</code>) like:</p>
+                <div class="code-block"><pre>&#160;
+    {
+        remote_client : [ "127.0.0.1:10001", "127.0.0.1:10002","127.0.0.1:10003"]
+    }
+    &#160;</pre>
+                </div>
+                <p>And invoke <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> as follows:</p>
+                <div class="code-block"><pre>&#160;
+    ./xsql -c client.cfg
+    &#160;</pre>
+                </div>
+                <h3>Using <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> interactive mode</h3>
+                <p>After connecting to servers, <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> goes to interactive mode. First we create a table on all nodes with command:</p>
+                <div class="code-block"><pre>&#160;
+    create table Orders (orderId int primary key, product string, 
+                customer string, price double, volume double);
+                &#160;</pre>
+                </div>
+                <p>By default, the <i>Distributed</i> SQL Engine sends queries to all nodes. So the <code>create table</code> statement will be executed by all three nodes. Next we can import and distribute the data across the servers using the following SQL statement:</p>
+                <div class="code-block"><pre>&#160;
+    insert into Orders select * from 'order.csv' as Orders where mod(orderId, %#)=%@;
+    &#160;</pre>
+                </div>
+                <p>The pseudoparameters '<code>%#</code>' and '<code>%@</code>' refer to the total number of nodes and zero-based node ID. In our case '<code>%#</code>' equals to 3 and '<code>%@</code>' is 0 for the first server (running on port <code>10001</code>), 1 for the second server and 2 for the third server. For example, on the second server the statement will be equivalent to:</p>
+                <div class="code-block"><pre>&#160;
+    insert into Orders select * from 'order.csv' as Orders where mod(orderId, 3)=1;
+    &#160;</pre>
+                </div>
+                <p>and as a result inserts orders with ID 1, 4, 7 and 10. (Note that if you start SQL servers on different hosts, the file <code>order.csv</code> must be accessible on all hosts.)</p>
+                <p>Now, to check the data, we select records from all nodes :</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;select * from Orders order by orderId;
+    orderId product customer        price   volume
+    ------------------------------------------------------------------------------
+    1       A       james   10.000000       100.000000
+    2       B       bob     50.000000       200.000000
+    3       A       paul    11.000000       300.000000
+    4       C       paul    100.000000      150.000000
+    5       B       bob     52.000000       100.000000
+    6       B       bob     49.000000       500.000000
+    7       A       james   11.000000       100.000000
+    8       C       paul    105.000000      300.000000
+    9       A       bob     12.000000       400.000000
+    10      C       james   90.000000       200.000000
+    &#160;
+    Selected records: 10
+    &#160;</pre>
+                </div>
+                <p>To select records from the second server only:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;2:select * from Orders;
+    orderId product customer        price   volume
+    ------------------------------------------------------------------------------
+    1       A       james   10.000000       100.000000
+    4       C       paul    100.000000      150.000000
+    7       A       james   11.000000       100.000000
+    10      C       james   90.000000       200.000000
+    &#160;</pre>
+                </div>
+                <p>To use <code>group by</code> and <code>order by</code> statements:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;select product, sum(price*volume) as s from Orders group by product;
+    product s
+    ------------------------------------------------------------------------------
+    A       10200.000000
+    B       39700.000000
+    C       64500.000000
+&#160;
+    XSQL&gt;select customer, sum(price*volume) as s from Orders group by customer order by s;
+    customer        s
+    ------------------------------------------------------------------------------
+    james   20100.000000
+    bob     44500.000000
+    paul    49800.000000
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2>Using a Table Qualifier</h2>
+                <p>Currently a distributed client application cannot use a table qualifier as a prefix in the <code>order by</code> or the <code>group by</code> column lists. For example, given a table <i>Customer</i> and a column <code>LastName</code> defined with a schema like the following:</p>
+                <div class="code-block"><pre>&#160;
+    class Customer
+    {
+        uint4 customerKey;
+        string FirstName;
+        string LastName;
+        &#160;
+        hash&lt;customerKey&gt; by_customerKey[500000];
+    };
+&#160;
+    class Facts
+    {
+        uint4 customerKey;
+        double price;
+        uint4 Quantity;
+        &#160;
+        tree&lt;customerKey&gt; by_customerKey;
+    };
+    &#160;</pre>
+                </div>
+                <p>The following <code>select</code> syntax <i>is not</i> supported:</p>
+                <div class="code-block"><pre>&#160;
+    SELECT customer.FirstName, customer.LastName,  sum(facts.Quantity) as qty,
+        sum(facts.price) as price, as sales
+    FROM customer, facts
+    GROUP BY customer.FirstName, customer.LastName
+    ORDER BY customer.FirstName, customer.LastName;
+    &#160;</pre>
+                </div>
+                <p>Nor is alternative syntax, like the following (using aliases) supported:</p>
+                <div class="code-block"><pre>&#160;
+    SELECT supplier.address as s_address, customer.address as c_address
+    FROM supplier, customer
+    ORDER BY s_address, c_address;
+    &#160;</pre>
+                </div>
+                <p>Nor is the following (specifying the column number):</p>
+                <div class="code-block"><pre>&#160;
+    SELECT supplier.address, customer.address
+    FROM supplier, customer
+    ORDER BY 1, 2;
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

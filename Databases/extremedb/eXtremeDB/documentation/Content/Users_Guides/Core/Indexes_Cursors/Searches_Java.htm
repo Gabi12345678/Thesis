@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|Java API|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Index Searches in Java</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Index Searches in Java</h1>
+            <blockquote>
+                <p>Search interfaces locate desired objects or groups of objects by unique identifier or by index.  Exact match lookups by <code>unique</code> identifier (including <a href="#HashTabl"><code>HashTable</code></a> and <a href="#Autoid" name="kanchor52"><code>autoid</code></a> ) using the <i>Cursor</i> method <code>find()</code> are extremely efficient for locating individual objects. <i>e</i>X<i>treme</i>DB also offers a rich set of specialized <a href="../../../Fundamental_Concepts/Indexes.htm">indexes</a> that employ <code>Cursors</code> to navigate a group of objects as an ordered  result set with <a href="#B-Tree"><a href="#BTree"><code>tree</code></a></a>-based (including <a href="#Patrici"><a href="#Patricia"><code>patricia</code></a></a>, <a href="#RTree"><code>rtree</code> <![CDATA[ ]]></a> and <a href="#Trigram"><code>trigram</code></a>) , or an unordered sequence of objects with <code><a href="#Hash">HashTable</a></code>  indexes declared as <code>unique=false</code> or <a href="#List"><code>List</code></a> indexes.</p>
+                <h1><a name="Find"></a>Find</h1>
+                <p> 
+The <i>Cursor</i> method <code>find()</code> searches an index for an exact match. By definition, an exact match lookup on a unique index returns exactly one result or zero if no match is found. Note that  an <code>autoid</code> is by definition <i>unique</i>. So an internally managed unique <code>HashTable</code> index is implemented for it and only the exact match <code>find()</code> method is appropriate for <a href="#Autoid"><code>autoid</code></a> object lookups.</p>
+                <h2><a name="Autoid"></a>Autoid Lookup</h2>
+                <p>As explained in the <a href="Indexes_Cursors_Java.htm">Indexes and Cursors</a> page, only "exact match" searches are possible for <code>autoid</code> indexes which are performed using the <i>Cursor</i> method <code>find()</code>. To demonstrate, consider the following schema:</p>
+                <div class="code-block"><pre>&#160;
+    @Persistent(autoid = true)
+    class Department
+    {
+        @Indexable(type=Database.IndexType.BTree, unique=true) // Declare unique tree index by "code" field
+        String code;
+        String name;
+    }
+    &#160;
+    @Persistent()
+    class Employee
+    {
+        @Indexable(type=Database.IndexType.BTree, unique=true) // Declare unique tree index by "name" field
+        String name;
+        long dept;
+    }
+    &#160;</pre>
+                </div>
+                <p>Note that a one-to-many relationship between <i>Department</i> and <i>Employee</i> objects can be implemented through the reference field <code>dept</code> of type <code>long</code> in class <i>Employee</i>. If each <i>Employee</i> object stores the <code>autoid</code> value of the <i>Department</i> object to which it belongs, the owner <i>Department</i> object could be quickly found with code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    con.startTransaction(Database.TransactionType.ReadOnly);
+    // 1. Find the Employee object by name
+    Cursor&lt;Employee&gt; cursor = new Cursor&lt;Employee&gt;(con, Employee.class, "name");
+    Employee emp;
+    emp = cursor.find(search_name);
+&#160;
+    // 2. Find the Department object by its autoid and display the Department name
+    Cursor&lt;Department&gt; cursor2 = new Cursor&lt;Department&gt;(con, Department.class);
+    Department d = cursor2.find(emp1.dept);
+    System.out.println("\n\nFind " + search_name + "'s co-workers in " + d.name + " :\n");
+    con.commitTransaction();
+    cursor.close();
+&#160;</pre>
+                </div>
+                <p> Note that here the <i>Cursor</i> <code>cursor2</code> is instantiated on class <i>Department</i> without specifying an index, which means "use the class <code>autoid</code> index". </p>
+                <p>&#160;</p>
+                <h1><a name="Search"></a>Search</h1>
+                <p>A <code>Cursor</code> is essentially an iterator over the collection of objects in a result set.  For each non-unique index declared for a class  a <i>Cursor</i> can be instantiated. The <i>Cursor</i> method <code>search()</code> positions it based on some value(s), and the <code>current()</code> method provides a handle to the database object at the current position. Most index types provide an ordered result set;  <a href="#List"><code>List</code></a>-based and non-unique <a href="#HashTabl"><code>HashTable</code></a>-based cursors allow navigation in sequential order (first to last, or last to first), though the order of the sequence is not defined; it is simply a mechanism to iterate over the unordered list of objects .</p>
+                <h3>Cursor Navigation</h3>
+                <p>After positioning a cursor with the <code>search()</code> method or one of the cursor positioning functions (<code>moveFirst(), moveLast(), moveNext()</code> or <code>movePrev()</code>), the <code>current()</code> method can be used to obtain a handle to the object in order to then use object interface methods.</p>
+                <p>&#160;</p>
+                <h2><a name="BTree"></a>BTree Index Search</h2>
+                <p>To demonstrate a common <code>BTree</code> index search scenario, consider the following database class definition:</p>
+                <div class="code-block"><pre>&#160;
+    @Persistent()
+    class Employee
+    {
+        @Indexable(type=Database.IndexType.BTree, unique=true) // Declare unique tree index by "name" field
+        String name;
+        int dept_no;
+    }
+    &#160;</pre>
+                </div>
+                <p>To lookup an <i>Employee</i> object by the <code>BTree</code> index <code>name</code>, we could use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    Employee emp;
+    String search_name = "William";
+    &#160;
+    con.startTransaction(Database.TransactionType.ReadOnly);
+    Cursor&lt;Employee&gt; cursor = new Cursor&lt;Employee&gt;(con, Employee.class, "name");
+    emp = cursor.find(search_name);
+    con.commitTransaction();
+    cursor.close();
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2><a name="Patricia"></a>Patricia Index Search</h2>
+                <p>As explained in the <a href="Indexes_Cursors_Java.htm">Indexes and Cursors</a> page, the <code>Patricia</code> index can be declared  <code>unique</code>; in the absence of the <code>unique</code> keyword it defaults to allowing duplicates.  </p>
+                <p>Searches on <code>Patricia</code> indexes are performed using the <i>Cursor</i> operations <code>ExactMatch</code>, <code>BestMatch</code>, <code>PrefixMatch</code> and  <code>NextMatch</code>. </p>
+                <p>Please refer to the <a href="Patricia.htm">Patricia Index</a> page for explanations and examples of how these <code>Patricia</code>-specific search operations work. To demonstrate use of the <code>Patricia</code> Java APIs, the SDK sample <a href="../../../Programming/Java/SDK_Samples/Core/indexes_Patricia.htm">Indexes_Patricia</a> is provided. Code snippets from this sample are used below to illustrate the different types of <code>Patricia</code> index searches.</p>
+                <p>Consider the class <i>AreaCode</i> with  string fields like the following:</p>
+                <div class="code-block"><pre>&#160;
+    @Persistent 
+    class AreaCode
+    {
+        @Indexable(type=Database.IndexType.Patricia) // Declare patricia index by "areaCode" field
+        String areaCode;
+&#160;
+        @Dimension(4)
+        String strAreaCode;
+    }
+    &#160;</pre>
+                </div>
+                <h3>Sequential search</h3>
+                <p>To sequentially list the contents of the database using the <code>Patricia</code> index <code>areaCode</code>, we could use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    con.startTransaction(Database.TransactionType.ReadOnly);
+    Cursor&lt;AreaCode&gt; cursor = new Cursor&lt;AreaCode&gt;(con, AreaCode.class, "areaCode");
+    for (AreaCode ac : cursor) 
+    {
+        System.out.println(ac.toString());
+    }
+    cursor.close();
+    con.commitTransaction();
+    &#160;</pre>
+                </div>
+                <p> Note that here the <code>search()</code> method is not needed as the <code>Cursor</code> is simply instantiated  and the sequential navigation of database objects is performed by standard Java iteration of the <code>Cursor</code>.</p>
+                <h3>Exact Match, Prefix Match and Best Match searches</h3>
+                <p>To perform an "exact match" search, we could use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    con.startTransaction(Database.TransactionType.ReadOnly);
+    Cursor&lt;AreaCode&gt; cursor = new Cursor&lt;AreaCode&gt; (con, AreaCode.class, "areaCode");
+    if (cursor.search(Cursor.Operation.ExactMatch, strAreaCode)) 
+    {
+        System.out.println("\tFound " + op + " for key " + strAreaCode);
+        do 
+        {
+            System.out.println(cursor.next().toString());
+        } while (cursor.search(Cursor.Operation.NextMatch, strAreaCode));
+    } 
+    else 
+    {
+        System.out.println("\t" + op + " not found for key " + strAreaCode);
+    }
+    cursor.close();
+    con.commitTransaction();
+    &#160;</pre>
+                </div>
+                <p>To perform a "prefix match" search, we could use code like the above, simply substituting <code>Cursor.Operation.PrefixMatch</code> as the <code>search()</code> operation. Likewise, substitute <code>Cursor.Operation.BestMatch</code> for a "best match" search. Note that to advance the Cursor, the operation <code>Cursor.Operation.NextMatch</code> is used.</p>
+                <p>&#160;</p>
+                <h2><a name="RTree"></a>RTree Index Search</h2>
+                <p>As explained in the <a href="Indexes_Cursors_Java.htm">Indexes and Cursors</a> page, the <code>RTree</code> index is commonly used to speed spatial searches. Searches on <code>RTree</code> indexes are performed using the <i>Cursor</i> method <code>search()</code> with  one of the four operations <code>Equals, Overlaps, Contains</code> or <code>Neighborhood</code>.</p>
+                <p>Please refer to the <a href="RTree.htm">RTree Index</a> page for explanations and examples of how these <code>RTree</code>-specific search operations work. To demonstrate use of the <code>RTree</code> Java APIs, the SDK sample <a href="../../../Programming/Java/SDK_Samples/Core/indexes_RTree.htm">Indexes_RTree</a> is provided.  Code snippets from this sample are used below to illustrate the different types of <code>RTree</code> index searches.</p>
+                <p>Consider the class <i>Rect</i> with a definition like the following:</p>
+                <div class="code-block"><pre>    &#160;
+    @Persistent(list=true) // Store class in eXtremeDB database, declare list index
+    class Rect
+    {
+        @Dimension(4)
+        @Indexable(type=Database.IndexType.RTree) // Declare rtree index on "square" field
+        public short[] square;
+    }
+    &#160;</pre>
+                </div>
+                <h3>Sequential search</h3>
+                <p>To sequentially list the contents of the <code>Cursor</code> using the <code>RTree</code> index, we could use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    // Print out objects in direct or reverse order
+    static int iterateRects(Cursor&lt;Rect&gt; cursor, boolean reverse_order) 
+    {
+        int i = 0;
+&#160;
+        for (Rect rect = (reverse_order) ? cursor.last() : cursor.first();
+        rect != null;
+        rect = (reverse_order) ? cursor.prev() : cursor.next())
+        {
+            if (i++ &lt; SHOW_FIRST) 
+            {
+                System.out.println("\t" + i + "." + rect);
+            }
+        }
+        if (i &gt; SHOW_FIRST) 
+        {
+            System.out.println("\t...");
+        }
+        return i;
+    }
+    &#160;</pre>
+                </div>
+                <p> Note that here the <code>search()</code> method is not needed as the <i>Cursor</i> is simply positioned using the <code>first()</code> or <code>last()</code> method depending on the value of flag <code>reverse_order</code> and the sequential navigation of database objects is performed by calling method <code>next()</code> or <code>prev()</code>.</p>
+                <h3>Exact Match, Overlaps, Contains and Neighbourhood searches</h3>
+                <p>To perform an "exact match" search, we use operation <code>Equals</code> with code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    con.startTransaction(Database.TransactionType.ReadWrite);
+    cursor = new Cursor&lt;Rect&gt; (con, Rect.class, "square");
+    System.out.println("\n\n\tSearch(Operation.Equals, '" + rect3 + "');");
+    if (cursor.search(Cursor.Operation.Equals, rect3.square)) 
+    {
+        i = iterateRects(cursor, false);
+        System.out.println("\tFound " + i + " rect(s)");
+    }
+    cursor.close();
+    con.commitTransaction();
+    &#160;</pre>
+                </div>
+                <p>To perform an "overlaps" search, we could use code like the above, simply substituting <code>Cursor.Operation.Overlaps</code> as the <code>search()</code> operation. Likewise, substitute <code>Cursor.Operation.Contains</code> for a "contains" search. To list the entire contents of the <i>Rect</i> class in order of each object's distance from a point, we specify the point coordinates in <code>rect3.square</code> and use <code>search()</code> operation <code>Cursor.Operation.Neighbourhood</code>.</p>
+                <p>&#160;</p>
+                <h2><a name="Trigram"></a>Trigram Index Search</h2>
+                <p>As explained in the <a href="Indexes_Cursors_C.htm">Indexes and Cursors</a> page, <code>Trigram</code> indexes are  ideal for text searches when the exact spelling of the target object is not precisely known.</p>
+                <p>Please refer to the <a href="Trigram.htm">Trigram Index</a> page for explanations and examples of how these <code>Trigram</code>-specific search operations work. To demonstrate use of the <code>Trigram</code> Java APIs, the SDK sample <a href="../../../Programming/Java/SDK_Samples/Core/indexes_Trigram.htm">Indexes_Trigram</a> is provided.  Code snippets from this sample are used below to illustrate the different types of <code>Trigram</code> index searches. </p>
+                <p>Consider the class <i>TrigramObj</i> with a definition like the following:</p>
+                <div class="code-block"><pre>    &#160;
+    @Persistent 
+    class TrigrmObj
+    {
+        @Indexable(type=Database.IndexType.Trigram)
+        String carid;
+    }
+    &#160;</pre>
+                </div>
+                <p>To perform a <code>search()</code> using a <code>Trigram</code> index we might use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    String[] search_pattern = { "768", " 77", "4pi", "8cc", "7u7", " 77a474ko" };
+&#160;
+    for (String ptrn : search_pattern) 
+    {
+        con.startTransaction(Database.TransactionType.ReadOnly);
+        cursor = new Cursor&lt;TrigrmObj&gt;(con, TrigrmObj.class, "carid");
+        System.out.println("\nObjects with pattern (" + ptrn + "):");
+        if (cursor.search(Cursor.Operation.Contains, ptrn)) 
+        {
+            for (TrigrmObj o : cursor) 
+            {
+                System.out.println("\t(" + o.carid + ") ");
+            }
+        }
+        cursor.close();
+        con.rollbackTransaction();
+    }
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2><a name="HashTabl"></a>HashTable Index Search</h2>
+                <p>As explained in the <a href="Indexes_Cursors_Java.htm">Indexes and Cursors</a> page, <code>HashTable</code> indexes are generally used for efficient object lookups. Also, as explained in the <a href="#Search">Search section</a> above,  a <code>HashTable</code> index declared <code>unique=false</code> allows <i>Cursor</i> navigation in sequential order (first to last, or last to first) over the unordered list of objects of a class. To demonstrate use of the <code>HashTable</code> Java APIs, the SDK sample <a href="../../../Programming/Java/SDK_Samples/Core/indexes_HashTable.htm">Indexes_HashTable</a> is provided.  Code snippets from this sample are used below.</p>
+                <p>Consider the database schema presented in  the <a href="Indexes_Cursors_Java.htm">Indexes and Cursors</a> page:</p>
+                <div class="code-block"><pre>&#160;
+    @Persistent 
+    class Record
+    {
+        @Indexable(type=Database.IndexType.Hashtable, unique=true, initSize=10000) // Declare unique hash index 
+        int iIdx;
+&#160;
+        @Indexable(type=Database.IndexType.Hashtable, unique=false, initSize=10000) // Declare non-unique hash index 
+        int iSeries;
+    }
+    &#160;</pre>
+                </div>
+                <p>The unique index <code>iIdx</code> in this class can be used only for exact lookups with <i>Cursor</i> method <code>find()</code>. For example:</p>
+                <div class="code-block"><pre>&#160;
+    int findValue = 10;
+    Record rec;
+    &#160;
+    // Find a specific value in unique index
+    System.out.println("\n\n\tFind record with index == " + findValue);
+&#160;
+    Connection con = new Connection(db);
+    con.startTransaction(Database.TransactionType.ReadOnly);
+    // Open the cursor
+    Cursor cursor = new Cursor&lt;Record&gt;(con, Record.class, "iIdx");
+    rec = cursor.find(findValue);
+    if ( rec != null )  
+    {
+        System.out.println("\tIndex " + rec.iIdx + " Series " + rec.iSeries);
+    } 
+    else 
+    {
+        System.out.println("\tnot found");
+    }
+    cursor.close();
+    con.rollbackTransaction();
+    &#160;</pre>
+                </div>
+                <p>The following code snippet demonstrates how to use a non-unique <code>HashTable</code> index <code>iSeries</code> to search for all objects having a specified value:</p>
+                <div class="code-block"><pre>&#160;
+    con.startTransaction(Database.TransactionType.ReadOnly);
+    cursor = new Cursor&lt;Record&gt;(con, Record.class, "iSeries");
+    // Search for records with specified value for iSeries */
+    if (cursor.search(Cursor.Operation.Equals, findValue)) 
+    {
+        // Show all records in cursor
+        rec = cursor.first();
+        for (i = 0; i &lt; nRecs &amp;&amp; rec != null; ++i) 
+        {
+            System.out.println("\tIndex " + rec.iIdx + " Series " + rec.iSeries);
+            rec = cursor.next();
+        }
+    } 
+    else 
+    {
+        System.out.println("\tno records found.");
+    }
+    cursor.close();
+    con.rollbackTransaction();
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2><a name="List"></a>List Index Search</h2>
+                <p>As explained in the <a href="Indexes_Cursors_Java.htm">Indexes and Cursors</a> page, the <code>List</code> index, like a non-unique <code>HashTable</code>, allows navigation in sequential order (first to last, or last to first) over the unordered list of objects of a class. </p>
+                <p>Consider the class <i>Rect</i> used above for the <code>RTree</code> example:</p>
+                <div class="code-block"><pre>    &#160;
+    @Persistent(list=true) // Store class in eXtremeDB database, declare list index
+    class Rect
+    {
+        @Dimension(4)
+        @Indexable(type=Database.IndexType.RTree) // Declare rtree index on "square" field
+        public short[] square;
+    }
+    &#160;</pre>
+                </div>
+                <p>Note the <code>@Persistent(list=true)</code> annotation. This causes a <code>List</code> index to be maintained internally as a non-unique <code>HashTable</code> index).</p>
+                <h3>Sequential search</h3>
+                <p>To sequentially list the contents of the <code>Cursor</code> using the <code>List</code> index, we could use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    con.StartTransaction(Database.TransactionType.ReadWrite);
+    // Create List cursor 
+    Cursor cursor = new Cursor&lt;Rect&gt; (con, Rect.class, "square");
+            
+    System.out.println("\n\tIterate through cursor with no search condition : ");
+    i = iterateRects(cursor, false);
+    System.out.println("\tFound " + i + " rect(s)");
+    cursor.close();
+    con.rollbackTransaction();
+    &#160;</pre>
+                </div>
+                <p> Note that here the <i>Cursor</i> is instantiated on class <i>Rect</i> without specifying an index, which means use the class <code>List</code> index. Then method <code>iterateRects()</code> is called to perform the sequential navigation of database objects as above in the <code>RTree</code> example .</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Getting Started with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Step 7: Vector-based Analytics Functions</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Step 7: Vector-based Analytics Functions</h1>
+            <blockquote>
+                <p>A powerful feature of <i>e</i>X<i>treme</i>DB is the <code><a href="../../../Users_Guides/Core/Sequences.htm">sequence</a></code> data type. Apart from the memory and processing efficiency enabled by the possibility to store data in this <a href="../../../Users_Guides/Core/Sequences.htm">"columnar" format</a>, sequences are particularly suited to vector-based statistical functions. Typically, these SQL statistical functions are used to perform analytical operations on “time series”; i.e. a group of related sequence fields.</p>
+                <p>The following examples will perform some statistical functions via queries on a simple database class:</p>
+                <div class="code-block"><pre>&#160;
+    class Quote {
+        char&lt;MAX_SYMBOL_LEN&gt; symbol;
+        sequence&lt;date asc&gt; day;
+        sequence&lt;float&gt; low;
+        sequence&lt;float&gt; high;
+        sequence&lt;float&gt; open;
+        sequence&lt;float&gt; close;
+        sequence&lt;uint4&gt; volume;
+        unique tree&lt;symbol&gt; by_sym;
+    };
+&#160;</pre>
+                </div>
+                <p>The data for these examples is taken from historical values from 2013 for IBM. This sample data and a group of script and shell command files that perform the select statements are included in directory <code>eXtremeDB/samples/native/sql/xsql/scripts/financial</code>. To create table <i>QuoteIBM</i> and load the sample data, open <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> in this directory with the following command:</p>
+                <div class="code-block"><pre>&#160;
+    xsql -i -size 100m -f IBM-q1-2013.sql
+    &#160;</pre>
+                </div>
+                <h2>Sequence Interval</h2>
+                <p>The first example will extract data belonging to a specified interval (January 2013). The ordered sequence <code>day</code> is used to select the interval and then this interval is projected to the other (unordered) sequences <code>open</code> and <code>close</code> with the following query:</p>
+                <div class="code-block"><pre>&#160;
+    SELECT flattened symbol, seq_search(day, 20130101, 20130131) as Jan_2013,
+        open@Jan_2013 as "open", close@Jan_2013 as "close"
+    FROM Quote WHERE symbol='IBM';
+    &#160;
+    symbol  Jan_2013        open            close
+    --------------------------------------------------
+    IBM     20130102        194.089996      196.350006
+    IBM     20130103        195.669998      195.270004
+    IBM     20130104        194.190002      193.990005
+    IBM     20130107        193.399994      193.139999
+    IBM     20130108        192.919998      192.869995
+    IBM     20130109        193.479996      192.320007
+    IBM     20130110        192.649994      192.880005
+    IBM     20130111        194.149994      194.449997
+    IBM     20130114        192.820007      192.619995
+    IBM     20130115        191.309998      192.500000
+    IBM     20130116        192.000000      192.589996
+    IBM     20130117        193.850006      193.649994
+    IBM     20130118        194.029999      194.470001
+    IBM     20130122        194.360001      196.080002
+    IBM     20130123        203.500000      204.720001
+    IBM     20130124        203.910004      204.419998
+    IBM     20130125        204.449997      204.970001
+    IBM     20130128        204.850006      204.929993
+    IBM     20130129        204.339996      203.899994
+    IBM     20130130        203.690002      203.520004
+    IBM     20130131        203.320007      203.070007
+    &#160;
+    Selected records: 21
+        &#160;</pre>
+                </div>
+                <p>Note that this query can be run from the script file <code>x3.sql</code>: </p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;script x3.sql
+&#160;</pre>
+                </div>
+                <p>Note the use of key word <code>flattened</code> to transform the sequence fields into a table so that the result set appears as individual rows for each set of corresponding sequence elements with the scalar field <code>symbol</code> value repeated on each row. (Also note that the bounds specified for <code>seq_search()</code> are “inclusive”.)</p>
+                <h2>Arithmetic on Sequences</h2>
+                <p>We can perform arithmetic operations on sequence elements. In the following query the two sequences <code>high</code> and <code>low</code> are averaged by adding each element of high to the corresponding element of  low and dividing by 2 to produce a result sequence:</p>
+                <div class="code-block"><pre>&#160;
+    SELECT flattened symbol, seq_search(day, 20130101, 20130131) as Jan_2013,
+        high@Jan_2013 as "high", low@Jan_2013 as "low",
+        (high@Jan_2013 + low@Jan_2013) / 2 as "average"
+    FROM Quote WHERE symbol='IBM';
+        &#160;
+    symbol  Jan_2013        high            low             average
+    ------------------------------------------------------------------
+    IBM     20130102        196.350006      193.800003      195.075012
+    IBM     20130103        196.289993      194.440002      195.364990
+    IBM     20130104        194.460007      192.779999      193.619995
+    IBM     20130107        193.779999      192.339996      193.059998
+    IBM     20130108        193.300003      191.610001      192.455002
+    IBM     20130109        193.490005      191.649994      192.570007
+    IBM     20130110        192.960007      191.279999      192.119995
+    IBM     20130111        195.000000      192.899994      193.949997
+    IBM     20130114        193.279999      191.750000      192.514999
+    IBM     20130115        192.729996      190.389999      191.559998
+    IBM     20130116        193.179993      191.350006      192.264999
+    IBM     20130117        194.460007      193.240005      193.850006
+    IBM     20130118        195.000000      193.800003      194.399994
+    IBM     20130122        196.080002      194.009995      195.044998
+    IBM     20130123        208.580002      203.360001      205.970001
+    IBM     20130124        205.059998      203.080002      204.070007
+    IBM     20130125        205.179993      204.130005      204.654999
+    IBM     20130128        206.220001      204.289993      205.255005
+    IBM     20130129        205.729996      203.639999      204.684998
+    IBM     20130130        204.880005      203.190002      204.035004
+    IBM     20130131        204.470001      202.960007      203.714996
+    &#160;
+    Selected records: 21
+    &#160;</pre>
+                </div>
+                <p>And this query can be run from the script file <code>x4.sql</code>.</p>
+                <h2>Filtering Sequence Elements</h2>
+                <p>The following query will extract the days of February 2013 when the  <code>close</code> value was greater than <code>open</code>:</p>
+                <div class="code-block"><pre>&#160;
+    SELECT symbol, seq_search(day, 20130201, 20130228) as Feb_2013,
+        close@Feb_2013 as Feb_Close, open@Feb_2013 as Feb_Open,
+        seq_filter(Feb_Close &gt; Feb_Open, Feb_2013) as "up_Feb",
+        seq_filter(Feb_Close &gt; Feb_Open, Feb_Open) as "up_Open",
+        seq_filter(Feb_Close &gt; Feb_Open, Feb_Close) as "up_Close"
+    FROM Quote WHERE symbol='IBM';
+    &#160;
+    symbol
+    Feb_2013{}
+    Feb_Close{}
+    Feb_Open{}
+    up_Feb{}
+    up_Open{}
+    up_Close{}
+    ------------------------------------------------------------------------------
+    IBM
+    {20130201, 20130204, 20130205, 20130206, 20130207, 20130208,
+    20130211, 20130212, 20130213, 20130214, 20130215, 20130219,
+    20130220, 20130221, 20130222, 20130225, 20130226, 20130227,
+    20130228}
+    {205.179993, 203.789993, 202.789993, 201.020004, 199.740005, 201.679993,
+    200.160004, 200.039993, 200.089996, 199.649994, 200.979996, 200.320007,
+    199.309998, 198.330002, 201.089996, 197.509995, 199.139999, 202.330002,
+    200.830002}
+    {204.649994, 204.190002, 204.309998, 200.389999, 200.619995, 199.970001,
+    200.979996, 200.009995, 200.649994, 199.729996, 199.979996, 200.600006,
+    200.619995, 198.630005, 199.229996, 201.669998, 198.630005, 198.889999,
+    202.179993}
+    {20130201, 20130206, 20130208, 20130212, 20130215, 20130222,
+    20130226, 20130227}
+    {204.649994, 200.389999, 199.970001, 200.009995, 199.979996, 199.229996,
+    198.630005, 198.889999}
+    {205.179993, 201.020004, 201.679993, 200.039993, 200.979996, 201.089996,
+    199.139999, 202.330002}
+    &#160;
+    Selected records: 1
+    &#160;</pre>
+                </div>
+                <p>The <code>up_Feb</code> sequence contains the dates when the close value was greater than the open for February of 2013. To illustrate we have highlighted the <code>date</code> value for February 8, 2013 in the <code>up_Feb</code> sequence which corresponds with the 3rd element of the <code>up_Open</code> and <code>up_Close</code> sequences and that satisfy the filter condition; i.e. 201.68 &gt; 199.97.</p>
+                <p>Note that the repeated calls of function <code>seq_filter()</code> are necessary to produce the filtered <code>open</code> and <code>close</code> sequences which make the output more easily understandable, as the Feb_2013, <code>Feb_Open</code> and <code> Feb_Close</code> sequences (which cannot be suppressed)  somewhat obscure the essential information.</p>
+                <p>Please view the <a href="../../../Users_Guides/Server/Analytics_Function_Library.htm">Analytics Function Library</a> page for many more examples and further explanation of these powerful analytic functions.</p>
+                <p>  <![CDATA[ ]]></p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

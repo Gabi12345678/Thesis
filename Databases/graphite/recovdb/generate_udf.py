@@ -53,7 +53,7 @@ for lines in args.lines:
 		lastTimestamp = 0
 		for i in tqdm(range(lines)):
 			values = f.readline()[:-1].split(" ")
-			currentTime = int((datetime.strptime(values[0], "%Y-%m-%dT%H:%M") - datetime(1970, 1, 1)).total_seconds())
+			currentTime = int((datetime.strptime(values[0], "%Y-%m-%dT%H:%M:%S") - datetime(1970, 1, 1)).total_seconds())
 			if firstTimestamp == 0:
 				firstTimestamp = currentTime
 			lastTimestamp = currentTime

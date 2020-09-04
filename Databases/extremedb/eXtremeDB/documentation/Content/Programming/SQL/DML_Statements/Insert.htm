@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>SQL Insert</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>SQL Insert</h1>
+            <blockquote>
+                <div class="code-block"><pre>    &#160;
+    INSERT [OR UPDATE] INTO table [(fields-list)] insert-data
+    fields-list::= field {, field }
+    field::= identifier { . identifier }
+    insert-data::= VALUES expressions-list | select-statement | record-data
+    expressions-list::= ( expression { , expression } )
+    &#160;</pre>
+                </div>
+                <p>The SQL <code>INSERT</code> statement creates a new row in the specified table, with the values indicated by the insert-data, which can be a list of values, the result of a <code>SELECT</code> statement, or a C structure containing the data to be inserted. If a fields-list is omitted, the application must provide a value in the expressions-list for every field in the table, in the same order in which the fields were defined in the database schema.</p>
+                <p>For example, given the table definition above, the following statements are equivalent:</p>
+                <div class="code-block"><pre>    &#160;
+    INSERT INTO t VALUES (1, 2, 3, 4, 5)
+    INSERT INTO t (A, B, C, D, E) VALUES (1, 2, 3, 4, 5)
+    &#160;</pre>
+                </div>
+                <p>If a fields-list is provided, then fields that are not specified in the fields-list will take on the default value specified in the database schema, or the system-defined default for the field type (e.g. zero, or an empty string).</p>
+                <p>The result set of a SQL <code>SELECT</code> statement used in lieu of an expressions-list must return exactly the same number of fields as the table if no fields-list is specified, or the same number of fields specified in the fields-list if one is provided.</p>
+                <p>For example,</p>
+                <div class="code-block"><pre>    &#160;
+    INSERT INTO t SELECT V, W, X, Y, Z from t2
+    Or
+    INSERT INTO t (A, C, E) SELECT V, X, Z from t2
+    &#160;</pre>
+                </div>
+                <p>The <i>e</i>X<i>treme</i>SQL-specific “record-data” form of the <code>INSERT</code> statement allows the application to, instead of providing a “fields-list”, specify the address of a C structure containing the field values to be inserted. The C structure must correspond exactly to the table as defined in the database schema.</p>
+                <p>For example, the following method call uses the data supplied in structure <code>person</code> to create a new row in table <code>Person</code>:</p>
+                <div class="code-block"><pre>    &#160;
+    engine.executeStatement( “INSERT INTO Person %r”, &amp;person );
+    &#160;</pre>
+                </div>
+                <h2>Insert or update</h2>
+                <p>The <code>insert or update</code> statement searches first for an object having the unique key value(s) specified in the <code>values</code> clause. If found the object will be updated; if not found a new object will be created. Note that it is mandatory that <i>the first column(s) in the statement are primary keys</i> to locate the object. </p>
+                <p>This statement can be applied to objects with any type of field and is especially useful with fields of type <code><a href="../../../Users_Guides/Core/Sequences.htm">sequence</a></code>. For <code>sequences</code> and <code>vectors</code> this statement can be used to insert new values or append values to existing fields. To append values the <code>append_mode</code> must be set to true, which is the default. Otherwise the vector or sequence values will be overwritten. The <code>append_mode</code> parameter is modified via the SQL set command:</p>
+                <div class="code-block"><pre>    &#160;
+    set append_mode true
+    &#160;</pre>
+                </div>
+                <p>For example the following statement would create a simple table and populate the <code>sequence</code> field with 3 values:</p>
+                <div class="code-block"><pre>    &#160;
+    create table t(id string primary key, day sequence(unsigned(4) asc));
+    insert into t&#160;values(1, [1,2,3]);
+    &#160;</pre>
+                </div>
+                <p> The following statement would append 3 values to the existing object with <code>key=1</code>:</p>
+                <div class="code-block"><pre>    &#160;
+    insert or update into t&#160;values(1, [4,5,6]);
+    &#160;</pre>
+                </div>
+                <p> The following statements would overwrite the existing sequence with new values:</p>
+                <div class="code-block"><pre>    &#160;
+    set append_mode false
+    insert or update into t&#160;values(1, [7,8,9]);
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

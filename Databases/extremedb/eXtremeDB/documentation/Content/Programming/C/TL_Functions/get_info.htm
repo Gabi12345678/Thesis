@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Static API|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>mco_translog_get_info</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>mco_translog_get_info</h1>
+            <p><a name="kanchor436"></a>This function obtains information about the currently running TL runtime.</p>
+            <h3>For an overview see page <a href="../../../Users_Guides/TL/TL_Applications.htm">TL Applications</a></h3>
+            <h3>Prototype</h3>
+            <div class="code-block"><pre>&#160;
+    MCO_RET	mco_translog_get_info(	mco_db_h db, 
+                    mco_TL_current_info_h info )
+&#160;</pre>
+            </div>
+            <h3>Arguments</h3>
+            <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');" cellspacing="0">
+                <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 125px;" />
+                <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">db</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Database connection handle</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">
+                            <p>info</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">
+                            <p>A pointer to a structure defined as:</p>
+                            <div class="code-block"><pre>typedef struct mco_TL_current_info_
+{
+uint2               flags;
+mco_trans_counter_t start_trans_count;
+mco_trans_counter_t last_trans_counter;
+mco_trans_counter_t stored_transactions;
+mco_size_t          log_size;
+mco_size_t          pipe_used_size;
+int                 labels_count;
+uint4              max_parallel_trans;
+uint4     exceeded_trans_slots_count;
+uint4              max_transaction_size;
+} mco_TL_current_info_t,
+*mco_TL_current_info_h;</pre>
+                            </div>
+                            <p>(The structure elements are explained below.)</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Description</h3>
+            <p style="text-indent: 0.5in;">This function obtains information about the currently running TL runtime.</p>
+            <h3>Return Codes</h3>
+            <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');" cellspacing="0">
+                <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 313px;" />
+                <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_S_OK</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Log file read successfully.</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>MCO_E_TL_INVAL</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>Arguments are wrong or incompatible.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">
+                            <p>MCO_E_TL_NOT_STARTED</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">
+                            <p>Transaction logging was not started.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>The structure elements for structure mco_TL_current_info are defined as follows:</p>
+            <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');" cellspacing="0">
+                <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 313px;" />
+                <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">flags</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The combination of <code><a href="../Structures/TL_Parameters.htm">MCO_TL_FLAGS</a></code> values specified in the flags element of the mco_TL_start_data structure passed to<a href="start.htm"> <code>mco_translog_start()</code></a>. </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>start_trans_counter</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>The value of the transaction counter when the log file was started.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>last_trans_counter</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>The current value of the transaction counter.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>stored_transactions</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>The count of transactions stored in the log file.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>log_size</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>The current size of the log file in bytes. In the pipe mode, this indicates the current size of the pipe, in bytes (could be less than or equal to the size of the pipe device).</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>pipe_used_size</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>Current pipe size.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>labels_count</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>The count of labels stored in the log file.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>max_parallel_trans</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>The maximum number of logging slots used simultaneously for parallel transaction commits since logging started when using the <code><a href="../../../Users_Guides/Core/MVCC_Transaction_Manager.htm" name="kanchor437">MVCC</a></code><a name="kanchor438"></a> transaction manager.  The total number of slots may be from 0 to max_connections*2. Note! Logging option <code><a href="../Structures/TL_Parameters.htm">MCO_TRANSLOG_SYNC_INSTANTLY</a></code> disables this optimization.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>exceeded_trans_slots_count</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>The number of times the max number of logging slots was exceeded.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">
+                            <p>max_transaction_size</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">
+                            <p>Size of the largest transaction since the log was started. It may be used as a statistic for optimizing the size of memory supplied for the function <code>mco_translog_iterate()</code> and also to tune the value of the field disk_page_size in pipe mode with the flag <code><a href="../Structures/TL_Parameters.htm">MCO_TRANSLOG_SYNC_INSTANTLY</a></code>.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Note that when the <code><a href="../../../Users_Guides/Core/MVCC_Transaction_Manager.htm">MVCC</a></code> transaction manager is used, the structure element <code>exceeded_trans_slots_count</code> is for informational value.  If the count of parallel transactions reaches its limit (max_connections * 2) then the TL runtime “holds” other parallel transactions until all previous transactions are saved.  So <code>exceeded_trans_slots_count</code> retains the count of times that all available log slots were used and other parallel transactions were “held”.  If this count is large it is recommended that the database be opened with a higher value for <code><a href="../Structures/Database_Parameters.htm">max_connections</a></code>.</p>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|High Availability User's Guide">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>HA Asynchronous Replication</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Asynchronous Replication</h1>
+            <blockquote>
+                <p>As mentioned in the <a href="HA_Applications.htm">HA&#160;Applications</a> page, in <code>asynchronous</code> or lazy replication, updates are propagated to replica nodes asynchronously and after the transaction commits on the master node. These updates are applied to replica nodes as separate transactions which can improve transaction responsiveness, however replica <code>read-only</code> transactions run the risk of operating with stale data. Because replica databases are available to the replica applications for read-only access, replica applications may read ‘stale’ data if transactions were committed at the master but not yet propagated to the replica.</p>
+                <p>Asynchronous replication is enabled in C/C++ applications by setting the <code>mode_flags</code> element to <code>MCO_HAMODE_ASYNCH</code> in the master:</p>
+                <div class="code-block"><pre>&#160;
+    mco_HA_master_params_t MasterParams;
+    mco_HA_master_params_init( &amp;MasterParams );
+    MasterParams.mode_flags = MCO_MASTER_MODE | MCO_HAMODE_ASYNCH;
+    …
+    mco_HA_set_master_params( db, &amp;MasterParams );
+    &#160;</pre>
+                </div>
+                <p>In C# and Java applications:</p>
+                <div class="code-block"><pre>&#160;
+    MasterConnection.Parameters MParams = new MasterConnection.Parameters(
+    MasterConnection.MCO_HAMODE_ASYNCH);
+    con.SetReplicationMode( MParams );
+    &#160;</pre>
+                </div>
+                <p>The master application must also create a memory device to accommodate the asynchronous buffer in either shared or conventional memory. The size of the buffer is defined in bytes (not in a number of transactions) and is processed in a separate task within the <i>e</i>X<i>treme</i>DB<i> High Availability</i><a name="kanchor960"></a> runtime.</p>
+                <p>The following code snippet demonstrates how the async buffer can be initialized in C/C++ applications:</p>
+                <div class="code-block"><pre>&#160;
+    /****************************************************
+    * Asynchronous commit thread
+    * It sends transaction data to replicas using the async_databuf
+    ****************************************************/
+    void AsyncCommit( sample_task_t * descriptor )
+    {
+        /* wait for async commit event and output the portion of data to the stream */
+        while (mco_HA_async_send_data_to_replicas(descriptor-&gt;db_connection) ==
+            MCO_S_OK)
+        sample_sleep(1);
+    }
+    &#160;
+    /****************************************************
+    /* Snippet from the master main that initializes async replication */
+    /****************************************************
+    mco_HA_master_params_init( &amp;MasterParams );
+    MasterParams.mode_flags = MCO_MASTER_MODE | MCO_HAMODE_ASYNCH;
+    &#160;
+    /* assign the device as an asynchronous buffer */
+    MasterParams.async_databuf.assignment = MCO_MEMORY_ASSIGN_HA_ASYNC_BUF;
+    &#160;
+    /* set the device size */
+    MasterParams.async_databuf.size       = ASYNC_DATABUF_SIZE;
+    if ( runtime_info.mco_shm_supported )
+    {
+        /* set the device as a shared named memory device */
+        MasterParams.async_databuf.type       = MCO_MEMORY_NAMED;
+        &#160;
+        /* set memory name */
+        sprintf( MasterParams.async_databuf.dev.named.name, "%s-ha", db_name);
+        MasterParams.async_databuf.dev.named.flags = 0;  /* zero flags */
+        &#160;
+        /* set mapping address or zero it out */
+        MasterParams.async_databuf.dev.named.hint  = 0;
+    } 
+    else 
+    {
+        /* set a conventional memory device */
+        MasterParams.async_databuf.type         = MCO_MEMORY_CONV;
+        MasterParams.async_databuf.dev.conv.ptr = (void*)malloc(ASYNC_DATABUF_SIZE);
+    }
+    &#160;
+    mco_HA_set_master_params(db, &amp;MasterParams); /*  set MASTER mode */
+    &#160;
+    /* start the ListenToReplicas thread*/
+    sample_start_connected_task(&amp;listen_task, ListenToReplicas, db_name, &amp;ha );
+    &#160;
+    /* start the AsyncCommit thread*/
+    sample_start_connected_task(&amp;async_commit_task, AsyncCommit, db_name, 0 );
+    &#160;</pre>
+                </div>
+                <p>A similar C# implementation would look like the following:</p>
+                <div class="code-block"><pre>&#160;
+    // Asynchronous commit thread that sends transaction data to replicas,
+    // using async databuf
+    public void Replicate()
+     {
+        MasterConnection con = new MasterConnection(db);
+        while (con.AsyncSendDataToReplicas())
+         {
+            Thread.Sleep(REPLICATION_PERIOD);
+        }
+        con.Disconnect();
+    }
+    &#160;
+    Master()
+    {
+        //****************************************************
+        // Snippet from the master main that initializes async replication
+        //****************************************************
+        // set HA mode
+        &#160;
+        MasterConnection.Parameters MParams = new
+        MasterConnection.Parameters(
+        MasterConnection.MCO_HAMODE_ASYNCH );
+        MasterParams.AsyncBuf = new
+        Database.PrivateMemoryDevice( Database.Device.Kind.AsyncBuffer,
+        ASYNC_BUF_SIZE );
+        con.SetReplicationMode( MParams );
+        MParams.listening = true;
+        &#160;
+        // start listen and async. commit threads
+        Thread listenThread = new Thread(new ThreadStart(Listen));
+        Thread replicateThread = new Thread(new ThreadStart(Replicate));
+        listenThread.Start();
+        replicateThread.Start();
+    &#160;</pre>
+                </div>
+                <p>As with synchronous replication, no additional replication logic is required in either master or replica applications; all replication operations are managed internally by the <i>e</i>X<i>treme</i>DB<i> High Availability</i> runtime.</p>
+                <p>
+                    <img src="../../Resources/Images/HA_12.PNG" />
+                </p>
+                <h2>Replication Event Notifications</h2>
+                <p>Whether using <code>synchronous</code> or <code>asynchronous</code> replication, replica application instances can be configured to receive notification of various synchronization and replication events.  The possible notification events are defined as follows:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_CONNECTED</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Replica successfully connected.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_CONNECT_FAILED</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Replica connection failed.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_DB_EQUAL</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The database is the same, no need to load the database. </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_DB_LOAD_BEGIN</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Begin loading the database.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_DB_LOAD_FAILED</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Error loading the database; param1 on the notification callback is the MCO_RET return code.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_DB_LOAD_OK</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Database successfully loaded; param1 on the notification callback is the MCO_E_HA_REPLICA_STOP_REASON code.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_DB_CREATION_FAILED</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Database creation failed" notification; param1 on the notification callback is the MCO_RET return code.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_COMMIT_FAILED</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Error during a transaction commit; param1 on the notification callback is the MCO_RET return code.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_REPLICA_STOPPED</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Replication stopped.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_HOTSYNC</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Hotsynch process beginning.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_EOHOTSYNC</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+Hotsynch process completed.
+</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_STATEFUL_SYNC</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Stateful synch process beginning.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_STATEFUL_SYNC_END    </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Stateful synch process completed.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">MCO_REPL_NOTIFY_MASTER_DB_EXTENDED    </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">The master has extended the database memory.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>Replication event notifications in C/C++ replica applications are enabled by setting  the <code>MCO_HAMODE_REPLICA_NOTIFICATION</code> bit in the <code>mode_flags</code> element and the function address of the event handler in the <code>notifying_callback</code> element in the <code>mco_HA_replica_params_t</code> structure passed to <code><a href="../../Programming/C/HA_Functions/attach_master.htm">mco_HA_attach_master()</a></code>. In C# and Java applications the mode flag and callback are specified in the <code>ReplicaConnection.Parameters</code> sent to method <code>ReplicaConnection.AttachMaster()</code>.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

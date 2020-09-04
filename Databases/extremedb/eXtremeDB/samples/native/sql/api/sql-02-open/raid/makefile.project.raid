@@ -1,0 +1,16 @@
+MCO_PRJ_LIST += api-sql-02-open-raid
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += api-sql-02-open-raid
+PRJ_api-sql-02-open-raid_TAGS:=sample sql
+PRJ_api-sql-02-open-raid_DIR:=$(call mco_project_dir)
+PRJ_api-sql-02-open-raid_SRC:=$(call mco_project_file,main.cpp) $(MCO_SAMPLES_COMMON_DIR)/common.c $(MCO_SAMPLES_COMMON_DIR)/commonSQL.c
+PRJ_api-sql-02-open-raid_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_api-sql-02-open-raid_DATABASES:=persondb
+PRJ_api-sql-02-open-raid_RUNTIME:=YES
+PRJ_api-sql-02-open-raid_MEMDEV:=PRIVATE
+PRJ_api-sql-02-open-raid_STORAGE:=PERSISTENT
+PRJ_api-sql-02-open-raid_STORAGEDEV:=AUTO
+PRJ_api-sql-02-open-raid_SYNC:=AUTO
+PRJ_api-sql-02-open-raid_TRANSMGR:=MURSIW
+PRJ_api-sql-02-open-raid_F_SQL:=LOCAL
+PRJ_api-sql-02-open-raid_F_CPP:=YES

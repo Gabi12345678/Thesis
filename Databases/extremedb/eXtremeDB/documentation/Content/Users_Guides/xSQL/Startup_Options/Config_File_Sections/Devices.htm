@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Devices Specification</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>xSQL</i> Devices Specification</h1>
+            <blockquote>
+                <p>The <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> configuration file can be used to define an array of memory devices which corresponds to C API <code><a href="../../../../Programming/C/Structures/Memory_Devices.htm">mco_device_t</a></code> structures. </p>
+                <h3>For an overview see page <a href="../xSQL_Config_File_Options.htm">Configuration File Parameters</a></h3>
+                <p>The <code>devices</code> section has syntax like the following to define an array:</p>
+                <div class="code-block"><pre>&#160;
+    devices : [
+        {
+            type : memory,
+            assignment : database,
+            name : "diskdb-db",
+            size : 10m
+        },
+        {
+            type : memory,
+            assignment : cache,
+            name : "diskdb-cache",
+            size : 10m
+        },
+        {
+            type : file,
+            assignment : persistent,
+            name : "diskdb.dbs"
+        },
+        {
+            type : file,
+            assignment : log,
+            name : "diskdb.log"
+        }
+    ]
+    &#160;</pre>
+                </div>
+                <p>An alternative to specifying the individual memory devices, the following "shortcut" parameters can be specified outside of the <code>devices</code> section:</p>
+                <div class="code-block"><pre>&#160;
+    database_size    :  10m,
+    cache_size : 10m,
+    database_filename: "diskdb.dbs", 
+    log_filename     : "diskdb.log",
+      </pre>
+                </div>
+                <p><i>Note that care must be taken to avoid conflicts between these shortcut parameters and the device specifications.</i>
+                </p>
+                <p>The following table lists the possible options for the "shortcut" parameters and the <code>devices</code> section with the corresponding C API structures and values specified in the comment:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <thead>
+                        <tr class="TableStyle-FunctionReference-Head-Header1">
+                            <th class="TableStyle-FunctionReference-HeadE-Column2-Header1" style="text-align: left;">Option name : example value</th>
+                            <th class="TableStyle-FunctionReference-HeadD-Column2-Header1" style="text-align: left;">Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">database_size    :  100m,      </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Database size in bytes, unsigned</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">cache_size       :  200m,      </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Disk cache size in bytes, unsigned</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">database_filename: "test.dbs", </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Persistent database file name, string</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">log_filename     : "test.log",</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Log file name, string</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2"><b>Device array specification parameters</b>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">type : memory,</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Device type (<code>mco_device_t::type</code>), one of :</p>
+                                <ul>
+                                    <li value="1"><code>memory</code> (<code>MCO_MEMORY_CONV</code> or 
+            <code>MCO_MEMORY_NAMED</code> depending on <code><a name="kanchor938"></a>runtime_configuration.shared_memory</code>), 
+            </li>
+                                    <li value="2"><code>file</code> (<code>MCO_MEMORY_FILE</code>), </li>
+                                    <li value="3"><code>multifile</code> (<code>MCO_MEMORY_MULTIFILE</code>), </li>
+                                    <li value="4"><code>raid</code> (<code>MCO_MEMORY_RAID</code>)           or </li>
+                                    <li value="5"><code>cyclic_file_buf</code> (<code>MCO_MEMORY_CYCLIC_FILE_BUF</code>)
+            </li>
+                                </ul>
+                                <p>Default value is <code>memory</code><![CDATA[
+]]></p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">assignment : database,   </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Device assignment (<code>mco_device_t::assignment</code>), one of :</p>
+                                <ul>
+                                    <li value="1"><code>database</code> (<code>MCO_MEMORY_ASSIGN_DATABASE</code>), 
+            </li>
+                                    <li value="2"><code>cache</code> (<code>MCO_MEMORY_ASSIGN_CACHE</code>), 
+            </li>
+                                    <li value="3"><code>persistent</code> (<code>MCO_MEMORY_ASSIGN_PERSISTENT</code>) or </li>
+                                    <li value="4"><code>log</code> (<code>MCO_MEMORY_ASSIGN_LOG</code>)
+            </li>
+                                </ul>
+                                <p>Default value is <code>database</code><![CDATA[
+]]></p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">            size : 100m</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Size of the device (<code>mco_device_t::size</code>), unsigned</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">name : "device-name",</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Device name (<code>mco_device_t::dev.&lt;...&gt;.name</code>). Ignored for <code>MCO_MEMORY_CONV</code>. string</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">            shared_hint : 0x2000000, </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Shared memory address hint (<code>mco_device_t::dev.named.hint</code>) for a <code>MCO_MEMORY_NAMED</code> device, unsigned</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">segment_size : 10m,</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">            Multifile segment size (<code>mco_device_t::dev.multifile.segment_size</code>) for <code>MCO_MEMORY_MULTIFILE</code> device type, unsigned</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">offset : 0,              </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">            RAID offset (<code>mco_device_t::dev.raid.offset</code>) for <code>MCO_MEMORY_RAID</code> device type, unsigned</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">level : 0,</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">RAID&#160;level (<code>mco_device_t::dev.raid.level</code>) for <code>MCO_MEMORY_RAID</code> device type, unsigned</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">            flags : default,</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">
+                                <p>Flag settings (<code>mco_device_t::dev.XXX.flags</code>), depends on device type: </p>
+                                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                                    <thead>
+                                        <tr class="TableStyle-FunctionReference-Head-Header1">
+                                            <th class="TableStyle-FunctionReference-HeadE-Column2-Header1" style="text-align: left;">For device type</th>
+                                            <th class="TableStyle-FunctionReference-HeadD-Column2-Header1" style="text-align: left;">Combination of flag values</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>MCO_MEMORY_NAMED</code>
+                                            </td>
+                                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                                <p><code>anonymous</code> (<code>MCO_RT_POSIX_SHM_ANONYMOUS)</code></p>
+                                                <p><code>shared</code> (<code>MCO_RT_POSIX_SHM_SHARED</code>)</p>
+                                            </td>
+                                        </tr>
+                                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">
+                                                <p><code>MCO_MEMORY_FILE</code>, </p>
+                                                <p><code>MCO_MEMORY_CYCLIC_FILE_BUF</code>, </p>
+                                                <p><code>MCO_MEMORY_MULTIFILE</code>, </p>
+                                                <p><code>MCO_MEMORY_RAID</code>
+                                                </p>
+                                            </td>
+                                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">
+                                                <p><code>default</code> (<code>MCO_FILE_OPEN_DEFAULT</code>), </p>
+                                                <p><code>read_only</code> (<code>MCO_FILE_OPEN_READ_ONLY</code>),</p>
+                                                <p><code>truncate</code> (<code>MCO_FILE_OPEN_TRUNCATE</code>),</p>
+                                                <p><code>no_buffering</code> (<code>MCO_FILE_OPEN_NO_BUFFERING</code>),</p>
+                                                <p><code>existing</code> (<code>MCO_FILE_OPEN_EXISTING</code>),</p>
+                                                <p><code>temporary</code> (<code>MCO_FILE_OPEN_TEMPORARY</code>),</p>
+                                                <p><code>fsync_fix</code> (<code>MCO_FILE_OPEN_FSYNC_FIX</code>),</p>
+                                                <p><code>subpartition</code> (<code>MCO_FILE_OPEN_SUBPARTITION</code>),</p>
+                                                <p><code>fsync_aio_barrier</code> (<code>MCO_FILE_OPEN_FSYNC_AIO_BARRIER</code>) </p>
+                                                <p><code>compressed</code> (<code>MCO_FILE_OPEN_COMPRESSED</code>)</p>
+                                                <p><code>lock</code> (<code>MCO_FILE_OPEN_LOCK</code>)</p>
+                                                <p><code>no_read_buffering</code> (<code>MCO_FILE_OPEN_NO_READ_BUFFERING</code>)</p>
+                                                <p><code>no_write_buffering</code> (<code>MCO_FILE_OPEN_NO_WRITE_BUFFERING</code>)</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p>&#160;</p>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|Java API|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Persistent Media I/O in Java</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Persistent Media I/O in Java</h1>
+            <blockquote>
+                <p>The <i>e</i>X<i>treme</i>DB<a name="kanchor681"></a> disk manager supports asynchronous I/O and different multi-file formats as described in the following sections.</p>
+                <p>&#160;</p>
+                <h2><a name="Asynchro"></a>Asynchronous file I/O</h2>
+                <p>By default, AIO is disabled. In order to use the asynchronous I/O mode, the application sets the <code>DB_USE_AIO</code> bit in the <code>Database.Parameters.mode</code> bitmask. The default parameters for AIO are <code>max_queue_length=10007</code> (the size of the asynchronous transaction buffer) and <code>n_workers=1</code> (the number of worker threads writing data to the persistent media.) If these parameters need to be altered the <i>Database</i> method <code>aioStart()</code> must be called after the <i>Database</i> constructor but before the <i>Database</i> method <code>Open()</code> . The <code>aioStart()</code> API signature is as follows:</p>
+                <div class="code-block"><pre>&#160;
+    public static void aioStart(long max_queue_length, long n_workers);
+    &#160;</pre>
+                </div>
+                <p>And when closing the database, AIO processing should be closed explicitly by calling Database method <code>aioStop()</code>. For example:</p>
+                <div class="code-block"><pre>&#160;
+    Database db = new Database(Database.MCO_CFG_DISK_SUPPORT);
+    Database.Parameters params = new Database.Parameters();
+    Database.Device devs[];
+    ...
+    params.mode |= Database.DB_USE_AIO;
+    ...
+    db.aioStart(1000,2);
+    db.Open("opendb", params, devs);
+    ...
+    // Database processing
+    &#160;
+    db.aioStop();
+    &#160;</pre>
+                </div>
+                <p><a name="kanchor682"></a>By default, one AIO thread is started for each database and the default queue size is set to 10007. Sometimes it could be beneficial to change the number of AIO threads (for example if the database is comprised of multiple physical IO devices, or is resided on a RAID) and/or the queue size. However note that the number of I/O threads won't exceed the number of databases created in a process, regardless of the value of worker's threads passed by the application (the runtime does not allow more than one AIO thread to serve a database)</p>
+                <p>(Applications do not need to call either of these methods, <code>aioStart()</code> or <code>aioStop()</code>, if the default values are acceptable.)</p>
+                <p>&#160;</p>
+                <h2>Multi-file databases</h2>
+                <p>Multi-file devices are defined in the same manner as other persistent memory devices except that they are of type <code>MultiFileDevice</code> or <code>RaidDevice</code>. </p>
+                <p>For <i>multifile</i> implementations, segments can be added at runtime by means of <i>Database</i> method <code>extend()</code>.  Note that multifile segments cannot be removed.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Analytics Functions </title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Analytics Functions </h1>
+            <blockquote>
+                <p><i>e</i>X<i>treme</i>DB provides a  library of C analytics functions that operate on <code><a href="../../Users_Guides/Core/Sequences.htm">sequences</a></code>. These functions use the specialized type <code>mco_seq_iterator_t</code> as the "handle" to manage sequence fields. They  all have a <i>result</i> sequence iterator as their first argument that receives the result of the function after applying the other function arguments. </p>
+                <p>These functions operate on specific sequence types. For example the binary function <code>mco_seq_add_int4()</code> will add two sequences with elements of type <code>int4</code>. To simplify the documentation we use the term <code>TYPE</code> as a placeholder for one of the following actual types: </p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">int1</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Signed one-byte integer</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">int2</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Signed two-byte integer</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">int4</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Signed four-byte integer</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">int8</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Signed eight-byte integer</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">uint1</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Unsigned one-byte integer</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">uint2</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Unsigned two-byte integer</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">uint4</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Unsigned four-byte integer</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">uint8</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Unsigned eight-byte integer</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">float</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Four-byte floating point</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">double</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Eight-byte floating point</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">datetime</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Eight-byte datetime</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>So  the function signature <code>mco_seq_add_TYPE()</code> refers to the sequence "add" function <code>mco_seq_add_int1()</code>, <code> mco_seq_add_int2(</code>), ..<code>, mco_seq_add_double(</code>), or <code>mco_seq_add_datetime(</code>); i.e. for elements of any of the above types. </p>
+                <p>To document the operational specifics and usage, these functions are divided into "categories". Please see the page <a href="Analytics_Functions/Functions_By_Category.htm">Analytics Functions by Category</a> to view explanations and examples of the individual functions.</p>
+                <h2>SQL Equivalents</h2>
+                <p>It is useful to note that all of the public C sequence functions have <a href="../../Appendix/Analytics_Function_Mappings.htm">SQL equivalents</a>. These SQL equivalents return the result sequence which makes it possible to express a "pipeline" of SQL functions in a more compact form. For example the following pipeline of four C functions calls adjusts historical closing prices for the effect of splits. (To understand the code snippet, assume that sequences <code>trade_date</code> and <code>closing_price</code> contain the  time series of trade dates paired with closing prices, and <code>split_date</code> the sequence of split dates for the trades of interest - for this example "IBM".)</p>
+                <div class="code-block"><pre>&#160;
+    mco_seq_iterator_t split;
+    mco_seq_iterator_t prd_split_factor;
+    mco_seq_iterator_t price_adjustment;
+    mco_seq_iterator_t trade_date;
+    mco_seq_iterator_t split_date;
+    mco_seq_iterator_t closing_price;
+    mco_seq_iterator_t adjusted_price;
+    ...
+    &#160;
+    rc = mco_seq_cum_agg_prd_float(&amp;prd_split_factor, &amp;split);
+    mco_seq_reverse_double(&amp;rev_prd_split_factor, &amp;prd_split_factor);
+    mco_seq_stretch_uint4_double(&amp;price_adjustment, &amp;trade_date, &amp;split_date, &amp;rev_prd_split_factor, 1.0);
+    mco_seq_mul_double(&amp;adjusted_price, &amp;closing_price, &amp;price_adjustment);
+&#160;</pre>
+                </div>
+                <p>The same result sequence can be calculated using the following  SQL <code>select</code> statement:</p>
+                <div class="code-block"><pre>&#160;
+    SELECT seq_mul(ClosePrice, seq_stretch(TradeDate, SplitDate,
+            seq_reverse(seq_cum_agg_prd(SplitFactor)))) as AdjustedClose
+    FROM Security
+    WHERE Security.Symbol = ‘IBM’
+&#160;</pre>
+                </div>
+                <p>Note the relationship between the functions in SQL and in the C API:  The inner-most nested function in the <code>select</code> statement is the first sequence function called in the series of C API functions.  The next most nested function, <code>seq_reverse()</code>, is the second function called in the C API, and so on.</p>
+                <h2>Null Values in Sequences</h2>
+                <p>The generated functions <code><i><a href="Core_Functions/Generated/Field/Sequence/append_nullable.htm"><i>classname_fieldname</i>_append_nullable()</a></i></code> and <a href="Core_Functions/Generated/Field/Sequence/append_nullable.htm"><a href="Core_Functions/Generated/Field/Sequence/insert_nullable.htm"><code><i>classname_fieldname</i>_insert_nullable()</code></a></a> can be used to insert null values into sequences. </p>
+                <p>The functions <code><a href="Core_Functions/Static/Statistical_Functions/Manipulator_Functions.htm">mco_seq_get_nullable_TYPE()</a></code> and <code><a href="Core_Functions/Static/Statistical_Functions/Manipulator_Functions.htm">mco_seq_unget_nullable_TYPE()</a></code> can be used to convert sequences to nullable arrays and vice versa.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

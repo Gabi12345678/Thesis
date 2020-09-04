@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Control Structures used in the C API">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Cluster_Params</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Cluster_Params</h1>
+            <blockquote>
+                <p>The <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> feature (included with <i>e</i>X<i>treme</i>DB<i> High Availability</i>) is configured by specifying the parameters described below.</p>
+                <h3>For an overview see page <a href="../../../Users_Guides/Cluster/CL_Applications_C.htm">Cluster Applications in C</a></h3>
+                <h2>Cluster Parameters</h2>
+                <p>The following structure is initialized and passed to function <code><a href="../Cluster_Functions/db_open.htm">mco_cluster_db_open()</a></code>:</p>
+                <div class="code-block"><pre>   
+&#160;
+    typedef struct mco_cluster_params_t_
+     {
+        uint4 rtrans_commit; /* nbr of successful remote transactions */
+        mco_cluster_node_params_t       *nodes;
+        uint2                            n_nodes;
+        uint2                            node_id;
+        uint2                            conn_pool_factor;
+        uint4                            sync_msg_objects; /* max number of objects per message during synchronization */
+        uint4                            sync_msg_size;    /* max size of message in bytes during synchronization */
+        mco_cluster_transsize_f          transsize_callback;
+        mco_cluster_check_quorum_f       check_quorum_func;
+        void                            *check_quorum_param;
+        mco_cluster_window_t             window;
+        mco_cluster_notifying            notifying_callback;
+        void                            *notifying_context;
+        mco_cluster_connection_context_f connect_ctx_callback;
+        void                            *connect_ctx_param;
+        uint4                            cl_sndbuf;
+        uint4                            cl_rcvbuf;
+        uint4                            mode_mask;
+        void*                            stream_handle;
+        mco_stream_read                  input_stream_reader;
+        union   {
+            mco_clnw_tcp_params_t tcp;
+            mco_clnw_mpi_params_t mpi;
+        } nw;
+    &#160;
+     } mco_cluster_info_t, * mco_cluster_info_h;
+&#160;</pre>
+                </div>
+                <h2>Transaction Window</h2>
+                <p>The cluster transaction window is defined by the following structure:</p>
+                <div class="code-block"><pre>&#160;
+    typedef struct mco_cluster_window_t_
+    {
+        uint4                      bsize;  /* in bytes */
+        uint4                      length; /* in transactions */
+        timer_unit                 timeout;
+    &#160;
+    } mco_cluster_window_t;
+    &#160;</pre>
+                </div>
+                <h2>Channel Parameters</h2>
+                <p>The network element <code>nw</code> allows the application to specify TCP or <a href="../../../Users_Guides/Cluster/CL_MPI.htm">MPI channel</a> as the network protocol. The following structures are used to specify channel-specific network settings.</p>
+                <h3>TCP</h3>
+                <div class="code-block"><pre>&#160;
+    typedef struct mco_clnw_tcp_params_t_
+    {
+        uint4                      so_sndbuf;
+        uint4                      so_rcvbuf;
+        timer_unit                 connect_timeout;
+        timer_unit                 connect_interval;
+        timer_unit                 keepalive_time;
+        uint4                      keepalive_probes;
+        MCO_SOCK_DOMAIN            socket_domain;
+        int                        compression_level;
+        void                      *ssl_params;
+    &#160;
+    } mco_clnw_tcp_params_t;
+&#160;</pre>
+                </div>
+                <h3>MPI</h3>
+                <div class="code-block"><pre>&#160;
+    typedef struct mco_clnw_mpi_params_t_
+    {
+        uint4                      flags;
+        void                      *communicator;
+    &#160;
+    } mco_clnw_mpi_params_t;
+&#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

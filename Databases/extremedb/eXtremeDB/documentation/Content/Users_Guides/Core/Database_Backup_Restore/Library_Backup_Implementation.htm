@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Incremental Backup Implementation</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Incremental Backup Implementation</h1>
+            <blockquote>
+                <p>The incremental backup process creates a backup file which stores database pages in blocks marked by a binary session header and footer structure (called a backup record). A single backup file can contain several independent backups, possibly of different types (full or incremental) or with different tags or timestamps.</p>
+                <p>For in-memory only databases only the backup file is created, while for persistent databases the database close operation causes the additional <i>Backup Map</i> file to be created.</p>
+                <h2>Backup Map</h2>
+                <p>This map file contains information used to determine the pages that were modified between one incremental backup and another. For a persistent database the <i>e</i>X<i>treme</i>DB<a name="kanchor1007"></a> runtime maintains a buffer full of counters (the backup bitmap) that is located in a memory buffer along with the database. When the application shuts the database down, the state of the counters needs to be saved and then restored when the application opens the database again.</p>
+                <p>Without this map file a full database snapshot would be needed after every application shutdown and restart since the backup procedure would have no data about modifications made to the database pages. So, when an application opens a persistent database with incremental backup enabled, the <i>e</i>X<i>treme</i>DB runtime will create the backup bitmap file on every database shutdown regardless of whether the backup API is called.</p>
+                <p>The backup map keeps track of database pages processed by the backup algorithm. To perform an incremental backup, the runtime needs to track modifications of all the database pages. This is done by using integer counters to indicate the pages' content versions. Every time a database page is modified the runtime increases a counter associated with this page.</p>
+                <p>It would be untenable to keep a separate counter for each database page since a database could require  several terabytes of storage. So the runtime instead keeps a counter for a cluster of pages. The size of that cluster depends on the parameter <code>backup_map_size</code> which determines the total number of counters for the database. The runtime calculates how many counters can fit in the specified <code>backup_map_size</code> and then how many pages (a cluster) will be served by a counter. Consequently the number of pages in a cluster is less for a larger map which means that the backup procedure will store fewer pages for every modified page to the backup file. Therefore the backup process will be faster and the backup file will be smaller. On the other hand, the map is allocated from the database memory buffer; so the buffer needs to be bigger for bigger maps.</p>
+                <p>The page modification tracking mechanism is similar for in-memory and persistent databases (and for hybrid databases the in-memory part and the persistent part of a database). The difference is in location of the page version counters: for the persistent part the counters reside in the backup bitmap and for the in-memory part the counters are contained in the data pages. The size of the memory allocated for the database is known from the database open call, so there is no need for the <code>backup_map_size</code> parameter for the in-memory part as the runtime calculates this automatically. But for persistent databases, a reasonable size should be specified.</p>
+                <p>A reasonable map size can be calculated as follows:</p>
+                <div class="code-block"><pre>&#160;
+    sizeof(int) * &lt;expected-persistent-part-size-in-bytes&gt; / &lt;disk-page-size&gt; / &lt;disk-pages-per-backup-cluster&gt;
+    &#160;</pre>
+                </div>
+                <p>where <code>disk-pages-per-backup-cluster</code> is the number of pages that will be stored into the backup map if even a single page of that cluster is modified. For example, suppose that the <code>disk-page-size</code> is 4K and we would like to store modifications in bunches of 64K; then <code>disk-pages-per-backup-cluster</code> would be <code>64 / 4 = 16</code>. Then to calculate <code>backup_map_size</code> for a 1G database on a 64 bit system (sizeof(int) = 4), the math would be as follows: </p>
+                <div class="code-block"><pre>    &#160;
+    4 * 1G / 4K / 16 = (4G / 4K) / 16 = 1M / 16 = 64K
+    &#160;</pre>
+                </div>
+                <p>If no <code>backup_map_size</code> is specified, then the <i>e</i>X<i>treme</i>DB runtime calculates it using the maximum persistent database size, which is <code>MCO_INFINITE_DATABASE_SIZE</code> (1 terabyte for 64-bit databases and 4G for 32-bit databases); so the default <code>backup_map_size</code> is calculated as:</p>
+                <div class="code-block"><pre>&#160;
+    64bit: 4 * 1T / 4K / 16 = (4T / 4K) / 16 = 1G / 16 = 64M
+    &#160;
+    32bit: 4 * 4G / 4K / 16 = (16G / 4K) / 16 = 4M / 16 = 256K
+    &#160;
+    &#160;</pre>
+                </div>
+                <h2>Backup Process</h2>
+                <p>The backup is an iterative process controlled by the two conditions <code>backup_max_passes</code> and <code>backup_min_pages</code>. The procedure periodically scans the database for modifications while it works in parallel with other application activities that may interact with the database runtime. On each pass it counts the number of modified pages. When it reaches the threshold determined by parameter <code>backup_min_pages</code> the final <i>exclusive backup pass</i> locks the database for the final pass when it writes modified pages to the backup file. The parameter <code>backup_max_passes</code> defines a limit on the number of backup procedure scans of the database. If the database usage is such that so few pages are modified that the <code>backup_min_pages</code> threshold may not be reached, <code>backup_max_passes</code> can be set to a small number of passes so that when it is reached the runtime will block database operations and initiate the final <i>exclusive backup pass</i>.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

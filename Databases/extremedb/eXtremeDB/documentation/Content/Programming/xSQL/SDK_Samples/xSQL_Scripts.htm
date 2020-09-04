@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>xSQL Scripts</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>xSQL</i> Scripts</h1>
+            <blockquote>
+                <p>As explained in the <code>samples/xsql/scripts/README.txt</code> file, the SQL sample files <code>*.sql</code> in this directory are designed to demonstrate <i>e</i>X<i>treme</i>SQL engine capabilities. They can be run by starting <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> with the following command from directory <code>eXtremeDB/samples/xsql/scripts</code>:</p>
+                <div class="code-block"><pre>&#160;
+    ..\..\..\target\bin\xsql -i
+    &#160;</pre>
+                </div>
+                <p>Or, to facilitate running the sample scripts, the command file <code>sqltest.bat</code> is provided. For example, using this command file from directory <code>eXtremeDB/samples/xsql/scripts</code> (in a Windows console window), the following is a minimal command to run <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> as a server and execute script <code>array.sql</code>:</p>
+                <div class="code-block"><pre>&#160;
+    xsqltest array
+    &#160;</pre>
+                </div>
+                <p>(Note that <i>e</i>X<i>treme</i>DB <i>for HPC</i> packages provide an additional subdirectory <a href="xSQL_Financial.htm">financial</a> which includes command file <code>xsql.bat</code> that is preferable for launching samples demonstrating <a href="../../../Users_Guides/Server/Analytics_Function_Library.htm">analytics</a> features.)</p>
+                <p>The following table lists the sample scripts available in directory <code>eXtremeDB/samples/xsql/scripts</code>:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 133px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/alter.htm">alter</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the <code>alter table</code> statement</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/array.htm">array</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates inserting values into an array field (column) using two different methods: with “{}”and “[]”syntax</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/as.htm">as</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>as</code> qualifier to convert the result of a query column</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/asof_join.htm">asof_join</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>asof</code> qualifier to perform joins with specified conditions</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/between.htm">between</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>between</code> operator</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/bulk.htm">bulk</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the array syntax “[]” to insert multiple values into scalar fields (columns) in a single insert operation</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/compound.htm">compound</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of a compound index. Note also the use of aliases <code>a1</code> and <code>a2</code> to form a self-join and use of the <code>explain</code> operator to display the execution plan</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/compound_nullable.htm">compound_nullable</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of a compound index and a null (nullable) field (column). Note also the use of aliases <code>a1</code> and <code>a2</code> to form a self-join and use of the <code>explain</code> operator to display the execution plans</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/create_index.htm">create_index</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the <code>create index</code> statement. Note the use of the <code>trace</code> command to display performance statistics for the queries</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/decimal.htm">decimal</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>decimal</code> field (column) type</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/delete.htm">delete</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the <code>delete</code> statement</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/disgroup.htm">disgroup</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>distinct</code> qualifier. Note the use of the <code>echo</code> command to display each SQL statement as it is executed and <code>explain</code> to display the execution plan</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/distinct.htm">distinct</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>distinct</code> qualifier</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/distinctsum.htm">distinctsum</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>distinct</code> qualifier with the <code>sum()</code> function. Note the use of the <code>explain</code> command to display the execution plan</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/drop.htm">drop</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>drop index</code> statement. Note the use of the <code>explain</code> command to display the execution plan</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/exists.htm">exists</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>exists</code> operator</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/fulltext.htm">fulltext</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>contains</code> operator to perform a text search. Note the use of the trace command to display performance statistics for the queries</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/functions.htm">functions</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of several built-in functions including: <code>sum()</code>, <code>substr()</code>, <code>length()</code>, <code>upper()</code>, <code>lower()</code>, <code>format()</code> and <code>count()</code>. Note the use of the trace command to display performance statistics for the queries</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/group_by.htm">group_by</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>group by</code> operator</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/group_by_having.htm">group_by_having</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>group by</code> operator with a <code>having</code> clause</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/group_by_substr.htm">group_by_substr</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>group by</code> operator and the <code>substr()</code> function</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/group_order.htm">group_order</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>group by</code> operator and the <code>order by</code> operator</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/hashjoin.htm">hashjoin</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates how to perform a hash join operation. Note the use of <code>explain</code> to display the execution plan</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/in.htm">in</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>in</code> operator</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/indexjoin.htm">indexjoin</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of an <code>index</code> to optimize a lookup operation. Note how the <code>explain</code> command displays different execution plans depending on the order of conjunctions in the <code>where</code> clause</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/insert.htm">insert</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates different forms of the <code>insert</code> operation</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/join.htm">join</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates a <code>join</code> operation joining two tables by date field (column) values</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/join_compound.htm">join_compound</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates a <code>join</code> operation joining two tables by date field (column) values using a compound index</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/like.htm">like</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>like</code> operator</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/nullable.htm">nullable</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>null</code> declaration to define a field (column) as nullable. Note the use of <code>explain</code> to display the execution plan</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/numeric.htm">numeric</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>numeric</code> field (column) type</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/order_by.htm">order_by</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>order by</code> operator</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/round.htm">round</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>round()</code> function</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/s_p.htm">s_p</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the various <code>union</code> and <code>join</code> operations</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/s_p_j_sp.htm">s_p_j_sp</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the various <code>exists</code>, <code>any</code> and <code>in</code> operations with relatively complex queries</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/search.htm">search</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates a variety of lookup operations with different orders of comparison operators and order by clauses. Note the difference in the execution plans displayed by the <code>explain</code> command and the performance statistics displayed using the <code>trace</code> command</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/select_s.htm">select_s</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates a variety of lookup operations on table <code>S</code> with relatively complex queries</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/select_sp.htm">select_sp</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates a lookup operation on table <code>SP</code> with “<code>&gt;= AND &lt;</code>” operators</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/sp.htm">sp</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates a variety of lookup operations on table <code>SP</code> with relatively complex queries</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/stringagg.htm">stringagg</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>string_agg()</code> function. Note the difference in the execution plans displayed by the <code>explain</code> command</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/system.htm">system</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the contents of system tables <code>Metatable</code> and <code>Statistic</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/trigram.htm">trigram</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of a <code>trigram</code> index</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/union.htm">union</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates some queries with the <code>union</code> operator</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/unionall.htm">unionall</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>union all</code> operator</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Scripts/upsert.htm">upsert</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <code>insert</code> or <code>update</code> operation to insert “horizontal” data into a sequence data type, which stores the data “vertically”</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><a href="Scripts/with.htm">with</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Demonstrates the use of the <code>with</code> operator</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

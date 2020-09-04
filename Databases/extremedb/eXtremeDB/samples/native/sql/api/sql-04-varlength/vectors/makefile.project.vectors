@@ -1,0 +1,15 @@
+MCO_PRJ_LIST += api-sql-04-varlength-vectors
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += api-sql-04-varlength-vectors
+PRJ_api-sql-04-varlength-vectors_TAGS:=sample sql
+PRJ_api-sql-04-varlength-vectors_DIR:=$(call mco_project_dir)
+PRJ_api-sql-04-varlength-vectors_SRC:=$(call mco_project_file,main.cpp) $(MCO_SAMPLES_COMMON_DIR)/common.c $(MCO_SAMPLES_COMMON_DIR)/commonSQL.c
+PRJ_api-sql-04-varlength-vectors_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_api-sql-04-varlength-vectors_DATABASES:=vectorsdb
+PRJ_api-sql-04-varlength-vectors_RUNTIME:=YES
+PRJ_api-sql-04-varlength-vectors_MEMDEV:=PRIVATE
+PRJ_api-sql-04-varlength-vectors_STORAGE:=TRANSIENT
+PRJ_api-sql-04-varlength-vectors_SYNC:=AUTO
+PRJ_api-sql-04-varlength-vectors_TRANSMGR:=MURSIW
+PRJ_api-sql-04-varlength-vectors_F_SQL:=LOCAL
+PRJ_api-sql-04-varlength-vectors_F_CPP:=YES

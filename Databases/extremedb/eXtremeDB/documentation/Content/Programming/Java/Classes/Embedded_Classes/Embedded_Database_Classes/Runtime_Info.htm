@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|Java API|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The Java Embedded Database Class RuntimeInfo</title>
+        <link href="../../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>The Java Embedded <i>Database</i> Class <i>RuntimeInfo</i></h1>
+            <p><i>RuntimeInfo</i> provides access to the <i>e</i>X<i>treme</i>DB database runtime settings.</p>
+            <h3>For an overview see page <a href="../../Database.htm">Java <i>Database</i> Class</a></h3>
+            <h3>Class Definition</h3>
+            <div class="code-block"><pre><a name="kanchor864"></a>&#160;
+    public static class RuntimeInfo 
+    {
+        public byte    mco_version_major;
+        public byte    mco_version_minor;
+        public short   mco_build_number;
+        public byte    mco_size_t;
+        public byte    mco_offs_t;
+        public boolean uint4_supported;
+        public boolean float_supported;
+        public byte    mco_checklevel;
+        public boolean evaluation_version;
+        public boolean large_database_supported;
+        public boolean collation_supported;
+        public boolean heap31_supported;
+        public boolean bin_serialization_supported;
+        public boolean fixedrec_supported;
+        public boolean statistics_supported;
+        public boolean events_supported;
+        public boolean save_load_supported;
+        public boolean object_initialization_supported;
+        public boolean direct_index_field_access_supported;
+        public boolean multiprocess_access_supported;
+        public boolean object_repack_supported;
+        public boolean transaction_logging_supported;
+        public boolean cluster_supported;
+        public boolean high_availability_supported;
+        public boolean ha_multicast_supported;
+        public boolean ha_incremental_replication_supported;
+        public boolean binary_schema_evalution_supported;
+        public boolean unicode_supported;
+        public boolean wchar_supported;
+        public boolean recovery_supported;
+        public boolean disk_supported;
+        public boolean direct_pointers_supported;
+        public boolean persistent_object_supported;
+        public boolean xml_import_export_supported;
+        public boolean user_defined_index_supported;
+        public boolean multifile_supported;
+        public boolean multifile_descriptor_supported;
+        public boolean two_phase_commit_supported;
+        public boolean rtree_supported;
+        public boolean tree_based_hash;
+        public boolean tmgr_mvcc_async_cleanup;
+        public boolean concurent_disk_btree;
+        public boolean open_cursor_goto_first;
+        public boolean smart_index_insert;
+        public boolean btree_leaf_lock;
+        public boolean null_statistics;
+        public boolean implicit_runtime_start;
+        public boolean bufferized_sync_iostream;
+        public boolean async_replication;
+        public boolean fast_transaction_list;
+        public boolean extendable_dirty_page_bitmap;
+        public byte    mursiw_policy;
+        public byte    sync_capabilities;
+        public byte    char_comparison_policy;
+        public long    stream_buffer_size;
+        public byte    max_db_instances;
+        public byte    max_db_name_length;
+        public byte    max_extends;
+        public long    tl_page_buffer_size;
+        public short   ha_max_replicas;
+        public long    ha_transmit_buffer_size;
+        public long    ha_syncronization_buffer_size;
+        public long    default_redo_log_limit;
+        public byte    mvcc_critical_sections;
+        public byte    mvcc_per_index_locks;
+        public short   con_disk_page_cache_size;
+        public byte    small_con_cache_threshold;
+        public long    extendable_dirty_page_bitmap_limit;
+        public byte    max_vista_sessions;
+        public byte    concurrent_write_transactions;
+        public byte    encryption_support;
+        public boolean backup_support;
+        public String  mco_revision;
+        public byte    mco_process_t;
+    };
+    &#160;</pre>
+            </div>
+            <h3>  Definitions:</h3>
+            <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                <col class="TableStyle-FunctionReference-Column-Column2" style="width: 233px;" />
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>mco_version_major</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The <i>e</i>X<i>treme</i>DB major version number</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>mco_version_minor</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The <i>e</i>X<i>treme</i>DB minor version number</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>mco_build_number</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The <i>e</i>X<i>treme</i>DB build number</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>mco_size_t</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Sizeof <code>mco_size_t</code> variable, depends on x32/x64 architecture</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>mco_offs_t</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Sizeof <code>mco_offs_t</code> variable, depends on x32/x64 architecture</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>uint4_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> <code>uint4</code> data type supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>float_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> <code>double</code>/<code>float</code> data type supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>mco_checklevel</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The runtime's checklevel, 0 for non-debug libraries</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>evaluation_version</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True</code> this is an <i>e</i>X<i>treme</i>DB evaluation package</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>large_database_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> large database supported (&gt;4G) for x32 runtime mode</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>collation_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> external collations (index comparison) supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>heap31_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code><i>e</i>X<i>treme</i>DB v3.1 application level heap feature supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>bin_serialization_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> Binary or XML serialization supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>fixedrec_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>If <code>True,</code>FIXEDREC</code> alloations for constant-size objects supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>statistics_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code>Statistic collection enabled</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>events_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code>Synch/Asynch events supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>save_load_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True</code>, the Connection methods <code>saveSnapshot()</code>, <code>saveClass()</code> and <code>loadClass()</code> are supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>object_initialization_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True, </code>new object fields initialization (instead of zeros) supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>direct_index_field_access_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> use values of indexed fields from the indexes instead of object bodies optimization (persistent objects)</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>multiprocess_access_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Conventional or shared memory driver linked into the program</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>object_repack_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Support of dynamic object repack feature. Obsolete. Left for compatibility</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>transaction_logging_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> <i>e</i>X<i>treme</i>DB<i> Transaction Logging</i> is enabled</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>cluster_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> is enabled</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>high_availability_supporte</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> <i>e</i>X<i>treme</i>DB<i> High Availability</i> is enabled</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>ha_multicast_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> <i>e</i>X<i>treme</i>DB<i> High Availability</i> multicast communication is enabled</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>ha_incremental_replication_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> <i>e</i>X<i>treme</i>DB<i> High Availability</i> incremental replication is enabled</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>binary_schema_evalution_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True</code>, Binary Schema Evolution is enabled</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>unicode_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> Unicode (<code>nchar</code> / <code>nstring</code> data type) supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>wchar_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> WChar (<code>wchar</code> / <code>wstring</code> datatype) supported. Required C/C++ runtime</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>recovery_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Recovery support. Obsolete, left for compatibility</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>disk_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> persistent objects (<code>vtmem</code> / <code>vtdsk</code> runtime) supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>direct_pointers_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> direct- or offset-based pointers in the database (<code>DPTR</code> / <code>OFFS</code> runtime) supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>persistent_object_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> object persistence supported (Allows persistent objects in IM-OFFS runtime)</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>xml_import_export_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> XML database export / import supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>user_defined_index_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> user-defined index (comparison) supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>multifile_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> multi-file persistent storage supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>multifile_descriptor_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> multi-file descriptor file (mfd-file) supported for multi-file persistent storage feature</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>two_phase_commit_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> two-phase commit supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>rtree_supported</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> include <code>rtree</code> index implementation code into runtime</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>tree_based_hash</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>If <code>True,</code> tree</code>-based hash implementation (for internal debugging) supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>tmgr_mvcc_async_cleanup</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Value of 1 indicates “delayed  cleanup of unneeded object versions”; value of 0 means cleanup immediately (represents the status of <code><a name="kanchor865"></a>MCO_CFG_TMGR_MVCC_ASYNC_CLEANUP</code> in file <code>mcocfg.h</code>)</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>concurent_disk_btree</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Always on, obsolete, left for compatibility</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>open_cursor_goto_first</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Indicates initial positioning of new cursors to the first element</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>smart_index_insert</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Pre-sort data records in a <code>voluntaty index</code> creation procedure</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>btree_leaf_lock</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Fine-grain locking of <code>tree</code> indexes</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>null_statistics</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Always on, obsolete, left for compatibility</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>implicit_runtime_start</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Always on, obsolete, left for compatibility</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>bufferized_sync_iostream</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Indicates that HA transmission buffer-ization is enabled for synchronization procedure</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>async_replication</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Asynchronous HA replication enabled</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>fast_transaction_list</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Indicates <code>tree</code><a name="kanchor866"></a> index in transaction list implementation enabled (MURSIW)</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>extendable_dirty_page_bitmap</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Persistent storage's dirty pages map extends</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>mursiw_policy</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code><a href="../../../../../Users_Guides/Core/MURSIW_Transaction_Manager.htm">MURSIW</a></code> TM behavior: 0 - Priority-based transaction queue, 1 - Sequential transaction queue, 2 - Global sync, 3 - RW-Lock</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>sync_capabilities</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Synchronization primitives implementation capabilities, bit mask: 1 - single-process, 2 - multi-process capable primitives</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>char_comparison_policy</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Compare chars as: 0 - Default, 1 - as signed, 2 - as unsigned</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>stream_buffer_size</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Size of buffer used in streaming code in HA / CL / TL etc. (Also for <a href="../../../../C/Structures/Stream_Reader.htm">Stream Reader</a> and <a href="../../../../C/Structures/Stream_Writer.htm">Stream Writer</a> functions.)</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>max_db_instances</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Max. number of database instances supported by the runtime</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>max_db_name_length</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Max. length of a database name supported by the runtime</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>max_extends</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Max. number of extends of database memory area</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>tl_page_buffer_size</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Size of internal buffers that TL operates</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>ha_max_replicas</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Max. number of HA replicas at a time</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>ha_transmit_buffer_size</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Size of buffer used in HA to send data from commit, default is 2K</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>ha_syncronization_buffer_size</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">HA synchronization stream IO buffer size, default is 2K</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>default_redo_log_limit</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Default size of <code>REDO</code> log length limit, default is 16M</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>mvcc_critical_sections</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Number of critical sections used by MVCC, it is better to be a prime number</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>mvcc_per_index_locks</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Number of locks used by index, it is better to be a prime number</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>con_disk_page_cache_size</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Size of per-connection page cache. The runtime pre-allocates some pages to speedup page allocation when needed</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>small_con_cache_threshold</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a name="kanchor867"></a>Use hashed per-connection cache if the <code>con_disk_page_cache_size &gt; small_con_cache_threshold</code>; use an array otherwise</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>extendable_dirty_page_bitmap_limit</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Max bitmap size if extendable dirty page bitmap enabled</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>max_vista_sessions</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Max number of Vista sessions (windows vista only)</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>concurrent_write_transactions</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a name="kanchor868"></a>Does current Transaction Manager support concurrent write transactions or not</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>encryption_support</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The number identifier of the currently supported encryption algorithm: specified in mco.h:</p>
+                            <div class="code-block"><pre>  &#160;
+  #define MCO_CFG_NO_ENCRYPTION      0
+  #define MCO_CFG_RC4_OLD_ENCRYPTION 1 
+  #define MCO_CFG_RC4_ENCRYPTION     2
+  #define MCO_CFG_AES_ENCRYPTION     3
+  &#160;</pre>
+                            </div>
+                            <p>(Note that the value <code>MCO_CFG_RC4_OLD_ENCRYPTION</code> indicates "RC4 encryption without page offset as salt: for backward compatibility only")</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>backup_support</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">If <code>True,</code> the <i><a href="../../../../../Users_Guides/Core/Database_Backup_Restore.htm">Incremental Backup</a></i> feature is supported</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>mco_revision</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The <i>e</i>X<i>treme</i>DB revision number</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><code>mco_process_t</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">The value <code>sizeof(mco_process_t)</code> - the size of the process identifier data type in bytes (This data type is usually utilized as a context in a database connection which in turn is used in <a href="../../../../../Users_Guides/Core/Recovery/Recovery_C.htm">sniffer</a> functionality)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

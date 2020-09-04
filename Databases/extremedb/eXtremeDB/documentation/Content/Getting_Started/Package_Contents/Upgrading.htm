@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Getting Started with eXtremeDB|eXtremeDB Package Contents">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Upgrading from eXtremeDB 7.1</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Upgrading from <i>e</i>X<i>treme</i>DB 7.1</h1>
+            <blockquote>
+                <p>As explained in page <a href="Libraries.htm">New Libraries with <i>e</i>X<i>treme</i>DB 8.0</a>, <i>e</i>X<i>treme</i>DB packages delivered with version 8.0 and successive releases have newly introduced libraries with respect to previous versions. For applications built with <i>e</i>X<i>treme</i>DB versions prior to 8.0, the set of libraries to be linked to the version 8.0 application will be different according to these newly introduced and deprecated libraries. Some examples of linker command lines for different types of application are shown below. (Note the linker lines and library names used in these examples are for Unix-Linux applications.)</p>
+                <h2>In-Memory Database Application</h2>
+                <p>For an in-memory database application using encryption, the <code><a href="../../Users_Guides/Core/MURSIW_Transaction_Manager.htm" name="kanchor661">MURSIW</a></code><a name="kanchor662"></a> transaction manager and trace output, the following linker line for <i>e</i>X<i>treme</i>DB version 7.1</p>
+                <div class="code-block"><pre>&#160;
+    -lmcolib -lmcomem -lmcovtmem -lmconet -lmcosmp -lmcomem -lmcostrerror -lmcotrace -lmcoslnxp 
+            
+    -lmcomconv -lmcotmursiw -lmcolib -lmcomem -lmcouwrt -lmcocryptstub
+            
+&#160;</pre>
+                </div>
+                <p>would be changed as follows for <i>e</i>X<i>treme</i>DB version 8.0</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    -lmcolib -lmcovtmem -lmcotrace -lmcoslnxp -lmcomconv -lmcotmursiw -lmcolib -lmcouwrt 
+            
+    -lmcocryptstub -lmcosallatches -lmcosalatomic -lmcosaltimer -lmcosalsmp -lmcosalmem
+            
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <h2>Persistent Database Application</h2>
+                <p>For a persistent database application using encryption, the <code><a href="../../Users_Guides/Core/MURSIW_Transaction_Manager.htm">MURSIW</a></code> transaction manager and trace output, the following linker line for <i>e</i>X<i>treme</i>DB version 7.1</p>
+                <div class="code-block"><pre>&#160;
+    -lmcolib -lmcomem -lmcovtdsk -lmconet -lmcosmp -lmcomem -lmcostrerror -lmcotrace -lmcoslnxp 
+            
+    -lmcomconv -lmcofu98zip -lmcotmursiw -lmcolib -lmcomem -lmcouwrt -lmcocryptstub
+            
+    &#160;</pre>
+                </div>
+                <p>would be changed as follows for <i>e</i>X<i>treme</i>DB version 8.0</p>
+                <div class="code-block"><pre>&#160;
+    -lmcolib -lmcovtdsk -lmcotrace -lmcoslnxp -lmcomconv -lmcofu98zip -lmcotmursiw -lmcolib 
+            
+    -lmcouwrt -lmcocryptstub -lmcosallatches -lmcosalatomic -lmcosaltimer -lmcosalsmp -lmcosalmem
+            
+    &#160;</pre>
+                </div>
+                <h2><i>e</i>X<i>treme</i>SQL Application </h2>
+                <p>For an <i>e</i>X<i>treme</i>SQL application using sequences and online incremental backup, the following linker line for <i>e</i>X<i>treme</i>DB version 7.1</p>
+                <div class="code-block"><pre>&#160;
+    -lmcoapi -lmcosql -lmcoapi -lmcoseq -lmcobackup -lmcoseri (+core)
+            
+    &#160;</pre>
+                </div>
+                <p>would be changed as follows for <i>e</i>X<i>treme</i>DB version 8.0</p>
+                <div class="code-block"><pre>&#160;
+    -lmcosql -lmcoseq -lmcoseqmath -lmcobackup -lmcoseri (+core)
+            
+    &#160;</pre>
+                </div>
+                <h2>Platform specific examples</h2>
+                <p>For further examples of linker command lines for <i>e</i>X<i>treme</i>DB version 8.0 and later, please use the link below according to your development platform:</p>
+                <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="../../Programming/C/Lib_Configurations/Unix-Linux_examples.htm">Unix-Linux</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Library list examples for Unix-Linux applications</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="../../Programming/C/Lib_Configurations/Win_examples.htm">Windows</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Library list examples for Windows applications</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1"><a href="../../Programming/C/Lib_Configurations/VxWorks_examples.htm">VxWorks</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">Library list examples for VxWorks applications</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

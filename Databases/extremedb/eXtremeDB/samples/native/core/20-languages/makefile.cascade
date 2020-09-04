@@ -1,0 +1,4 @@
+-include $(call mco_makefile_file, \
+cpp/makefile.project.cpp \
+cpp_smartptr/makefile.project.cpp_smartptr \
+)

@@ -65,11 +65,11 @@ for lines in args.lines:
 			except FileNotFoundError:
 				continue
 			break
-		time.sleep(30)
+		time.sleep(1)
 		current_last_modified = os.path.getmtime(args.storage_path)
 		while current_last_modified != initial_last_modified:
 			initial_last_modified = current_last_modified
-			time.sleep(30)
+			time.sleep(1)
 			current_last_modified = os.path.getmtime(args.storage_path)
 
 		final_size = get_size()
@@ -92,7 +92,8 @@ for lines in args.lines:
 			'target': 'kmeans(master.dim*)',
 		}
 		
-		requests.get(url = "http://localhost/render", params = params)
+		r = requests.get(url = "http://localhost/render", params = params)
+		print(r.text)
 		final_time = (datetime.now() - datetime(1970, 1, 1)).total_seconds()
 		print("+" * 100)
 		print("KMeans time: ", final_time - initial_time)

@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += Statistics
+PRJ_TARGET_CLASS += Statistics
+PRJ_Statistics_TAGS:=sample java core
+PRJ_Statistics_DIR :=$(call mco_project_dir)
+PRJ_Statistics_SRC :=$(call mco_project_file,Statistics.java)

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Incremental Backup and Restore in C</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Incremental Backup and Restore in C</h1>
+            <blockquote>
+                <p>Incremental online backup can be performed while normal database activity proceeds uninterrupted. While the <i><a href="#Library">library level</a></i> backup is the recommended method of implementation, the <i>e</i>X<i>treme</i>DB<a name="kanchor459"></a> runtime exports <i><a href="#Low">low level</a></i> APIs to allow applications to provide custom backup implementation.</p>
+                <h3>For alternative data export options see page <a href="../Data_Export_Import/Data_Export_Import_C.htm">Data Export and Import in C</a></h3>
+                <h2><a name="Library"></a>Library Level  Backup</h2>
+                <p>The library level is a convenient way to integrate a database backup process into C applications. This approach assumes that the backup is done to a file system. The backup and restore functions are provided in the <code>mcobackup</code> library file. Please see the <a href="Library_Backup_Implementation.htm">Incremental Backup Implementation</a> page for a detailed description of how the backup process is performed. Also, please see SDK sample <a href="../../../Programming/C/SDK_Samples/Core_Samples/18-Backup_Online.htm">18-backup_online</a> for implementation details.</p>
+                <p>In order to implement a full or incremental backup, the application must first define filenames for the backup files and labels for backup "tags" then set the appropriate parameters in the <code><a href="../../../Programming/C/Structures/Database_Parameters.htm">mco_db_params_t</a></code> structure passed to <code><a href="../../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm">mco_db_open_dev()</a></code>. For example:</p>
+                <div class="code-block"><pre>&#160;
+    char * filename = "MyDb.bak";
+    char * label_full = "Full";
+    char * label_inc1 = "Inc1";
+    char * label_inc2 = "Inc2";
+    &#160;
+    db_params.backup_map_size = 4 * DATABASE_SEGMENT_SIZE / DISK_PAGE_SIZE / 16;
+    db_params.backup_max_passes = 10;
+    db_params.backup_min_pages = 10;
+    sprintf(db_params.backup_map_filename, "%s","Backup_map");
+    db_params.mode_mask = MCO_DB_INCREMENTAL_BACKUP;
+    &#160;
+    rc = mco_db_open_dev(db_name, MyDb_get_dictionary(), &amp;dev, 1, &amp;db_params );
+    &#160;</pre>
+                </div>
+                <p>The <i>backup map</i> is used to keep track of database pages processed by the backup algorithm. For persistent databases the backup map is written to a file when the <code><a href="../../../Programming/C/Core_Functions/Static/Database_Control/close.htm">mco_db_close()</a></code> API is called for storage between database sessions. If no <code>backup_map_filename</code> is specified, the default name of <code>&lt;database_name&gt;.bm</code> is used.</p>
+                <p>The backup is an iterative process controlled by the two conditions <code>backup_max_passes</code> and <code>backup_min_pages.</code>The value of <code>backup_min_pages</code> specifies the required minimum number of modified pages to complete the backup. </p>
+                <table class="TableStyle-FunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 163px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">backup_map_size</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The size of the backup counters array in bytes. It must be power of two. This parameter is ignored and calculated automatically if  the parameter <code>disk_max_database_size</code> is defined (non-zero)</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">backup_min_pages</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>The minimum number of modified pages required to compete the backup. When the number of remaining pages is less than <code>backup_min_pages</code> the backup process locks the database exclusively and finalizes the backup. If the number of modified pages is small, it takes a very short time to write them out and complete the backup. (Note that a value of zero disables the backup.) </p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">backup_max_passes</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">
+                                <p>This parameter represents the maximum number of backup loops until the backup claims an exclusive access to the repository and performs a final pass over it.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>A single backup file can contain several independent backups, possibly of different types (full or incremental) or with different tags or timestamps. Each backup is "framed" within a header and a footer (this frame is called a backup record). </p>
+                <p>To create a backup file applications call <code><a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Backup/create.htm">mco_backup_create()</a></code> specifying a <code>file_name</code>, a <code>label</code> and the backup <code>type</code> <code>MCO_BACKUP_TYPE_SNAPSHOT</code>. This creates the initial backup record. Then successive incremental backup records can be added by calling <code><a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Backup/create.htm">mco_backup_create()</a></code>with backup type <code>MCO_BACKUP_TYPE_INCREMENTAL</code>. Or the backup type <code>MCO_BACKUP_TYPE_AUTO</code> can be specified to cause automatic selection of a <i>snapshot</i> or <i>incremental</i> record depending on the content of the backup file; if there is no <i>snapshot</i> in the file yet the backup process will create one; otherwise a partial (incremental) backup record is created.</p>
+                <h2> Restoring or Verifying a Backup </h2>
+                <p>Once created, the backup file can be used to restore the database from a specific backup record by calling the <code><a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Backup/restore.htm">mco_backup_restore()</a></code> API with the appropriate label. To view the records in a backup file call the <code><a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Backup/list.htm">mco_backup_list()</a></code> API which displays the <code>name</code>, <code>type</code>, <code>label</code> and other properties of the backup records. Sometimes it may be useful to check backup files for consistency without actually performing the restore. The <code><a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Backup/verify.htm">mco_backup_verify()</a></code> function is provided for this purpose.</p>
+                <p>Following C application code snippets demonstrate how these APIs might be used. First, to backup a database:</p>
+                <div class="code-block"><pre>&#160;
+    {
+        mco_db_h con;
+        MCO_RET rc;
+        char * filename = “backup.bak”;
+        char * label = “a label”;
+&#160;
+        /* connect to a database */
+        rc = mco_db_connect( db_name, &amp;con );
+&#160;
+        /* backup the database */
+        rc = mco_backup_create( con, filename, label,
+                        MCO_BACKUP_TYPE_AUTO, 1, 0, 0);
+    }
+    &#160;</pre>
+                </div>
+                <p>Then to restore a database from the backup file:</p>
+                <div class="code-block"><pre>&#160;
+    {
+        mco_db_h con;
+        MCO_RET rc;
+        char * filename = “backup.bak”;
+        char * label = “a label”;
+&#160;
+        /* connect to a database */
+        rc = mco_db_connect( db_name, &amp;con );
+&#160;
+        /* restore the database */
+        rc = mco_backup_restore( con, filename, label, 0, 0);
+    }
+    &#160;</pre>
+                </div>
+                <h2>Library Level API Reference:</h2>
+                <p>See page <a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Backup.htm">Incremental Backup C API</a> for detailed descriptions and examples of the library level  APIs.</p>
+                <h2><a name="Low"></a>Low level C API backup functions</h2>
+                <p>The <i>e</i>X<i>treme</i>DB backup services can be overridden via custom callback function implementations. Also services can be turned on/off through the internal runtime configuration file <code>target/mcolib/mcocfg.h</code> define <code>MCO_CFG_BACKUP</code>. </p>
+                <p>By default, the backup services are enabled and the following backup-related APIs are exported:</p>
+                <div class="code-block"><pre>&#160;
+    typedef MCO_RET (*mco_backup_info_proc_t)( uint4 phase,
+        const mco_backup_info_t * info, void * param );
+&#160;
+    typedef MCO_RET (*mco_backup_chunk_proc_t)( uint4 chunk_id,
+        const char * mem, uint4 mem_sz, void * param );
+&#160;
+    typedef MCO_RET (*mco_restore_chunk_proc_t)( uint4* chunk_id,
+        char ** mem, uint4 * mem_sz, void * param );
+        &#160;</pre>
+                </div>
+                <p>The <code>mco_backup_info_proc_t()</code> and <code>mco_backup_chunk_proc_t()</code> callbacks are called by internal <i>e</i>X<i>treme</i>DB runtime function <code>mco_backup()</code>. The first is intended to store informational headers that frame a backup record. The second stores a chunk of data. The <code>mco_restore_chunk_proc_t()</code> callback is called by internal <i>e</i>X<i>treme</i>DB runtime function <code>mco_restore()</code> and is intended to restore a chunk of data from the backup storage. A<i>pplications cannot call these callback APIs directly</i>. </p>
+                <p>This core-level incremental backup/restore API does not limit the application to use a file system or any other specific type of storage. It is up to the application to decide how to store its backups. Internally the runtime functions <code>mco_backup()</code> and <code>mco_restore()</code>assure the integrity of the data chunks. Optionally the application may encrypt or compress the data in the process. </p>
+                <p>The restore procedure requires a database with the same database properties (such as size, memory page size and etc.) and overwrites its content with the data pages read from the backup record. As for the library-level backup, it is necessary to have at least one snapshot (full backup record), and any possible number of incremental records, to restore the content of a database.</p>
+                <p>The following code snippet demonstrates one possible simple implementation of these callback APIs:</p>
+                <div class="code-block"><pre>&#160;
+    /* backup callbacks */
+    MCO_RET mco_backup_info(uint4 phase, const mco_backup_info_t* info, void* param)
+    {
+        mco_backup_ctx_t *ctx = (mco_backup_ctx_t *)param;
+        mco_backup_info_t hdr = *info;
+        &#160;
+        switch (phase) 
+        {
+            case MCO_BACKUP_PHASE_1:
+                …
+                /* write backup header */
+                if (fwrite(&amp;hdr, sizeof(hdr), 1, ctx-&gt;f) != 1) 
+                {
+                    return MCO_E_DISK_WRITE;
+                }
+                ...
+                break;
+&#160;
+            case MCO_BACKUP_PHASE_2:
+                ...
+                /* write backup footer */
+                if (fwrite(&amp;hdr, sizeof(hdr), 1, ctx-&gt;f) != 1) 
+                {
+                    return MCO_E_DISK_WRITE;
+                }
+                ...
+                break;
+&#160;
+            default:
+                return MCO_E_ILLEGAL_PARAM;
+        }
+&#160;
+        return MCO_S_OK;
+    }
+&#160;
+    MCO_RET mco_backup_chunk(uint4 chunk_id, const char* chunk, uint4 chunk_size, 
+                    void* param )
+    {
+        mco_backup_ctx_t *ctx = (mco_backup_ctx_t *)param;
+        ...
+        &#160;
+        /* write the chunk */
+        if (fwrite( chunk, chunk_size, 1, ctx-&gt;f) != 1) 
+        {
+            return MCO_E_DISK_WRITE;
+        }
+        ...
+        return MCO_S_OK;
+    }
+&#160;
+    MCO_RET mco_backup_create(mco_db_h con, char const* file_name, char const* label, 
+                    mco_backup_type type, char* err_buf, unsigned int * err_buf_sz)
+    {
+        MCO_RET rc;
+        mco_backup_ctx_t ctx;
+        ...
+&#160;
+        /* open a backup file */
+        ctx.f = fopen(file_name, "rb+”);
+        ...
+&#160;
+        /* run backup procedure passing-in two callbacks */
+        rc = mco_backup(con, label, type, mco_backup_info, mco_backup_chunk, &amp;ctx);
+        ...
+&#160;
+        /* close backup file */
+        fclose(ctx.f);
+        ...
+&#160;
+        return rc;
+    }
+&#160;
+    MCO_RET mco_restore_chunk(uint4* chunk_id, char** pchunk, uint4* pchunk_size, void * param)
+    {
+        mco_backup_ctx_t *ctx = (mco_backup_ctx_t *) param;
+        ...
+&#160;
+        /* read chunk into a buffer and return read size and the content */
+        ...
+&#160;
+        if ( ((*pchunk_size)=fread( ((*pchunk)=buf), size, 1, ctx-&gt;f)) != 1) 
+        {
+            return MCO_E_DISK_READ;
+        }
+&#160;
+        ...
+        return MCO_S_OK;
+    }
+&#160;
+    MCO_RET mco_backup_restore(mco_db_h con, char const* file_name, char const* label, 
+                    char const* cipher, char* err_buf, unsigned int * err_buf_sz)
+    {
+        MCO_RET rc;
+        mco_backup_ctx_t ctx;
+        mco_backup_info_t info;
+        ...
+        &#160;
+        /* open a backup file */
+        ctx.f = fopen(file_name, "rb+”);
+        ...
+        &#160;
+        /* read backup header and footer*/
+        fread( &amp;info, sizeof(info), ctx.f );
+        ...
+        &#160;
+        /* apply the backup from the file passing-in chunk read callback and the
+            backup info (header &amp; footer) */
+        rc = mco_restore(con, &amp;info, mco_restore_chunk, &amp;ctx);
+        ...
+&#160;
+        /* close backup file */
+        fclose(ctx.f);
+        ...
+&#160;
+        return rc;
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

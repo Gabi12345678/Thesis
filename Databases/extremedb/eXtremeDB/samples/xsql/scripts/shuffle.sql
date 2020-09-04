@@ -1,0 +1,12 @@
+create table A(id integer, s varchar);
+create table B(id integer, s varchar);
+insert into A values (1,'one');
+insert into A values (2,'one');
+insert into A values (3,'three');
+insert into A values (4,'four');
+insert into A values (5,'five');
+insert into B values (1,'1');
+insert into B values (3,'3');
+insert into B values (5,'5');
+select * from A join B on A.id = B.id;
+select * from A shuffle join B on A.id = B.id;

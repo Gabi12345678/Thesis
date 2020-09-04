@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Index Searches in C</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Index Searches in C</h1>
+            <blockquote>
+                <p>Search interfaces locate desired objects or groups of objects by unique identifier or by index.  Exact match lookups by <code>unique</code> identifier (including <code>unique hash</code>, <code>oid</code> and <code><a name="kanchor227"></a>autoid</code> ) using the <code>_find()</code> functions are extremely efficient for locating individual objects. <i>e</i>X<i>treme</i>DB also offers a rich set of specialized <a href="../../../Fundamental_Concepts/Indexes.htm">indexes</a> that employ <code>cursors</code> to navigate a group of objects as an ordered  result set with <a href="#B-Tree"><code>tree</code></a>-based (including <a href="#Patrici"><code>patricia</code></a>, <a href="#RTree"><code>rtree</code></a>, <a href="#KD-Tree"><code>kdtree</code></a> and <a href="#Trigram">trigram</a> ), or an unordered sequence of objects with <code><a href="#Hash">nonunique hash</a></code> or <a href="#List"><a href="#List"><code>list</code></a></a> indexes.</p>
+                <p>The C API also allows custom <a href="#User">user-defined</a> indexes.</p>
+                <h1><a name="Find"></a>Find</h1>
+                <p> 
+Generated <code>_find()</code> functions search an index for an exact match. By definition, an exact match lookup on a unique index returns exactly one result or zero if no match is found. So for C applications, the <code>_find()</code> functions do not require a cursor; the function returns an object handle through the output parameter. These <code>_find()</code> functions are generated for classes that have one or more <code>unique hash</code> indexes  or one or more <code>unique tree</code> indexes declared. </p>
+                <p>Note that <code>oid</code> and <code>autoid</code> are by definition <i>unique</i>. So an internally managed unique <code>hash</code> index is implemented for them and only exact match <code>_find()</code> functions are appropriate for <a href="#OID"><code>oid</code></a> and <a href="#Autoid"><code>autoid</code></a> object lookups.</p>
+                <p>For each unique index, an interface like the following is generated:
+</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET classname_index_name_find( /*IN*/ mco_trans_h trans,
+
+                                                            /*IN*/ &lt;type&gt; [*]param1,
+
+                                                            [/*IN*/ uint2 len1,]
+
+                                                            [/*IN*/ &lt;type&gt; [*]param2,
+                        
+                                    [/*IN*/ uint2 len2,] …]
+
+                                                            /*OUT*/ classname *handle);
+
+                        &#160;</pre>
+                </div>
+                <h3>Exact Match Lookup Example </h3>
+                <p>To demonstrate an exact match lookup, consider the following database schema:</p>
+                <div class="code-block"><pre>&#160;
+    class Employee
+    {
+        string name;
+        uint2  dept_no;
+&#160;
+        unique tree&lt;name&gt; Iname;
+    };
+    &#160;</pre>
+                </div>
+                <p>To lookup an Employee object by the <code>unique tree</code> index <code>Iname</code>, we could use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    Employee emp;
+    &#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+    if (MCO_S_OK == rc) 
+    {
+        rc = Employee_Iname_find(t, search_name, (uint2)strlen(search_name), &amp;emp);
+        if ( MCO_S_OK == rc) 
+        {
+            // Process Employee object
+        }
+        rc = mco_trans_commit(t);
+    }
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2><a name="OID"></a>OID Index Lookups</h2>
+                <p>As explained in the <a href="Indexes_Cursors_C.htm">Indexes and Cursors</a> page, only "exact match" searches are possible for <code>oid</code> which are performed using the generated <code>_oid_find()</code> function. To demonstrate, consider the following schema:</p>
+                <div class="code-block"><pre>&#160;
+    declare database mydb;
+    &#160;
+    // Define the OID struct
+    struct oid_struct 
+    {
+        uint4 a;
+        int1  b;
+    };
+    &#160;
+    declare oid oid_struct[OID_SIZE];
+    &#160;
+    class anObject
+    {
+        uint4 value;
+        &#160;
+        // Declare the OID index
+        oid;
+    };
+    &#160;</pre>
+                </div>
+                <p>The following <code>_oid_find()</code> function would be generated:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET      anObject_oid_find( mco_trans_h t, const mydb_oid *id, /*OUT*/ A *handle );
+    &#160;</pre>
+                </div>
+                <p>The following code snippet demonstrates how the <code>_oid_find()</code> function could be used to perform an "exact match" search:</p>
+                <div class="code-block"><pre>&#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+    if ( MCO_S_OK == rc ) 
+    {
+        anObject rec;
+        oid_struct findObj;
+        findObj.a = 1;
+        findObj.b = 99;
+        &#160;
+        rc = anObject_oid_find(t, &amp;findObj, &amp;rec);
+        if ( MCO_S_OK == rc )  
+        {
+            // Process the found object
+        }
+        mco_trans_rollback(t);
+    }
+&#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2><a name="Autoid"></a>Autoid Index Lookups</h2>
+                <p>As explained in the <a href="Indexes_Cursors_C.htm">Indexes and Cursors</a> page, only "exact match" searches are possible for <code>autoid</code> indexes which are performed using the generated <code>_autoid_find()</code> function. To demonstrate, consider the following schema:</p>
+                <div class="code-block"><pre>&#160;
+    class Department
+    {
+        autoid[1000];
+        string name;
+&#160;
+        unique tree&lt;name&gt; Iname;
+    };
+&#160;
+    class Employee
+    {
+        string name;
+        autoid_t dept;
+&#160;
+        unique tree&lt;name&gt; Iname;
+    };
+    &#160;</pre>
+                </div>
+                <p>Note that a one-to-many relationship between <i>Department</i> and <i>Employee</i> objects can be implemented through the reference field <code>dept</code> of type <code>autoid_t</code> in class <i>Employee</i>. The following <code>autoid_find()</code> function is generated for class <i>Department</i>:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET      Department_autoid_find( mco_trans_h t, autoid_t autoid_key_, 
+                            /*OUT*/ Department *handle_);
+    &#160;</pre>
+                </div>
+                <p>If each <i>Employee</i> object stores the <code>autoid</code> value of the <i>Department</i> object to which it belongs, the owner <i>Department</i> object could be quickly found with code like the following:</p>
+                <div class="code-block"><pre>    &#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+    if ( MCO_S_OK == rc ) 
+    {
+        rc = Employee_Iname_find(t, search_name, (uint2)strlen(search_name), &amp;emp);
+        if (MCO_S_OK == rc) 
+        {
+            Employee_dept_get(&amp;emp, &amp;dept_id1);
+            // Find the Department object by its autoid
+            rc = Department_autoid_find(t, dept_id1, &amp;dept1);
+            
+            if (MCO_S_OK == rc) 
+            {
+                // Process Department object
+            }
+        }
+        mco_trans_rollback(t);
+    }
+&#160;</pre>
+                </div>
+                <h1>Search</h1>
+                <p>A <code>cursor</code> is essentially an iterator over the collection of objects in a result set.  For each index declared for a class in the schema definition, the <a href="../../../Programming/C/DDL.htm">DDL</a> compiler generates functions to instantiate a cursor, position it based on some value(s), and obtain a handle to the database object from the cursor. <code>List</code>-based and non-unique <code>hash</code>-based cursors allow navigation in sequential order (first to last, or last to first), though the order of the sequence is not defined; it is simply a mechanism to iterate over the unordered list of objects of a class. A <code>list</code> or <code>nonunique hash</code> declaration in the schema file will cause the <a href="../../../Programming/C/DDL.htm">DDL</a> compiler to generate a cursor <code>_search()</code> function.</p>
+                <p>The  <code>_search()</code> functions for <code>tree</code> indexes, are used whenever it is necessary to:</p>
+                <ul>
+                    <li value="1">Establish a starting position in a sorted list with a known starting value and optionally retrieve subsequent results in ascending or descending sorted order.</li>
+                    <li value="2">Establish a starting position in a sorted list when only part of the starting value is known, find the closest match, and optionally retrieve subsequent results in ascending or descending sorted order.</li>
+                    <li value="3">Establish a starting position as above, iterate over the sorted list in ascending or descending sorted order until a lower or upper bound is reached, using the <code>_compare()</code> function to determine when the range limit is reached.</li>
+                </ul>
+                <p>The <code>_search()</code> functions for <code>nonunique hash</code> indexes (that allow duplicates) are used whenever it is necessary to:</p>
+                <ul>
+                    <li value="1">Establish a starting position with a known starting value and iterate over the list to retrieve each duplicate, using the <code>_compare()</code> function to determine when the last duplicate was retrieved.</li>
+                </ul>
+                <p>The following two functions are generated to obtain a cursor for a <code>list</code> or a field with a declared index:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET classname_list_cursor( /*IN*/  mco_trans_h t, /*OUT*/ mco_cursor_h c );
+&#160;
+    MCO_RET classname_indexname_index_cursor( /*IN*/  mco_trans_h t, /*OUT*/ mco_cursor_h c );
+    &#160;</pre>
+                </div>
+                <p>Note that after calling one of the above functions the cursor must be properly initialized with a cursor search or positioning function (see the following <a href="#Cursor">section</a>) to retrieve a valid database object handle.</p>
+                <p>The <code>_search()</code> functions generated for all <code>tree</code> indexes are of the following form:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET classname_indexname_search( /*IN*/ mco_trans_h trans,
+                        /*INOUT*/ mco_cursor_h cursor,
+                        /*IN*/ MCO_OPCODE op,
+                        /*IN*/ [const] &lt;type&gt; [*]param1,
+                        [[/*IN*/ uint2 len1,]
+                        [/*IN*/ [const] &lt;type&gt; [*]param2,
+                        [/*IN*/ uint2 len2,] …]);
+                        &#160;</pre>
+                </div>
+                <p>Here <code>MCO_OPCODE</code> represents a compare operation as defined in <a href="../../../Programming/C/Structures/Cursor.htm">cursor operator codes</a>.</p>
+                <p>The <code>_search()</code> functions generated for all <code>nonunique hash</code> indexes are of the following form:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET classname_indexname_search( /*IN*/ mco_trans_h trans,
+                        /*INOUT*/ mco_cursor_h cursor,
+                        /*IN*/ [const] &lt;type&gt; key);
+                        &#160;</pre>
+                </div>
+                <p>No <code>MCO_OPCODE</code> is required in this case because <code>hash</code> index searches are always for an exact match.</p>
+                <h2><a name="Cursor"></a>Cursor Navigation</h2>
+                <p>After positioning a cursor with a <code>_search()</code> function or one of the cursor positioning functions (<a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/first.htm"><code>mco_cursor_first()</code></a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/last.htm"><code>mco_cursor_last()</code></a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/next.htm"><code>mco_cursor_next()</code></a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/prev.htm"><code>mco_cursor_prev()</code></a>), the generated <a href="../../../Programming/C/Core_Functions/Generated/Class/from_cursor.htm"><code>_from_cursor()</code></a> function is used to obtain a handle to the object in order to then use object interface functions such as <code>_get()</code> or <code>_put()</code>:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET classname_from_cursor( /*IN*/  mco_trans_h t,
+                        /*IN*/  mco_cursor_h c,
+                        /*OUT*/ classname *object);
+                        &#160;</pre>
+                </div>
+                <p>The <a href="../../../Programming/C/Core_Functions/Generated/Index/locate.htm"><code>_locate()</code></a> function is used to position a <code>tree</code> index cursor based on an object reference.  The cursor must have been previously instantiated using the <a href="../../../Programming/C/Core_Functions/Generated/Index/index_cursor.htm"><code>_index_cursor()</code></a> function. The <a href="../../../Programming/C/Core_Functions/Generated/Index/locate.htm"><code>_locate()</code></a> function applies only to <code>tree</code>-based cursors (i.e. not to <code>list</code> or <code>hash</code> cursors):</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET classname_indexname_locate( /*IN*/    mco_trans_h t,
+                        /*INOUT*/ mco_cursor_h c,
+                        /*IN*/    classname * handle);
+                        &#160;</pre>
+                </div>
+                <p>An <i>e</i>X<i>treme</i>DB <code>tree</code> index is a tree-like structure in the application’s memory that contains a collection of keys. A key can be simple (based on a single field) or compound (containing more than one field).  The <code>tree</code> index stores the keys in sorted order. In order to support sorting, the <code>tree</code> index must have a <i>compare</i> function.  Regardless of the key type (simple or compound), the compare function must be able to compare two keys and determine whether the first key is less than (compare returns -1), equal to (0) or greater than (1) the second key. The <code>tree</code> index <a href="Search_Algorithm.htm">algorithm</a> sorts the keys based on this comparison.</p>
+                <blockquote>
+                    <p>
+                        <img src="../../../Resources/Images/note.png" /> Note: that the <code>tree</code> index <a href="Search_Algorithm.htm">algorithm</a> sorts the keys based on their relative weight, determined from the compare function results, rather than on the key’s value.</p>
+                </blockquote>
+                <p>The <a href="../../../Programming/C/Core_Functions/Generated/Index/compare.htm"><code>_compare()</code></a> function generated for each <code>tree</code> index has the following form:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET	classname_indexname_compare( /*IN*/ mco_trans_h trans,
+                        /*IN*/ mco_cursor_h cursor,
+                        /*IN*/ [const] &lt;type&gt; [*]param1,
+                        [[/*IN*/ uint2 len1,]
+                        [/*IN*/ [const] &lt;type&gt; [*]param2,
+                        [/*IN*/ uint2 len2,] …],
+                        /*OUT*/ int *result);
+                        &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2><a name="B-Tree"></a>B-Tree Index Search</h2>
+                <p>The <a href="Search_Algorithm.htm">search algorithm</a> page demonstrates how key weights determine the results of <code>tree</code> index searches and cursor navigation operations with two examples. To implement the first example in C, the <code>tree</code> index would be defined as a single <code>uint4</code> field, and the following compare function would be defined:</p>
+                <div class="code-block"><pre>&#160;
+    int compare_uint4( uint4 a, uint4 b)
+    {
+        if ( a == b ) return 0;
+        if ( a &gt; b ) return 1;
+        return -1;
+    };
+    &#160;</pre>
+                </div>
+                <p>For the second example, the key is represented as a structure containing two fields, <code>uint4</code> and <code>char[16]</code>:</p>
+                <div class="code-block"><pre>&#160;
+    typedef struct
+    {
+        uint4 f1;
+        char  f2[16];
+    } the_key;
+    &#160;</pre>
+                </div>
+                <p>The compare function compares integers as in the above sample and the char buffers as ASCII characters:</p>
+                <div class="code-block"><pre>&#160;
+    int compare_compound_key ( the_key a, the_key b )
+    {
+        int i;
+&#160;
+        if ( a.f1 &lt; b.f1 ) return -1;
+        if ( a.f2 &gt; b.f2 ) return 1;
+&#160;
+        for ( i=0; i&lt;sizeof(the_key.f2); i++ )
+        {
+            if ( a.f2[i] &lt; b.f[2] ) return -1;
+            if ( a.f2[i] &gt; b.f[2] ) return 1;
+        }
+&#160;
+        return 0;
+    };
+    &#160;</pre>
+                </div>
+                <p>Please refer to the <a href="Search_Algorithm.htm">search algorithm</a> page to see how the cursor position is determined after calling a <a href="../../../Programming/C/Core_Functions/Generated/Index/search.htm"><code>_search()</code></a> function, and what would be the results of calling <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/prev.htm"><code>mco_cursor_prev()</code></a> and <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/next.htm"><code>mco_cursor_next()</code></a> with each of the possible cursor operation codes.</p>
+                <h3>B-Tree search example.</h3>
+                <p>To demonstrate a common <code>tree</code> index search scenario, consider the following database schema:</p>
+                <div class="code-block"><pre>&#160;
+    class anObject
+    {
+        uint4 value;
+&#160;
+        tree &lt;value&gt; Idx; // Equivalent to "nonunique tree&lt;value&gt; Idx;"
+    };
+    &#160;</pre>
+                </div>
+                <p>Note that the <code>tree</code> declaration without the explicit <code>unique</code> qualifier defaults to <code>nonunique</code>; i.e. allow duplicates. To perform a search on index <code>Idx</code>, we could use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+    if ( MCO_S_OK == rc )  
+    {
+        rc = anObject_Idx_index_cursor(t, &amp;csr);
+        if ( MCO_S_OK == rc ) 
+        {
+            printf("\nObjects with value == %d : ", search_value);
+            for (rc = anObject_Idx_search(t, &amp;csr, MCO_EQ, search_value); 
+                    MCO_S_OK == rc; rc = mco_cursor_next(t, &amp;csr)) 
+            {
+                int result = 0;
+                /* Use _compare() to stop before the object with non-equal value */
+                anObject_Idx_compare(t, &amp;csr, search_value, &amp;result);
+                if (result) break;
+&#160;
+                anObject_from_cursor(t, &amp;csr, &amp;obj);
+                anObject_value_get(&amp;obj, &amp;value);
+                printf("(%d) ", value);
+            }
+        }
+        mco_trans_rollback(t);
+    }
+    &#160;</pre>
+                </div>
+                <p>Note that when it returns <code>MCO_S_OK</code> the generated <code>_search()</code> function positions the <code>cursor</code> at the first index value matching the specified key (<code>search_value</code>). After processing the first found object, <code>mco_cursor_next()</code> is called to advance the cursor. Within the processing loop, the generated <code>_compare()</code> function is called to assure that the index value of the current object is still equal to the specified key (<code>search_value</code>). When the compare function returns a non-zero value we exit the processing loop.</p>
+                <h3>A common search and delete mistake</h3>
+                <p>Sometimes, C applications need to obtain a <code>cursor</code> to traverse through a class and delete some of the objects in the process.  The <code>cursor</code> contains a reference to the current object. Therefore, if the current object is deleted, the <code>cursor</code><a name="kanchor228"></a> is unable to move and the database runtime returns a <code>MCO_E_CURSOR_INVALID</code> error code.  To remove an object within a <code>cursor</code>, the application needs to first move the <code>cursor</code> and, after the <code>cursor</code> no longer points to the target object, delete the object. Note that this is true regardless of the type of index to which this <code>cursor</code> corresponds. The following pseudo-code illustrates this technique:</p>
+                <div class="code-block"><pre>&#160;
+    rc = open_cursor(cursor);
+    while (rc == MCO_S_OK &amp;&amp; (rc = from_cursor(cursor,obj)) == MCO_S_OK)
+    {
+        rc = move_cursor(cursor);
+        delete_obj(obj);
+    }
+    &#160;</pre>
+                </div>
+                <h2>Pattern Search</h2>
+                <p>As described in the <a href="../Searches.htm">Searches</a> page, <i>e</i>X<i>treme</i>DB supports wildcard pattern matching. To illustrate the use of the generated pattern search functions, consider the following class definition:</p>
+                <div class="code-block"><pre>&#160;
+    class PatternTest
+    {
+        string      key1;
+        char&lt;20&gt;    key2;
+        int4        key3;
+        &#160;
+        tree &lt;key1,key2,key3&gt; i1;
+        tree &lt;key2,key3&gt; i2;
+    };
+    &#160;</pre>
+                </div>
+                <p>The schema compiler will generate the following  functions for index <code>i1</code>:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET  PatternTest_i1_pattern_size( const    char *key1, uint2 sizeof_key1, const    char *key2,
+                            uint2 sizeof_key2, int4  key3 /*OUT*/ uint4 *pattern_size);
+&#160;
+    MCO_RET  PatternTest_i1_pattern_search( mco_trans_h t, void        *allocated_pattern, uint4        memsize,
+                            PatternTest *obj, const char  *key1, uint2        sizeof_key1,
+                            const char  *key2, uint2        sizeof_key2, int4         key3 );
+&#160;
+    MCO_RET  PatternTest_i1_pattern_next( mco_trans_h  t, void        *allocated_pattern, PatternTest *obj);
+    &#160;</pre>
+                </div>
+                <p>To use <code>i1</code> to perform a pattern search, requires the following steps:</p>
+                <p>First, allocate a buffer that the <i>e</i>X<i>treme</i>DB run-time uses as a state machine during the pattern search. The size of the buffer required is determined by <code>&lt;classname&gt;_pattern_size()</code>, for example:</p>
+                <div class="code-block"><pre>&#160;
+    char *key1 = "Gr?ve*";
+    char *key2 = S"*";
+    uint4 key3 = 46;
+    void *buf;
+    uint4 bsize;
+    PatternTest pat;
+&#160;
+    PatternTest_i1_pattern_size(key1, strlen(key1), key2, strlen(key2), key3, &amp;bsize);
+    buf = malloc(bsize);
+    &#160;</pre>
+                </div>
+                <p>Now a loop to retrieve the index entries that match the specified pattern could be coded as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    for( rc = PatternTest_i1_pattern_search( transaction, buf, bsize, &amp;pat, key1, 
+                            strlen(key1), key2, strlen(key2), key3 );
+&#160;
+        rc == MCO_S_OK ;
+        rc = PatternTest_i1_pattern_next(transaction, buf, &amp;pat) 
+    {
+        ... 
+    }
+    free(buf);
+    &#160;</pre>
+                </div>
+                <h3>Pattern Search Policy</h3>
+                <p>Pattern search is controlled by information the runtime obtains from a <code>mco_pattern_policy_t</code> structure that can be customized by the application. The following functions use the pattern policy structure to get and set the pattern matching policy:</p>
+                <div class="code-block"><pre>&#160;
+    typedef struct mco_pattern_policy_t_ 
+    {
+        char ignore_other_fields; // default = MCO_NO
+        char any_char;            // default = ‘*’
+        char one_char;            // default = ‘?’
+        nchar_t any_nchar;        // default = 0x002a
+        nchar_t one_nchar;        // default = 0x003f
+        #ifdef MCO_CFG_WCHAR_SUPPORT
+            wchar_t any_wchar;        // default = (wchar_t)0x002a
+            wchar_t one_wchar;        // default = (wchar_t)0x003f
+        #endif
+    };
+    &#160;
+    void mco_get_default_pattern_policy(mco_pattern_policy_t * p);
+    MCO_RET mco_get_pattern_policy(mco_trans_h t, mco_pattern_policy_t *p);
+    MCO_RET mco_set_pattern_policy(mco_trans_h t, const mco_pattern_policy_t *p);
+    &#160;</pre>
+                </div>
+                <p>The <code>ignore_other_fields</code> element controls whether non-character fields that participate in an index are considered during the pattern matching or not. In the example at the beginning of this section, an index consisting of two character fields and a 4-byte integer field was defined. By setting <code>ignore_other_fields = MCO_YES</code> this index can be used to match patterns on the two character fields without regard to the value of the integer field.</p>
+                <p>The following code snippet demonstrates how the pattern matching policy might be changed:</p>
+                <div class="code-block"><pre>&#160;
+    mco_pattern_policy_t p;
+    /*
+    * NOTE: The change policy operation must be executed within a Read_Write
+    * transaction.
+    */
+    mco_get_pattern_policy(trn, &amp;p);
+    p.ignore_other_fields = MCO_YES;
+    mco_set_pattern_policy(trn, &amp;p);
+&#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2><a name="Patrici"></a> Patricia Index Search</h2>
+                <p>As explained in the <a href="Indexes_Cursors_C.htm">Indexes and Cursors</a> page, the <code>patricia</code> index can be declared only on single fields (not multiple fields) and can be <code>unique</code>; in the absence of the <code>unique</code> keyword it defaults to allowing duplicates.  </p>
+                <p>Searches on <code>patricia</code> indexes are performed using the generated functions <code><a href="../../../Programming/C/Core_Functions/Generated/Index/longest_match_patricia_bitarray.htm">_longest_match()</a>, <a href="../../../Programming/C/Core_Functions/Generated/Index/exact_match_patricia_bitarray.htm">_exact_match()</a>, <a href="../../../Programming/C/Core_Functions/Generated/Index/prefix_match_patricia_bitarray.htm">_prefix_match()</a></code> and <a href="../../../Programming/C/Core_Functions/Generated/Index/next_match_patricia_bitarray.htm"><code>_next_match()</code></a>. </p>
+                <p>Please refer to the <a href="Patricia.htm">Patricia Index</a> page for explanations and examples of how these <code>patricia</code>-specific search operations work. To demonstrate use of the <code>patricia</code> C APIs, two SDK samples are provided: <a href="../../../Programming/C/SDK_Samples/Core_Samples/05-Indexes_Patricia_Character.htm">05-Indexes_Patricia_Character</a> and <a href="../../../Programming/C/SDK_Samples/Core_Samples/05-Indexes_Patricia_Binary.htm">05-Indexes_Patricia_Binary</a>. Code snippets from the second sample are used below to illustrate the different types of <code>patricia</code> index searches.</p>
+                <p>Consider the class <i>AreaCode</i> with a bit array and string fields like the following:</p>
+                <div class="code-block"><pre>&#160;
+    class AreaCode
+    {
+        vector&lt;boolean&gt; areaCode;
+        char&lt;4&gt; strAreaCode
+        &#160;
+        patricia&lt;areaCode&gt; IareaCode;
+    };
+    &#160;</pre>
+                </div>
+                <h3>Sequential search</h3>
+                <p>To sequentially list the contents of the database using the <code>patricia</code> index <code>IareaCode</code>, we could use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    rc = mco_trans_start(db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;trn);
+    if ( MCO_S_OK == rc ) 
+    {
+        /* initialize cursor */
+        rc = AreaCodeBool_IareaCode_index_cursor(trn, &amp;csr);
+        if ( MCO_S_OK == rc ) 
+        {
+            for (rc = mco_cursor_first(trn, &amp;csr); MCO_S_OK == rc; 
+                rc = mco_cursor_next(trn, &amp;csr))
+            {
+                rc = AreaCodeBool_from_cursor(trn, &amp;csr, &amp;areaCode);
+                prnObject(&amp;areaCode);
+            }
+        }
+        rc = mco_trans_commit(trn);
+    }
+    &#160;</pre>
+                </div>
+                <p> Note that here the <code>_search()</code> function is not needed as the cursor is simply positioned using <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/first.htm"><code>mco_cursor_first()</code></a> and the sequential navigation of database objects is performed by calling function <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/next.htm"><code>mco_cursor_next()</code></a>. </p>
+                <p>In the search examples that follow, the generated <a href="../../../Programming/C/Core_Functions/Generated/Index/next_match_patricia_bitarray.htm"><code>_next_match()</code></a> function will be used to advance the <code>cursor</code> position which assures that the next object in the result set still matches the given  key value (<code>AreaCode</code>).</p>
+                <p>
+                    <img src="../../../Resources/Images/note.png" />Note that the cursor functions <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/next.htm"><code>mco_cursor_next()</code></a> or <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/prev.htm"><code>mco_cursor_prev()</code></a>could be used,  instead of the <code>patricia</code>-specific function <a href="../../../Programming/C/Core_Functions/Generated/Index/next_match_patricia_bitarray.htm"><code>_next_match()</code></a>, to traverse result sets. But this would require calling the <code>cursor</code> compare function to determine if the index still matches the key.</p>
+                <p>In the following code snippets, the functions <code>calcBitLen()</code>and <code>make_mask()</code> work in combination to calculate the size of the bit array and the hex value for a given <code>AreaCode</code>; and <code>prnObject()</code> simply displays the <code>AreaCode</code> and <code>strAreaCode</code> values for the current object. (Please see SDK sample <a href="../../../Programming/C/SDK_Samples/Core_Samples/05-Indexes_Patricia_Binary.htm">05-Indexes_Patricia_Binary</a> for implementation details.) </p>
+                <h3>Exact Match search</h3>
+                <p>To perform an "exact match" search, we could use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;trn);
+    if ( MCO_S_OK == rc ) 
+    {
+        rc = AreaCodeBool_IareaCode_index_cursor(trn, &amp;csr);
+        sz = calcBitLen(AreaCode);
+        rc = AreaCodeBool_IareaCode_exact_match(trn, &amp;csr, (char*)make_mask(AreaCode, sz), sz);
+        if ( MCO_S_OK == rc )
+        {
+            printf("\tFound ExactMatch for key %x:\n", AreaCode);
+            while ( MCO_S_OK == rc )
+            {
+                rc = AreaCodeBool_from_cursor(trn, &amp;csr, &amp;areaCode);
+                prnObject(&amp;areaCode);
+                rc = AreaCodeBool_IareaCode_next_match(trn, &amp;csr, (char*)make_mask(AreaCode, sz), sz);
+            }
+        }
+        else
+        {
+            printf("\tExactMatch not found for key %x:\n", AreaCode);
+        }
+        rc = mco_trans_commit(trn);
+    }
+    &#160;</pre>
+                </div>
+                <h3>Prefix Match Search</h3>
+                <p>To perform a "prefix match" search, we could use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;trn);
+    if ( MCO_S_OK == rc ) 
+    {
+        rc = AreaCodeBool_IareaCode_index_cursor(trn, &amp;csr);
+        sz = calcBitLen(AreaCodePref);
+        rc = AreaCodeBool_IareaCode_prefix_match(trn, &amp;csr, (char*)make_mask(key, sz), sz);
+        if ( MCO_S_OK == rc )
+        {
+            int found = 0;
+            while ( MCO_S_OK == rc )
+            {
+                if (!found)
+                {
+                    printf("\tFound PrefixMatch for key %x:\n", AreaCodePref);
+                }
+                found = 1;
+                rc = AreaCodeBool_from_cursor(trn, &amp;csr, &amp;areaCode);
+                prnObject(&amp;areaCode);
+                rc = AreaCodeBool_IareaCode_next_match(trn, &amp;csr, (char*)make_mask(key, sz), sz);
+            }
+            if (!found)
+            {
+                printf("\tPrefixMatch not found for key %x:\n", AreaCodePref);
+            }
+        }
+        else
+        {
+            printf("\tPrefixMatch not found for key %x:\n", AreaCodePref);
+        }
+        rc = mco_trans_commit(trn);
+    }
+    &#160;</pre>
+                </div>
+                <h3>Longest Match Search</h3>
+                <p>To perform a "longest match" search, we could use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;trn);
+    if ( MCO_S_OK == rc ) 
+    {
+        rc = AreaCodeBool_IareaCode_index_cursor(trn, &amp;csr);
+        sz = calcBitLen(AreaCodePref);
+        rc = AreaCodeBool_IareaCode_longest_match(trn, &amp;csr, (char*)make_mask(key, sz), sz);
+        if ( MCO_S_OK == rc )
+        {
+            int found = 0;
+            while ( MCO_S_OK == rc )
+            {
+                if (!found)
+                {
+                    printf("\tFound LongestMatch for key %x:\n", AreaCodePref);
+                }
+                found = 1;
+                &#160;
+                rc = AreaCodeBool_from_cursor(trn, &amp;csr, &amp;areaCode);
+                prnObject(&amp;areaCode);
+                rc = AreaCodeBool_IareaCode_next_match(trn, &amp;csr, (char*)make_mask(key, sz), sz);
+            }
+            if (!found)
+            {
+                printf("\tLongestMatch not found for key %x:\n", AreaCodePref);
+            }
+        }
+        else
+        {
+            printf("\tLongestMatch not found for key %x:\n", AreaCodePref);
+        }
+        rc = mco_trans_commit(trn);
+    }
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2><a name="RTree"></a>R-Tree Index Search</h2>
+                <p>As explained in the <a href="Indexes_Cursors_C.htm">Indexes and Cursors</a> page, the <code>rtree</code> is commonly used to speed spatial searches. Searches on <code>rtree</code> indexes are performed using the generated <code>_search()</code> function with  one of the four <code>MCO_OPCODES</code>: <code>MCO_EQUAL, MCO_OVERLAP, MCO_CONTAIN</code> or <code>MCO_NEIGHBORHOOD</code>.</p>
+                <p>Please refer to the <a href="RTree.htm">RTree Index</a> page for explanations and examples of how these <code>rtree</code>-specific search operations work. To demonstrate use of the <code>rtree</code> C APIs, the SDK sample <a href="../../../Programming/C/SDK_Samples/Core_Samples/05-Indexes_Rtree.htm">05-Indexes_rtree</a> is provided.  Code snippets from this sample are used below to illustrate the different types of <code>rtree</code> index searches.</p>
+                <p>Consider the class <i>rtrree_class</i> with a definition like the following:</p>
+                <div class="code-block"><pre>    &#160;
+    class rtree_class
+    {
+        int2 	square[4];
+&#160;
+        rtree &lt;square&gt;  ridx;
+    };
+    &#160;</pre>
+                </div>
+                <h3>Sequential search</h3>
+                <p>To sequentially list the contents of the <code>cursor</code> using the <code>rtree</code> index <code>ridx</code>, we could use code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    int iterate_rects(mco_trans_h t, mco_cursor_t *c, mco_bool reverse_order)
+    {
+        MCO_RET rc;
+        int i;
+        rtree_class obj;
+        int2 square[4];
+        &#160;
+        rc = (reverse_order == MCO_NO) ? mco_cursor_first(t, c) : mco_cursor_last(t, c);
+        for (i = 0; MCO_S_OK == rc; i++) 
+        {
+            rc = rtree_class_from_cursor(t, c, &amp;obj);
+            rc = rtree_class_square_get_range(&amp;obj, 0, 4, (int2*)square);
+            printf("\t%d. (%d,%d) - (%d,%d)\n", i + 1, square[0], square[1], square[2], square[3]);
+            rc = (reverse_order == MCO_NO) ? mco_cursor_next(t, c) : mco_cursor_prev(t, c);
+        }
+        return i;
+    }
+    &#160;</pre>
+                </div>
+                <p> Note that here the <code>_search()</code> function is not needed as the cursor is simply positioned using <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/first.htm"><code>mco_cursor_first()</code></a> or <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/last.htm"><code>mco_cursor_last()</code></a> depending on the value of flag <code>reverse_order</code> and the sequential navigation of database objects is performed by calling function <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/next.htm"><code>mco_cursor_next()</code></a> or <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/prev.htm"><code>mco_cursor_prev()</code></a>.</p>
+                <h3>Exact Match search</h3>
+                <p>To perform an "exact match" search, we use <i>opcode</i> <code>MCO_EQ</code> with code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+    if ( MCO_S_OK == rc ) 
+    {
+        mco_cursor_t c;
+        int2 rect[4] = { 25, 25, 50, 35 };
+        &#160;
+        rc = rtree_class_ridx_index_cursor(t, &amp;c);
+        rc = rtree_class_ridx_search(t, MCO_EQ, &amp;c, (int2*)rect);
+        if ( MCO_S_OK == rc ) 
+        {
+            // Process the found rect
+        }
+        rc = mco_trans_commit(t);
+    }
+    &#160;</pre>
+                </div>
+                <h3>Overlaps Search</h3>
+                <p>To find rectangles that overlap the specified <code>rect</code> and iterate them, we use <i>opcode</i> <code>MCO_OVERLAP</code> with code like the following:</p>
+                <div class="code-block"><pre>    &#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+    if ( MCO_S_OK == rc ) 
+    {
+        mco_cursor_t c;
+        int2 rect[4] = { 25, 25, 50, 35 };
+        &#160;
+        rc = rtree_class_ridx_index_cursor(t, &amp;c);
+        rc = rtree_class_ridx_search(t, MCO_OVERLAP, &amp;c, (int2*)rect);
+        if ( MCO_S_OK == rc ) 
+        {
+            iterate_rects(t, &amp;c, MCO_NO);
+        }
+        rc = mco_trans_commit(t);
+    }
+    &#160;</pre>
+                </div>
+                <p>(Note that the function <code>iterate_rects()</code>  which sequentially lists the contents of the <code>cursor</code> is shown above.)</p>
+                <h3>Contains Search</h3>
+                <p>To find rectangles that contain the specified <code>rect</code> and iterate them, we use <i>opcode</i> <code>MCO_CONTAIN</code> with code like the following:</p>
+                <div class="code-block"><pre>    &#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+    if ( MCO_S_OK == rc ) 
+    {
+        mco_cursor_t c;
+        int2 rect[4] = { 25, 25, 50, 35 };
+        &#160;
+        rc = rtree_class_ridx_index_cursor(t, &amp;c);
+        rc = rtree_class_ridx_search(t, MCO_CONTAIN, &amp;c, (int2*)rect);
+        if ( MCO_S_OK == rc ) 
+        {
+            iterate_rects(t, &amp;c, MCO_NO);
+        }
+        rc = mco_trans_commit(t);
+    }
+    &#160;</pre>
+                </div>
+                <p>(Note that the function <code>iterate_rects()</code>  which sequentially lists the contents of the <code>cursor</code> is shown above.)</p>
+                <h3>Neighborhood Search</h3>
+                <p>To list all rectangles in order of their distance from a specified point (a rectangle with 0 height and width), we use <i>opcode</i> <code>MCO_NEIGHBOURHOOD</code> with code like the following:</p>
+                <div class="code-block"><pre>    &#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+    if ( MCO_S_OK == rc ) 
+    {
+        mco_cursor_t c;
+        int2 point[4] = { 10, 10, 10, 10 };
+        &#160;
+        rc = rtree_class_ridx_index_cursor(t, &amp;c);
+        rc = rtree_class_ridx_search(t, MCO_NEIGHBOURHOOD, &amp;c, (int2*)point);
+        if ( MCO_S_OK == rc ) 
+        {
+            iterate_rects(t, &amp;c, MCO_NO);
+        }
+        rc = mco_trans_commit(t);
+    }
+    &#160;</pre>
+                </div>
+                <p>(Note that the function <code>iterate_rects()</code>,  which sequentially lists the contents of the <code>cursor</code>, is shown above. )</p>
+                <p>&#160;</p>
+                <h2><a name="KD-Tree"></a>KD-Tree Index Search</h2>
+                <p>As explained in the <a href="Indexes_Cursors_C.htm">Indexes and Cursors</a> page, <code>kdtree</code> indexes are ideal for multi-dimensional key value searches. Searches on <code>kdtree</code> indexes are performed using the generated <code>_search()</code> function using a <i>Query-By-Example</i> approach to locate objects that match a given search condition. </p>
+                <p>Please refer to the <a href="KDTree.htm">KDTree Index</a> page for explanations and examples of how this <code>kdtree</code>-specific search works. To demonstrate use of the <code>kdtree</code> C APIs, the SDK sample <a href="../../../Programming/C/SDK_Samples/Core_Samples/05-Indexes_Kdtree.htm">05-Indexes_kdtree</a> is provided.  Code snippets from this sample are used below to illustrate <i>Query-By-Example</i> searches.</p>
+                <p>Consider the database schema presented in  the <a href="KDTree.htm">KDTree Index</a> page:</p>
+                <div class="code-block"><pre>&#160;
+    class Car
+    {
+        string vendor;
+        string model;
+        string color;
+        uint4 year;
+        uint4 mileage;
+        boolean automatic;
+        boolean ac;
+        uint4 price;
+        char&lt;3&gt; state;
+        string description;
+        &#160;
+        kdtree &lt;year, mileage, color, model, vendor, automatic, ac, price&gt; index;
+    };
+    &#160;</pre>
+                </div>
+                <p>To perform a <i>Query-By-Example</i> search, we temporarily insert a single "pattern object" if an exact match search, or two boundary "pattern objects" <code>from</code> and <code>till</code> to specify a range. Then we call the generated <code>_search()</code> function and use the cursor functions <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/next.htm"><code>mco_cursor_next()</code></a> or <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/prev.htm"><code>mco_cursor_prev()</code></a> to advance through the result set. For example:</p>
+                <div class="code-block"><pre>&#160;
+    /* Use read-write transaction to store boundary patterns in the database */
+    rc = mco_trans_start(db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t);
+    if (rc == MCO_S_OK) 
+    {
+        Car_new(t, &amp;from); /* Create low boundary pattern object */
+        Car_new(t, &amp;to);   /* Create high boundary pattern object */
+        Car_vendor_put(&amp;from, "Ford", 4); Car_vendor_put(&amp;to, "Ford", 4);
+        Car_price_put(&amp;to, 30000);
+        Car_year_put(&amp;from, 2000); Car_year_put(&amp;to, 2006);
+        Car_mileage_put(&amp;to, 100000);
+        printf("\n\n\tRange results for:");
+        print_car("\t(from", &amp;from );
+        print_car("\t(to", &amp;to );
+        printf("\n");
+        &#160;
+        Car_index_index_cursor(t, &amp;cursor);
+        rc = Car_index_search(t, &amp;cursor, &amp;from, &amp;to);
+        for ( i=1; MCO_S_OK == rc; i++ ) 
+        {
+            Car choice;
+            Car_from_cursor(t, &amp;cursor, &amp;choice);
+            sprintf( str, "%d", i );
+            print_car( str, &amp;choice);
+            rc = mco_cursor_next(t, &amp;cursor);
+        }
+        Car_delete(&amp;from); /* Delete pattern */
+        Car_delete(&amp;to); /* Delete pattern */
+        mco_trans_commit(t);
+    }
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2><a name="Trigram"></a>Trigram Index Search</h2>
+                <p>As explained in the <a href="Indexes_Cursors_C.htm">Indexes and Cursors</a> page, <code>trigram</code> indexes are  ideal for text searches when the exact spelling of the target object is not precisely known. </p>
+                <p>&#160;</p>
+                <h2><a name="Hash"></a>Hash Index Searches</h2>
+                <p>As explained in the <a href="Indexes_Cursors_C.htm">Indexes and Cursors</a> page, <code>hash</code> indexes are generally used for efficient object lookups. Also, as explained in the <a href="#Find">Find section</a> above,  a <code>nonunique hash</code> declaration in the schema file will cause the <a href="../../../Programming/C/DDL.htm">DDL</a> compiler to generate a cursor <code>_search()</code> function which allows navigation in sequential order (first to last, or last to first) over the unordered list of objects of a class. To demonstrate use of the <code>hash</code> C APIs, the SDK sample <a href="../../../Programming/C/SDK_Samples/Core_Samples/05-Indexes_Hash.htm">05-Indexes_hash</a> is provided.  Code snippets from this sample are used below to illustrate a <code>nonunique hash</code> search.</p>
+                <p>Consider the database schema presented in  the <a href="Indexes_Cursors_C.htm">Indexes and Cursors</a> page:</p>
+                <div class="code-block"><pre>&#160;
+    class Record
+    {
+        uint4  iIdx;                  /* Index      */
+        uint4  iSeries;							  /* Series of measurement */
+&#160;
+        hash &lt;iIdx&gt;  I_Index[10000];
+        nonunique hash &lt;iSeries&gt; I_Series[10000];
+    };
+    &#160;</pre>
+                </div>
+                <p>The following code snippet demonstrates how to use a non-unique <code>hash</code> index to search for all objects having a specified <code>hash</code> table value:</p>
+                <div class="code-block"><pre>&#160;
+    /* Show all records with specified value in non-unique index */
+    printf("\n\n\tSearch for records with iSeries == %d :", findValue);
+    &#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+    if ( MCO_S_OK == rc )  
+    {
+        /* Open the cursor */
+        rc = Record_I_Series_index_cursor(t, &amp;csr);
+        if ( MCO_S_OK ==  rc )  
+        {
+            /* Search for records with specified value for iSeries */
+            rc = Record_I_Series_search(t, &amp;csr, findValue);
+            if ( MCO_S_OK ==  rc )  
+            {
+                Record rec;
+                /* Move to first item */
+                rc = mco_cursor_first(t, &amp;csr);
+                /* Show all records in cursor */
+                for (i = 0; i &lt; nRecs &amp;&amp; MCO_S_OK == rc; i++)  {
+                /* Get Record from cursor */
+                Record_from_cursor(t, &amp;csr, &amp;rec);
+                Record_iIdx_get(&amp;rec, &amp;idx);
+                Record_iSeries_get(&amp;rec, &amp;series);
+                printf("\n\tIndex %d Series %d", idx, series);
+                /* Move to next item */
+                rc = mco_cursor_next(t, &amp;csr);
+            }
+        }
+        /*  Close the transaction */
+        mco_trans_rollback(t);
+    }
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2><a name="List"></a>List Index Searches</h2>
+                <p>As explained in the <a href="#Find">Find section</a> above,  a <code>list</code> declaration in the schema file will cause the creation of an internal <code>hash</code> index which allows navigation in sequential order (first to last, or last to first) over the unordered list of objects of a class. </p>
+                <p>To demonstrate, consider the following schema:</p>
+                <div class="code-block"><pre>&#160;
+    class anObject
+    {
+        uint4 value;
+        &#160;
+        list;
+    };
+    &#160;</pre>
+                </div>
+                <p>For this class a  <code>_cursor()</code> function is generated like the following:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET anObject_list_cursor( mco_trans_h t, /*OUT*/ mco_cursor_h c );
+    &#160;</pre>
+                </div>
+                <p>The following code snippet could be used to scroll through the objects of this class:</p>
+                <div class="code-block"><pre>&#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+    if ( MCO_S_OK == rc )  
+    {
+        rc = anObject_list_cursor(t, &amp;csr);
+        if ( MCO_S_OK == rc ) 
+        {
+            printf("All objects             : ");
+            for (rc = mco_cursor_first(t, &amp;csr); 
+                rc == MCO_S_OK; 
+                rc = mco_cursor_next(t, &amp;csr)) 
+            {
+                anObject_from_cursor(t, &amp;csr, &amp;obj);
+                anObject_value_get(&amp;obj, &amp;value);
+                printf("(%d) ", value);
+            }
+        }
+        mco_trans_rollback(t);
+    }
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2><a name="User"></a>User Defined Index Searches</h2>
+                <p>As explained in the <a href="Indexes_Cursors_C.htm">Indexes and Cursors</a> page, C applications can declare a <code>hash</code> or <code>tree</code> index <code>userdef</code> and define custom compare functions for them. For <code>userdef hash</code> indexes, only a <code>_find()</code> function is generated. So only exact match searches are appropriate. But for <code>userdef tree</code> indexes, both exact match and index searches can be implemented which will use the custom compare functions defined by the developer.</p>
+                <p>Before the user-defined index functions can be used, the application must register the custom compare and hash functions with the database runtime. This is done via the <code>mco_db_register_udf()</code> API:</p>
+                <div class="code-block"><pre>    &#160;
+    MCO_RET mco_db_register_udf( const char * db_name, mco_userdef_funcs_h udfs );
+    &#160;</pre>
+                </div>
+                <p>The second argument <code>udfs</code> is a pointer to the custom functions table obtained via the generated <code>dbname_get_udfs()</code> function. The <code><a href="../../../Programming/C/Core_Functions/Static/Database_Control/register_udf.htm">mco_db_register_udf()</a></code> must be called after <a href="../../../Programming/C/Core_Functions/Static/Runtime_Control/runtime_start.htm"><code>mco_runtime_start()</code></a> and before the call to <a href="../../../Programming/C/Core_Functions/Static/Database_Control/connect.htm"><code>mco_db_connect()</code></a> that creates a connection to the database.  For example:</p>
+                <div class="code-block"><pre>&#160;
+    mco_runtime_start();
+&#160;
+    mco_db_open("MyDB", mydb_get_dictionary(), start_mem, DBSIZE, PAGESIZE);
+    &#160;
+    mco_db_register_udf("MyDB", mydb_get_udfs());
+    &#160;
+    mco_db_connect("MyDB", &amp;db);
+    ...&lt;continue processing&gt;...
+    &#160;</pre>
+                </div>
+                <p>If user-defined indexes are declared for the database, but custom functions are not registered via the <code><a href="../../../Programming/C/Core_Functions/Static/Database_Control/register_udf.htm">mco_db_register_udf()</a></code>, the call to <a href="../../../Programming/C/Core_Functions/Static/Database_Control/connect.htm"><code>mco_db_connect()</code></a> will return the <code>MCO_E_NOUSERDEF_FUNCS</code> return code.</p>
+                <p>Now search operations can be performed using the user-defined index in the same manner as a normal <code>tree</code> index. For example:</p>
+                <div class="code-block"><pre>&#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+    if (rc == MCO_S_OK) 
+    {
+        /* Using userdef tree index */
+        rc = Record_tudf_index_cursor(t, &amp;c);
+        if (rc == MCO_S_OK) {
+        for (rc = mco_cursor_first(t, &amp;c); 
+            rc == MCO_S_OK; 
+            rc = mco_cursor_next(t, &amp;c))  
+        {
+            Record_from_cursor(t, &amp;c, &amp;rec);
+            Record_name_get(&amp;rec, buf, 11, &amp;len);
+            Record_value_get(&amp;rec, &amp;value);
+            printf("\n\t%-15s, value = %d", buf, value);
+        }
+        rc = mco_trans_commit(t);
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

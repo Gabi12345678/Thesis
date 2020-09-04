@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Analytics Functions Library Examples</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Analytics Functions Library Examples</h1>
+            <blockquote>
+                <p> The table below lists a number of examples using the Vector-based Analytics Functions library. The first example demonstrates how a C API "pipeline" of function calls can be used to compute closing prices adjusting for splits; then compares this to the SQL <code>select</code> statement which performs the same computation. As the SQL API is more compact, it is used for the remaining examples.</p>
+                <h2>SQL syntax extension: the @ operator</h2>
+                <p>The examples 3 through 14 give the flavor of <code>select</code> statements using <code>sequences</code> or what are typically referred to as “time series”. Some of these examples  use an extension to standard SQL syntax to express the “pipeline” of function calls more neatly. <i>e</i>X<i>treme</i>SQL adds the <code>sequence</code> operator <code>@</code> which is a polymorphic operator used to <i>map</i>, <i>project</i> or <i>sort</i> a <code>sequence</code> based on the result of another <code>sequence</code> computation.</p>
+                <p>To illustrate this usage, consider the following three sequence queries:</p>
+                <div class="code-block"><pre>&#160;
+    select seq_sort(volume, 'asc') as by_volume,
+        seq_order_by(open, by_volume),
+        seq_order_by(close, by_volume)
+    from Instrument where name='ABB';
+    &#160;
+    select seq_top_pos_max(close, 3) as top_price,
+        seq_map(open, top_price),
+        seq_map(close, top_price),
+        seq_map(high, top_price),
+        seq_map(low, top_price)
+    from Instrument;
+    &#160;
+    select max_price 
+    from ( select seq_search(hdate, 20100101, 20100331) as quarter,
+            seq_max(seq_project(close, quarter)) as max_price
+        from Instrument where name='ABB');
+            &#160;</pre>
+                </div>
+                <p>These statements can be written using the <code>@</code> operator as follows:</p>
+                <div class="code-block"><pre>&#160;
+    select seq_sort(volume, 'asc') as by_volume, open@by_volume, close@by_volume
+    from Instrument where name='ABB';
+    &#160;
+    select seq_top_pos_max(close, 3) as top_price, open@top_price, close@top_price, high@top_price, low@top_price
+    from Instrument;
+    &#160;
+    select max_price 
+    from ( select seq_search(hdate, 20100101, 20100331) as quarter,
+            seq_max(close@quarter) as max_price
+        from Instrument where name='ABB');
+        &#160;</pre>
+                </div>
+                <p>Note that if the right part of the <code>@</code> operation refers to the result of <code><a href="../../../Programming/SQL/Analytics_Functions/Miscellaneous/SQL_Sort.htm">seq_sort()</a></code>, the <code>@</code> invokes <code><a href="../../../Programming/SQL/Analytics_Functions/Miscellaneous/SQL_Order_By.htm">seq_order_by()</a></code>; if the right part refers to the result of <code><a href="../../../Programming/SQL/Analytics_Functions/Iterator/SQL_Search.htm">seq_search()</a></code>, the <code>@</code> invokes <code><a href="../../../Programming/SQL/Analytics_Functions/Iterator/SQL_Project.htm">seq_project()</a></code>; and if the right part refers to the result of some operator that returns the <i>positions of elements in the sequence</i>, eg. <code><a href="../../../Programming/SQL/Analytics_Functions/Top/SQL_TopMax_TopMin_TopPosMax_TopPosMin.htm">seq_top_pos_max()</a></code> the <code>@</code> invokes <code><a href="../../../Programming/SQL/Analytics_Functions/Iterator/SQL_Map.htm"><code>seq_map()</code></a></code>.</p>
+                <h2>Keyword "flattened"</h2>
+                <p>The key word <code>flattened</code> is an <i>e</i>X<i>treme</i>SQL extension that transforms <code>sequence</code> fields into a table so that the result set appears as individual rows for each set of corresponding sequence elements with the class’s scalar fields’ values repeated on each row. (See Example 3 below.)</p>
+                <h2>Example data and scripts</h2>
+                <p>For the examples 3 through 14 we perform queries on a simple database class:</p>
+                <div class="code-block"><pre>&#160;
+    class Quote {
+        char&lt;MAX_SYMBOL_LEN&gt; symbol;
+        sequence&lt;date asc&gt; day;
+        sequence&lt;float&gt; low;
+        sequence&lt;float&gt; high;
+        sequence&lt;float&gt; open;
+        sequence&lt;float&gt; close;
+        sequence&lt;uint4&gt; volume;
+        unique tree&lt;symbol&gt; by_sym;
+    };
+    &#160;</pre>
+                </div>
+                <p>The data in the following examples is taken from historical values from 2013 for IBM. This sample data and a group of script and shell command files that perform the select statements in the following examples are included in the <i>e</i>X<i>treme</i>DB <i>for HPC</i> samples directory <code>samples/xsql/scripts/financial</code>. To reproduce any of the examples run the <code>x.bat</code> (or <code>x.sh</code> on Linux systems) specifying the example number. For instance, to run example 7, with <code>scripts/financial</code> as the current working directory, simply type:</p>
+                <div class="code-block"><pre>    &#160;
+    x 7
+    &#160;</pre>
+                </div>
+                <p>The command file invokes <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> with the appropriate SQL scripts. (Please note that the output from <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> will be formatted differently in most cases from that printed below as we have reformatted the text here and highlighted specific elements to aid in describing the operations being performed.)</p>
+                <h2>Example links</h2>
+                <p>Please use the links below to view details of each example:</p>
+                <table class="TableStyle-FunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example1.htm">Example 1</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Historical Closing Prices Adjusting for Splits</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example2.htm">Example 2</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Volume Weighted Average Buy and Sell Prices</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example3.htm">Example 3</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"> Sequence Interval</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example4.htm">Example 4</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"> Arithmetic on Sequences </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example5.htm">Example 5</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+Filter Sequence Elements 
+</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example6.htm">Example 6</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Correlation</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example7.htm">Example 7</a> <![CDATA[ ]]></td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Grand Aggregate Maximum</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example8.htm">Example 8</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Window Aggregate</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example9.htm">Example 9</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"> Grid Aggregate</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example10.htm">Example 10</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Group Aggregate Sum</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example11.htm">Example 11</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Hash Aggregate Average</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example12.htm">Example 12</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Sort Sequence Elements</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Examples/Example13.htm">Example 13</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Top Values</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><a href="Examples/Example14.htm">Example 14</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Value Weighted Average</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

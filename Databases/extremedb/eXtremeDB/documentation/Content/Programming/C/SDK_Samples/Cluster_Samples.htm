@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|C API Samples">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>C API Cluster Samples</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>C API Cluster Samples</h1>
+            <blockquote>
+                <p>The <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> packages include sample applications that demonstrate basic distributed database functionality. The samples require running multiple instances (at least two) of the application as separate processes on the same machine (node) or on different nodes in a network. Most of the samples are started with command line parameters that specify the size of the cluster (<code>n_nodes</code>) and the <code>node_id</code> of this instance. </p>
+                <p>By default, all sample executables are built in the <code>target/bin</code> directory, so after building the sample(s) it is convenient to <code>cd</code> to <code>target/bin</code> to run one instance of the cluster sample and run another instance in the development system debugger. The following general instructions apply to all Cluster samples. For descriptions and instructions for running individual samples see <a href="#Instruct">Instructions for running the Cluster Samples</a> below.</p>
+                <h2>Single Processor example</h2>
+                <p>For example, to run two instances of a sample the first instance would be started with a command line like:</p>
+                <div class="code-block"><pre>&#160;
+    cluster_sample 2 0
+    &#160;</pre>
+                </div>
+                <p>This starts the application as the first of two processes (nodes) with <code>node_id</code> = 0 (a zero-based  integer counter). Then in a separate command window start the second instance with <code>node_id</code> = 1:</p>
+                <div class="code-block"><pre>&#160;
+    cluster_sample 2 1
+    &#160;</pre>
+                </div>
+                <p>In this case the list of nodes will automatically be populated with the <span class="Param">IP address</span> and <span class="Param">port</span> values: <code>127.0.0.1:20000, 127.0.0.1:20100</code>.</p>
+                <h2>Multiple Processor example</h2>
+                <p>When running on different network nodes, it is necessary to specify a list of nodes. This can be done directly on the command line using the <code>-nodelist</code> option, or in a node description file  by specifying the <code>–nodefile</code> option.  The format for the <code>nodelist</code> argument is</p>
+                <div class="code-block"><pre>&#160;
+    &lt;IP_address1&gt; [: &lt;port1&gt;]; &lt;IP_address2&gt; [: &lt;port2&gt; ];....; &lt;IP_addressN&gt; [: &lt;portN&gt;]
+    &#160;</pre>
+                </div>
+                <p>For example, to run this 2-node  sample on the two network nodes <code>192.168.1.1</code> and <code>192.168.1.2</code>, the following command line arguments would be used on the indicated nodes:</p>
+                <div class="code-block"><pre>&#160;
+    192.168.1.1&gt;:cluster_sample --nodelist "192.168.1.1:10000; 192.168.1.2:10000" 0
+    &#160;
+    192.168.1.2&gt;:cluster_sample --nodelist "192.168.1.1:10000; 192.168.1.2:10000" 1
+    &#160;</pre>
+                </div>
+                <p>Note that the <code>nodelist</code> argument must be the same on all nodes, and the <code>node_id</code> must correspond to the serial number of the node in the list (starting with 0). In the above case <code>192.168.1.1</code> is the first in the list, so on node <code>192.168.1.1</code> the <code>node_id</code> of 0 is specified; on node <code>192.168.1.2</code> the <code>node_id</code> is 1.</p>
+                <h2>Node file example</h2>
+                <p>It may be more convenient to specify the nodes in a file and use the <code>–nodefile</code> option. The node file entries specify the <span class="Param">IP address</span> and (optional) <span class="Param">port</span> number for each node. For example this 2-node sample would use a file like the following:</p>
+                <p><code>nodelist.txt:</code>
+                </p>
+                <div class="code-block"><pre>&#160;
+    192.168.1.1:10000
+    192.168.1.2:10000
+    &#160;</pre>
+                </div>
+                <p>In this case the following command lines would be used to start the two sample instances:</p>
+                <div class="code-block"><pre>&#160;
+    192.168.1.1&gt;:cluster_sample --nodefile nodelist.txt 0
+    &#160;
+    192.168.1.2&gt;:cluster_sample --nodefile nodelist.txt 1
+    &#160;</pre>
+                </div>
+                <h2>Other command line options</h2>
+                <p>The following other options can be specified on the command line to change the default values in the <a href="../Structures/Cluster_Parameters.htm"><code>mco_cluster_params_t</code></a> structure used to control the sample application:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1" style="height: 27px;">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">--winlen N</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"> (mco_cluster_params_t:: window::length): the maximum window size in transactions</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">--winsz N</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">  (mco_cluster_params_t:: window::bsize): the maximum window size in bytes</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">--winto N</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">  (mco_cluster_params_t::window::timeout): the window timeout value</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">--sndbuf N</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">  (mco_cluster_params_t::nw::tcp::so_sndbuf): the maximum TCP socket send buffer size in bytes</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">--rcvbuf N</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">  (mco_cluster_params_t::nw::tcp::so_rcvbuf): the maximum TCP socket receive buffer size in bytes</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">--connto N</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">  (mco_cluster_params_t::nw::tcp::connect_timeout): the timeout threshold for connecting nodes to each other in milliseconds</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">--connint N</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">  (mco_cluster_params_t::nw::tcp::connect_interval): the time between attempts to connect to other nodes in milliseconds</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">--katime N</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">  (mco_cluster_params_t::nw::tcp::keepalive_time): the time between keep-alive messages in milliseconds</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">--kaprobes N </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"> (mco_cluster_params_t::nw::tcp::keepalive_probes): the maximum number of keep-alive probes to send before a node disconnects</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">--cpfact N</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">  (mco_cluster_params_t::conn_pool_factor): the maximum percent of cached connections</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">--debug</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1"> 	(mco_cluster_params_t::mode_mask = MCO_CLUSTER_MODE_DEBUG_OUTPUT): enables debug output to stdout (works only with _debug libraries version)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2><a name="Instruct"></a>Instructions for running the Cluster Samples </h2>
+                <p>Please use the links below to view descriptions and specific instructions for the individual Cluster samples:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1" style="height: 27px;">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/Attach.htm">cluster_attach</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates how to re-attach a node to a cluster </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/Binev.htm">cluster_binev</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates using the <i>e</i>X<i>treme</i>DB <span class="Param">Binary Schema Evolution</span> feature to open different versions of a database on different cluster nodes</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/Demo.htm">cluster_demo</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates basic cluster performance </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/Discover.htm">cluster_discover</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates how to determine the list of active nodes in a cluster</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/Dynamic.htm">cluster_dynamic</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates how to connect a node to a cluster if it was not known in advance</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/Events.htm">cluster_events</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of synchronous and asynchronous events in a cluster environment</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/MT.htm">cluster_mt</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of multiple listener threads</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/Nodes.htm">cluster_nodes</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates cluster synchronization when one of the nodes in a cluster fails</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/Open.htm">cluster_open</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The simplest cluster example - demonstrates how to create a cluster database</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/Perf.htm">cluster_perf</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Shows basic performance statistics</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/Quorum.htm">cluster_quorum</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates how to use the quorum callback technique</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/RW.htm">cluster_rw</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates how to tune read-write workload on a per-thread basis</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/Scatter.htm">cluster_scatter</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates how to manually synchronize database content distributed on different nodes
+
+</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Cluster/Shared.htm">cluster_shared</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of shared memory in a cluster environment</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><a href="Cluster/Window.htm">cluster_window</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Demonstrates the use of the <i>transaction window</i> feature to increase overall cluster performance</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,18 @@
+declare database iotrouter;
+declare auto_oid[100];
+
+iot router<100> 50;
+
+uptable class Sensor {
+    datetime      ts;
+    unsigned<4>   sensorId;
+    double        value;
+    tree<ts, sensorId> idx;
+};
+
+downtable class Config {
+    unsigned<4>  param_id;
+    double       value;
+    tree<param_id> idx;
+};
+

@@ -1,0 +1,8 @@
+-include $(call mco_makefile_file, \
+api/c/makefile.project.c \
+api/cpp/makefile.project.cpp \
+basic/makefile.project.basic \
+inetdb-cpp/makefile.project.inetdb-cpp \
+nomath/makefile.project.nomath \
+struct/makefile.project.struct \
+)

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>xSQL Data Compression and Encryption</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>xSQL</i> Data Compression and Encryption</h1>
+            <blockquote>
+                <p>In-memory databases can be compressed to conserve memory and persistent database data and log files can be compressed to conserve disk space. Data can also be encrypted for security. </p>
+                <h2>In-memory compression</h2>
+                <p>For in-memory database compression the <a href="Startup_Options/xSQL_Config_File_Options.htm">configuration file</a> option <a href="Startup_Options/Config_File_Sections/Db_Params.htm">db_params:mode_mask</a> must be set with the <code>inmemory_compression</code> flag value. It is also possible to explicitly set the options <code>page_hash_bundles</code>, <code>compression_level</code>, <code>compression_mask</code>, and <code>expected_compression_ratio</code>. For example:</p>
+                <div class="code-block"><pre>&#160;
+    db_params: 
+    { 
+        mode_mask: in_memory_compression,
+        page_hash_bundles: 8,
+        compression_level: 1,
+        compression_mask: 3,
+        expected_compression_ratio: 4
+    }
+    &#160;</pre>
+                </div>
+                <h2>Persistent database compression</h2>
+                <p>Note that, as explained in Data Compression, disk file compression is supported only on Unix-Linux platforms. </p>
+                <p>To enable compression with <i>e</i>X<i>treme</i>DB, the <a href="Startup_Options/Config_File_Sections/Db_Params.htm">configuration file</a> must specify which file to compress (or is compressed) and which special file system library to load to manage the compression. (The database files must use library <code>mcofu98zip</code>, while log files use library <code>mcofu98ziplog</code>.)</p>
+                <p>For example, to compress the persistent database file <code>test.dbs</code>, the configuration file would specify the flag value <code>compressed</code> for the file device and use  library <code>mcofu98zip</code> with the following option settings:</p>
+                <div class="code-block"><pre><a name="kanchor239"></a>&#160;
+    devices : [
+        {assignment: database, size : 100m},
+        {assignment: cache, size : 100m},
+        {type:file, assignment : persistent, name : test.dbs, flags: compressed},
+        {type:file, assignment : log, name : test.log},
+    ],
+    &#160;
+    runtime_configuration:
+    {
+        fs_library: mcofu98zip,
+    }
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p>To compress the log file <code>test.log</code>, the configuration file would contain the following options:</p>
+                <div class="code-block"><pre>&#160;
+    devices : [
+        {assignment: database, size : 100m},
+        {assignment: cache, size : 100m},
+        {type:file, assignment : persistent, name : test.dbs},
+        {type:file, assignment : log, name : test.log, flags: compressed },
+    ],
+    &#160;
+    runtime_configuration:
+    {
+        fs_library: mcofu98ziplog,
+    }
+    &#160;</pre>
+                </div>
+                <p>(Note that if both database and log files need to be compressed, <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> must be run twice, once with  <code>mcofu98zip</code> for the database file(s) and once with <code>mcofu98ziplog</code>  for the log file - only one file system library, either <code>mcofu98zip</code> or <code>mcofu98ziplog</code>  can be loaded at a time.)</p>
+                <h2>Data Compression for IoT Communications</h2>
+                <p>Data compression for IoT communications is enabled by setting the <code>compression_level</code> parameter of the <code><a href="Startup_Options/Config_File_Sections/IoT_Params.htm">iot_params</a></code> configuration file section (which corresponds to the <code>compression_level</code> element of structure <code><a href="../../Programming/C/Structures/IoT_Communicator_Parameters.htm">mco_iot_comm_paramst_t </a></code>).</p>
+                <p>Also, as explained in the <a href="../Core/Compression.htm">Data Compression</a> page is the formula used to determine  the <i>compression ratio</i>. The <code><a href="../../Programming/xSQL/xSQL_IoT_Functions.htm">xsql_iot_list()</a></code> SQL function can be called to retrieve the statistics for a connection; fields <code>rx_zratio</code> and <code>tx_zratio</code> of returned Result Set (which correspond to elements <code>sent_compression_ratio</code> and <code>recv_compression_ratio</code> of structure <code><a href="../../Programming/C/Structures/IoT_Communicator_Parameters.htm">mco_iot_connection_stat_t</a></code> ) show the compression efficiency for incoming and outgoing communications.</p>
+                <p>&#160;</p>
+                <h1>Data Encryption</h1>
+                <p>To encrypt a disk database, the configuration file section <a href="Startup_Options/Config_File_Sections/Db_Params.htm">db_params</a> must contain the <code>cipher_key</code> option:</p>
+                <div class="code-block"><pre>&#160;
+    db_params : {
+        cipher_key : "my_secret_password"
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

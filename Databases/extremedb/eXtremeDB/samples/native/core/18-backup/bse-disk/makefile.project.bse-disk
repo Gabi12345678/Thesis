@@ -1,0 +1,15 @@
+MCO_PRJ_LIST += 18-backup-bse-disk
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 18-backup-bse-disk
+PRJ_18-backup-bse-disk_TAGS:=persistent sample core
+PRJ_18-backup-bse-disk_DIR:=$(call mco_project_dir)
+PRJ_18-backup-bse-disk_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_18-backup-bse-disk_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_18-backup-bse-disk_DATABASES:=backupdb
+PRJ_18-backup-bse-disk_RUNTIME:=YES
+PRJ_18-backup-bse-disk_MEMDEV:=PRIVATE
+PRJ_18-backup-bse-disk_STORAGE:=PERSISTENT
+PRJ_18-backup-bse-disk_STORAGEDEV:=AUTO
+PRJ_18-backup-bse-disk_SYNC:=AUTO
+PRJ_18-backup-bse-disk_TRANSMGR:=MURSIW
+PRJ_18-backup-bse-disk_F_SERI:=YES

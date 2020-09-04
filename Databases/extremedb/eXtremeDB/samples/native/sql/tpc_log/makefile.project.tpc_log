@@ -1,0 +1,17 @@
+MCO_PRJ_LIST += tpc_log
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += tpc_log
+PRJ_tpc_log_TAGS:=sample sql
+PRJ_tpc_log_DIR:=$(call mco_project_dir)
+PRJ_tpc_log_SRC:=$(call mco_project_file,tpc_log.cpp) $(MCO_SAMPLES_COMMON_DIR)/common.c $(MCO_SAMPLES_COMMON_DIR)/commonSQL.c
+PRJ_tpc_log_SCHEMAS:=$(call mco_project_file,tpcdb.mco)
+PRJ_tpc_log_DATABASES:=tpcdb
+PRJ_tpc_log_RUNTIME:=YES
+PRJ_tpc_log_MEMDEV:=PRIVATE
+PRJ_tpc_log_STORAGE:=TRANSIENT
+PRJ_tpc_log_STORAGEDEV:=AUTO
+PRJ_tpc_log_SYNC:=AUTO
+PRJ_tpc_log_TRANSMGR:=MURSIW
+PRJ_tpc_log_F_SQL:=LOCAL
+PRJ_tpc_log_F_LOG:=YES
+PRJ_tpc_log_F_CPP:=YES

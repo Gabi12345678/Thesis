@@ -1,0 +1,70 @@
+/****************************************************************
+ *                                                              *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.    *
+ *                                                              *
+ *  Inmemory database for holding performance counters           *
+ *                                                              *
+ *                                                              *
+ ****************************************************************/
+
+#define uint1     unsigned<1>
+#define uint2     unsigned<2>
+#define uint4     unsigned<4>
+#define uint8     unsigned<8>
+#define int4        signed<4>
+
+declare database mcoperfmon_db;
+
+transient class Node
+{
+    uint2   no;
+    string  name;
+    tree<no> no_idx;
+};
+
+transient class eXDBDatabase
+{
+    uint2   no;
+    string  db_name;
+    tree<no> no_idx;
+};
+
+transient class PerfCounter 
+{
+    uint2   no; /* Is actually index in the values vector in PerfReading.values or PerfTimingReading vectors depending on datatype */
+    string  name;
+    string  descr;
+    uint1   datatype;
+
+    unique tree<no>  no_idx;
+};
+
+transient class PerfReading
+{
+    uint2   node; /* cluster node id, or 0 */
+    uint2   db;
+
+    uint8   stamp;
+    vector  <uint4> values;
+
+    tree <node,db,stamp> rec_idx; 
+    tree <stamp> stamp_idx; 
+};
+
+transient class PerfTimingReading
+{
+    uint2   node;
+    uint2   db;
+
+    uint8   stamp;
+
+    vector  <uint8> current;
+    vector  <uint8> min;
+    vector  <uint8> max;
+    vector  <uint8> avg;
+    vector  <uint8> total;
+    vector  <uint4> count;
+
+    tree <node, db, stamp> rec_idx; 
+    tree <stamp> stamp_idx; 
+};

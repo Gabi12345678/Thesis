@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Managing eXtremeSQL Transactions in C++</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Managing <i>e</i>X<i>treme</i>SQL Transactions in C++</h1>
+            <blockquote>
+                <p>All <i>e</i>X<i>treme</i>DB database access is performed within transactions to assure database integrity by enforcing the <code>ACID</code> principles (see the <a href="../../Core/Transaction_Control.htm"><i>e</i>X<i>treme</i>DB User Guide</a> for a detailed description of transaction processing). When using the <i>e</i>X<i>treme</i>SQL API, transaction processing is <code>implicit</code><a name="kanchor760"></a>, i.e. transactions are started and committed by the runtime without requiring explicit function calls.  Specifically, the <i><a href="../../../Programming/C++/Classes/McoSqlEngine.htm">McoSqlEngine</a></i> method <code>executeStatment()</code> starts and closes a <code>READ_ONLY</code> transaction when performing an SQL <code>SELECT</code> (unless the <code>FOR UPDATE</code> clause is specified), and a <code>READ_WRITE</code> transaction when performing <code>INSERT</code>, <code>UPDATE</code> or <code>DELETE</code> statements. Similarly, the <i><a href="../../../Programming/C++/Classes/QueryResult.htm">QueryResult</a></i> constructor starts a <code>READ_ONLY</code> transaction and returns a result set <code>cursor</code>; it’s destructor closes the transaction.</p>
+                <p> However, some applications need to perform updates that require transaction blocking that spans more than one <i>e</i>X<i>treme</i>SQL function call.  For example, consider the following example that enters a “money exchange” where a credit and debit update need to be recorded simultaneously.  Here it is crucial for data integrity that both updates happen.  If some system malfunction where to interrupt the application between the updates, the database data would be left in an inconsistent state.  Transaction blocking assures that either both updates succeed or neither update is applied to the database.</p>
+                <p>To take control of transaction processing with <i>e</i>X<i>treme</i>DB the application uses the <i><a href="McoSqlEngine.htm">McoSqlEngine</a></i> method <code>beginTransaction()</code> to create a <i><a href="../../../Programming/C++/Classes/Transaction.htm">Transaction</a></i> object, then the <i><a href="../../../Programming/C++/Classes/Transaction.htm">Transaction</a></i> method <code>commit()</code> is called to complete the block of database operations. (Note that multi-threaded applications will use an <i><a href="../../../Programming/C++/Classes/McoSqlSession.htm">McoSqlSession</a></i> object which inherits the <i><a href="../../../Programming/C++/Classes/McoSqlEngine.htm"><i>McoSqlEngine</i></a></i> methods. Note also that you can use the <i><a href="../../../Programming/C++/Classes/Transaction.htm">Transaction</a></i> method <code>checkpoint()</code> to update indexes and make objects visible to queries while the transaction is still open, or <code>rollback()</code> to undo all operations performed in this transaction.) </p>
+                <h3>Example</h3>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    // Define global McoSQL engine
+    using namespace McoSql;
+    McoMultithreadedSqlEngine engine;
+    &#160;
+    // Define the structure correponding to database record Person
+    struct _Member
+    {
+        int  id;
+        char * name;
+        int  balance;
+    };
+    &#160;
+    int main()
+    {
+        _Member m;
+        &#160;
+        // Open eXtremeDB database and SQL engine
+        engine.open( db_name, exchangedb_get_dictionary(), DATABASE_SIZE, MEMORY_PAGE_SIZE);
+        &#160;
+        //Create a McoSession to manage the transactions
+        McoSqlSession session(&amp;engine);
+        &#160;
+        // Insert two Member records with initial balances of 100
+        m.id = 201000001;
+        m.name = "John Smith";
+        m.balance = 100;
+        session.executeStatement("insert into Member %r", &amp;m);
+        m.id = 201000002;
+        m.name = "Peter Brown";
+        m.balance = 100;
+        session.executeStatement("insert into Member %r", &amp;m);
+        &#160;
+        // List the contents of the Member table
+        printf ("\n\tInitial Member records:\n");
+        listMembers( &amp;session );
+        &#160;
+        // Enter an exchange of 50 units from Smith to Brown and display result
+        doExchange( &amp;session, 201000001, 201000002, 50 );
+        printf ("\n\tAfter an exchange of 50 units from 'Smith' to 'Brown':\n");
+        listMembers( &amp;session );
+        &#160;
+        // Close SQL session, engine and database
+        engine.close();
+        return 0;
+    }
+    &#160;
+    void doExchange( McoSqlSession * session, int idFrom, int idTo, int amount)
+    {
+        int fromBalance = getBalance( session, idFrom ) - amount;
+        int toBalance = getBalance( session, idTo ) + amount;
+        &#160;
+        // Perform two updates that must both complete within a single database transaction
+        Transaction* trans = session-&gt;database()-&gt;beginTransaction(Transaction::ReadWrite);
+            
+        session-&gt;executeStatement(trans, "update Member set balance=%i where id=%i",
+            
+                        fromBalance, idFrom);
+            
+        session-&gt;executeStatement(trans, "update Member set balance=%i where id=%i",
+            
+                        toBalance, idTo);
+            
+        trans-&gt;commit();
+            
+        trans-&gt;release();
+            
+    }
+    &#160;
+    int getBalance( McoSqlSession * session, int id )
+    {
+        QueryResult result(session-&gt;executeQuery( "select * from Member where id=%i", id ) );
+        Cursor* cursor = result-&gt;records();
+        Record* rec = cursor-&gt;next();
+        _Member m;
+        result-&gt;extract(rec, &amp;m, sizeof(m));
+        return m.balance;
+    }
+    &#160;
+    void listMembers( McoSqlSession * session )
+    {
+        QueryResult result(session-&gt;executeQuery("select * from Member order by id"));
+        Cursor* cursor = result-&gt;records();
+        while (cursor-&gt;hasNext())
+        {
+            _Member m;
+            Record* rec = cursor-&gt;next();
+            result-&gt;extract(rec, &amp;m, sizeof(m));
+            printf("\t\t%s: Balance=%d\n", m.name, m.balance );
+        }
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>Some programming points to note in the code sample above:</p>
+                <ul>
+                    <li value="1">	The <i><a href="../../../Programming/C++/Classes/McoSqlSession.htm">McoSqlSession</a></i> constructor is called to instantiate a session object then all successive database access is performed using this session</li>
+                    <li value="2">	The <i><a href="../../../Programming/C++/Classes/McoMultithreadedSqlEngine.htm">McoMultithreadedSqlEngine</a></i> object is used only to open and close the <i>e</i>X<i>treme</i>SQL runtime and database</li>
+                    <li value="3">	The <i><a href="../../../Programming/C++/Classes/Transaction.htm">Transaction</a></i> object is instantiated by calling method <code>beginTransaction()</code> on the <code>database</code> member of the session object.</li>
+                    <li value="4">	After completing the database updates, the transaction object is closed and its memory freed by calling its <code>commit()</code> and <code>release()</code> methods.</li>
+                </ul>
+                <h2>Checkpoint and Autocheckpoint</h2>
+                <p>As explained in the <a href="../SQL_Transaction_Control.htm"><i>e</i>X<i>treme</i>SQL Transaction Control</a> page, a <b>checkpoint</b> operation may be necessary in complex transactions to update indexes prior to the <b>transaction commit</b>. The C++ API function to cause a checkpoint can be called as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    {
+        int fromBalance = getBalance( session, idFrom ) - amount;
+        int toBalance = getBalance( session, idTo ) + amount;
+        &#160;
+        // Perform two updates that must both complete within a single database transaction
+        Transaction* trans = session-&gt;database()-&gt;beginTransaction(Transaction::ReadWrite);
+        session-&gt;executeStatement(trans, "update Member set balance=%i where id=%i",
+                        fromBalance, idFrom);
+        trans-&gt;checkpoint();
+            
+        QueryResult result(session-&gt;executeQuery("select * from Member order by id"));
+        ...
+        trans-&gt;commit();
+        trans-&gt;release();
+    }
+    &#160;</pre>
+                </div>
+                <p>Or the following SQL statement can be used to cause a checkpoint:</p>
+                <div class="code-block"><pre>&#160;
+    executeStatement("CHECKPOINT TRANSACTION");
+    &#160;</pre>
+                </div>
+                <p>To enable the <b>autocheckpoint</b> feature, set the <code>SqlEngine.autoCheckpoint</code>:</p>
+                <div class="code-block"><pre>    &#160;
+    using namespace McoSql;
+    McoSqlEngine engine;
+    int main(int argc, char* argv[])
+    {
+        engine.autoCheckpoint = true;
+        ...
+    }
+    &#160;</pre>
+                </div>
+                <p>Or set the <code>MCO_DB_SQL_AUTOCHECKPOINT</code> flag in database parameter <code>mco_db_params_t.mode_mask</code>.  For example:</p>
+                <div class="code-block"><pre>&#160;
+    int main(int argc, char* argv[])
+    {
+        ...
+        mco_db_params_t       db_params;
+        ...
+        mco_db_params_init( &amp;db_params );               /* Initialize the params with default values */
+        ...
+        db_params.mode_mask = MCO_DB_SQL_AUTOCHECKPOINT;
+            
+        ...
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

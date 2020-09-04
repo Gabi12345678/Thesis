@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|Java API|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Data Export and Import in Java</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Data Export and Import in Java</h1>
+            <blockquote>
+                <h2>Database backup</h2>
+                <p>The <i>e</i>X<i>treme</i>DB database backup and restore functionality is implemented by the <i>Connection</i> class methods <code>createBackup()</code> and <code>restoreBackup()</code>. Please see SDK sample <a href="../../../Programming/Java/SDK_Samples/Core/incBackup.htm">incBackup</a> for implementation details.</p>
+                <h3>createBackup()</h3>
+                <p>The <code>createBackup()</code> method has two forms:</p>
+                <div class="code-block"><pre>    &#160;
+    public virtual void createBackup(String fileName, String label, Database.BackupType type);
+&#160;
+    public virtual void createBackup(String fileName, String label, Database.BackupType type,
+                        int compressionLevel, String cipher);
+                        &#160;</pre>
+                </div>
+                <p>where the backup <code>type</code> and <code>compressionLevel</code> are defined as follows:</p>
+                <div class="code-block"><pre>&#160;
+    public enum BackupType {
+        Auto, Snapshot, Incremental
+    };
+    public const int BACKUP_FLAG_COMPRESSED = 1;
+    public const int BACKUP_FLAG_ENCRYPTED  = 2;
+    &#160;</pre>
+                </div>
+                <h3>restoreBackup()</h3>
+                <p>Similarly the <code>restoreBackup()</code> method can be called with or without an encryption key:</p>
+                <div class="code-block"><pre>&#160;
+    public virtual void restoreBackup(String fileName, String label);
+&#160;
+    public void restoreBackup(String fileName, String label, String cipher);
+    &#160;</pre>
+                </div>
+                <h3>listBackup()</h3>
+                <p>In addition the method <code>listBackup()</code> can be called to retrieve information from a backup file in the following structure:</p>
+                <div class="code-block"><pre>&#160;
+    public virtual Database.BackupInfo [] listBackup(String fileName);
+&#160;
+    public static class BackupInfo 
+    {
+        public int        protocolVersion;
+        public BackupType type;
+        public int        flags;
+        public int        backupNo;
+        public long       timestamp;
+        public long       size;
+        public long       offset;
+        public int        crc;
+        public long       transNo;
+        public int        memPageSize;
+        public int        diskPageSize;
+        public long       nPagesTotal;
+        public String     dbName;
+        public String     label;
+    }
+    &#160;</pre>
+                </div>
+                <h3>Additional backup parameters</h3>
+                <p>Further backup parameters can be specified in the <i>Database.Parameters</i> used for the <code>open()</code> method:</p>
+                <div class="code-block"><pre>    &#160;
+    /**
+    *  Size of backup counters array, bytes, power of two, ignored if disk_max_database_size set. Default is 0 - disable backup feature
+    */
+    public long        backupMapSize;
+&#160;
+    /**
+    *  Number of pages for last exclusive pass of backup procedure, set to zero to disable treshold. Default is 0
+    */
+    public int         backupMinPages;
+&#160;
+    /**
+    * Max number of passes before exclusive pass of backup procedure. Default is 10
+    */
+    public int         backupMaxPasses;
+&#160;
+    /**
+    * Name of a file will be used to store backup temporary data on mco_db_close() call.
+    * Optional, set to null for default "&lt;persistent-storage&gt;.bmap" file locate at the same location as persistent storage file
+    */
+    public String      backupMapFile;
+    &#160;</pre>
+                </div>
+                <p>(These parameters correspond to <code>backup_map_size</code>, <code>backup_min_pages</code>, <code>backup_max_passes</code>, <code>backup_map_filename</code> in <a href="../../../Programming/C/Structures/Database_Parameters.htm"><code>struct mco_db_params_t </code></a>in the C API.)</p>
+                <h2>Database snapshots</h2>
+                <p>To save an image of an in-memory database (transient objects) to a specified file, the <i>Connection</i> class provides method <code>saveSnapshot()</code>.  This snapshot can later be loaded by the <i>Database</i> method <code>open()</code> if the corresponding file path is specified in <i>Database.Parameters</i> property <code>databaseSnapshotFilePath</code>. (A file is always created, or overwritten if it exists). The method returns <code>true</code> if the snapshot was successfully saved, <code>false</code> if the specified file can not be opened. The method signature is:</p>
+                <div class="code-block"><pre>&#160;
+    public boolean saveSnapshot(String databaseSnapshotFilePath)
+    &#160;</pre>
+                </div>
+                <h2>Saving and Loading individual classes</h2>
+                <p>It is sometimes desirable to export / import only data for an individual database class. The <i>Connection</i> class provides the following methods for this purpose:</p>
+                <div class="code-block"><pre>&#160;
+    public boolean saveClass(String filePath, Class cls)
+&#160;
+    public boolean loadClass(String filePath, Class cls, boolean doMerge)
+                  &#160;</pre>
+                </div>
+                <p>Note that if the <code>doMerge</code> argument is <code>false</code>, the existing data content of this class is cleared before loading from the image file. If <code>true</code> the loaded objects are "added" to the class. The methods return <code>true</code> if the objects were successfully saved or loaded, <code>false</code> if the specified file can not be opened.</p>
+                <h2>Saving the database metadata</h2>
+                <p>It is possible to save the database Metadata (data layout information in <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> config file format (JSON) suitable for loading into <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> in order to connect to the database as a client application. The <i>Connection</i> class provides method <code>saveMetadata()</code>. The method signature is:</p>
+                <div class="code-block"><pre>&#160;
+    public boolean saveMetadata(String databaseMetadataFilePath, boolean saveDefaults)
+    &#160;</pre>
+                </div>
+                <h2>Saving the database schema</h2>
+                <p>It is possible to save the database schema to an external file.  The <i>Connection</i> class provides method <code>saveDictionary()</code>.</p>
+                <div class="code-block"><pre>&#160;
+    public boolean saveDictionary(String databaseDictionaryFilePath)
+&#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += Perf
+PRJ_TARGET_CLASS += Perf
+PRJ_Perf_TAGS:=sample core java
+PRJ_Perf_DIR :=$(call mco_project_dir)
+PRJ_Perf_SRC :=$(call mco_project_file,Perf.java)

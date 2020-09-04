@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Control Structures used in the C API">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Runtime Options</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><a name="kanchor2"></a>Runtime Options</h1>
+            <blockquote>
+                <p>The function <code><a href="../Core_Functions/Static/Runtime_Control/runtime_setoption.htm"><code>mco_runtime_setoption()</code></a></code> allows applications to control certain characteristics of the <i>e</i>X<i>treme</i>DB runtime. The following possible values for runtime options are defined in the header file <code>mco.h</code>:</p>
+                <table style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');" class="TableStyle-IndentedFunctionReference" cellspacing="0">
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><span style="color: #ff4500;">MCO_RT_OPTION_EXTHEAPS</span>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Enable use of custom heap management. <span style="color: #ff4500;">This option has been deprecated in version 7.1. If specified, <code>mco_runtime_setoption( MCO_RT_OPTION_EXTHEAPS, 1)</code> will return the <code>MCO_E_UNSUPPORTED</code> error code.</span></td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><span style="color: #dc143c;">MCO_RT_OPTION_DB_SAVE_CRC</span>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Enable CRC32 coverage of stream consistency. <span style="color: #dc143c;">This option has been deprecated in version 7.1. See <a href="../Core_Functions/Static/Database_Control/load.htm">mco_db_load()</a>.</span> The CRC is always kept with a saved database image since version 7.1. Note that to preserve backward compatibility the <code>mco_db_load()</code> function is able to load a snapshot saved without CRC. This ability will be removed from future releases. </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><span style="color: #dc143c;">MCO_RT_OPTION_DB_SAVE_BSE</span>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Enable Binary Schema Evolution (BSE) save mode. <span style="color: #dc143c;">This option has been deprecated in version 7.1. See <a href="../Core_Functions/Static/Database_Control/load.htm">mco_db_load()</a>.</span> The dictionary is always stored with the image and the database is always subject to a binary evolution (<code>BSE</code>) process since version 7.1. Note that to preserve backward compatibility the <code><a href="../Core_Functions/Static/Database_Control/load.htm">mco_db_load()</a></code> function is capable of loading a page-based image created with a previous versions of the runtime. This ability will be removed from future releases. </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_OPTION_MARK_LAST_OBJ</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Use to specify that notification of ”end-of-transaction” is required. (See <a href="../../../Users_Guides/Transaction_Logging.htm">Transaction Logging</a>.)</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_CRC_ALGORITHM</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Specifies the CRC32 algorithm used to verify persistent database consistency. </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_MAX_PATRICIA_DEPTH</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Specifies the maximum depth of a Patricia trie index before the error <code>MCO_E_PATRICIA_TOO_DEEP</code> is thrown. (Default value is 256.) </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_MAX_DYNAMIC_PIPES</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Defines the maximum number of the PIPE_BUF type devices that can be added through <a href="../Core_Functions/Static/Database_Control/extend_dev.htm">mco_db_extend_dev()</a>. (See <a href="../../../Users_Guides/Transaction_Logging.htm">Transaction Logging</a>.)</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_OPTION_CLASS_LOAD_MERGE</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Defines the policy when function <code><a href="../Core_Functions/Static/Database_Control/class_load.htm">mco_class_load()</a></code> needs to merge (append) loaded objects with objects already existing in the database. The default value is 0 (delete all of objects of specified class before loading).</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_OPTION_DATETIME_PRECISION</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Time resolution (precision) for <code>datetime</code> values: <code>1</code> - seconds, <code>1000</code> - milliseconds, <code>1000000</code> - microseconds, <code>1000000000</code> (nanoseconds).</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_OPTION_LAST</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1"><b>This is not an option but simply a marker to facilitate obtaining the total count of runtime options.</b>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1" colspan="2"><span style="color: #000000; font-weight: bold;">Unix shared memory options.</span>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_OPTION_UNIX_SHM_MASK</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Set Unix shared memory access mode. (See “Shared Memory Runtime Options”.)</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1" colspan="2" style="color: #000000;"><b>Posix shared memory options.</b>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_POSIX_SHM_OPT</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Enable setting a combination of the following POSIX shared memory options. </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_POSIX_SHM_ANONYMOUS</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Enables option MAP_ANONYMOUS of the POSIX function 'mmap' that provides mapping of virtual shared memory to a current process. </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_POSIX_SHM_SHARED</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Specifies that option MAP_SHARED of the POSIX function 'mmap' will be used. Otherwise option MAP_PRIVATE is used. </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1" colspan="2"><span style="color: #000000; font-weight: bold;">Windows shared memory and synchronization primitives naming and security descriptor options.</span>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_WINDOWS_SHM_OPT</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Enable setting a combination of the following Windows shared memory options.</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_WINDOWS_SHM_PREFIX_GLOBAL</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Use global prefix. Shared objects are visible in all sessions</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_WINDOWS_SHM_PREFIX_LOCAL</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Use Local prefix, Shared object are visible in current session only</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_WINDOWS_SHM_PREFIX_SESSIONS</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Vista sessions fix</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_WINDOWS_SHM_PREFIX_NONE</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">No prefix (Default)</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_WINDOWS_SHM_PREFIX_MASK</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Every one can access</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_WINDOWS_SHM_SEC_DESCR_EMPTY </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Use windows default policy (Default)</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_WINDOWS_SHM_SEC_DESCR_SAMEUSER</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Only the same user can access</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1" colspan="2" style="color: #000000;font-weight: bold;">The default Windows shared memory options combination is:
+MCO_RT_WINDOWS_SHM_PREFIX_NONE|MCO_RT_WINDOWS_SHM_SEC_DESCR_NULL 
+which makes the database visible and accessible from the local session only.
+</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_CRC32_NONE</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Do not calculate CRC</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_CRC32</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The implementation of CRC used prior to release 15523 2014-07-17</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_CRC32_FAST</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Calculate the CRC only for the first and last 8-byte word of data</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_RT_CRC32_OLD</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The implementation of CRC used prior to release 12823 2013-01-28</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">MCO_RT_CRC32C</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">CRC32C hardware &amp; software implementations used after release 15523 2014-07-17</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

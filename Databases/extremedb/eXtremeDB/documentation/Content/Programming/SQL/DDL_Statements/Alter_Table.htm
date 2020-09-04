@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>SQL Alter Table</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>SQL Alter Table</h1>
+            <blockquote>
+                <p>The <code>alter table</code> statement alters the definition of a table by modifying, adding, or dropping columns and constraints.  The <code>alter table</code> statements can be of two types:</p>
+                <ul>
+                    <li value="1">Those that don't change the table layout format but simply use the <code>RENAME</code> operation.</li>
+                    <li value="2"><a name="kanchor301"></a>Those that change the table format. These operations normally take a relatively long time as the database runtime creates a new table and moves all data from the original table into the newly created one.</li>
+                </ul>
+                <p>The syntax is defined as follows:</p>
+                <div class="code-block"><pre>&#160;
+    ALTER TABLE name action {"," action }
+    &#160;
+    action:
+        RENAME TO new_table_name
+        RENAME [ COLUMN ] old_column_name TO new_column_name
+        ADD [ COLUMN ] column_name column_spec
+        ADD CONSTRAINT constraint_name table_constraint
+        DROP [ COLUMNS ] column_name
+        DROP CONSTRAINT constraint_name
+        ALTER [ COLUMN ] column_name TYPE column_spec
+        SET [ NOT ] TEMPORARY
+&#160;
+    table_constraint: 
+        PRIMARY KEY "(" column_name [ "," ... ] ")" | 
+        FOREIGN KEY "(" column_name [ "," ... ] ")" references | 
+        UNIQUE "(" column_name [ "," ... ] ")"
+&#160;
+    column_spec:
+        data_type [ column_constraint ]
+&#160;
+    column_constraint:
+        PRIMARY KEY |
+        UNIQUE |
+        USING [ HASH | RTREE | TRIGRAM | INCLUSIVE | BTREE ] INDEX
+        [ FOREIGN KEY ] references
+        [ NOT ] NULL
+&#160;
+    references:
+        REFERENCES table [ "(" columns ")" ]
+        &#160;</pre>
+                </div>
+                <p>Note that the <code>REFERENCES</code> clause notifies the SQL engine of a <code>FOREIGN KEY</code> constraint. <b>The referential integrity is not enforced by the SQL engine</b>.</p>
+                <p>Also, note that all SQL keywords are case <i>insensitive</i> in <i>e</i>X<i>treme</i>SQL - i.e. <code>ALTER TABLE</code> and <code>alter table</code> are equivalent.</p>
+                <p>&#160;</p>
+                <h2>Adjusting dictionary memory space</h2>
+                <p>Note that when tables are dropped or altered, the database engine does not completely remove all traces of the modified tables from the dictionary. The remaining memory is rather small (~ 50 bytes remain in the "dictionary" memory area (controlled by the <code><a href="../../../Users_Guides/SQL/SQL_DDL.htm"><code>ddl_dict_size</code></a></code> parameter). If it is anticipated that the <code>alter table</code> or <code>drop table</code> operations are going to be frequent, or if an application dynamically creates a lot of non-BTree indexes (e.g. <code>hash</code> indexes), it is advisable to reserve extra space for the dictionary. For example. when using <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>, adjust the <a href="../../../Users_Guides/xSQL/Startup_Options/xSQL_Config_File_Options.htm">configuration  file</a> option <code><a href="../../../Users_Guides/xSQL/Startup_Options/Config_File_Sections/Db_Params.htm">db_params:additional_heap_size</a></code>. </p>
+                <p>&#160;</p>
+                <h2>Warning for non-SQL applications</h2>
+                <p>For applications built with a static schema that has been changed either through the <code>alter table</code> or otherwise, any attempt to open a transaction with a persistent database through any API other than SQL <i>must be avoided</i>. If the "pre-modified" schema is used, the database runtime will preserve the consistency of the database – normally. If the static schema modifications are detected, the transaction returns the <code>MCO_E_SCHEMA_CHANGED</code> error code. However it is possible that the application could read incorrect or stale data. In order to use the new schema from non-SQL applications, the new schema must be saved and reprocessed or reloaded depending on the API used by the non-SQL application. (See topic <a href="../../../Users_Guides/Changing_Schema.htm">Changing the Database Schema</a> for further details.)</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

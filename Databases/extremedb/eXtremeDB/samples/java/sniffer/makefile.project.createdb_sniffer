@@ -1,0 +1,14 @@
+MCO_PRJ_LIST += createdb_sniffer
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += createdb_sniffer
+PRJ_createdb_sniffer_TAGS:=sample core
+PRJ_createdb_sniffer_DIR:=$(call mco_project_dir)
+PRJ_createdb_sniffer_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_createdb_sniffer_SCHEMAS:=$(call mco_project_file,snifferdb.mco)
+PRJ_createdb_sniffer_DATABASES:=snifferdb
+PRJ_createdb_sniffer_RUNTIME:=YES
+PRJ_createdb_sniffer_MEMDEV:=SHARED
+PRJ_createdb_sniffer_STORAGE:=TRANSIENT
+PRJ_createdb_sniffer_SYNC:=AUTO
+PRJ_createdb_sniffer_TRANSMGR:=MURSIW
+PRJ_createdb_sniffer_F_NATIVE:=YES

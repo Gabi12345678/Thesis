@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|Python API|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Step 4: Using Sequence Fields</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Step 4: Using Sequence Fields</h1>
+            <blockquote>
+                <p>To perform operations on database objects containing <code><a href="../../../Users_Guides/Core/Sequences.htm">sequence</a></code> fields the Python application uses <i><a href="../../../Programming/Python/Classes/SequenceIterator.htm"><i>SequenceIterator</i></a></i> methods and <code><a href="https://www.tutorialspoint.com/python/python_tuples.htm">tuples</a></code>. Consider the following class <i>Quote</i>:</p>
+                <div class="code-block"><pre>&#160;
+    class Quote 
+    {
+        char&lt;8&gt; symbol;
+        sequence&lt;time asc&gt; timestamp;
+        sequence&lt;float&gt; low;
+        sequence&lt;float&gt; high;
+        sequence&lt;float&gt; open;
+        sequence&lt;float&gt; close;
+        sequence&lt;uint4&gt; volume;
+&#160;
+        hash&lt;symbol&gt; by_sym[1000];
+    };
+    &#160;</pre>
+                </div>
+                <p>To work with the <code>sequence</code> fields, we first need a 'connected' object, i.e. loaded from the database or created with <i><a href="../../../Programming/Python/Classes/Connection.htm">Connection</a></i> method <code><a href="../../../Programming/Python/Classes/Connection.htm">new()</a></code>. When an object like <i>Quote</i> is instantiated,   <i>SequenceIterators</i> are created for the object's <code>sequence</code> fields and are in 'initial' state. To assign values to the <code>sequence</code> fields we use the <i>SequenceIterator</i> method <code><a href="../../../Programming/Python/Analytics_Methods/Iterator_Methods.htm">append()</a></code>. For example, the following code snippet initializes a <i>Quote</i> object's sequence fields:</p>
+                <div class="code-block"><pre>  
+    con.startTransaction(exdb.Transaction.MCO_READ_WRITE)
+    &#160;
+    quote = con.new("Quote")
+    quote.symbol = 'AAA'
+    &#160;
+    op = array.array('f', [2.0] * BUF_SIZE)
+    cl = array.array('f', [3.0] * BUF_SIZE)
+    hg = array.array('f', [4.0] * BUF_SIZE)
+    lw = array.array('f', [1.0] * BUF_SIZE)
+    &#160;
+    i = 0
+&#160;
+    while i &lt; N_QUOTES:
+        quote.timestamp.append( [i+j+1 for j in xrange(BUF_SIZE)])
+        quote.open.append(op)
+        quote.close.append(cl)
+        quote.high.append(hg)
+        quote.low.append(lw)
+        quote.volume.append( [i+j for j in xrange(BUF_SIZE)] )
+        i += BUF_SIZE
+    con.commit()
+    &#160;</pre>
+                </div>
+                <p>To get a specific value or range of values in a <code>sequence</code> field we use <i>SequenceIterator</i> method <code><a href="../../../Programming/Python/Analytics_Methods/Iterator_Methods.htm">search()</a></code>. Then to perform operations on a corresponding group of "dependent" <code>sequence</code> fields we use method <code><a href="../../../Programming/Python/Analytics_Methods/Iterator_Methods.htm">project()</a></code> to create corresponding <code>tuples</code>. For example the following code snippet selects the range of values greater than 10 from the <i>ordered</i> <code>sequence</code> field <code>timestamp</code>, extracts the corresponding range of values from the dependent <code>sequence</code> fields into <code>tuples</code>, then executes a loop to accumulate the sum of values for each <code>sequence</code>:</p>
+                <div class="code-block"><pre>&#160;
+    &#160;
+    FROM = 10
+    TILL = N_QUOTES - 10
+    &#160;
+    conn.startTransaction()
+&#160;
+    # Find the record in the database
+    cursor = conn.cursor()
+    quote = cursor.find("Quote", "by_sym", "AAA")
+&#160;
+    # Perform a search operation on  ordered sequence "timestamp"
+    tsit = quote.timestamp.search(FROM, exdb.SeqIteratorBoundary.MCO_SEQ_BOUNDARY_EXCLUSIVE, 
+                    TILL, exdb.SeqIteratorBoundary.MCO_SEQ_BOUNDARY_INCLUSIVE)
+                    &#160;
+    # Project the search result to the other 'dependent' sequence fields
+    # creating tuples for the dependent sequences
+    tsit.project('open', 'close', 'high', 'low', 'volume')
+&#160;
+    # Iterate over a set of values
+    count = 0
+    for (ts, open, close, high, low, volume) in tsit:
+        timestamp_sum += ts
+        open_sum += open
+        close_sum += close
+        high_sum += high
+        low_sum += low
+        volume_sum += volume
+        count += 1
+&#160;
+    conn.rollback()
+    &#160;</pre>
+                </div>
+                <p>SDK sample <a href="../../../Programming/Python/SDK_Samples/Sequences/seqbasic.htm"><code>samples/python/seqbasic</code></a> illustrates how to use these  <i>SequenceIterator</i> methods to perform basic sequence operations. Please <a href="../../Building_Running_SDK_Samples.htm">build and run</a> the sample application and examine the source code. </p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

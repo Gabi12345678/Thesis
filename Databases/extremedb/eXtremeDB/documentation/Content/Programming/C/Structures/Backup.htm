@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Incremental Backup</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <h1>Incremental Backup</h1>
+            <blockquote>
+                <p>The <i><a href="../../../Users_Guides/Core/Database_Backup_Restore.htm">Incremental Backup</a></i> feature uses the following structures defined in <code>mco.h</code>:</p>
+                <div class="code-block"><pre>&#160;
+    typedef struct mco_backup_info_t 
+    {
+        uint4 magic; 
+        uint4 protocol_version; 
+        uint4 type; 
+        uint4 flags; 
+        uint4 backup_no; 
+        uint8 timestamp; 
+        uint8 size; 
+        uint8 offset; 
+        uint4 crc; 
+        mco_trans_counter_t trans_no; 
+        uint4 mem_page_size; 
+        uint4 disk_page_size; 
+        mco_counter_t n_pages_total; 
+        char db_name[MCO_MAX_BACKUP_DBNAME_SIZE];
+        char label[MCO_MAX_BACKUP_LABEL_SIZE]; 
+    &#160;
+    } mco_backup_info_t;
+    &#160;
+    typedef struct tag_mco_async_backup_progress_info_ 
+    {
+        mco_backup_progress_info_t core_info; 
+        char const *               file_name; 
+        char const *               last_label; 
+        mco_backup_type            type; 
+        int                        compression_level; 
+        MCO_RET                    last_error_code; 
+        char const *               last_error_msg; 
+    &#160;
+    } mco_async_backup_progress_info_t;
+    &#160;</pre>
+                </div>
+                <h2>Definitions</h2>
+                <table style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');" class="TableStyle-FunctionReference" cellspacing="0">
+                    <col style="width: 58px;" class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">magic</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A "magic" number to identify the backup record header</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">protocol_version</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The backup protocol identification</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">type</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>The type of the backup record: one of the following:</p>
+                                <div class="code-block"><pre>  &#160;
+  typedef enum {
+    MCO_BACKUP_TYPE_AUTO,
+    MCO_BACKUP_TYPE_SNAPSHOT,
+    MCO_BACKUP_TYPE_INCREMENTAL
+  } mco_backup_type;
+  &#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">flags</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>The backup flags: a combination of the following:</p>
+                                <div class="code-block"><pre>  &#160;
+  typedef enum {
+    MCO_BACKUP_FLAG_COMPRESSED = 1,
+    MCO_BACKUP_FLAG_ENCRYPTED  = 2
+  } mco_backup_flags;
+  &#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">backup_no</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A sequential number </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">timestamp</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The backup timestamp</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">size</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The size of the backup segment including the header (<code>mco_backup_info_t</code>)</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">offset</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The offset in the file</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">crc</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The backup record checksum</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">trans_no</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The last transaction number</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">mem_page_size</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The size of the memory page for the database</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">disk_page_size</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The size of the persistent storage page for the database</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">n_pages_total</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The total number of memory pages</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">db_name</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The name of the database</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">label</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The backup record label</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2"><span style="font-size: 12pt; font-weight: bold;">Asynchronous backup progress</span>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">core_info</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The core backup info structure</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">file_name</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The name and location of the backup file</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">last_label</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The latest backup record label</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">type</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The type of the backup set by  <code><a href="../Core_Functions/Static/Auxiliary/Backup/async_backup_start.htm">mco_async_backup_start()</a></code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">compression_level</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The  backup compression level set by  <code><a href="../Core_Functions/Static/Auxiliary/Backup/async_backup_start.htm">mco_async_backup_start()</a></code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">last_error_code</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The latest error code of the async backup processing</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">last_error_msg</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">The latest error message from the async backup processing</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

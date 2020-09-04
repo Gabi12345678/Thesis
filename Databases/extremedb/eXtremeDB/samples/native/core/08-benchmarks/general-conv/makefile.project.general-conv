@@ -1,0 +1,14 @@
+MCO_PRJ_LIST += 08-benchmarks-general-conv
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 08-benchmarks-general-conv
+PRJ_08-benchmarks-general-conv_TAGS:=persistent sample core
+PRJ_08-benchmarks-general-conv_DIR:=$(call mco_project_dir)
+PRJ_08-benchmarks-general-conv_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_08-benchmarks-general-conv_SCHEMAS:=$(call mco_project_file,general.mco)
+PRJ_08-benchmarks-general-conv_DATABASES:=general
+PRJ_08-benchmarks-general-conv_RUNTIME:=YES
+PRJ_08-benchmarks-general-conv_MEMDEV:=PRIVATE
+PRJ_08-benchmarks-general-conv_STORAGE:=TRANSIENT
+PRJ_08-benchmarks-general-conv_STORAGEDEV:=
+PRJ_08-benchmarks-general-conv_SYNC:=AUTO
+PRJ_08-benchmarks-general-conv_TRANSMGR:=MURSIW

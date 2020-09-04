@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>SQL Select</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>SQL Select</h1>
+            <blockquote>
+                <p>The SQL <code>SELECT</code> statement is used to display the contents of the specified columns in a table (known as “projection”).  <i>e</i>X<i>treme</i>SQL supports almost all standard SQL constructions. (Please see the wikipedia page for a detailed description of the <a href="https://en.wikipedia.org/wiki/SQL_syntax">select statement syntax</a>.) </p>
+                <p>Some important <i>e</i>X<i>treme</i>SQL features and SQL&#160;extensions are described in the sections below.</p>
+                <h2>Order By</h2>
+                <p>The <code>order by</code> clause causes the result set to be sorted by the specified columns. For example, consider the following table and index definition initialized with 6 initial rows:</p>
+                <div class="code-block"><pre>&#160;
+    create table orders(id integer not null, tm integer not null);
+    create index idx on orders(id,tm);
+    insert into orders values (2,  200);
+    insert into orders values (2,  220);
+    insert into orders values (2,  210);
+    insert into orders values (1,  100);
+    insert into orders values (1,  120);
+    insert into orders values (1,  110);
+    &#160;</pre>
+                </div>
+                <p>A simple select displays the rows in the order of insertion:</p>
+                <div class="code-block"><pre>&#160;
+    select * from orders;
+    id      tm
+    ---------------------
+    2       200
+    2       220
+    2       210
+    1       100
+    1       120
+    1       110
+    &#160;</pre>
+                </div>
+                <p>Now, using the <code>order by</code> clause, we can sort the result set in ascending order by column <code>id</code> and <code>tm</code> as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    select * from orders order by id, tm;
+    id      tm
+    -------------------------------------
+    1       100
+    1       110
+    1       120
+    2       200
+    2       210
+    2       220
+    &#160;</pre>
+                </div>
+                <p>Or sort the result set rows in descending order as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    select * from orders order by id desc, tm desc;
+    id      tm
+    -----------------------------------------------
+    2       220
+    2       210
+    2       200
+    1       120
+    1       110
+    1       100
+    &#160;</pre>
+                </div>
+                <h2>Distinct Order</h2>
+                <p>A useful <i>e</i>X<i>treme</i>SQL extension is the possibility to add the <code>distinct</code> keyword in the <code>order by</code> clause. This allows restricting the result set to a single record from an ordered subset. For example, using the <code>distinct order</code> feature, we can extract the first row from each "ordered subset" defined by the values of column <code>id</code>  as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    select * from orders order by id distinct,  tm;
+    id    tm
+    ----------------------------------------------
+    1    100
+    2    200
+&#160;</pre>
+                </div>
+                <p>Or we can extract the last row from the "ordered subset" by specifying the <code>descending</code> order as follows:</p>
+                <div class="code-block"><pre>&#160;
+    select * from orders order by id desc distinct, tm desc;
+    id    tm
+    --------------------------------------------------------
+    2    220
+    1    120
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2>For Update</h2>
+                <p>The <code>for update</code> clause in a SQL select statement is used to indicate that the result set (cursor) is going to be used subsequently for updating data values.  Note that the <i>e</i>X<i>treme</i>SQL implementation of the <code><code>for update</code></code> clause differs slightly from the standard.  Whereas the standard specifies “For Update On” where the “On” preposition requires specification of a list of columns that will be subject to updates, <i>e</i>X<i>treme</i>SQL does not require the “On list” – all columns are modifiable. In <i>e</i>X<i>treme</i>SQL, the <code>for update</code><a name="kanchor200"></a> clause instructs the runtime to avoid issuing a transaction upgrade (from <code>READ_ONLY</code> to <code>READ_WRITE</code>), but rather to open a <code>READ_WRITE</code> transaction from the outset.</p>
+                <p>&#160;</p>
+                <h2>The Ignore Column Operator for Sequences</h2>
+                <p>The exclamation point (<code>"!"</code>) can be used as a shortcut for the sequence function <code>seq_ignore()</code>  to indicate that a calculated column is to be ignored in the result set output. For example consider the following table with one ordered and two unordered sequence columns:</p>
+                <div class="code-block"><pre>    &#160;
+    create table Quotes(sym string primary key, 
+        day sequence(int asc), 
+        open sequence(int), 
+        close sequence(int));
+    insert into Quotes values('AAA', 
+        [20170501, 20170502, 20170503, 20170504, 20170505, 20170509, 20170510], 
+        [101, 102, 103, 104, 105, 109, 110], 
+        [111, 112, 113, 114, 115, 119, 120]);
+    insert into Quotes values('BBB', 
+        [20170501, 20170502, 20170503, 20170504, 20170505, 20170509, 20170510], 
+        [201, 202, 203, 204, 205, 209, 210], 
+        [211, 212, 213, 214, 215, 219, 220]);
+    insert into Quotes values('CCC', 
+        [20170501, 20170502, 20170503, 20170504, 20170505, 20170509, 20170510], 
+        [301, 302, 303, 304, 305, 309, 310], 
+        [311, 312, 313, 314, 315, 319, 320]);
+        &#160;
+    select !seq_search(day, 20170501, 20170503) as daterange, 
+        open@daterange as "open", close@daterange as "close"
+    from Quotes;
+    &#160;
+    daterange open    close
+    ------------------------------------------------------------------------------
+    {?}     {101, 102, 103} {111, 112, 113}
+    {?}     {201, 202, 203} {211, 212, 213}
+    {?}     {301, 302, 303} {311, 312, 313}
+&#160;
+    Selected records: 3
+    &#160;</pre>
+                </div>
+                <p>In this query we select an interval with function <code>seq_search()</code> and, as we don't need all timestamps in the interval in the query result, we mark the column as <i>ignored</i> with the<code>!</code> operator. Ignored column may be used in other calculated columns but will not appear in the actual statement output.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

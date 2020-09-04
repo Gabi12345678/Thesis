@@ -1,0 +1,15 @@
+#define uint4 unsigned<4>
+#define MAX_SYMBOL_LEN 21
+
+declare database stockdb;
+
+class Quote {
+    char<MAX_SYMBOL_LEN> symbol;
+    sequence<date asc> day;
+    sequence<float> low;
+    sequence<float> high;
+    sequence<float> open;
+    sequence<float> close;
+    sequence<uint4> volume;
+    unique tree<symbol> by_sym;
+};

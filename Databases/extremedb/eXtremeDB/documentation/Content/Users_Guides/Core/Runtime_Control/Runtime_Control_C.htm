@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Runtime Control in C</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><a name="kanchor246"></a>Runtime Control in C</h1>
+            <blockquote>
+                <p>The startup procedure that initializes the <i>e</i>X<i>treme</i>DB runtime environment in C applications is <a href="../../../Programming/C/Core_Functions/Static/Runtime_Control/runtime_start.htm"><code>mco_runtime_start()</code></a>. It must be called before any database operations can be performed. However, prior to calling <a href="../../../Programming/C/Core_Functions/Static/Runtime_Control/runtime_start.htm"><code>mco_runtime_start()</code></a>, it is common practice to register a fatal error handler by calling <code><a href="../../../Programming/C/Core_Functions/Static/Error_Handling/set_handler.htm">mco_error_set_handler()</a></code>and in some special cases it may be necessary to set runtime options by calling <a href="../../../Programming/C/Core_Functions/Static/Runtime_Control/runtime_setoption.htm"><code>mco_runtime_setoption()</code></a>. The function <code><a href="../../../Programming/C/Core_Functions/Static/Runtime_Control/get_runtime_info.htm">mco_get_runtime_info()</a></code> can be called any time after initialization to obtain the specific configuration details of the current runtime. Then, when finished with database activity (after disconnecting from and closing all databases), C&#160; applications must call <code><a href="../../../Programming/C/Core_Functions/Static/Runtime_Control/runtime_stop.htm">mco_runtime_stop()</a></code>  to clean up semaphores and perform an orderly shutdown of the runtime.</p>
+                <p>The typical sequence of API calls would look like the following:</p>
+                <div class="code-block"><pre>&#160;
+    static void errhandler(MCO_RET n)
+    {
+        printf("\neXtremeDB runtime fatal error: %d", n);
+        getchar();
+        exit( 0 );
+    }
+    &#160;
+    int main(int argc, char* argv[])
+    {
+        MCO_RET   rc;
+        mco_db_h  db;
+        &#160;
+        mco_error_set_handler(&amp;errhandler);
+        &#160;
+        mco_runtime_start();
+        &#160;
+        // Perform database processing
+        &#160;
+        mco_runtime_stop();
+    }</pre>
+                </div>
+                <p class="Code">&#160;</p>
+            </blockquote>
+            <blockquote>
+                <h2>Runtime Options</h2>
+                <p>There are a small number of per-process global database runtime options to manage <i>shared memory</i> operating system parameters and other special features. These options are set by calling <code><a href="../../../Programming/C/Core_Functions/Static/Runtime_Control/runtime_setoption.htm">mco_runtime_setoption()</a></code> prior to runtime initialization and can be retrieved at any time prior to runtime shutdown by calling <a href="../../../Programming/C/Core_Functions/Static/Runtime_Control/runtime_getoption.htm"><code>mco_runtime_getoption()</code></a>. (Please refer to the Reference Guide page <code><a href="../../../Programming/C/Core_Functions/Static/Runtime_Control/runtime_setoption.htm">mco_runtime_setoption()</a></code> for the list of actual runtime options.)</p>
+                <p>For example a multi-process shared memory application on a Unix system may need to set the shared memory access mode from the default value of <code>0666</code>. To do so the application would set this runtime option with code like the following.</p>
+                <div class="code-block"><pre>&#160;
+    mco_runtime_setoption( MCO_RT_OPTION_UNIX_SHM_MASK, 0600 );
+    ...
+    mco_runtime_start();
+    ...
+&#160;</pre>
+                </div>
+                <h3>Persistent Databases</h3>
+                <p>The runtime options for persistent database applications are the same as for in-memory database applications, however there are important <a href="../Database_Control/Devices_C.htm">memory device definitions</a> and <a href="../Persistent_Databases/Database_Control/Persistent_Open_C.htm">database open parameters</a> that must be specified for persistent databases. (Please use these links for detailed explanations.)</p>
+                <h2>Runtime Libraries</h2>
+                <p>At a minimum, In-Memory database applications must link with the following basic <i>e</i>X<i>treme</i>DB libraries:</p>
+                <blockquote>
+                    <p>1.	<code>mcolib</code>: basic core runtime functions</p>
+                    <p>2.	<code>mcovtmem</code>: “virtual table”  memory manager functions </p>
+                    <p>3.	<a href="../MURSIW_Transaction_Manager.htm"><code>mcotmursiw</code></a>, <a href="../MVCC_Transaction_Manager.htm"><code>mcotmvcc</code></a> or <a href="../Concurrency_Transaction_Managers.htm"><code>mcotexcl</code></a><a name="kanchor247"></a>:  Transaction Manager functions</p>
+                    <p>4.	<code>mcomconv</code>, <code>mcomipc</code>, <code>mcompsx</code>, or <code>mcomw32</code>: memory devices functions</p>
+                    <p>5.	synchronization library: functions that synchronize access to database objects as well as internal runtime structures (see below)</p>
+                    <p>6.	<code>mcouwrt</code> or <code>mcowrt</code>: utility functions</p>
+                </blockquote>
+                <h3>Persistent Databases</h3>
+                <p>Whereas In-Memory database applications use the “virtual tables” library <code>mcovtmem</code>, persistent  database applications use library <code>mcovtdsk</code> and a file system library:</p>
+                <ul>
+                    <li value="1"><a href="../../../Getting_Started/Package_Contents/Package_Unix-Linux_Target_bin_EXT.htm"><code>mcofuni</code></a>: Unix-Linux file systems</li>
+                    <li value="2"><a href="../../../Getting_Started/Package_Contents/Package_Win_Target_bin_EXT.htm"><code>mcofw32</code></a>: Windows file systems</li>
+                </ul>
+                <p>Applications that use the <i>e</i>X<i>treme</i>DB<a href="../../../Programming/C/Core_Functions/Static/Database_Control/save.htm"> <code>mco_db_save()</code></a> or <a href="../../../Programming/C/Core_Functions/Static/Database_Control/load.htm"><code>mco_db_load()</code></a> functions to store and retrieve database image files to or from persistent media, require serialization and file system functions that are provided in the <code>mcoseri</code> library. (Please refer to the <a href="../../../Programming/C/Runtime_Libraries.htm">runtime libraries</a> reference guide page for further  details and examples.)</p>
+                <h3>Synchronization Libraries</h3>
+                <p>The database repository and the database runtime metadata are shared resources. They are read and written by multiple tasks at a time. To ensure the correctness of internal structures and repository data, the <i>e</i>X<i>treme</i>DB runtime must make sure that those read and write operations are executed in proper order. In other words, access to them must be “synchronized”.  For most supported platforms, two synchronization methods are provided. One is based solely on the operating system’s synchronization kernel primitive, such as <i>semaphores</i>. The other method combines atomic instructions with OS synchronization primitives.</p>
+                <p>A locking algorithm can create a user-space “fast path” by first attempting to lock the resource using an atomic instruction. If the attempt fails, and a thread needs to block, a system call is then executed. But if there is no contention (as is often the case) the kernel doesn't need to be notified. Kernel calls are relatively expensive because they lead to CPU context switching and other activity. So where atomic operations are possible, they provide significant performance advantages.</p>
+                <p>These synchronization methods are implemented in the synchronization libraries. All applications, except possibly single-threaded applications (see comment on <code>mcosempty.c</code> below) must link with one of the synchronization libraries listed in the <a href="../../../Getting_Started/Package_Contents.htm">package contents</a> by operating system. Where possible, a version of the library is provided that uses “atomic operations” to avoid unnecessary kernel calls.</p>
+                <p>Most applications, particularly single-threaded or multi-threaded applications with low database activity (on the order of one database update per second), can benefit greatly by using the “+ atomic op.” library if available. But there is no universal general rule. Many factors determine whether the “+ atomic op.” library will work, such as: the application’s database access pattern and rate, the kernel’s scheduler policy, and even hardware.</p>
+                <p>Where two versions of the synchronization library are provided, the same version must be used by all applications. When more than one application will be accessing the database, or in multi-platform scenarios where database access may be incorporated in different application modules written in C, C++, C# or Java, it is important that all application modules are linked with the same synchronization library.</p>
+                <p>The file <code>mcosempty.c</code> contains a “hollow” synchronization implementation that can be compiled on any platform. It has no synchronization code, so it is the fastest implementation - but it is valid <i>for single-threaded applications only</i>. If this source file is included in the application build, then no synchronization library is necessary. </p>
+                <p>The most commonly used synchronization libraries are:</p>
+                <ul>
+                    <li value="1"><a href="../../../Getting_Started/Package_Contents/Package_Unix-Linux_Target_bin.htm"><code>mcoslnx</code></a>: for Unix-Linux</li>
+                    <li value="2"><a href="../../../Getting_Started/Package_Contents/Package_Win_Target_bin.htm"><code>mcosw32</code></a>: for Windows</li>
+                </ul>
+                <p>(Again, please refer to the <a href="../../../Getting_Started/Package_Contents.htm">package contents</a> for platform-specific details.)</p>
+                <h3>Direct Pointer Libraries</h3>
+                <p>As mentioned in the <a href="../../../eXtremeDB_Product_Family.htm">Product Overview</a>, <i>e</i>X<i>treme</i>DB provides two versions of runtime libraries for all-in-memory databases: the optimized “Direct Pointer Arithmetic” version and the “Offset” version. The advantages of the “Offset” libraries are A) that a saved binary image of an in-memory database can be loaded to a different starting address in memory, and, B) two (or more) applications that share an in-memory database in shared memory do not have to map the shared memory segment to the same address space in their local process (which is sometimes impossible). The advantage of the Direct Pointer Arithmetic library is better performance, and is ideal for in-memory databases within a single (possibly multi-threaded) process.</p>
+                <p>In <i>e</i>X<i>treme</i>DB packages prior to version 7.1, the package was specifically built for Direct Pointer or for Offset support. For <i>e</i>X<i>treme</i>DB version 7.1 and later all packages include two versions of the runtime libraries. The Offset version is the default and this version of the runtime libraries is located in directories <code>eXtremeDB/target/bin</code> and <code>eXtremeDB/target/bin.so</code>. The Direct Pointer version of the libraries is located in directories <code>eXtremeDB/target/bin.dptr</code> and <code>eXtremeDB/target/bin.dptr.so</code>.</p>
+                <p>When building applications on Unix-Linux systems, the make command line option <code>PRJ_DIRECTPTR=YES</code> can be used to cause linking with the Direct Pointer libraries. On Windows, applications are generally developed with Visual Studio which does not have a convenient command line option. So to link with the Direct Pointer libraries, project settings must be properly set to the <code>eXtremeDB/target/bin.dptr</code> or <code>eXtremeDB/target/bin.dptr.so</code> directories.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

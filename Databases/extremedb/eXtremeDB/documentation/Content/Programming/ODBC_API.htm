@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The eXtremeSQL ODBC API</title>
+        <link href="../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>The <i>e</i>X<i>treme</i>SQL ODBC API</h1>
+            <blockquote>
+                <p>This topic describes the <i>e</i>X<i>treme</i>SQL ODBC Driver implementation and how to use the ODBC driver to connect to existing <i>e</i>X<i>treme</i>DB databases. (Please use the following links for details on configuring the ODBC DSN on <a href="ODBC/ODBC_DSN_Win.htm">Windows</a> systems or on <a href="ODBC/ODBC_Unix-Linux.htm">Unix-Linux</a> systems.)</p>
+                <p>The objective of the ODBC Driver is to allow ODBC client applications to gain access to a standard <i>e</i>X<i>treme</i>SQL application.  It is not intended, and it is not possible, to create a <i>stand-alone</i> ODBC application.  <i>e</i>X<i>treme</i>SQL interfaces with on-disk and in-memory databases; the database dictionary that describes the structure of the database is encoded in the application by virtue of linking the <code><a href="../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a></code>-generated C file.  Further, <i>e</i>X<i>treme</i>DB in-memory databases don’t exist until they are created by the application, unlike on-disk databases that persist across executions of the application and which store the database dictionary with the on-disk database files.</p>
+                <p>The <i>e</i>X<i>treme</i>SQL ODBC Driver can be used to connect to an <i>e</i>X<i>treme</i>DB database in two distinct ways:</p>
+                <ul>
+                    <li value="1">connect to a <i style="font-weight: bold;">local</i> database (an on-disk or in-memory database created on the same machine by a standard <i>e</i>X<i>treme</i>DB or <i>e</i>X<i>treme</i>SQL application), or</li>
+                    <li value="2">connect to a <i style="font-weight: bold;">remote</i> database (on-disk or  in-memory) through the <i>e</i>X<i>treme</i>SQL remote server.</li>
+                </ul>
+                <p>In the first case, the driver acts as a thin client that serializes SQL queries and deserializes the results via a TCP connection to the <i>e</i>X<i>treme</i>SQL server application; the server can be the <i>xSQL</i> utility or any application using the <i>e</i>X<i>treme</i>SQL APIs.</p>
+                <p>In the second case, the ODBC driver connects to a remote database if the <code>DSN=</code> string in the ODBC configuration file specifies a TCP address. Or the ODBC driver can open a database locally in <i style="font-weight: bold;">shared memory</i>. In this case the process that loads the ODBC driver in its memory space gains direct access to the database in shared memory. (<i>Note that in this case, if the application crashes or terminates inside an open transaction, it can cause database corruption.</i>)</p>
+                <p>Whether the database is accessed locally or remotely is determined by the <code>DSN=</code> string in the ODBC configuration file. If the <code>DSN</code>string has a TCP address semantic like <code>192.168.1.1:5000</code> or <code>localhost:5000</code> (where the <code>:port_number</code> portion indicates the communication port) then the ODBC driver acts as a remote SQL client and tries to connect to the specified address. When the <code>DSN</code> string specifies just a name with no port specification (<code>:port_number</code>), the ODBC driver tries to connect to a local database in shared memory with the specified name.</p>
+                <p>The <i>xSQL</i> utility can be invoked as a ready-to-use <i>e</i>X<i>treme</i>SQL remote server which interfaces with a database created in shared memory by another application (the main application). Thus <i>xSQL</i> can act as a medium between any in-memory database placed in shared memory and the <i>e</i>X<i>treme</i>SQL ODBC Driver on the client side. To provide a connection from the ODBC Driver to a persistent (on-disk) remote database, an <i>e</i>X<i>treme</i>SQL remote server needs to be embedded into the main application. (Note that the <a href="C++/SDK_Samples/SQL_Samples/12-Interactive.htm"><code>sql-12-interactive</code></a>  source code in the SDK samples demonstrates how to setup and run an <i>e</i>X<i>treme</i>SQL remote server with interactive user interface.)</p>
+                <p>The diagram below illustrates how the ODBC driver interfaces with an application that opens an in-memory database in shared memory:</p>
+                <p>
+                    <img src="../Resources/Images/ODBC_DSN/Local_Inmem.png" />
+                </p>
+            </blockquote>
+            <p>The diagram below illustrates how the ODBC driver interfaces with a remote in-memory database opened by <i>xSQL</i>:</p>
+            <p>
+                <img src="../Resources/Images/ODBC_DSN/Remote_xSQL.png" />
+            </p>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

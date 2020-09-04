@@ -1,0 +1,6 @@
+-include $(call mco_makefile_file, \
+fulltext/makefile.project.fulltext \
+locate/makefile.project.locate \
+pattern/makefile.project.pattern \
+search/makefile.project.search \
+)

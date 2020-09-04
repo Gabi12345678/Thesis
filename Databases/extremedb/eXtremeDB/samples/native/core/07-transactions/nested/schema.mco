@@ -1,0 +1,15 @@
+/************************************************************
+ *                                                          *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.*
+ *                                                          *
+ ************************************************************/
+declare database transdb;
+
+class Transaction {
+    unsigned<4> from;
+    unsigned<4> to;
+    
+    hash<from> hFrom[10000];
+    nonunique hash<to> hTo[10000];
+};
+

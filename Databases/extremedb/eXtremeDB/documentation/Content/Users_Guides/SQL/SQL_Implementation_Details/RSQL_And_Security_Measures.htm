@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeSQL Remote SQL and Security Measures</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>SQL Remote SQL and Security Measures</h1>
+            <blockquote>
+                <p>Remote SQL (RSQL) applications can run on different processors even with different architectures. For example validation tests have been run using database shards provided by servers running on the following systems:</p>
+                <ul>
+                    <li value="1">Itanium processor (big-endian) x64</li>
+                    <li value="2">x86 processor (little-endian) x64</li>
+                    <li value="3">x86 processor (little-endian) x32</li>
+                </ul>
+                <p>Client applications can be run on x86, x32 or x64 systems. So neither the architecture nor the endianness affects the <i>e</i>X<i>treme</i>SQL RSQL interface.</p>
+                <h2>Security measures</h2>
+                <p><i>e</i>X<i>treme</i>SQL Remote SQL applications can implement security of two types: password authentication or Secure Sockets Layer as explained in the following sections.</p>
+                <h3>Password authentication</h3>
+                <p>RSQL applications can password-protect a remote SQL connection by setting the <code>authenticationRequired</code> parameter in the <i>SqlServer</i> class. If the parameter is set to true, in order to connect to the server, a client application must pass the authentication credentials to the <i>RemoteSqlEngine</i> or <i>DistributedSqlEngine</i> through the <code>authenticate()</code> API:</p>
+                <div class="code-block"><pre>&#160;
+    RemoteSqlEngine::authenticate(char const* login, char const* password);
+    &#160;
+    DistributedSqlEngine::authenticate(char const* login, char const* password);
+    &#160;</pre>
+                </div>
+                <p>The authentication requires a table <i>Users</i> with two required string fields, <code>login</code> and <code>password</code> to keep user names and passwords:</p>
+                <div class="code-block"><pre>&#160;
+    create table Users (login string primary key, password string);
+    insert into Users values ('user1', 'mypass');
+    insert into Users values ('user2', 'hYfjdKK2');
+    &#160;</pre>
+                </div>
+                <p>Remote client applications must provide the credentials to match those found in the table <i>Users</i> in order to connect to the database. Note the following important characteristics of this password-protection feature:</p>
+                <blockquote>
+                    <p>1.	The <i>Users</i> table can include fields in addition to <code>login</code> and <code>password</code>.</p>
+                    <p><a name="kanchor850"></a>2.	The credentials are not encrypted by the database runtime. If desired, it is the application's responsibility to either encrypt or somehow protect the content of the <code>Users</code> table.</p>
+                    <p>3.	The transmission of the credentials through the Remote Engine protocol is not encrypted either. However it is possible to use the Remote server authentication in conjunction with SSL encryption.</p>
+                    <p>4.	If  SSL encryption (without authentication) is enabled when using <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>, the password transmission would be protected.</p>
+                </blockquote>
+                <h3>RemoteSQL SSL Client Applications</h3>
+                <p>To start <i>RemoteSQL</i> client and server applications with SSL security it is necessary to set SSL parameters that are used to establish the network connection. Please refer to the <a href="../../Core/Network_Communications.htm">Network Communications</a> page for details on implementing OpenSSL security.</p>
+                <h2>Setting Remote SQL timeouts</h2>
+                <p>For RSQL applications built with <i>e</i>X<i>treme</i>SQL versions prior to release 7.0, an RSQL client may appear to hang while waiting to establish a server connection or while waiting for the results of a query. This is because the <i>RemoteSqlEngine</i> implementation uses TCP <code>connect()</code> and <code>read()</code> functions which rely on the TCP timeouts to notify the client of a network error. (Note that a connection timeout error does little to tell you what went wrong or why the error happened; it just identifies that the error occurred. Timeout errors can happen for a number of reasons. The server, the requesting device, the network hardware or an internet connection can be at fault.)</p>
+                <p>The problem is the default TCP timeout values are quite large. Moreover changing these values requires administrative privileges and effect the entire operating environment. On Linux the TCP timeout values are kernel parameters and on Windows the timeouts are configured through the registry.</p>
+                <p>To avoid the hassle of modifying system-wide parameters, the implementation of the <i>RemoteSQL</i> engine has been extended to allow setting the connection and read timeouts through the <code>RemoteSqlEngine::open()</code> and the <code>DistributedSQlEngine::open()</code> methods through two additional parameters: <code>connect_timeout</code> and <code>read_timeout</code>. Internally the timeout values are passed to the socket API. However, an application should not execute a query of unpredictable size using RSQL, even via <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>. One should know the approximate query length in advance and make any necessary adjustment to the timeouts or modify the query, as the server will remain busy performing the query.</p>
+                <p>The old-style API can still be used. If not explicitly specified, the timeout parameters default values are 2000 (i.e. 2000 milliseconds or 2 seconds) for the <code>connect()</code> and 1200000 ( 20 minutes) for <code>read()</code> operations.</p>
+                <p>The following code snippet demonstrates a call to the new <code>open()</code> API from a client application that connects to the above server:</p>
+                <div class="code-block"><pre>&#160;
+    RemoteSqlEngine engine;
+&#160;
+    engine.open(SERVER_HOST, SERVER_PORT, connect_attempts, local_domain, 
+            0, connect_timeout, read_timeout);
+    &#160;</pre>
+                </div>
+                <p>or</p>
+                <div class="code-block"><pre>&#160;
+    DistributedSqlEngine engine;
+    &#160;
+    engine.open(nodes, n_nodes, n_replicas, replication_type, connect_attempts, 
+            &amp;bad_node, local_domain, 0, connect_timeout, read_timeout);
+            &#160;</pre>
+                </div>
+                <p>From Java applications, the new <code>open()</code> API call would be as follows:</p>
+                <div class="code-block"><pre>&#160;
+    SqlConnection con = new SqlRemoteConnection(host, port, maxAttempts, bufSize, 
+                            connectTimeout, readTimeout);
+    &#160;</pre>
+                </div>
+                <p>or</p>
+                <div class="code-block"><pre>    &#160;
+        SqlConnection con = new SqlRemoteConnection(nodes, nReplicas, 
+                    SqlRemoteConnection.ReplicationType.SQLReplication, 
+                    maxAttempts, bufSize, connectTimeout, readTimeout);
+                    &#160;</pre>
+                </div>
+                <p>From Python applications, the new <code>open()</code> API call would be as follows:</p>
+                <div class="code-block"><pre>&#160;
+    Remote engine: conn = exdb.connect('localhost', 5001, 
+                    connectTimeout=3000L, readTimeout=1500L)
+                &#160;</pre>
+                </div>
+                <p>or</p>
+                <div class="code-block"><pre>&#160;
+    Distributed engine: conn = exdb.connect(nodes=('localhost:5001', 'localhost:5002'), 
+                        connectTimeout=3000L, readTimeout=1500L)
+                        &#160;</pre>
+                </div>
+                <p>When using <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> to connect to a remote database, the timeout values are set in the configuration file:</p>
+                <div class="code-block"><pre>&#160;
+    sql_connect_timeout : 2000,
+    sql_read_timeout : 120000,
+    &#160;</pre>
+                </div>
+                <p>Also, the <i>e</i>X<i>treme</i>SQL JDBC driver allows an application to adjust the default timeout value of 90 seconds by specifying a timeout value (in seconds) in the connection string. For example, the code snippet below creates a connection to the <code>extremedb</code> JDBC driver using TCP address <code>localhost</code>, port 5001 and the timeout for read operations of 10 seconds:</p>
+                <div class="code-block"><pre>&#160;
+    String url = "jdbc:extremedb:localhost:5001:10";
+    String user = null;
+    String password = null;
+    Connection con = DriverManager.getConnection(url, user, password);
+    &#160;</pre>
+                </div>
+                <h2>&#160;</h2>
+                <h2>Transmission buffer reallocation</h2>
+                <p>If the buffer size (the default size is 64 * 1024 bytes) passed into the <i>SqlServer</i> instance is not large enough for the record (data) being transmitted, the runtime will reallocate (increase) the size of the buffer in order to process the data transmission without raising an out-of-memory exception.</p>
+                <h2>Shutting down Remote SQL servers</h2>
+                <p>In <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>, the <code>shutdown</code> command can be executed to shutdown (stop) a remote server. The command is implemented via the SQL UDF <code>xsql_shutdown()</code>. When the shutdown is issued by a  distributed <span class="Param">SQL</span> client (<span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> acting as client with multiple servers on different network nodes), all servers (shards) that the client is connected to are shut down.</p>
+                <p>Note the following limitations:</p>
+                <blockquote>
+                    <p>1.The UDF doesn't work for servers running on Windows platforms (yet the client can run on Windows and shut down servers running on *nix systems).</p>
+                    <p>2.An <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> server can be stopped by the <code>shutdown</code> command only if it is running in a non-interactive mode.</p>
+                </blockquote>
+                <p>For <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> there is an 'alias' on the server: the two commands <code>exit</code> and <code>shutdown</code> are equivalent. Any <i>e</i>X<i>treme</i>SQL client application connected to a <i>RemoteSqlEngine</i> or <i>DistributedSqlEngine</i> can shut down the remote server(s) by executing the UDF. For example:</p>
+                <div class="code-block"><pre>&#160;
+    engine.executeStatement("select xsql_shutdown();");
+    &#160;</pre>
+                </div>
+                <p>(Note however that if this statement is executed by <i>DistributedSqlEngine</i> and <code>nReplicas &gt; 1</code>, then only one (random) replica of each shard receives the statement and shuts down.)</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

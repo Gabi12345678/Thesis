@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeSQL Autoid References</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i><a name="kanchor289"></a>SQL Autoid References</h1>
+            <blockquote>
+                <p>As discussed in the <a href="../../Core/Indexes_Cursors/Hash_Autoid.htm"><i>e</i>X<i>treme</i>DB User Guide</a>, an <code>autoid</code> can be defined for a table to provide a unique number  that is generated automatically when a new row is inserted. This type of internally incremented number is known in some popular DBMSs as an "auto-increment", "identity" or "sequence" value. Highly efficient object references can be implemented using an <code>autoid</code> column and referencing that column from a dependent object. <i>e</i>X<i>treme</i>SQL supports the <code>autoid</code> (an 8 byte integer value) by using the <code>autoid</code> and <code>reference</code> keywords in declarations when creating the tables. For example:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    create table Company (autoid reference, userid integer primary key,
+                    name string);
+    create table Employee (userid integer primary key, name string,
+                    company reference to Company);
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>Note that the reference field must have both <code>autoid</code> and <code>reference</code> in its declaration and must come before any other fields in the table. An automatically generated unique value will be inserted into the reference field when an insert statement is executed. The <code>autoid</code> counter is global for the database and not related to the table, so the actual <code>autoid</code> values for an individual table will not necessarily be sequential. And when inserting data into a table with an <code>autoid</code>, the <code>autoid</code> is not included in the column list.</p>
+                <p>For example:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    insert into Company values (10, 'ACME Enterprises');
+    insert into Company values (20, 'Carrot Patch Inc.');
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>The reference values can then be displayed:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    select autoid, userid, name from Company;
+    autoid  userid  name
+    --------------------------------------------------------------------
+    1       10      ACME Enterprises
+    2       20      Carrot Patch Inc.
+    Selected records: 2
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>In addition to the auto-generated reference values, an <code>index</code> (hash) is created to optimize lookups on the reference field. The reference values can then be inserted into the dependent table to create the <code>foreign key</code> reference:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    insert into Employee values (101, 'Wylie Coyote', 1);
+    insert into Employee values (102, 'Road Runner', 1);
+    insert into Employee values (201, 'Elmer Fudd', 2);
+    insert into Employee values (202, 'Bugs Bunny', 2);
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>Then highly efficient queries joining the two tables can be executed that take advantage of the reference hash index. For example:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    select c.name as “Company”, e.userid as “Employee: Id”,
+    e.name as “Name”
+    from Company c, Employee e
+    where c.userid = 10 and c.autoid = e.company;
+    Company    Employee: Id Name
+    --------------------------------------------------------------------
+    ACME Enterprises        101     Wylie Coyote
+    ACME Enterprises        102     Road Runner
+    &#160;
+    Selected records: 2
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>or</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    select c.name as “Company”, e.userid as “Employee: Id”,
+    e.name as “Name”
+    inner join Employee e on c.autoid = e.company
+    where c.userid` = 20;
+    Company    Employee: Id Name
+    --------------------------------------------------------------------
+    Carrot Patch Inc.       201     Elmer Fudd
+    Carrot Patch Inc.       202     Bugs Bunny
+    &#160;
+    Selected records: 2
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>Because the value of a reference field is auto-generated, it may not be known when inserting dependent records, as demonstrated in the examples above. For this reason the <code>get_last_autoid()</code>function is provided. It can be used as follows to insert “owner” and dependent objects:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    insert into Company values (10, 'ACME Enterprises');
+    insert into Employee values (101, 'Wylie Coyote', get_last_autoid());
+    insert into Employee values (102, 'Road Runner', get_last_autoid());
+    insert into Company values (20, 'Carrot Patch Inc.');
+    insert into Employee values (201, 'Elmer Fudd', get_last_autoid());
+    insert into Employee values (202, 'Bugs Bunny', get_last_autoid());
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>Note that the value of field <code>autoid</code> generated when the <code>Company</code> object is inserted is retrieved by <code><a href="../SQL_Language_Reference/Functions/Miscellaneous_Functions.htm">get_last_autoid()</a></code>in the two subsequent inserts of <code>Employee</code> objects.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

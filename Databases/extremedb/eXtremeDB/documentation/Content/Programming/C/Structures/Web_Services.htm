@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Control Structures used in the C API">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Web Services API Structures</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Web Services API Structures</h1>
+            <blockquote>
+                <p>The <i>e</i>X<i>treme</i>DB Web Services API uses streams to read and write data from JSON requests. The constants, prototypes, structures and enums used to manage streams are defined in the following sections.</p>
+                <h2>Stream Structures</h2>
+                <p>The stream prototypes and structures used by <a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_status_.htm"><a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_json_read_.htm"><code>mcorest_api_json_read_*()</code></a></a> and <a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_status_.htm"><a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_json_write_.htm"><code>mcorest_api_json_write_*()</code></a></a> functions are defined in file <code>include/mcorestapi.h</code> as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    typedef int (* mcorest_api_stream_read_fn)(void *ctx, char *buf, int len);
+    &#160;
+    typedef int (* mcorest_api_stream_write_fn)(void *ctx, const char *buf, int len);
+&#160;
+    typedef struct mcorest_api_stream_t_
+    {
+        void *ctx;  /* User-defined context that will be passed to read_fn and write_fn. */
+        mcorest_api_stream_read_fn read_fn;  /* Stream read function. */
+        mcorest_api_stream_write_fn write_fn;  /* Stream write function. */
+&#160;
+    } mcorest_api_stream_t;
+    &#160;</pre>
+                </div>
+                <h2>JSON&#160;Read Context Structure</h2>
+                <p>The JSON context structure used by <a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_status_.htm"><a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_json_read_.htm"><a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_json_read_.htm"><code>mcorest_api_json_read_*()</code></a></a></a> functions is defined in file <code>include/mcorestapi.h</code> as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    #define MCOREST_API_JSON_READER_BUFFER_SIZE 256
+    &#160;
+    typedef struct mcorest_api_json_read_ctx_t_
+    {
+        mcorest_api_stream_t *stream;  /* Stream to read JSON data from. */
+        &#160;
+        /* The following fields are for the JSON reader's internal use. */
+        int stream_err;  /* Stream error flag. */
+        int stream_end;  /* Stream end flag. */
+        char buf[MCOREST_API_JSON_READER_BUFFER_SIZE];  /* Stream input buffer. */
+        int buf_len;  /* Number of bytes available in the input buffer. */
+        const char *buf_p;  /* Current buffer position pointer. */
+        int obj_level;  /* Object nesting level. */
+        int arr_level;  /* Array nesting level. */
+        int read_escaped;  /* Escaped character read flag. */
+    &#160;
+    } mcorest_api_json_read_ctx_t;
+    &#160;</pre>
+                </div>
+                <h2>JSON Token Types</h2>
+                <p>The <code>enum</code> that defines the possible token types returned by function <a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_status_.htm"><a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_json_read_.htm"><a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_json_write_.htm"><a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_json_read_.htm"><code>mcorest_api_json_read_next_token()</code></a></a></a></a> is defined in file <code>include/mcorestapi.h</code> as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    typedef enum MCOREST_API_JSON_TKN_TYPE_E_
+    {
+        MCOREST_API_JSON_TKN_UNKNOWN = 0,  /* Unknown token. */
+        MCOREST_API_JSON_TKN_OBJECT_BGN,  /* Object start ('{'). */
+        MCOREST_API_JSON_TKN_OBJECT_END,  /* Object end ('}'). */
+        MCOREST_API_JSON_TKN_ARRAY_BGN,  /* Array start ('['). */
+        MCOREST_API_JSON_TKN_ARRAY_END,  /* Array end (']'). */
+        MCOREST_API_JSON_TKN_STRING,  /* Quoted string. */
+        MCOREST_API_JSON_TKN_NUMBER,  /* Number (integer or real). */
+        MCOREST_API_JSON_TKN_TRUE,  /* "true" literal. */
+        MCOREST_API_JSON_TKN_FALSE,  /* "false" literal. */
+        MCOREST_API_JSON_TKN_NULL  /* "null" literal. */
+&#160;
+    } MCOREST_API_JSON_TKN_TYPE;
+    &#160;</pre>
+                </div>
+                <h2>JSON Write Context Structure</h2>
+                <p>The JSON context structure used by <a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_status_.htm"><a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_json_read_.htm"><a href="../Core_Functions/Static/Auxiliary/Web_Services/mcorest_api_json_write_.htm"><code>mcorest_api_json_write_*()</code></a></a></a> functions is defined in file <code>include/mcorestapi.h</code> as follows:</p>
+                <div class="code-block"><pre>&#160;
+    typedef struct mcorest_api_json_write_ctx_t_
+    {
+        mcorest_api_stream_t *stream;  /* Stream to write JSON data into. */
+        int indent;  /* Indentation level for pretty-printing. */
+        &#160;
+        /* The following fields are for the JSON encoder's internal use. */
+        int first_entry;  /* Non-zero if the next key is the first in the object/array. */
+        int key_allowed;  /* Non-zero if a key is allowed to be written. */
+        int key_was_put;  /* Non-zero if a key has just been written. */
+        int obj_level;  /* Object nesting level. */
+        int arr_level;  /* Array nesting level. */
+    &#160;
+    } mcorest_api_json_write_ctx_t;
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

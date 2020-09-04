@@ -1,0 +1,7 @@
+-include $(call mco_makefile_file, \
+allocator/makefile.project.allocator \
+imp_csv/makefile.project.imp_csv \
+initililize/makefile.project.initililize \
+raid/makefile.project.raid \
+shutdown/makefile.project.shutdown \
+)

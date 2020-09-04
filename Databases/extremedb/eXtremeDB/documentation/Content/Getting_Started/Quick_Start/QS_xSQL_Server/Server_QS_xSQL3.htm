@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Getting Started with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Step 3: Formatting output</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Step 3: Formatting output</h1>
+            <blockquote>
+                <p>The output from <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> interactive commands can be redirected to a file or suppressed by the <code>output</code> command:</p>
+                <div class="code-block"><pre>&#160;
+    output console|null|&lt;filename&gt;
+    &#160;</pre>
+                </div>
+                <p>This command switches output of the SQL engine between the console, a null device (suppress output) and a disk file. For example the following commands will direct the output of the successive commands and/or SQL statements to file <code>S.csv</code>, then redirect the output to the console:</p>
+                <div class="code-block"><pre>    &#160;
+    output S.csv
+    select ...
+    &#160;
+    output console
+    &#160;</pre>
+                </div>
+                <h1>Formatting Query Output</h1>
+                <p>As mentioned in <a href="Server_QS_xSQL2.htm">Step 2</a>, the output from select statements can be formatted for more readable display. In fact there are a variety of ways to style the output and format specific types of output fields.</p>
+                <h2>Output styles</h2>
+                <p>By default <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> displays query results as seen in previous examples. This is termed <code>TEXT</code> format. But output can also be displayed in <code>HTML</code>, <code>XML</code>, <code>CSV</code>, or <code>LIST</code> formats. </p>
+                <blockquote>
+                    <h3>TEXT</h3>
+                    <p>For example, run the <code>account.sql</code> script and then run the following <code>select</code>:</p>
+                    <div class="code-block"><pre>&#160;
+    XSQL&gt;script account.sql
+    XSQL&gt;select * from Account;
+    userid  name    lastlog
+    ------------------------------------------------------------------------------
+    101     Dennis Hamer    01/23/2015 14:15:03
+    102     Edith Jackson   02/12/2015 19:30:16
+    103     Eric Harmon     02/14/2015 09:34:47
+    &#160;</pre>
+                    </div>
+                    <p>This is the standard or <code>TEXT</code> format. </p>
+                    <h3>CSV</h3>
+                    <p>To switch the above query result to <code>CSV</code> format, we use the <code>format</code> command which has syntax:</p>
+                    <div class="code-block"><pre>&#160;
+    format CSV [delimiter ‘&lt;C&gt;’ [header on|off] ]
+    &#160;</pre>
+                    </div>
+                    <p>For example, to use the pipe '|' character to separate fields:</p>
+                    <div class="code-block"><pre>    &#160;
+    XSQL&gt;format CSV delimiter '|'
+    XSQL&gt;select * from Account;
+    userid|name|lastlog|volume
+    101|Dennis Hamer|01/23/2015 14:15:03|12.775843
+    102|Edith Jackson|02/12/2015 19:30:16|420.885432
+    103|Eric Harmon|02/14/2015 09:34:47|0.348857
+    &#160;</pre>
+                    </div>
+                    <p>And to remove the header line:</p>
+                    <div class="code-block"><pre>    &#160;
+    XSQL&gt;format CSV delimiter '|' header off
+    XSQL&gt;select * from Account;
+    101|Dennis Hamer|01/23/2015 14:15:03|12.775843
+    102|Edith Jackson|02/12/2015 19:30:16|420.885432
+    103|Eric Harmon|02/14/2015 09:34:47|0.348857
+    &#160;</pre>
+                    </div>
+                    <h3>LIST</h3>
+                    <p>The LIST option displays each field on a separate line, which can be convenient for long field values (i.e. arrays or sequences):</p>
+                    <div class="code-block"><pre>&#160;
+    XSQL&gt;format LIST
+    XSQL&gt;select * from Account;
+    userid: 101
+    name: Dennis Hamer
+    lastlog: 01/23/2015 14:15:03
+    volume: 12.775843
+    -------------------------------------------------------
+    userid: 102
+    name: Edith Jackson
+    lastlog: 02/12/2015 19:30:16
+    volume: 420.885432
+    -------------------------------------------------------
+    userid: 103
+    name: Eric Harmon
+    lastlog: 02/14/2015 09:34:47
+    volume: 0.348857
+    -------------------------------------------------------
+    &#160;
+    Selected records: 3
+    &#160;</pre>
+                    </div>
+                    <h3>HTML</h3>
+                    <p>The <code>HTML</code> option represents the output as an <code>HTML</code> table:</p>
+                    <div class="code-block"><pre>&#160;
+    XSQL&gt;format HTML
+    XSQL&gt;select * from Account;
+    &lt;table border&gt;
+    &lt;tr&gt;&lt;th&gt;userid&lt;/th&gt;&lt;th&gt;name&lt;/th&gt;&lt;th&gt;lastlog&lt;/th&gt;&lt;th&gt;volume&lt;/th&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;101&lt;/td&gt;&lt;td&gt;Dennis Hamer&lt;/td&gt;&lt;td&gt;01/23/2015 14:15:03&lt;/td&gt;&lt;td&gt;12.775843&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;102&lt;/td&gt;&lt;td&gt;Edith Jackson&lt;/td&gt;&lt;td&gt;02/12/2015 19:30:16&lt;/td&gt;&lt;td&gt;420.885432&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;103&lt;/td&gt;&lt;td&gt;Eric Harmon&lt;/td&gt;&lt;td&gt;02/14/2015 09:34:47&lt;/td&gt;&lt;td&gt;0.348857&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+    &#160;</pre>
+                    </div>
+                    <h3>XML</h3>
+                    <p>The <code>XML</code> option displays tags corresponding to the table and field names:</p>
+                    <div class="code-block"><pre>&#160;
+    XSQL&gt;format XML
+    XSQL&gt;select * from Account;
+    &lt;Account&gt;
+    &lt;userid&gt;101&lt;/userid&gt;
+    &lt;name&gt;Dennis Hamer&lt;/name&gt;
+    &lt;lastlog&gt;01/23/2015 14:15:03&lt;/lastlog&gt;
+    &lt;volume&gt;12.775843&lt;/volume&gt;
+    &lt;/ Account &gt;
+    &lt; Account &gt;
+    &lt;userid&gt;102&lt;/userid&gt;
+    &lt;name&gt;Edith Jackson&lt;/name&gt;
+    &lt;lastlog&gt;02/12/2015 19:30:16&lt;/lastlog&gt;
+    &lt;volume&gt;420.885432&lt;/volume&gt;
+    &lt;/ Account &gt;
+    &lt; Account &gt;
+    &lt;userid&gt;103&lt;/userid&gt;
+    &lt;name&gt;Eric Harmon&lt;/name&gt;
+    &lt;lastlog&gt;02/14/2015 09:34:47&lt;/lastlog&gt;
+    &lt;volume&gt;0.348857&lt;/volume&gt;
+    &lt;/ Account &gt;
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <h2>Numerical format</h2>
+                <p>Often it is desirable to reformat numerical data in query output. This is easily done by means of the format commands: <code>numformat</code>, <code>dtformat</code>, <code>strformat</code>, <code>seqformat</code> and <code>arrayformat</code>. </p>
+                <blockquote>
+                    <h3>numformat</h3>
+                    <p>The <code>numformat</code> command uses the standard C <code>printf()</code> type format string; for example:</p>
+                    <div class="code-block"><pre>&#160;
+    XSQL&gt;numformat "%6.2f"
+    &#160;</pre>
+                    </div>
+                    <p>Using <code>numformat</code> to round the <code>close</code> values to cents in the previous <code>top_close.sql</code> query we would specify numeric format as follows:</p>
+                    <div class="code-block"><pre>&#160;
+    XSQL&gt;script top_close.sql
+    symbol  top_index       top_Close       volume
+    ------------------------------------------------------------------------------
+    SYM0    {34}    { 97.24}        {732}
+    SYM1    {57}    { 96.53}        {406}
+    SYM2    {2}     { 94.87}        {765}
+    SYM3    {65}    { 98.74}        {953}
+    SYM4    {62}    { 93.25}        {312}
+    SYM5    {76}    { 92.52}        {829}
+    SYM6    {59}    { 94.83}        {761}
+    SYM7    {98}    { 99.32}        {583}
+    SYM8    {37}    { 97.59}        {593}
+    SYM9    {81}    { 93.78}        {257}
+    &#160;
+    Selected records: 10
+    &#160;</pre>
+                    </div>
+                    <p>(Note that the format specification string is a string suitable for the C <code>printf()</code> function and allowable options depend on the version of the <code>glibc</code> library installed on the development system.)</p>
+                    <h3>Date/Time format</h3>
+                    <p>By default, <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> will display date fields, like <code>lastlog</code> in the current locale settings for the host computer. For example:</p>
+                    <div class="code-block"><pre>&#160;
+    XSQL&gt;select lastlog from Account;
+    lastlog
+    ------------------------------------------------------------------------------
+    01/23/2015 14:15:03
+    02/12/2015 19:30:16
+    02/14/2015 09:34:47
+    &#160;</pre>
+                    </div>
+                    <p>But we can reformat the output using command <code>dtformat</code> to display the date in international date format with the time in 12-hour notation as follows:</p>
+                    <div class="code-block"><pre>&#160;
+    XSQL&gt;dtformat "%d/%m/%Y %I:%M:%S %p"
+    XSQL&gt;select * from Account;
+    userid  name    lastlog
+    ------------------------------------------------------------------------------
+    101     Dennis Hamer    23/01/2015 02:15:03 PM
+    102     Edith Jackson   12/02/2015 07:30:16 PM
+    103     Eric Harmon     14/02/2015 09:34:47 AM
+    &#160;</pre>
+                    </div>
+                    <p>(Note that the format specification string is a string suitable for the C <code>strftime()</code> function and allowable options depend on the version of the <code>glibc</code> library installed on the development system.)</p>
+                    <p>To restore output to the current locale settings:</p>
+                    <div class="code-block"><pre>&#160;
+    XSQL&gt;dtformat "%c"
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <h2>String format</h2>
+                <p>We might want to restrict string length in query output to a fixed width. For example:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;script strings.sql
+    XSQL&gt;select * from A;
+    strlen  s
+    ------------------------------------------------------------------------------
+    33      A string containing 33 characters
+    14      A short string
+    &#160;</pre>
+                </div>
+                <p>Then restrict the width in output to 20 characters as follows:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;strformat width=20
+    XSQL&gt;select * from A;
+    strlen  s
+    ------------------------------------------------------------------------------
+    33      A string containing&gt;
+    14      A short string
+    &#160;</pre>
+                </div>
+                <p>Note that field <code>s</code> in the second query is truncated to length 20 with the <code>&gt;</code> character indicating truncation. To return to the full width of string fields, specify zero width as follows:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt; strformat width=0
+    &#160;</pre>
+                </div>
+                <p>It is also possible to use the index operator “[from:to]“ with strings to extract a range of characters. For example:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;select s[1:7] from A;
+    #1
+    ------------------------------------------------------------------------------
+    A strin
+    A short
+    &#160;</pre>
+                </div>
+                <p>But in most cases it is preferable to use the <code>substr()</code> function  (demonstrated in <a href="Server_QS_xSQL6.htm">step 6</a>) to extract substrings from character string fields.</p>
+                <h2>Sequence format</h2>
+                <p>Fields of the <code>sequence</code> data type can be ungainly in query output. By default <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> displays the first 5 and last 5 elements of a <code>sequence</code> with an expression like “<code>…&lt;N element(s)&gt;…</code>” in the middle. For example, if we start <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> with command</p>
+                <div class="code-block"><pre>&#160;
+    xSQL –i –f IBM-q1-2013.sql
+    &#160;</pre>
+                </div>
+                <p>the script creates table <i>QuoteIBM</i> and initializes it with some historical data from 2013. The sequence field <code>high</code> can be displayed as follows:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;numformat "%6.2f"
+    XSQL&gt;select symbol, high from Quote;
+    symbol  high
+    ------------------------------------------------------------------------------
+    IBM     {196.35, 196.29, 194.46, 193.78, 193.30, ...&lt;50 element(s)&gt;..., 213.17, 212.81, 212.50, 212.16, 213.44}
+    &#160;</pre>
+                </div>
+                <p>With command <code>seqformat</code> we can limit the number of first and last elements to display. There are two options for how the elements are displayed. The short format displays the elements in order as above; the long format displays the index of each element followed by its value. For example we could reformat the sequence output as follows:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;seqformat short 3 3
+    XSQL&gt; select symbol, high from Quote;
+    symbol  high
+    ------------------------------------------------------------------------------
+    IBM     {196.35, 196.29, 194.46, ...&lt;54 element(s)&gt;..., 212.5, 212.16, 213.44}
+    &#160;
+    XSQL&gt;seqformat long 2 1
+    XSQL&gt;select symbol, high from Quote;
+    symbol  high
+    ------------------------------------------------------------------------------
+    IBM     {0:196.35, 1:196.29, ...&lt;57 element(s)&gt;..., 59:213.44}
+    &#160;
+    XSQL&gt;seqformat short 3 0
+    XSQL&gt;select symbol, high from QuoteIBM;
+    symbol  high
+    ------------------------------------------------------------------------------
+    IBM     {196.35, 196.29, 194.46, ...&lt;57 element(s)&gt;...}
+    &#160;
+    XSQL&gt;seqformat short 0 0
+    XSQL&gt;select symbol, high from QuoteIBM;
+    symbol  high
+    ------------------------------------------------------------------------------
+    IBM     {...&lt;60 element(s)&gt;...}
+    &#160;</pre>
+                </div>
+                <p>It is also possible to use the index operator <code>[from:to]</code> with sequences to extract a range of values. For example:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;select symbol, high[1:3] from Quote;
+    symbol  #2
+    ------------------------------------------------------------------------------
+    IBM     {196.29, 194.46, 193.78}
+    &#160;
+    &#160;
+    XSQL&gt;select symbol, high[57:] from Quote;
+    #1
+    ------------------------------------------------------------------------------
+    IBM     {212.50, 212.16, 213.44}
+    &#160;</pre>
+                </div>
+                <h2>Array format</h2>
+                <p>Similar to <code>seqformat</code> for sequences, with command <code>arrayformat</code> we can limit the number of first and last elements to display for fields of type array. For example, we could create and initialize a table <i>A</i> and restrict the array field output as follows:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;create table B (id integer primary key, arr array(char(10)));
+    XSQL&gt;insert into B values (1, ['zero', 'one', 'two', 'three', 'four', 'five',
+    'six', 'seven', 'eight', 'nine', 'ten']);
+    XSQL&gt;select * from B;
+    id      arr
+    ------------------------------------------------------------------------------
+    1       [zero, one, two, three, four, ...&lt;1 element(s)&gt;..., six, seven, eight, nine, ten]
+&#160;
+    XSQL&gt;arrayformat long 3 3
+    XSQL&gt;select * from B;
+    id      arr
+    ------------------------------------------------------------------------------
+    1       [0:zero, 1:one, 2:two, ...&lt;5 element(s)&gt;..., 8:eight, 9:nine, 10:ten]
+    &#160;
+    XSQL&gt;arrayformat short
+    XSQL&gt;select * from B;
+    id      arr
+    ------------------------------------------------------------------------------
+    1	[zero, one, two, three, four, five, six, seven, eight, nine, ten]
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p>Now that we have seen how to tailor output format, it is useful to explore some of the powerful features of <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>, like <b>Distributed Database Sharding</b> (<a href="Server_QS_xSQL4.htm">step 4</a>), <b>Using Configuration Files</b> (<a href="Server_QS_xSQL5.htm">step 5</a>), and more.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,16 @@
+MCO_PRJ_LIST += tlogbasic
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += tlogbasic
+PRJ_tlogbasic_TAGS:=sample tlog
+PRJ_tlogbasic_DIR:=$(call mco_project_dir)
+PRJ_tlogbasic_SRC:=$(call mco_project_file, main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_tlogbasic_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_tlogbasic_DATABASES:=tlogbasicdb
+PRJ_tlogbasic_RUNTIME:=YES
+PRJ_tlogbasic_MEMDEV:=PRIVATE
+PRJ_tlogbasic_STORAGE:=TRANSIENT
+PRJ_tlogbasic_STORAGEDEV:=AUTO
+PRJ_tlogbasic_SYNC:=AUTO
+PRJ_tlogbasic_TRANSMGR:=MURSIW
+PRJ_tlogbasic_F_LOG:=YES
+PRJ_tlogbasic_F_SERI:=YES

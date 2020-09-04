@@ -1,0 +1,10 @@
+create table foo (x integer);
+insert into foo values (1);
+select * from foo where x=1;
+explain select * from foo where x=1;
+create index pk on foo(x);
+select * from foo where x=1;
+explain select * from foo where x=1;
+drop index foo.pk;
+explain select * from foo where x=1;
+select * from foo where x=1;

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|High Availability User's Guide|Cluster User's Guide|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeDB Cluster Applications in C/C++</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>DB Cluster Applications in C/C++</h1>
+            <blockquote>
+                <p>To implement a C/C++ Cluster application requires, as a minimum, calling the following functions:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET mco_cluster_init();
+    MCO_RET mco_cluster_params_init();
+    MCO_RET mco_cluster_db_open();
+    MCO_RET mco_cluster_listen();
+    MCO_RET mco_cluster_stop();
+    &#160;</pre>
+                </div>
+                <p><a name="kanchor59"></a>A Cluster application can register a “quorum check callback” function to verify that the necessary minimum number of cluster nodes is present before database processing begins. If no quorum callback function is registered, the cluster runtime uses the <code>qrank</code> mechanism to verify a quorum,  Also, a “notification callback” function can be registered to detect when nodes enter or leave the cluster.</p>
+                <p>The following code snippet demonstrates a C/C++ Cluster application with quorum check and connection notification callback functions:</p>
+                <div class="code-block"><pre>    &#160;
+    const char dbName [] = "clusterdb";
+    &#160;
+    // Listen-thread
+    THREAD_PROC_DEFINE (ClusterListen, p)
+    {
+        mco_db_h db;
+        mco_db_connect (dbName, &amp; db);
+        mco_cluster_listen (db);
+            
+        mco_db_disconnect (db);
+        return 0;
+    }
+    &#160;
+    // Quorum check callback function. It must return MCO_YES if the node can start
+    // (or continue) to work:
+    // parameters:
+    // uint2 *neighbor_ids - array of active neighbors
+    // uint2 n_neighbors - number of active neighbors in the neighbor_ids array
+    // void *param - user-defined context
+    mco_bool my_check_quorum(uint2 *neighbor_ids, uint2 n_neighbors, void *param) 
+    {
+        mco_bool result = MCO_YES;
+        //    &lt;some logic&gt;
+        return result;
+    }
+    &#160;
+    // Notification callback function.
+    void cluster_notifying(mco_db_h db, mco_cluster_notification_t notification_code,
+                        mco_cluster_node_info_t *node_info,
+                        void *param, void *user_context) 
+    {
+                        &#160;
+        mco_cluster_node_info_t nodes_info[MCO_MAX_CLUSTER_SIZE];
+        uint2 nd, n_nodes_info = MCO_MAX_CLUSTER_SIZE;
+        printf("***NOTIFICATION*** Node %d (%s, qrank %d) %s.\n", node_info-&gt;node_id,
+        node_info-&gt;addr, node_info-&gt;qrank,
+        notification_code == MCO_CLUSTER_NOTIFY_NODE_CONNECT ?
+        "CONNECTED" : "DISCONNECTED");
+        &#160;
+        mco_cluster_get_active_nodes(db, nodes_info, &amp;n_nodes_info);
+        printf("List of active nodes: \n --------------------------\n");
+        &#160;
+        for (nd = 0; nd &lt; n_nodes_info; ++nd) 
+        {
+            printf("ID %d, Addr %s, Qrank %d\n", nodes_info[nd].node_id,
+            nodes_info[nd].addr, nodes_info[nd].qrank);
+        }
+    }
+    &#160;
+    int main ()
+    {
+        mco_cluster_params_t cl_params;
+        mco_cluster_node_params_t nodes [2];
+        mco_device_t dev [4];
+        unsigned int n_dev;
+        mco_db_params_t db_params;
+        &#160;
+        // Initialize cluster runtime
+        mco_cluster_init ();
+            
+        &#160;
+        // Initialize cluster parameters
+        mco_cluster_params_init(&amp;cl_params);
+            
+    &#160;
+        // Prepare dev, n_dev, db_params, as usual for mco_db_open_dev()
+    &#160;
+        // Fill the information about nodes
+        strcpy (nodes[0].addr, "node1:10000")
+        strcpy (nodes[1].addr, "node2:10000");
+        nodes[0].qrank = nodes [1].qrank = 1;
+        cl_params.nodes = nodes;
+        cl_params.n_nodes = 2
+        cl_params.node_id = local_id; // on node1 this value should be 0
+        &#160;
+        // on node2 this value should be 1, and so on
+    &#160;
+        // set Quorum callback function
+        cl_params.check_quorum_func  = my_check_quorum;
+        cl_params.check_quorum_param = 0; // don't use the context
+        &#160;
+        // set Notification callback function
+        cl_params.notifying_callback  = cluster_notifying;
+        cl_params.notifying_context = 0; // don't use the context
+        &#160;
+        / * create cluster database * /
+        mco_cluster_db_open (dbName,
+            
+                    clusterdb_get_dictionary(),
+                    dev,
+                    n_dev,
+                    &amp;db_params,
+                    &amp;cl_params);
+                    &#160;
+        / * Start mco_cluster_listen() thread * /
+        createThread (ClusterListen, 0, &amp; hListenThread);
+        &#160;
+        / * Work with the database as usual * /
+        / * Stop the cluster * /
+        mco_cluster_stop ();
+            
+        &#160;
+        / * Wait for the listen-thread to stop * /
+        THREAD_JOIN (hListenThread, res);
+    &#160;
+        / * Close the database * /
+        mco_db_close ();
+    }
+    &#160;</pre>
+                </div>
+                <p>Note that the <code><a href="../../Programming/C/Structures/Cluster_Parameters.htm"><code>mco_cluster_params_t</code></a></code> struct (<code>cl_params</code>) passed to <a href="../../Programming/C/Cluster_Functions/db_open.htm"><code>mco_cluster_db_open()</code></a> contains the cluster specifications. Typically this will define the number of nodes (<code>n_nodes</code>), the integer identifier (<code>node_id</code>) of this node, and the node list, an array of <a href="../../Programming/C/Structures/Cluster_Node_Info.htm"><code href="../../Programming/C/Structures/Cluster_Parameters.htm">mco_cluster_node_params_t</code></a>  structs (nodes) containing the node id (the array index; i.e. <code>nodes[0]</code> corresponds to <code>node_id=0</code>, <code>nodes[7]</code> - to <code>node_id=7</code> and so on), address and <code>qrank</code> of the other nodes in the cluster. It can also specify callback functions for quorum check and node notification.</p>
+                <p>This sample uses a quorum check callback function <code>my_check_quorum()</code>. This allows the application to validate the collection of nodes online to determine if the cluster can begin processing.</p>
+                <p>
+                    <img src="../../Resources/Images/note.png" />Note that when working with a cluster database, the <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/commit.htm">mco_trans_commit()</a></code> function may return error code: <code>MCO_E_CLUSTER_NOQUORUM</code>. This happens if one or more nodes go down, and the remaining nodes do not constitute a quorum.</p>
+                <p>&#160;</p>
+                <p>Also note the use of a notification callback function (<code>notifying_callback</code>); so the application will receive a connection event (type <code>notification_code</code> = <code>connect</code> / <code>disconnect</code>) with  <code>node_info</code> and <code>user_context</code> (the application's context) parameters when nodes attach to and detach from the cluster.</p>
+                <p>
+                    <img src="../../Resources/Images/note.png" />Note that the notification function is called in the context of a listener task. Thus it has to do whatever it does quickly, and can't perform any transactional activities or any active cluster operations. Only <code><a href="../../Programming/C/Structures/Cluster_Info.htm">mco_cluster_info()</a></code> and <code><a href="../../Programming/C/Cluster_Functions/get_active_nodes.htm">mco_cluster_get_active_nodes()</a></code> are appropriate here.</p>
+                <p>&#160;</p>
+                <h2>Adding a node to an active Cluster</h2>
+                <p>A new node can join an existing cluster by simply calling <code><a href="../../Programming/C/Cluster_Functions/db_open.htm">mco_cluster_db_open()</a></code> with a unique <code>node_id</code> and the <code>address:port</code> and <code>node_id</code> of one of the running nodes. For example, suppose we have <code>nodeA</code> and <code>nodeB</code> running as a cluster with <code>nodeA</code> having <code>node_id = 0</code> and <code>nodeB</code> with <code>node_id = 1</code>. The new <code>nodeN</code> knows about <code>nodeA</code> but doesn't know about <code>nodeB</code>. It chooses <code>node_id = 2</code> and fills the <code>node_params</code> structure as following:</p>
+                <div class="code-block"><pre>    &#160;
+    strcpy(node_params[0].addr, "nodeA:10000");
+    strcpy(node_params[1].addr, ""); // set empty address, because don't know about nodeB
+    strcpy(node_params[2].addr, "&lt;my address and port&gt;");
+    &#160;</pre>
+                </div>
+                <p>To join the cluster <code>nodeN</code> then calls <code><a href="../../Programming/C/Cluster_Functions/db_open.htm">mco_cluster_db_open()</a></code> as usual. Note that if <code>nodeN</code> were to accidentally choose <code>node_id = 1</code> (which is occupied by <code>nodeB</code>), <code><a href="../../Programming/C/Cluster_Functions/db_open.htm">mco_cluster_db_open()</a></code> will return <code>MCO_E_CLUSTER_DUPLICATE_NODEID</code>. To determine the members of a cluster and their <code>node_id</code>, the <code><a href="../../Programming/C/Cluster_Functions/discover.htm">mco_cluster_discover()</a></code> function can be helpful.</p>
+                <p>A node can also call <a href="../../Programming/C/Cluster_Functions/detach.htm"><code>mco_cluster_detach()</code></a> /<code><a href="../../Programming/C/Cluster_Functions/attach.htm"> mco_cluster_attach()</a></code> to leave or join the cluster. When a node joins the cluster it need only know the address of one of its neighbor nodes. It then obtains an updated node list from the cluster runtime.</p>
+                <p>For example, consider a cluster with 4 nodes, A, B, C and D. Their node lists, <code>node_id</code> and <code>qrank</code> settings are as follows:</p>
+                <blockquote>
+                    <p><b>Node A</b> : { "A", "B" }, <code>node_id = 0</code>, <code>qrank = 1</code> - Node <code>A</code> indicates its own address and also knows about node <code>B</code>. No indication of the <code>C</code> and <code>D</code> nodes presence.</p>
+                    <p><b>Node B</b> : { "A", "B"}, <code>node_id = 1</code>, <code>qrank - 1 -</code> Node <code>B</code> indicates its own address and also knows about node <code>A</code>. No indication of the <code>C</code> and <code>D</code> nodes presence.</p>
+                    <p><b>Node C</b> :  { "A", "B", "C"}, <code>node_Id = 2</code>, <code>qrank = 0 - </code>Node <code>C</code> "knows" about nodes <code>A</code> and <code>B</code>. The <code>qrank = 0</code> means that disconnecting <code> C</code> does not reflect on the quorum.</p>
+                    <p><b>Node D</b> :  { "A", "B", "", "D"} <code>node_id = 3</code>, <code>qrank = 0 - </code>Node <code>D</code> "knows" about nodes <code>A</code> and <code>B</code>, but not whether <code>C</code> is connected. The <code>qrank = 0</code> means that disconnecting  <code>D</code> does not reflect on the quorum.</p>
+                </blockquote>
+                <p>Nodes <code>A</code> and <code>B</code> are started first, they have each other’s addresses, so they are able to communicate. Then node <code>C</code> is "attached", <code>C</code> is connected to <code>A</code> and <code>B</code> and <code>A</code> and <code>B</code> are able to add <code>C</code> into their cluster lists. Then <code>D</code> is attached. It is first connected to <code>A</code> and <code>B</code> (the addresses of which are known to <code>D</code>), receives the cluster lists from <code>A</code> and <code>B</code> (that now include <code>C</code>). It is now able to connect to <code>C</code>.</p>
+                <p>The <a href="../../Programming/C/Cluster_Functions/detach.htm"><code>mco_cluster_detach()</code></a> API disconnects the database from the cluster. The database immediately becomes available for both read and write access. Note that <code><a href="../../Programming/C/Cluster_Functions/detach.htm"><code>mco_cluster_detach()</code></a></code> decrements the overall sum of cluster <code>qranks</code>.  For example, consider a cluster consisting of two working nodes <code>A</code> and <code>B</code> with qranks of 1. If node <code>B</code> fails, then the cluster (node <code>A</code>) is stopped because the quorum is no longer there (the <code>qrank</code> sum of active nodes must be greater than half of the qranks of all nodes - and 1 is not greater than  2 / 2 = 1). However, if node <code>B</code> calls <a href="../../Programming/C/Cluster_Functions/detach.htm"><a href="../../Programming/C/Cluster_Functions/detach.htm"><code>mco_cluster_detach()</code></a></a>, node <code>A</code> is able to continue functioning "as a cluster", since this was a “voluntary detachment” as opposed to a network / node failure. The <code>qrank</code> of node <code>B</code> becomes 0, and the quorum is still there (1 &gt; 1/2).</p>
+                <p>To determine the presence of “dynamic” nodes (nodes that detach from or attach to the cluster), the <a href="../../Programming/C/Cluster_Functions/get_active_nodes.htm"><code>mco_cluster_get_active_nodes()</code></a> API can be called at any time. Note that before calling <a href="../../Programming/C/Cluster_Functions/get_active_nodes.htm"><code>mco_cluster_get_active_nodes()</code></a>, the application should call <a href="../../Programming/C/Cluster_Functions/info.htm"><code>mco_cluster_info(db,&amp;cl_info)</code></a> which returns information including the number of active nodes (<code>cl_info.n_active_nodes</code>). This parameter is then passed to function  <code><a href="../../Programming/C/Cluster_Functions/get_active_nodes.htm">mco_cluster_get_active_nodes()</a></code> in order to allocate appropriate space for the <code>nodes_info</code> array.</p>
+                <p>&#160;</p>
+                <h2>Restricting replication</h2>
+                <p>Sometimes it is beneficial to restrict automated replication to a limited set of classes. This is done by declaring some of the classes as <code>distributed</code> . The <code>distributed</code>  classes are declared in the <code>schema</code> and objects of these classes don’t get distributed to the cluster automatically.  Instead, each node buffers (keeps an internal list) of all inserts, modifications and deletions made to its <code>distributed</code> classes. Transactions that update the local objects don’t trigger any network-related activities.</p>
+                <p>Periodically, the application will  trigger replication of the <code>distributed</code> objects to the cluster by calling one of the following functions:</p>
+                <div class="code-block"><pre>    &#160;
+    MCO_RET mco_cluster_scatter(mco_db_h db, uint2 *class_codes, uint2 n_class_codes,
+                    uint2 *node_ids, uint2 n_node_ids);
+    MCO_RET mco_cluster_gather(mco_db_h db, uint2 *class_codes, uint2 n_class_codes,
+                    uint2 *node_ids, uint2 n_node_ids);
+    &#160;</pre>
+                </div>
+                <p>The application can <i>scatter</i> (push) updates made to the <code>distributed</code> objects to one or many cluster nodes, or <i>gather</i> (pull) updates made on one or many cluster nodes to a set of remote <code>distributed</code> objects. Both operations are atomic. If conflicts are detected, the entire scatter or gather operation is rolled back. The <a href="../../Programming/C/Cluster_Functions/scatter.htm"><code>mco_cluster_scatter()</code></a> function will push out updates made to its distributed tables after the last successful replication of the data. Similarly, <a href="../../Programming/C/Cluster_Functions/gather.htm"><code>mco_cluster_gather()</code></a> will pull updates made to the remote “distributed” objects of interest after the last successful replication.</p>
+                <p>For example, consider 3 nodes <code>A</code>, <code>B</code> and <code>C</code> and 2 <code>distributed</code> classes <code>X</code> and <code>Y</code> in the following scenario:</p>
+                <blockquote>
+                    <p>1. <code>A</code> creates <code>x1</code></p>
+                    <p>2. <code>B</code> creates <code>x2</code></p>
+                    <p>3. <code>A</code> scatter <code>{X}</code> to <code>{B}</code>            [<code>A</code> sends <code>x1</code> to <code>B</code>]</p>
+                    <p>4. <code>B</code> gather <code>{X}</code> from <code>{A,C}</code>    [no sends because <code>x1</code> is already on <code>B</code>]</p>
+                    <p>5. <code>A</code> creates <code>y1</code></p>
+                    <p>6. <code>A</code> scatter <code>{X,Y}</code> to <code>{B,C}</code>     [<code>A</code> sends <code>y1</code> to <code>B</code> and (<code>x1</code>,<code>y1</code>) to <code>C</code>]</p>
+                    <p>7. <code>C</code> gather <code>{X,Y}</code> from <code>{A,B}</code> [<code>C</code> gets <code>x2</code> from <code>B</code> (<code>x1</code>,<code>y1</code> already on <code>C</code>)]</p>
+                </blockquote>
+                <p>Because Cluster in general, and the <code>distributed</code> classes in particular, allows hardware (separate nodes ) to be added to the network to increase the overall throughput. if all data is distributed automatically, the scalability is limited because of  network-related overhead. The <code>distributed</code> feature allows segmenting data and processing those data segments locally (quickly). Yet the results of the local processing can be shared automatically via the <code><a href="../../Programming/C/Cluster_Functions/scatter.htm">mco_cluster_scatter()</a></code> and <code><a href="../../Programming/C/Cluster_Functions/gather.htm">mco_cluster_gather()</a></code> functions.</p>
+                <p>Another method for restricting the data being replicated is by using the <code>local</code> declaration in the <code>schema</code>. Objects of classes declared as <code>local</code> are never subject to replication – i.e. they are maintained in the local database for the individual node on which they are declared but this data is never distributed to other nodes.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

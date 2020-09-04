@@ -1,0 +1,15 @@
+MCO_PRJ_LIST += tlogappend
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += tlogappend
+PRJ_tlogappend_TAGS:=sample tlog
+PRJ_tlogappend_DIR:=$(call mco_project_dir)
+PRJ_tlogappend_SRC:=$(call mco_project_file, main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_tlogappend_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_tlogappend_DATABASES:=tlogappenddb
+PRJ_tlogappend_RUNTIME:=YES
+PRJ_tlogappend_MEMDEV:=PRIVATE
+PRJ_tlogappend_STORAGE:=TRANSIENT
+PRJ_tlogappend_STORAGEDEV:=AUTO
+PRJ_tlogappend_SYNC:=AUTO
+PRJ_tlogappend_TRANSMGR:=MURSIW
+PRJ_tlogappend_F_LOG:=YES

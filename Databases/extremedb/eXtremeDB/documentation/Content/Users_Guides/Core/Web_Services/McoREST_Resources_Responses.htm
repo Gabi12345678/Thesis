@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The eXtremeDB Web Service Resources</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>The <i>e</i>X<i>treme</i>DB<i>  <![CDATA[ ]]></i>Web Service Resources</h1>
+            <blockquote>
+                <p>The <code>mcorest</code> library exposes a REST-like interface to access a number of <i>e</i>X<i>treme</i>DB resources. The response data is encoded using JSON notation. </p>
+                <h3>For an overview see page <a href="../Web_Services.htm"><i>e</i>X<i>treme</i>DB Web Services</a></h3>
+                <p>In order to enable access to the <i>e</i>X<i>treme</i>DB Web Services, the REST server must be started. When using <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> to start the REST server, the <code>rest</code> section must appear in the configuration file. For example:</p>
+                <div class="code-block"><pre>    &#160;
+    database_name : xsqldb,
+    database_size : 100m, 
+    &#160;
+    rest : {
+        port : 8083
+    }
+    &#160;</pre>
+                </div>
+                <p>(Note that here the rest parameter <code>addr</code> is omitted  which allows the REST server to accept incoming connections on all available network interfaces. See page <a href="../../xSQL/Startup_Options/Config_File_Sections/Web_Services.htm"><i>xSQL</i> Web Services REST Parameters</a> for further information.) </p>
+                <p>Below is a list of resources that are currently supported, as well as samples of the JSON responses. (For more detailed information use the links to the individual resource pages.)</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 279px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 170px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 385px;" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="api_resource.htm">/api</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Lists the <i>e</i>X<i>treme</i>DB version information and the registered web services</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+
+  "version":
+  {
+    "major": 8,
+    "minor": 0,
+    "build": 1798,
+    "revision": "unstable"
+  },
+  "services":
+  [
+    "\/api"
+    "\/api\/xsql",
+    "\/api\/db",
+    "\/api\/perf",
+    "\/api\/sql
+  ]
+}
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_resource.htm">/api/db</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Lists names of the available databases</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+
+  "databases":
+
+  [
+    
+    "xsqldb",
+
+    "eXDB_perf"
+  
+  ]
+
+}
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_backup_status_resource.htm">/api/db/&lt;dbname&gt;/backup/status</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">The current status of a running incremental backup procedure</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>{
+
+  "phase": "IDLE",
+  "max_passes": 0,
+  "max_steps": 0,
+  "pass_no": 0, 
+  "step_no": 0
+}</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_backup_control_resource.htm">/api/db/&lt;dbname&gt;/backup/control</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"> Implements the asynchronous backup and restore control</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>{
+  "action":                  "backup_start",
+  "file_name":               "database.bkp",
+  "label":                   "my_label",
+  "backup_cycle_delay_msec":  1000
+}</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_backup_list_resource.htm">/api/db/&lt;dbname&gt;/backup/list</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Prints the contents of a backup file</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">&#160;
+							<div class="code-block"><pre>{
+   "backup_list":
+   [
+      {
+		 "magic": 3987782336,
+		 "protocol_version": 2,
+		 "type": "SNAPSHOT",
+		 "flags":
+		 [
+		 ],
+		 "backup_no": 0,
+		 "timestamp": 1558223122,
+		 "size": 411916,
+		 "offset": 0,
+		 "crc": 784321220,
+		 "trans_no": 10,
+		 "mem_page_size": 256,
+		 "disk_page_size": 0,
+		 "n_pages_total": 79003,
+		 "db_name": "bkpdb",
+		 "label": "BKPLBL00000"
+	 }
+   ]
+ }</pre></div></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_backup_verify_resource.htm">/api/db/&lt;dbname&gt;/backup/verify</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Verifies a backup file </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>
+   {
+	   "result":
+	   {
+		  "code": 0,
+		  "str": "MCO_S_OK - Operation succeeded"
+       }
+   }
+</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_stat_resource.htm">/api/db/&lt;dbname&gt;/stat</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Shows database statistics</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+
+  "mem":
+
+  {
+    
+    "free_pages": 406735",
+    "total_pages": 406786,
+
+    "page_size": 256  
+  }
+  "disk":
+  {
+    "data_file_size": 122880,
+    "log_file_size": 73940,
+    "used_database_size": 123648
+  },
+  "classes":
+  [
+    {
+      "table_name": "A",
+      "objects_num": 3,
+      "versions_num": 3,
+      "core_pages": 3,
+      "blob_pages": 0,
+      "seq_pages": 0,
+      "core_space": 768,
+      "indexes":
+      [
+        {
+          "type": 2064,
+          "type_s":
+          [
+            "MCO_IDXST_TYPE_MEM",
+            "MCO_IDXST_NATURE_BTREE",
+            "MCO_IDXST_FEATURE_UNIQUE",
+            "MCO_IDXST_FUNCTION_LIST"
+          ],
+          "plabel": "T.list_index_",
+          "keys_num": 1,
+          "pages_num": 1,
+          "avg_cmp": 1,
+          "max_cmp": 1,
+          "btree":
+          {
+            "levels_num": 0,
+            "duplicates_num": 0
+          }
+        }
+      ]
+    }
+  ],
+}
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_classes_resource.htm">/api/db/&lt;dbname&gt;/classes</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">GET: Shows an abbreviated list of database classes</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>{
+
+  "classes":
+  [
+    {
+      "struct_no": 0,
+      "name": "T",
+      "class_code": 1
+    },
+    {
+      "struct_no": 1,
+      "name": "T2",
+      "class_code": 2
+    }
+  ],
+}</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_structs_resource.htm">/api/db/&lt;dbname&gt;/structs</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">GET: Shows abbreviated list of database structures</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>{
+
+  "structs":
+  [
+    {
+      "struct_no": 0,
+      "name": "B",
+      "class_code": 1
+    }
+  ],
+}</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_schema_resource.htm">/api/db/&lt;dbname&gt;/schema</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">GET: Returns the entire schema of the database</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>{
+
+  "schema":
+  {
+
+    "classes":
+    [
+      ...
+    ],
+  }
+  {
+
+    "structs":
+    [
+      ...
+    ],
+  }
+}</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_classes_struct_no_resource.htm">/api/db/&lt;dbname&gt;/classes/&lt;struct_no&gt;</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p>GET: Shows the schema of the database class identified by <code>struct_no</code></p>
+                                <p>POST: Writes records to the database</p>
+                                <p>DELETE: Deletes all records of the specified class</p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>{
+
+  "schema":
+  {
+
+    "struct_no": 0,
+    "name": "T",
+    "flags": 9,
+    "flags_s":
+    [
+      "MCO_DICT_SI_CLASS",
+      "MCO_DICT_SI_LIST"
+    ],
+    "class_code": 1,
+    "fields":
+    [
+      ...
+    ],
+    "indexes":
+    [
+      ...
+    ],
+    "events":
+    [
+      ...
+    ],
+  }
+}</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_structs_struct_no_resource.htm">/api/db/&lt;dbname&gt;/structs/&lt;struct_no&gt;</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p>GET: Shows the schema of the database structure identified by <code>struct_no</code></p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>{
+
+  "schema":
+  {
+
+    "struct_no": 0,
+    "name": "B",
+    "fields":
+    [
+      "field_no": 0,
+      "name": "i1",
+      "type": 4,
+      "type_s": "MCO_DD_INT1"
+    ],
+    ...
+  }
+}</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_classes_struct_no_byindex_index_no_list_resource.htm">/api/db/&lt;dbname&gt;/classes/&lt;struct_no&gt;/byindex/&lt;index_no&gt;/list</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p>GET: Returns records of the specified class using the index identified by <code>index_no </code></p>
+                                <p>DELETE: Deletes individual objects, as specified by the query arguments</p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The response is a JSON object with two keys, <code>header</code> and <code>resultset</code>.
+
+The <code>header</code> contains the array of field descriptors, <code>"fields"</code>. The format of the descriptors is the same as the one in the database schema (see <code>/api/db/&lt;dbname&gt;/schema</code> for details). The only difference is that structure fields' descriptors are recursively expanded, that is, every structure field descriptor will also include the array of that structure's fields' descriptors.
+
+The <code>resultset</code> is an array of JSON objects representing database records.
+
+</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_classes_struct_no_byindex_index_no_eq_key_resource.htm">/api/db/&lt;dbname&gt;/classes/&lt;struct_no&gt;/byindex/&lt;index_no&gt;/eq/&lt;key&gt;</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p>Supports GET, DELETE and PATCH requests</p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The response for <code>GET</code> requests is the same as for <a href="db_classes_struct_no_byindex_index_no_list_resource.htm">/api/db/&lt;dbname&gt;/classes/&lt;struct_no&gt;/byindex/&lt;index_no&gt;/list</a>. <code>DELETE</code> removes individual records matching the specified key. PATCH updates individual fields of a record identified by the key value.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_classes_struct_no_byindex_index_no_eq_key_resource.htm">/api/db/&lt;dbname&gt;/classes/&lt;struct_no&gt;/byindex/&lt;index_no&gt;/eq/&lt;key&gt;/field/&lt;field_no&gt;/at/&lt;elem_index</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p>Supports GET, DELETE and PATCH requests</p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The response for <code>GET</code> requests returns the value of the element or structure field. <code>DELETE</code> deletes the element. PATCH overwrites the value of the element.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="db_classes_struct_no_byindex_index_no_eq_key_field_at_elem_resource.htm">/api/db/&lt;dbname&gt;/classes/&lt;struct_no&gt;/byindex/&lt;index_no&gt;/eq/&lt;key&gt;/field/&lt;field_no&gt;/at/&lt;elem_index&gt;</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p>Supports GET, DELETE and PATCH requests</p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Provides access to individual elements for arrays, vectors, sequences, and structures.</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="perf_resource.htm">/api/perf</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Shows <code>perf</code> database information, if enabled</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+
+  "databases":
+
+  [
+    {
+    
+      "name": "xsqldb",
+
+      "no": 0
+  
+    }
+  ],
+  "nodes":
+  [
+  ],
+  "readings":
+  [
+    {
+      "name": "MCO_PERF_ERROR_COUNT",
+      "description": "Error count",
+      "type": "counter",
+      "no": 0
+    },
+    ...
+  ]
+
+}
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="sql_stat_resource.htm">/api/sql/stat</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Shows SQL statistics</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+
+  "clients":
+  [
+    {
+      "clientid": 107173520884043,
+      "statementid": 1,
+      "connected": 1,
+      "begin": 1514548415379034,
+      "ip": "0:0:0:0:0:0:0:1",
+      "port": 57480,
+      "state": "DONE",
+      "sql": "select * from Statistic",
+      "failmsg": "",
+      "memory": 70612,
+      "rows": 0,
+      "bytes": 176,
+      "exectime": 776,
+      "txtime": 51,
+      "res_ucpu": 0,
+      "res_scpu": 0,
+      "res_inb": 0,
+      "res_outb": 0,
+      "res_maxrss": 0,
+      "res_nswap": 0,
+      "res_ncsw": 0
+    }
+  ],
+  "sql_engine":
+  {
+    "engine_heap_size": 724936,
+    "total_heap_size": 0
+  }
+
+}
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="sql_stat_sessions_resource.htm">/api/sql/stat/sessions</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Shows SQL sessions statistics and allow the http DELETE method for removing sessions from the history</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+
+  "sessions":
+  [
+    {
+      "clientid": -1,
+      "client_type": "interactive",
+      "connected": 1,
+      "begin_time": 1523278397728268,
+      "end_time": 0,
+      "idle_time": 2354789,
+      "ip": "0:0:0:0:0:0:0:0",
+      "port": 0,
+      "memory": 0
+      "sql": "select * from Statistic",
+      "failmsg": "",
+    }
+  ]
+}
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="sql_exec_resource.htm">/api/sql/exec</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Execute an SQL statement or multiple statements</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+Request:
+                            
+{
+
+  "sql": "SELECT * FROM Statistic",
+  "max_records": 100,
+  "max_array": 10,
+  "max_sequence": 10
+}
+&#160;
+Response:
+                            
+{
+  "type": "query",
+  "data":
+  {
+    "header":
+    {
+      "resultset_size": 4,
+      "fields":
+      [
+        { "name": "i", "type": "Int4" },
+        { "name": "s", "type": "String" }
+      ]
+    },
+    "resultset":
+    [
+      [ 1, "string1" ],
+      [ 2, "string2" ],
+      [ 3, "string3" ],
+      [ 4, "string4" ]
+    ]
+  }
+}
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="trace.htm">/api/trace</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Provide read-only trace access</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+
+  "trace": "\/mcobject\/eXtremeDB_8.0\/eXtremeDB\/target\/xsql\/mcoxsql\/mcoxsql.cpp:2916-mcorest started at port 8083\n",
+  "from": 5051,
+  "to": 5151
+}</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="cluster_restlist_resource.htm">/api/cluster/restlist</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">List the array of nodes in the cluster network</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+
+  "cluster":
+  [
+    {
+      "node_id": 1,
+      "role" : "node",
+      "address": "127.0.0.1",
+      "rest_iface": "0.0.0.0",
+      "rest_port": 8081,
+      "rest_secure: true
+    }
+    {
+      "node_id": 2,
+      "role" : "node",
+      "address": "127.0.0.1",
+      "rest_iface": "0.0.0.0",
+      "rest_port": 8082,
+      "rest_secure: true
+    }
+  ]
+}</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ha_restlist_resource.htm">/api/ha/restlist</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">List the array of nodes in the High Availability network</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+
+  "ha":
+  [
+    {
+      "node_id": 1,
+      "role" : "master",
+      "address": "127.0.0.1",
+      "rest_iface": "0.0.0.0",
+      "rest_port": 8081,
+      "rest_secure: true
+    }
+    {
+      "node_id": 2,
+      "role" : "replica",
+      "address": "127.0.0.1",
+      "rest_iface": "0.0.0.0",
+      "rest_port": 8082,
+      "rest_secure: true
+    }
+  ]
+}</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><a href="iot_restlist_resource.htm">/api/iot/restlist</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">List the array of nodes in the IoT network</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">
+                                <div class="code-block"><pre xml:space="preserve">&#160;
+{
+  "this_node_id": 1,
+  "this_node_role": "server",									
+  "iot":
+  [
+    {
+      "node_id": 43,
+      "role" : "device",
+      "address": "127.0.0.1",
+      "rest_iface": "0.0.0.0",
+      "rest_port": 8082,
+      "rest_secure: false
+    }
+  ]
+}</pre>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

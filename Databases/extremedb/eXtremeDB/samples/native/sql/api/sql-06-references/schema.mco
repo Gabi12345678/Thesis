@@ -1,0 +1,46 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Rights Reserved.    *
+ *                                                               *
+ *****************************************************************/
+#define int1      signed<1>
+#define int2      signed<2>
+#define int4      signed<4>
+#define uint8   unsigned<8>
+#define uint4   unsigned<4>
+#define uint2   unsigned<2>
+#define uint1   unsigned<1>
+
+declare database referencesdb;
+
+class PostalAddress
+{
+    int4   zipcode;
+    string city;
+    string street;
+
+    hash<zipcode> iaddr[20000];
+    autoid[20000]; 
+    list;
+};
+
+class Company { 
+    autoid_t<PostalAddress> location;
+    string            name;
+
+    hash<name> iname[20000];
+    hash<location> iaddr[20000];
+    autoid[20000]; 
+    list;
+};
+
+class Orders {
+    autoid_t<Company> company;
+    date              shipment;
+    uint8             amount;
+    string            description;
+    
+    hash<company> icomp[20000];
+    list;
+};
+        

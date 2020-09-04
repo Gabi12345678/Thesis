@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Cache Management in C</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Cache Management in C</h1>
+            <blockquote>
+                <p>As explained in the <a href="Prioritized_Cache.htm">Prioritized Cache</a> page, <i>e</i>X<i>treme</i>DB<a name="kanchor453"></a> provides a number of C API functions to monitor and manage the runtime cache. These APIs and important information regarding their usage are described in the following sections.</p>
+                <h2>Cache Priorities</h2>
+                <p>Applications can influence how long certain pages remain in memory by assigning the cache priority database objects. This is done by setting the following parameters  in the <code><a href="../../../../Programming/C/Structures/Database_Parameters.htm">db_params</a></code> passed to the <a href="../../../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm"><code>mco_db_open_dev()</code></a> function: for indexes <code>index_caching_priority</code>, for the memory allocator bitmap pages <code>allocation_bitmap_priority</code> and for data object pages (excluding BLOBs) <code>object_caching_priority</code>. The default value of zero means that the caching priority for all objects is the same. But an integer value greater than zero can be specified; the higher the value the longer the index, allocation bitmap or object  pages will remain in the cache.</p>
+                <p>Using the preset object priority as a baseline, the generated function <code><a href="../../../../Programming/C/Core_Functions/Generated/Class/set_caching_priority.htm">&lt;classname&gt;_set_caching_priority()</a></code> can be called to adjust the relative priorities of specific classes. For example, large and rarely accessed objects can be assigned lower priority, while small frequently accessed classes can be assigned a higher priority. The caching priority assigned at runtime is stored in the database and is used until it is explicitly overwritten.</p>
+                <p>Other memory initialization factors that can affect overall performance are the sizes specified for the cache and <code>disk_max_database_size</code>. These are explained in the following sections.</p>
+                <h2>Cache Size</h2>
+                <p>The memory address and size for the cache are specified  in the <a href="../../../../Programming/C/Structures/Memory_Devices.htm">devices</a> parameter <code>devs</code> passed to the <a href="../../../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm"><code>mco_db_open_dev()</code></a><a name="kanchor454"></a> function. The memory can be either shared memory or local memory. (It must be shared memory if two or more processes are to share the database.) Generally a larger cache will improve application performance, but the frequency of updates to persistent media (flushing of cache pages) is more important for performance. How database updates are written to persistent media is determined by the Transaction Commit Policy.</p>
+                <h2>Maximum Database Size</h2>
+                <p>The <i>e</i>X<i>treme</i>DB runtime uses the value of the <code>disk_max_database_size</code> element of the <a href="../../../../Programming/C/Structures/Database_Parameters.htm"><code>mco_db_params_t</code></a> parameter passed to <a href="../../../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm"><code>mco_db_open_dev()</code></a> to allocate the “dirty pages bitmap”. The bitmap is allocated in cache at the time the cache is created. The bitmap size can be roughly calculated as:</p>
+                <div class="code-block"><pre>&#160;
+    disk_max_database_size / page_size / 8.
+&#160;</pre>
+                </div>
+                <p>The application can set <code>disk_max_database_size = MCO_INFINITE_DATABASE_SIZE</code> to indicate that the maximum size of the database is unknown. In this case, the size of the bitmap is set to 1/16 of the size of the cache. The runtime can also be configured with the ‘extendable bitmap’ option, allowing for unlimited database size. If the runtime is configured with the extendable bitmap, then <code>disk_max_database_size = MCO_INFINITE_DATABASE_SIZE</code> is specified and in this scenario the bitmap is allocated in <i>e</i>X<i>treme</i>DB heap space.</p>
+                <h2>Reserve Page Pool</h2>
+                <p>As explained in the <a href="Prioritized_Cache.htm">Prioritized Cache</a> page, the database runtime provides the page pool reservation mechanism that facilitates out-of-memory error handling for the cache. The size of the reserve pool is calculated internally by the runtime based on the value of the <a href="../../../../Programming/C/Structures/Database_Parameters.htm"><code>mco_db_params.max_active_pages</code></a> parameter (the default value is 32) and the number of currently active connections to the database runtime.</p>
+                <p>It is possible to disable this mechanism by setting the <code>MCO_DB_DISABLE_PAGE_POOL_RESERVE</code> bit in the database <a href="../../../../Programming/C/Structures/Database_Open_Modes.htm"><code>mco_db_params.mode_mask</code></a>.</p>
+                <h2><a name="kanchor455"></a>Connection cache</h2>
+                <p>The connection cache is enabled by default. Two functions, <code><a href="../../../../Programming/C/Core_Functions/Static/Disk_Manager/enable_connection_cache.htm">mco_disk_enable_connection_cache()</a></code> and <code><a href="../../../../Programming/C/Core_Functions/Static/Disk_Manager/reset_connection_cache.htm">mco_disk_reset_connection_cache()</a></code>, are provided to allow  applications control over the connection cache:</p>
+                <div class="code-block"><pre>&#160;
+    mco_bool mco_disk_enable_connection_cache(mco_db_h con, mco_bool enabled);
+    &#160;
+    MCO_RET mco_disk_reset_connection_cache(mco_db_h con);
+    &#160;</pre>
+                </div>
+                <p>The first function enables or disables the connection cache. Passing <code>MCO_YES</code> or <code>MCO_NO</code> as the <code>enable</code> parameter value enables and disables the cache. The function returns the current state of the connection cache.  The second function commits the connection cache (resets) to the database.</p>
+                <p>These two functions address a scenario with many connections and long-lasting transactions.  In this scenario, the connection cache could cause the page pool to run out of free pages (a new transaction allocates its own connection cache, but long transactions prevent those pages from being released back to the shared page pool). To address this, the connection cache could be turned off or reset often. Under normal circumstances, the application does not need to control the connection cache.</p>
+                <h2>In-memory Page allocation</h2>
+                <p>The minimum and maximum number of pages held by the per-connection allocator in <code><a href="../../MVCC_Transaction_Manager.htm" name="kanchor456">MVCC</a></code> mode are determined by the database parameters <code>min_conn_local_pages</code> and <code>max_conn_local_pages</code> parameters in the <a href="../../../../Programming/C/Structures/Database_Parameters.htm"><code>mco_db_params_t</code></a> argument for <a href="../../../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm"><code>mco_db_open_dev()</code></a>. The <a href="../../MVCC_Transaction_Manager.htm"><code>MVCC</code></a><a name="kanchor457"></a> transaction manager optimizes access to the shared memory pool by pre-allocating a number of pages at once and assigning these pages to the connection. The default value for <code>min_conn_local_pages</code> is 256 pages and for <code>max_conn_local_pages</code> is 512. The min/max value assignments represents a tradeoff between accessing a shared resource more frequently and allocating extra memory. Changing these default values can be effective if there are well defined object allocation and deallocation patterns in the application.</p>
+                <h2>Obtaining runtime cache statistics</h2>
+                <p>The <a href="../../../../Programming/C/Core_Functions/Static/Disk_Manager/get_cache_info.htm"><code>mco_disk_get_cache_info()</code></a><a name="kanchor458"></a> function allows applications to obtain runtime disk manager cache statistics, including cache hits and cache misses. A cache hit occurs when the address or data required by the database runtime is found in the cache and does not require retrieval from the storage media. This information could, for example, be used to fine-tune the application’s caching policies (see the <a href="Prioritized_Cache.htm">Prioritized Cache</a> page).</p>
+                <h2>Saving and Loading the Cache</h2>
+                <p>The <a href="../../../../Programming/C/Core_Functions/Static/Disk_Manager/save_cache.htm"><code>mco_disk_save_cache()</code></a> function allows applications to save the disk manager cache to persistent storage; and <a href="../../../../Programming/C/Core_Functions/Static/Disk_Manager/load_cache.htm">mco_disk_load_cache()</a> can be called to load a previously saved image of the cache from same.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|C API Samples|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Samples Helper Functions in C</title>
+        <link href="../../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Samples Helper Functions in C</h1>
+            <blockquote>
+                <p>The <code>samples/native/common</code> directory contains several <code>common*.c</code> and <code>common*.h</code> files that define and implement helper functions used in the C API SDK samples. These functions allow the sample applications to focus on only the specific <i>e</i>X<i>treme</i>DB functionality that the sample is intended to demonstrate by implementing outside of the main function some of the unrelated code.</p>
+                <p>The following table describes briefly the content of each file. (Note that the actual files in your package may not include all of these listed.) It is recommended that these files be examined in your development environment during testing and modification of the SDK samples. (Some functions provide a link for more detailed descriptions). </p>
+                <table style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../../../Resources/TableStyles/FunctionReference.css');" class="TableStyle-FunctionReference" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 352px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2" style="text-align: center;"><b>common.h / common.c (used in most samples)</b>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Samples_Common/open_database.htm">MCO_RET <b>sample_open_database</b>( ... )</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Open an in-memory or persistent database</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Samples_Common/load_database.htm">MCO_RET <b>sample_load_database</b>( ... )</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Load a database</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_RET <b>sample_close_database</b>( const char * db_name, sample_memory_t * pdev )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Close the specified database and free its memory</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_header</b>( const char * descr )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Display the specified message <code>descr</code> (normally called at the beginning of a sample application to indicate the features being demonstrated)</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_errhandler</b>( MCO_RET n )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Implement a simple <i>e</i>X<i>treme</i>DB <a href="../../../Return Codes/Fatal_Error_Codes.htm">fatal error</a> handler</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_pause</b>( const char * prompt )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Display a prompt and pause the sample for user input</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_pause_end</b>( const char * prompt )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">For Windows applications, if in release mode, print a line, and call <code>sample_pause()</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b><a name="kanchor785"></a>sample_show_runtime_info</b>( const char * lead_line )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Display runtime information indicating which libraries are linked and which <i>e</i>X<i>treme</i>DB features are enabled</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_show_device_info</b>( const char * lead_line, mco_device_t dev[], int nDev )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Display the memory type, assignment type and file information (for persistent databases) of all memory devices</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_rc_check</b>( const char * msg, MCO_RET rc )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Display "Successful" and the specified message <code>msg</code> or an error message if the return code <code>rc</code> is not <code>MCO_S_OK</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">int <b>sample_is_release</b>()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return a non-zero value if the release libraries are linked</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">int <b>sample_disk_supported</b>()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a name="kanchor786"></a>Return a non-zero value if the persistent database disk manager libraries are linked</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">const char * <b>mco_ret_string</b>( MCO_RET rc, int * is_error )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return the error message string associated with an <i>e</i>X<i>treme</i>DB <a href="../../../Return_Codes.htm">return code</a> and set <code>is_error</code> true if the code represents a <a href="../../../Return Codes/Non_Fatal_Error_Codes.htm">non-fatal error</a></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">#define <b>CHECK</b>( func )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Macro to call a function and terminate the applications with an error message if an error occurs</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">#define <b>CHECK_CODE</b>( func, code )  </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Macro to call a function and terminate the applications with an error code and message if an error occurs</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">unsigned int <b>sample_start_task</b>( ... )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Call <code>sample_start_connected_task()</code> to spawn a thread</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Samples_Common/start_connected_task.htm">unsigned int <b>sample_start_connected_task</b>( ... )</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Initialize the task descriptor and spawn a task (thread)</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">unsigned int <b>sample_stop_task</b>( sample_task_t * descr )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Sett the task descriptor flag <code>stopped</code> to cause the thread to stop</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">unsigned int <b>sample_join_task</b>( sample_task_t * descr )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Join the task (thread) pointed to by the specified descriptor</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">int  <b>sample_msec</b>()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return the current system time in milliseconds</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_sleep</b>( unsigned int duration_msec )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Cause the application to sleep for the specified number of milliseconds</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2" style="text-align: center;"><b>commonSQL.h / commonSQL.c (used in SQL samples)</b>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">const char * <b>sql_ret_string</b>( MCO_RET rc )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return the SQL message string corresponding to the specified return code <code>rc</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_sql_rc_check</b>(const char * msg, MCO_RET rc)</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Display "Successful" and the specified message <code>msg</code> or an <a href="../../../Return Codes/SQL_Return_Codes.htm">SQL error message</a> if the return code <code>rc</code> is not <code>MCO_S_OK</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2" style="text-align: center;"><b>commonha.h / commonha.c (used in High Availability samples)</b>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">#define <b>CLEAR_PROCESS_MASKS</b>( set )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Define macro <code>CLEAR_PROCESS_MASKS</code> for the current platform</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"> #define <b>SET_PROCESS_MASK</b>( set, mask ) </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Define macro <code>SET_PROCESS_MASKS</code> for the current platform</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_HA_replica_notifying</b>(  ... )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Replica notifying procedure that simply prints replica notifications in human-readable form</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2" style="text-align: center;"><b>commoncl.h / commoncl.c (used in Cluster samples)</b>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Samples_Common/cluster_parse_opts.htm">int <b>sample_cluster_parse_opts</b>( ... )</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Parse the application's <code>argv[]</code> argument list and set cluster parameters accordingly</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_cluster_print_params</b>( mco_cluster_params_t *cl_params )
+</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Display the Cluster runtime parameter settings </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_cluster_usage</b>()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Display the possible application runtime options and their meanings</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2" style="text-align: center;"><b>initos.h / initos.c (used in most samples)</b>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_os_initialize</b>( int req_features )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A startup function to initialize specific platform dependent features for embedded systems like <i>VxWorks</i> and <i>ecos</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">void <b>sample_os_shutdown</b>()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A termination function to shutdown specific platform dependent features for embedded systems like <i>VxWorks</i> and <i>ecos</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">int <b>main</b>( int argc, char* argv[] ) and int <b>main</b>()</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">A standardized main entry point for applications on embedded systems like <i>VxWorks</i> and <i>ecos</i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p><a href="javascript:void(0);" class="MCHelpControl MCHelpControl-Related relatedTopics" data-mc-topics="Runtime Statistics|Statistics.htm"><span class="MCHelpControl-RelatedHotSpot_"><img class="MCHelpControl_Image_Icon" src="../../../../../../Skins/Default/Stylesheets/Images/transparent.gif" height="16" width="16" alt="Related Topics Link Icon" />Related Topics</span></a>
+            </p>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

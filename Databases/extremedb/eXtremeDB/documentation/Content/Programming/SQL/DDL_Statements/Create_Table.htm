@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>SQL Create Table</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>SQL Create Table</h1>
+            <blockquote>
+                <p>An SQL table, which corresponds to an <i>e</i>X<i>treme</i>DB class, is created using the SQL <code>create table</code> statement specifying the table name and column (field) definitions. For example:</p>
+                <div class="code-block"><pre>&#160;
+    create table t (x integer);
+    &#160;</pre>
+                </div>
+                <p>Here the table (class) <code>t</code> is created with a single column (field) <code>x</code> of type <code>integer</code>.</p>
+                <p>The syntax is as follows:</p>
+                <div class="code-block"><pre>&#160;
+    CREATE [temporary | local] TABLE name "(" { column_name data_type [ column constraint [ ... ] ] | 
+                        [ CONSTRAINT name ] table_constraint } [ "," ... ] ")"
+                        [IF&#160;NOT&#160;EXISTS]
+&#160;
+    column_constraint: 
+        [ NOT ] NULL | PRIMARY KEY | UNIQUE | 
+        USING [ HASH | RTREE ] INDEX | 
+        [ FOREGN KEY ] REFERENCES table_name [ "(" column_name [ "," ... ]   ")"
+    &#160;
+    table_constraint:
+        | UNIQUE "("  column_name [ "," ... ]  ")"
+        | PRIMARY KEY "("  column_name [ "," ... ]  ")"
+        | FOREIGN KEY REFERENCES table_name "("  column_name [ "," ... ]  ")"
+&#160;
+    data_type: 
+        BIT | BOOLEAN | CHAR [ "(" size ")" ] | VARCHAR [ "(" size ")" ] | LOGNVARCHAR [ "(" size ")" ] | 
+        STRING [ (" width ")" ] | UNICODE[ (" width ")" ]  -- corresponds to eXtremeDB nstring or nchar
+        | TINYINT    -- signed&lt;1&gt;
+        | SMALLINT -- signed&lt;2&gt;
+        | INT [ "(" n ")" ]      -- where n=1,2,4,8 corresponds to eXtremeDB signed&lt;n&gt;
+        | INTEGER [ "(" n ")" ]      -- where n=1,2,4,8 corresponds to eXtremeDB signed&lt;n&gt;
+        | UNSIGNED [ "(" n ")" ]      -- where n=1,2,4,8 corresponds to eXtremeDB unsigned&lt;n&gt;
+        | BIGINT -- signed&lt;8&gt;
+        | FLOAT
+        | REAL -- double
+        | DOUBLE
+        | NUMERIC [ "(" width [ "," precision ]  ")" ]  -- eXtremeDB numeric&lt; width,precision&gt; type
+        | DECIMAL [ "(" width [ "," precision ]  ")" ]   -- eXtremeDB numeric&lt; width,precision&gt; type
+        | DATE -- eXtremeDB 8-byte datetime type
+        | TIME   -- eXtremeDB 8-byte datetime type
+        | TIMESTAMP  -- eXtremeDB 8-byte datetime type
+        | BIANRY [ "(" size ")" ]  --- array or vector of signed&lt;1&gt;
+        | VARBINARY  [ "(" size ")" ]   --- array or vector of signed&lt;1&gt;
+        | LONGVARBINARY  [ "(" size ")" ]   --- array or vector of signed&lt;1&gt;
+        | REFERENCE
+        | BLOB
+        | ARRAY "(" data_type [ "," length ] ")"
+        | SEQUENCE "(" scalar_data_type [ ASC | DESC ] ")"
+        | user-defined-type  -- declared by "create domain"
+        &#160;</pre>
+                </div>
+                <p>Note that all SQL keywords are case <i>insensitive</i> in <i>e</i>X<i>treme</i>SQL - i.e. "<code>CREATE TABLE"</code> and <code>"create table"</code> are equivalent.</p>
+                <p>The optional keyword <code>temporary</code> can be used to create temporary or <i>virtual</i> tables. Please see page <a href="../../../Users_Guides/SQL/SQL_Implementation_Details/Virtual_Tables.htm"><i>e</i>X<i>treme</i>SQL Virtual Tables</a> for further details.</p>
+                <p>When creating tables it is also necessary to reserve space for the dictionary and newly created tables in the database header. This is done by specifying <code>ddl_dict_size, max_classes</code> and <code>max_indexes </code>in the <code><a href="../../C/Structures/Database_Parameters.htm">mco_db_params_t</a></code> structure passed to <code><a href="../../C/Core_Functions/Static/Database_Control/open_dev.htm">mco_db_open_dev()</a></code> if using the C/C++ API. For example :</p>
+                <div class="code-block"><pre>    &#160;
+    db_params.ddl_dict_size = 16*1024;
+    db_params.max_classes = 100;
+    db_params.max_indexes = 100;
+    &#160;</pre>
+                </div>
+                <p>If using <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>, these parameters can be set with config file parameters:</p>
+                <div class="code-block"><pre>&#160;
+    db_params: 
+    {
+        ddl_dict_size: 16K,
+        max_classes : 100,
+        max_indexes : 100,
+    }
+    &#160;</pre>
+                </div>
+                <h2>Local Tables</h2>
+                <p>The <code>local</code> qualifier designates the table for <i>e</i>X<i>treme</i>DB<i> High Availability</i> <a href="../../../Users_Guides/HA/HA_Implementation_Details.htm">partial replication</a>. Tables can be declared <code>local</code> for the <i>master</i> or <i>replica</i> database to keep data in these tables from being replicated across the network.</p>
+                <h2>If Not Exists</h2>
+                <p>The <code>if not exists</code> clause can be used to override an error when the table already exists. For example, note how the following c<code>reate table</code> statement fails while adding the <code>if not exists</code> clause allows the execution to succeed:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;create table foo(x integer);
+    XSQL&gt;create table foo(x integer, y integer);
+    ERROR: Table already exists
+    XSQL&gt;create table if not exists foo(x integer, y integer);
+    XSQL&gt;insert into foo values (1);
+    XSQL&gt;select * from foo;
+    x
+    ------------------------------------------------------------------------------
+    1
+    &#160;
+    Selected records: 1
+    &#160;</pre>
+                </div>
+                <h1>Constraint interpretation</h1>
+                <p>Constraints can be specified for the entire table or for individual columns. If a table constraint is explicitly assigned a name (using the <code>CONSTRAINT name</code> clause) then this name is used as the index name. Otherwise the name of first constraint field is used as the index name.</p>
+                <p>If no index is specified by means of constraints, then a <code>list</code> index (actually a <code>hash</code>) is implicitly created for this class.</p>
+                <h3>[Not] Null</h3>
+                <p>In the case of column <code>NULL</code> constraint, the <i>e</i>X<i>treme</i>DB field is marked as <code>nullable</code> (a null-indicator is explicitly created for this field).</p>
+                <p>Note that:</p>
+                <blockquote>
+                    <p>1.	The scope of this command is connection (SQL session)</p>
+                    <p>2.	<code>Nullable</code> fields add storage overhead; one byte per field. <code>Nullable</code> fields cannot be indexed, which can greatly affect performance by removing index-based optimizations. For instance, given this default policy, and the following <code>CREATE TABLE</code> statement:</p>
+                    <div class="code-block"><pre>&#160;
+    create table foo(x integer using index);
+    &#160;</pre>
+                    </div>
+                    <p>An index will not be used to execute</p>
+                    <div class="code-block"><pre>&#160;
+    select * from foo order by x;
+    &#160;</pre>
+                    </div>
+                    <p>3.	This default policy allows third-party tools to connect to an <i>e</i>X<i>treme</i>SQL database via JDBC and ODBC as these tools rely on the specified SQL standard to access databases.</p>
+                </blockquote>
+                <h3>Unique and Primary Key</h3>
+                <p>For <code>UNIQUE</code> and <code>PRIMARY KEY</code> a unique index is created. The <code>USING [HASH] INDEX</code> and <code>FOREIGN KEY</code> constraints cause creation of a <code>non-unique</code> index. The column constraint <code>USING INDEX</code> can be combined with <code>UNIQUE</code> - in this case the index will be also declared as unique.</p>
+                <p>In the case of the <code>USING HASH INDEX</code> constraint, an <i>e</i>X<i>treme</i>DB hash table index is used, otherwise a B-Tree index is used. The initial size of the hash table is set to <code>100000</code> (this hash table will be dynamically reallocated if the number of records in the table becomes larger than this value).</p>
+                <h2>Varying vs. Fixed Size types</h2>
+                <p>The <code>CHAR(N)</code> specification maps to the <i>e</i>X<i>treme</i>DB fixed length character array type (<code>char&lt;N&gt;</code> or <code>nchar&lt;N&gt;</code>). The <code>VARCHAR</code>, <code>LONGVARCHAR</code>, <code>STRING</code> or <code>UNICODE</code> types are mapped to the <i>e</i>X<i>treme</i>DB<code>string</code> or <code>nstring</code> type; if followed by a size specification, the size specification is ignored.</p>
+                <p>The <code>BINARY(N)</code> specification is mapped to the fixed size binary <i>e</i>X<i>treme</i>DB type (<code>binary&lt;n&gt;</code>). The <code>VARBINARY</code> or <code>LONGVARBINARY</code> types are mapped to the <i>e</i>X<i>treme</i>DB variable size binary type (<code>varbinary)</code>; if followed by a size specification, the size specification is ignored. Note that, unlike the<code> CHAR(N)and VARCHAR</code> types, <code>BINARY(N)</code> and <code>VARBINARY</code> types are not passed with zeros and do not interpret null  character (<code>\0</code>) as the string terminator. </p>
+                <p>Please see the <a href="../../C/DDL/Base_Data_Types.htm">Base Data Types</a> page for definitions of the <i>e</i>X<i>treme</i>DB data types.</p>
+                <h2>User-defined Types</h2>
+                <p><i>e</i>X<i>treme</i>SQL supports the <code>create domain</code> statement. Domains can be used as session level type <i>aliases</i>. However note that <i>e</i>X<i>treme</i>DB does not persist the domain definition (i.e. once the session is terminated the domain definition is lost).</p>
+                <p>The syntax is very simple:</p>
+                <div class="code-block"><pre>&#160;
+    CREATE DOMAIN name type;
+    &#160;</pre>
+                </div>
+                <p>where <code>type</code> is any valid type definition, for example <code>char(10)</code>.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

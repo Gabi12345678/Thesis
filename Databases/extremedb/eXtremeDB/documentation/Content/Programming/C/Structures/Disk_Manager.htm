@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Control Structures used in the C API">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Disk Manager</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><a name="kanchor797"></a>Disk Manager</h1>
+            <blockquote>
+                <p>The disk manager controls operations between the <i>e</i>X<i>treme</i>DB cache and the persistent storage media. Following is the definition of the <code>mco_disk_info_t</code> structure which describes the state of the current Disk Manager. </p>
+                <h2>Disk info</h2>
+                <p>The structure is defined in <code>mco.h</code> as follows:</p>
+                <div class="code-block"><pre>&#160;
+    typedef struct mco_disk_info
+    {
+        mco_offs_t data_file_size;     /* Total size of database storage */
+        mco_offs_t log_file_size;      /* Total size of database log */
+        mco_offs_t used_database_size; /* Size of used part of database storage */
+    } mco_disk_info_t;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <table style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" class="TableStyle-FunctionReference" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">data_file_size</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Total size of database storage</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">log_file_size</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Total size of database log.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">used_database_size</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Size of used part of database storage</td>
+                    </tr>
+                </table>
+                <p>&#160;</p>
+                <h2>Cache info</h2>
+                <p>Following is the definition of the <code>mco_disk_cache_info_t</code> structure which describes the state of the current Disk Manager cache.</p>
+                <p>The structure is defined in <code>mco.h</code> as follows:</p>
+                <div class="code-block"><pre>&#160;
+    typedef struct mco_disk_cache_info_t_ 
+    {
+        mco_counter_t connection_cache_hits;
+        mco_counter_t cache_hits;
+        mco_counter_t cache_misses;
+        mco_counter_t allocated_pages;
+        mco_counter_t used_pages;
+        mco_counter32_t  pinned_pages; /* Number of pinned pages: need to be 32 bit to be able to use atomic  */
+        mco_counter_t modified_pages; /* Number of pages modified by active transactions */
+        mco_counter_t dirty_pages; /* Number of dirty pages */
+        mco_counter_t copied_pages; /* Number of copies of original pages (REDO_LOG+MCO_COMMIT_DELAYED) */
+        mco_counter_t write_delayed_pages; /* Number of write delayed pages */
+        mco_counter_t subsequent_reads;    /* Number of reads of sequentally located paged */
+    } mco_disk_cache_info_t;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <table style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" class="TableStyle-FunctionReference" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 171px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">connection_cache_hits</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a name="kanchor798"></a>The number of connection cache hits since the database was opened
+</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">cache_hits</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The number of disk manager cache hits since the database was opened</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">cache_misses</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The number of disk manager cache misses</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">allocated_pages</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The disk manager cache size in pages</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">used_pages</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The number of used pages in the disk cache</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">pinned_pages</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The number of pages pinned. Pinned pages can’t be swapped out</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">modified_pages</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Number of pages in the cache modified by active transactions (as opposed to dirty pages, below). The number of modified pages is always less than or equal to the number of dirty pages.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">dirty_pages</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Number of dirty pages. In the  <code>MCO_DELAYED_COMMIT</code> mode, it is all the pages that have not been committed to the database yet.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">copied_pages</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Number of copies of original pages (<code>REDO_LOG</code>+<code>MCO_COMMIT_DELAYED</code>). The number of extra pages allocated from the page pool in support of the <code>MCO_COMMIT_DELAYED</code><a name="kanchor799"></a> mode. In order to roll back a transaction in this mode, the database runtime saves images of the modified pages prior to the transaction start. These copies are kept in the page pool, thus extra pages are used. When the transaction is committed all these copies are removed.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">write_delayed_pages</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The number of write delayed pages</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">subsequent_reads</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Number of reads of sequentially located pages</td>
+                    </tr>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

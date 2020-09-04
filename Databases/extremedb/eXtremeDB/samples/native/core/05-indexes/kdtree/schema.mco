@@ -1,0 +1,28 @@
+/****************************************************************
+ *                                                              *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.    *
+ *                                                              *
+ ****************************************************************/
+
+// This sample demonstrates operations with tree-indexes
+
+#define uint4   unsigned<4>
+#define boolean unsigned<1>
+
+declare database  kdtreedb;
+
+class Car 
+{
+     string  vendor;
+     string  model;
+     string  color;
+     uint4   year;
+     uint4   mileage;
+     boolean automatic;
+     boolean ac;
+     uint4   price;
+     char<3> state;
+
+     kdtree<year, mileage, color, model, vendor, automatic, ac, price> index;
+};
+

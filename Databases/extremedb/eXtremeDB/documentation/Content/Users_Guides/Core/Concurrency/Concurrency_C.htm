@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Database Concurrency and Transaction Management in C</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Database Concurrency and Transaction Management in C</h1>
+            <blockquote>
+                <p>As explained in the <a href="../Transaction_Control.htm">Transaction</a> and <a href="../Concurrency_Transaction_Managers.htm">Concurrency</a> control pages, applications use <a href="#Transact">transaction blocking</a> for all database access. This allows the <i>e</i>X<i>treme</i>DB <a href="#Transact2">transaction managers</a> to schedule and process all database operations, whether they involve simple <code>READ_ONLY</code> access or <code>READ_WRITE</code> operations that modify database objects.</p>
+                <h2><a name="Transact"></a>Transaction blocking</h2>
+                <p>An <i>e</i>X<i>treme</i>DB transaction block consists of a set of database operations enclosed within a transaction <b>start</b> and <b>commit</b> or <b>rollback</b>. In C applications, transactions are started by calling one of two <i>e</i>X<i>treme</i>DB functions <a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/start.htm"><code>mco_trans_start()</code></a> or <a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/start_ex.htm">mco_trans_start_ex()</a>.  The second differs only in that it allows setting the <a href="../Isolation_Levels.htm">isolation level</a> for the transaction. To commit  a transaction call <a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/commit.htm"><code>mco_trans_commit()</code></a>; to discard any database operations since the <a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/start.htm"><code>mco_trans_start()</code></a>, call <a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/rollback.htm"><code>mco_trans_rollback()</code>.</a></p>
+                <h2><a name="Transact2"></a>Transaction Managers</h2>
+                <p>As explained in the <a href="../../../Fundamental_Concepts/Concurrency_Control.htm">Fundamental Concepts page</a>, <i>e</i>X<i>treme</i>DB offers three transaction managers to meet varying application demands and concurrency strategies. The choice of transaction manager can have a significant performance impact on applications. But fortunately, changing transaction managers is simply a matter of changing the linker directive and rebuilding the application. Please use these links to view implementation details of the <a href="../MURSIW_Transaction_Manager.htm" name="kanchor743"><code>MURSIW</code></a> and <a href="../MVCC_Transaction_Manager.htm" name="kanchor744"><code>MVCC</code></a> transaction managers. To link with <code>MURSIW</code> use the <code>mcotmursiw_debug</code> library for development, and <code>mcotmursiw</code> for release versions of your application. To link with <code>MVCC</code> use the <code>mcotmvcc_debug</code> library for development, and <code>mcotmvcc</code> for release versions of your application. </p>
+                <p>The EXCL(usive) transaction manager is intended only for single-process, single-threaded applications, and thus does not actually manage concurrency. To link with <code>EXCL</code> use the <code>mcotexcl_debug</code> library for development, and <code>mcotexcl</code> for release versions of your application. </p>
+                <h2>Setting the Isolation Level</h2>
+                <p>When <a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/start.htm"><code>mco_trans_start()</code></a> is called, the transaction isolation level is set to <code>MCO_DEFAULT_ISOLATION_LEVEL</code>, which is by default <code>MCO_SERIALIZABLE</code> for <code>MURSIW</code> and <code>MCO_REPEATABLE_READ</code> for <code>MVCC</code>.  (Note that if <code>MURSIW</code> is used the only possible level is <code>MCO_SERIALIZABLE</code>.) It is possible to redefine the default transaction isolation level for the database session (connection).  In C applications this is done by calling function <a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/set_default_isolation_level.htm"><code>mco_trans_set_default_isolation_level()</code></a> which returns the previous default isolation level. The application can determine the current isolation level by calling function <a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/isolation_level.htm"><code>mco_trans_isolation_level()</code></a> and can inspect what transaction isolation levels are supported by the currently running transaction manager by calling function <a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/get_supported_isolation_levels.htm"><code>mco_trans_get_supported_isolation_levels()</code></a>.</p>
+                <h2>Setting the Transaction Priority and Scheduling Policy</h2>
+                <p>As explained in the <a href="../Transaction_Priorities_Scheduling.htm">Transaction Priorities and Scheduling</a><a name="kanchor745"></a> page, applications can adjust the  transaction priority and scheduling policy at runtime. The transaction priority is specified in the call to <a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/start.htm"><code>mco_trans_start()</code></a>. Applications can explicitly define the <code>MURSIW</code> scheduling policy by setting the desired <code>MCO_TRANS_SCHED_POLICY</code> flag in the <code>trans_sched_policy</code> in the <a href="../../../Programming/C/Structures/Database_Parameters.htm"><code>mco_db_params_t</code></a> passed into <a href="../../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm"><code>mco_db_open_dev()</code>.</a></p>
+                <h2>MVCC Conflict management</h2>
+                <p>When <code>MVCC</code> is used with other than <code>MCO_SERIALIZABLE</code>, then <code>MCO_READ_WRITE</code> transactions are executed concurrently.  Sometimes concurrent transactions modify the same objects, thus creating transaction conflicts.  The transaction manager resolves those conflicts by aborting one of the conflicting transactions and letting the other one commit its updates to the database.  When a transaction is aborted, the application receives the <code>MCO_E_CONFLICT</code> error code. It is the application’s responsibility to manage this possibility with logic similar to the following:</p>
+                <div class="code-block"><pre>&#160;
+    do {
+        mco_trans_start( db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t);
+        ...&lt;update database&gt;...
+        rc = mco_trans_commit(t);
+    } while ( rc == MCO_E_CONFLICT );
+    &#160;</pre>
+                </div>
+                <p>
+                    <img src="../../../Resources/Images/note.png" /> Note that when MVCC is used, the application must be able to tolerate transaction rollbacks due to conflicts.</p>
+                <p>If the number of conflicts is too high, it could lead to sharp performance degradation due to the need to retry transactions.  When this occurs, the transaction manager temporarily changes the isolation level to <code>MCO_SERIALIZABLE</code>.  The application can set the conflicts threshold over which the optimistic control is disabled.  This is done by calling <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/optimistic_threshold.htm">mco_trans_optimistic_threshold()</a></code>. </p>
+                <p>If the percentage of transactions that have been aborted because of the transaction conflict exceeds the <code>max_conflicts_percent</code>, the transaction isolation level is changed to <code>SERIALIZABLE</code> for <code>disable_period</code> successive transactions.  <code>SERIALIZABLE</code> permits a single <code>MCO_READ_WRITE</code> transaction at a time (eliminating the potential for conflicts), that can run in parallel with <code>MCO_READ_ONLY</code> transactions.  By default, the optimistic threshold is set to 100, which means “never disable optimistic mode no matter how many conflicts occur”.</p>
+                <h3>Adjusting Transaction Locking</h3>
+                <p>Note that when <code>MVCC</code> is used it is possible to adjust the maximum number of active write transactions when locking of B-Tree indexes is being performed. This threshold is set by parameter <code>index_optimistic_lock_threshold</code> in the <a href="../../../Programming/C/Structures/Database_Parameters.htm"><code>mco_db_params_t</code></a> passed into <a href="../../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm"><code>mco_db_open_dev()</code></a>.</p>
+                <h3>Accelerating  MVCC Performance</h3>
+                <p>It has been verified that performance of the <code>MVCC</code> transaction manager can be accelerated by use of an internal bitmap. By default this feature is disabled. An application can enable this feature by specifying a non-zero value for database parameter <code>mvcc_bitmap_size</code> in the <a href="../../../Programming/C/Structures/Database_Parameters.htm"><code>mco_db_params_t</code></a> passed into <a href="../../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm"><code>mco_db_open_dev()</code></a>. (Note that the value specified should be a power of 2.)</p>
+                <h2>Two-phase commit</h2>
+                <p>Some applications require more elaborate control of transaction commit processing; specifically, committing the transaction in two steps (phases).  The first phase writes the data into the database, inserts new data into indexes and checks index restrictions (uniqueness) (all together, the “pre-commit”) and returns control to the application.  The second phase finalizes the commit.</p>
+                <p>One example of such an application is the case where multiple <i>e</i>X<i>treme</i>DB databases need to synchronize the updates performed within a single transaction.  Another example could be that the <i>e</i>X<i>treme</i>DB transaction commit is included in a global transaction that involves other database systems or external storage.  In this case, the application coordinates the <i>e</i>X<i>treme</i>DB transaction with the global transaction between the first phase and the second phase.</p>
+                <p>To facilitate these and similar application scenarios, <i>e</i>X<i>treme</i>DB provides the following two API functions for C applications: <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/commit_phase1.htm">mco_trans_commit_phase1()</a></code> and <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/commit_phase2.htm">mco_trans_commit_phase2()</a></code>.</p>
+                <p>To perform the two-phase commit, the application needs to call the commit phases sequentially instead of calling one <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/commit.htm">mco_trans_commit()</a></code>. After the first commit phase is returned, the application cannot perform any activities against the database except initiating the second commit phase or rolling back the transaction. This process is illustrated in the following code segment:</p>
+                <div class="code-block"><pre>&#160;
+    mco_db_h db;
+    mco_trans_h t;
+    &#160;
+    ...
+    mco_trans_start(db, MCO_READ_WRITE, _&amp;t);
+    ...
+    if ( (mco_trans_commit_phase1(t) == MCO_S_OK) &amp;&amp; global_transaction() == SUCCESS )	)
+    {
+        mco_trans_commit_phase2(t);
+    }
+    else
+    {
+        mco_trans_rollback(t);
+    }
+    &#160;</pre>
+                </div>
+                <p>
+                    <img src="../../../Resources/Images/note.png" /> Note	that the two-phase commit API is not supported when using the <code>MVCC</code> transaction manager with a persistent database.</p>
+                <h2>Transaction Upgrade</h2>
+                <p>After navigating the database to find a desired object or group of objects, sometimes an application will need to update the found object(s).  A <code>MCO_READ_WRITE</code> transaction is required to update the database. To allow applications to optimize transaction performance when using the <code>MURSIW</code> <a href="#Transact2">transaction manager</a>, a <code>MCO_READ_ONLY</code> transaction can be upgraded to <code>MCO_READ_WRITE</code> by calling <a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/upgrade.htm"><code>mco_trans_upgrade()</code></a>. This function attempts to elevate a <code>MCO_READ_ONLY</code> transaction to the <code>MCO_READ_WRITE</code> access level.</p>
+                <p>With <code>MVCC</code>, this call always succeeds.</p>
+                <p>When <code>MURSIW</code> is used, the upgrade can either succeed, in which case <code>MCO_S_OK</code> is returned, or fail with the <code>MCO_E_UPGRADE_FAIL</code> error code. This error code indicates that the runtime was unable to upgrade the transaction because another upgrade has been requested and granted by another <code>MCO_READ_ONLY</code> transaction - <code>MURSIW</code> only allows a single <code>MCO_READ_WRITE</code> transaction at a time.</p>
+                <p>In order to guarantee that the upgrade will be successful, the transaction should be started as a <code>MCO_UPDATE</code> transaction ("read with intent to update") instead of <code>MCO_READ_ONLY</code> as demonstrated in the following pseudo-code snippet:</p>
+                <div class="code-block"><pre>&#160;
+    mco_trans_h t;  // transaction handle
+&#160;
+    mco_trans_start(db, MCO_UPDATE, MCO_TRANS_FOREGROUND, &amp;t);
+    read_data(t);
+    if (some_condition() == TRUE)
+    {
+&#160;
+        // it is necessary to make modifications in the database
+        rc = mco_trans_upgrade(t);
+        if ( MCO_S_OK == RC ) 
+        {
+            // the transaction is READ_WRITE now
+            write_data(t);
+            rc = mco_trans_commit(t);
+        } 
+        else 
+        {
+            // upgrade failed – take appropriate action
+            rc = mco_trans_rollback(t);
+        }
+    }
+    &#160;</pre>
+                </div>
+                <p>The <code>MURSIW</code> transaction manager uses a queue to process transactions. When <code>mco_trans_upgrade()</code> is called in the context of the  <code>MCO_UPDATE</code>  transaction, the upgrade is guaranteed to succeed. The actual logic for upgrading transactions in MURSIW is quite complex; see <a href="../MURSIW_Transaction_Manager.htm">here</a> for a detailed explanation.</p>
+                <h2>Getting the Transaction Type and Error State</h2>
+                <p>Sometimes an application module that performs an update may be called from different points in the application.  If passed a transaction handle, this function might need to first determine if the transaction is <code>MCO_READ_WRITE</code> before proceeding with the update.  The function <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/trans_type.htm">mco_trans_type()</a></code> serves this purpose.</p>
+                <p>If an error occurs during a transaction, the transaction enters an error state and subsequent operations within that transaction will return <code>MCO_E_TRANSACT</code>.  In this case, to obtain the error code of the operation that initially caused the error condition, C applications call function <code><a href="../../../Programming/C/Core_Functions/Static/Error_Handling/get_last_error.htm">mco_get_last_error()</a></code>.</p>
+                <h2>Examining the content of a transaction</h2>
+                <p>The <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/iterate.htm">mco_trans_iterate()</a></code> function provides C applications the ability to iterate over all modifications made by a transaction, read the modified objects, and determine what kind of modifications were applied (new, update, delete). The function signature is:</p>
+                <div class="code-block"><pre>&#160;
+    extern MCO_RET mco_trans_itertate (mco_trans_h trans, 	
+                        mco_trans_iterator_callback_t callback, 
+                        void* user_ctx);
+    &#160;</pre>
+                </div>
+                <p>The second parameter is an application-defined callback function that inspects each object, and determines whether it is subject to an external transaction, etc. The callback receives a <code>handle</code> to the modified object, the <code>class_id</code> of the object, the <code>opcode</code> of the modification operation and some application-specific context <code>user_ctx</code> (anything that the application needs to pass into the callback). The callback will return <code>MCO_S_OK</code> to indicate that the application can continue iterating through the transaction, or any other value to indicate a problem, in which case the application rolls the transaction back.  This function is especially useful when used together with the two-phase commit as demonstrated in the following code snippet:</p>
+                <div class="code-block"><pre>&#160;
+    mco_trans_start(db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;trans);
+    ...
+    rc = mco_trans_commit_phase1(&amp;trans);
+    if (rc == MCO_S_OK) 
+    {
+        /* commit to external database */
+        rc = mco_trans_iterate(&amp;trans, &amp;my_iterator_callback, my_iterator_context);
+        if (rc == MCO_S_OK) 
+        {
+            /* external commit succeeded */
+            mco_trans_commit_phase2(&amp;trans);
+        } 
+        else 
+        {
+            mco_trans_rollback(&amp;trans);
+        }
+    }
+    &#160;</pre>
+                </div>
+                <p>
+                    <img src="../../../Resources/Images/note.png" /> Note that a transaction may read, insert, update or delete a single object or many objects, even thousands, depending on the application’s needs. When processing blocks of objects in a single transaction it might happen that an object is deleted, but then before committing the transaction the same object is accessed again. If this occurs the read (get) or update (put) operation, or any other access such as locating the object in a cursor or generating XML on the object, will cause a fatal error code of  <code>MCO_ERR_OBJECT_HANDLE+N</code> where <code>N</code> is a line number in the source code that identifies the exact point where the invalid handle was detected. In order to avoid this fatal error C applications can call the function <a href="../../../Programming/C/Core_Functions/Static/Database_Control/is_object_deleted.htm"><code>mco_is_object_deleted()</code></a> to determine if the object was deleted within the current transaction.</p>
+                <h2>Pseudo-nested Transactions</h2>
+                <p>Nested transactions might be necessary when two different application functions may be called separately or call each other.  To facilitate transaction nesting <i>e</i>X<i>treme</i>DB allows a C application to call <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/start.htm">mco_trans_start()</a></code> or <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/start_ex.htm">mco_trans_start_ex()</a></code> before the current transaction is committed or aborted. The <i>e</i>X<i>treme</i>DB runtime maintains an internal counter that is incremented each time <code> <a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/start.htm">mco_trans_start()</a></code> or <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/start_ex.htm">mco_trans_start_ex()</a></code> is called, and decremented by <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/commit.htm">mco_trans_commit()</a></code> and <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/rollback.htm">mco_trans_rollback()</a></code>.  A transaction commit in an inner transaction does not perform any actions except to reduce the nested transaction counter, and the transaction context remains valid until the outer transaction performs a commit or rollback.  The runtime will not actually commit the transaction until the counter reaches zero.</p>
+                <p>If an “inner” transaction calls <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/rollback.htm">mco_trans_rollback()</a></code>, the transaction is put into an error state, and any subsequent calls to modify the database in the scope of the outer-most transaction will return immediately.  Object handles become invalid and a subsequent attempt to use them will return an error.</p>
+                <p>Outer and inner transactions will be assigned the stricter transaction type without requiring the application to upgrade the transaction type; each transaction code block should simply call <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/start.htm">mco_trans_start()</a></code> with the appropriate transaction type for the operation being performed within its own body.  Note, however, that the inner block’s <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/start.htm">mco_trans_start()</a></code> might fail in the same manner as described for <code><a href="../../../Programming/C/Core_Functions/Static/Transaction_Control/upgrade.htm">mco_trans_upgrade()</a></code> above. The following code snippet illustrates a nested transaction implementation:</p>
+                <div class="code-block"><pre>&#160;
+    /* Schema definition for class ‘BankTransaction’ */
+    class BankTransaction 
+    {
+        unsigned&lt;4&gt; from;
+        unsigned&lt;4&gt; to;
+&#160;
+        hash&lt;from&gt; hFrom[10000];
+        nonunique hash&lt;to&gt; hTo[10000];
+    };
+    &#160;
+    /* insert two BankTransaction records  */
+    int insert_two(mco_db_h db, uint4 from1, uint4 to1, uint4 from2, uint4 to2)
+    {
+        MCO_RET rc;
+        mco_trans_h t;
+        BamkTransaction  b2;
+        &#160;
+        rc = mco_trans_start(db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t);
+        if ( MCO_S_OK != rc )
+            return 0;
+&#160;
+        /* call nested transaction in insert_one() to insert first object */
+        insert_one(db, from2, to2 );
+        /* insert second object */
+        rc = BankTransaction_new(t, &amp;b2);
+        if ( MCO_S_OK != rc )
+        {
+            mco_trans_rollback(t);
+            return 0;
+        }
+&#160;
+        /* put values in first 'new' object */
+        BankTransaction_from_put(&amp;b2, from1);
+        BankTransaction_to_put(&amp;b2, to1);
+&#160;
+        /* now commit the transaction to complete the insert of the first object */
+        return mco_trans_commit(t);
+    }
+&#160;
+    /* insert one BankTransaction record within a read-write transaction */
+    MCO_RET insert_one(mco_db_h db, uint4 from, uint4 to )
+    {
+        MCO_RET rc;
+        mco_trans_h t;
+        BankTransaction b1;
+&#160;
+        rc = mco_trans_start(db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t);
+        if (rc ) return 0;
+&#160;
+        rc = BankTransaction_new(t, &amp;b1);
+        if ( MCO_S_OK != rc )
+        {
+            mco_trans_rollback(t);
+            return 0;
+        }
+        BankTransaction_from_put(&amp;b1s, from);
+        BankTransaction_to_put(&amp;b1, to);
+        return mco_trans_commit(t);
+    }
+&#160;
+    int main(int argc, char* argv[])
+    {
+        MCO_RET rc;
+        mco_db_h db;
+        ...
+        /* perform a simple nested transaction... */
+        uint4 from1 = 11, to1 = 16, from2 = 7, to2 = 17;
+        &#160;
+        rc = insert_two(db, from1, to1, from2, to2);
+        ...
+    }
+    &#160;</pre>
+                </div>
+                <p>
+                    <img src="../../../Resources/Images/note.png" /> Note that if the transaction type in module <code>insert_two()</code> had been <code>MCO_READ_ONLY</code>, the nested transaction in <code>insert_one()</code> would automatically promote the transaction type to <code>MCO_READ_WRITE</code> causing the outer transaction to complete successfully even though it would otherwise fail on the attempt to instantiate a new object (the line <code>rc = Transaction_new(t, &amp;trans) )</code> within a <code>MCO_READ_ONLY</code> transaction.</p>
+                <p>Unfortunately the C language provides no safe way of enforcing the scope of a transaction. Consequently applications can make the mistake of not closing transactions, unintentionally creating pseudo-nested transactions. Debugging unclosed transactions can be challenging. For this reason, <i>e</i>X<i>treme</i>DB can provide two additional libraries to aid developers in tracing transaction <b>start</b> and <b>close</b> calls within their source code. These libraries and methods for using them to aid debugging are available by request from <i>McObject Support</i>.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

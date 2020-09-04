@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Static API">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Active Replication Fabric API</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Active Replication Fabric API</h1>
+            <blockquote>
+                <p>The <a href="../../Users_Guides/ADR/ADR_Applications_C.htm">Active Replication Fabric Applications in C</a> page describes the general principles of <i>e</i>X<i>treme</i>DB<i> Active Replication Fabric</i> application design and implementation.</p>
+                <p>Please use the links below to view Reference Guide pages for the <i>e</i>X<i>treme</i>DB<i> Active Replication Fabric</i> API functions: </p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 206px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/init.htm">mco_iot_init</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a name="kanchor917"></a> Initialize the ARF (IoT) runtime</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2" style="text-align: center;"><b>Communicator Functions</b>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/comm_params_init.htm">mco_iot_comm_params_init</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Set the default values for the <i>communicator</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/comm_create.htm">mco_iot_comm_create</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Create a <i>communicator</i> object</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/comm_register_callback.htm">mco_iot_comm_register_callback</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Register callback functions</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/comm_unregister_callback.htm">mco_iot_comm_unregister_callback</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Delete the callback function from the specified context</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/comm_listen.htm">mco_iot_comm_listen</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Create a socket to listen on the specified IP address </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/comm_stop_listen.htm">mco_iot_comm_stop_listen</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Close the listen socket</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/comm_connect_async.htm">mco_iot_comm_connect_async</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Call <code>connect()</code> on the specified address asynchronously</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/comm_stop_connect.htm">mco_iot_comm_stop_connect</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Interrupt the asynchronous connect initiated through the <code>mco_iot_comm_connect_async()</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/comm_find_conn.htm">mco_iot_comm_find_conn</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Find a <i>connection</i> by <code>agentId</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/comm_next_conn.htm">mco_iot_comm_next_conn</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Get the next active <i>connection</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/comm_stop.htm">mco_iot_comm_stop</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Stop the <i>communicator</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/comm_destroy.htm">mco_iot_comm_destroy</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Destroy the <i>communicator</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2" style="text-align: center;font-weight: bold;">Connection handle API</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/conn_get_address.htm">mco_iot_conn_get_address</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return the <i>connection</i> address</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/conn_get_agent_id.htm">mco_iot_conn_get_agent_id</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return  the remote node <code>agentId</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/conn_get_stat.htm">mco_iot_conn_get_stat</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Receive <i>connection</i> statistics</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/conn_get_error.htm">mco_iot_conn_get_error</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Receive the last error description</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/conn_get_comm.htm">mco_iot_conn_get_comm</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return the <i>communicator</i> the current <i>connection</i> belongs to</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/conn_release.htm">mco_iot_conn_release</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Release the "pinned" <i>connection</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/conn_disconnect.htm">mco_iot_conn_disconnect</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Drop the <i>connection</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2" style="text-align: center;"><b>Replicator Functions</b>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/replicator_params_init.htm">mco_iot_replicator_params_init</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Set the default values for the <i>replicator</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/replicator_create.htm">mco_iot_replicator_create</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Create a <i>replicator</i> object</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/replicator_connect.htm">mco_iot_replicator_connect</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Call <code>connect()</code> synchronously</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/replicator_get_comm.htm">mco_iot_replicator_get_comm</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return the underlying <i>communicator</i> for the specified <i>replicator</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/replicator_get_agent_id.htm">mco_iot_replicator_get_agent_id</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return the <code>agent_id</code> of the specified node</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/replicator_get_level.htm">mco_iot_replicator_get_level</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return the level of the specified node</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/replicator_set_level.htm">mco_iot_replicator_set_level</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Changes the level of the router at runtime</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/replicator_sync.htm">mco_iot_replicator_sync</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Start the node's synchronization</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/replicator_clear.htm">mco_iot_replicator_clear</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Delete data that have been transmitted and acknowledged by the peer</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/replicator_clear_class.htm">mco_iot_replicator_clear_class</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Delete data only from the specified class that have been transmitted and acknowledged by the peer</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/replicator_enum_agents.htm">mco_iot_replicator_enum_agents</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Enumerate the active <i>connections</i> <![CDATA[ ]]></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="ADR_Functions/replicator_stop.htm">mco_iot_replicator_stop</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Stop the <i>replicator</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><a href="ADR_Functions/replicator_destroy.htm">mco_iot_replicator_destroy</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Destroy the <i>replicator</i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

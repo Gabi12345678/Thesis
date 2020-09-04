@@ -1,0 +1,15 @@
+MCO_PRJ_LIST += api-sql-10-rsql-server
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += api-sql-10-rsql-server
+PRJ_api-sql-10-rsql-server_TAGS:=sample net sql
+PRJ_api-sql-10-rsql-server_DIR:=$(call mco_project_dir)
+PRJ_api-sql-10-rsql-server_SRC:=$(call mco_project_file,main.cpp) $(MCO_SAMPLES_COMMON_DIR)/common.c $(MCO_SAMPLES_COMMON_DIR)/commonSQL.c
+PRJ_api-sql-10-rsql-server_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_api-sql-10-rsql-server_DATABASES:=rsqldb
+PRJ_api-sql-10-rsql-server_RUNTIME:=YES
+PRJ_api-sql-10-rsql-server_MEMDEV:=PRIVATE
+PRJ_api-sql-10-rsql-server_STORAGE:=TRANSIENT
+PRJ_api-sql-10-rsql-server_SYNC:=AUTO
+PRJ_api-sql-10-rsql-server_TRANSMGR:=MURSIW
+PRJ_api-sql-10-rsql-server_F_SQL:=REMOTE
+PRJ_api-sql-10-rsql-server_F_CPP:=YES

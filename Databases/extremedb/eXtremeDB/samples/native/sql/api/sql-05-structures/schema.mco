@@ -1,0 +1,48 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Rights Reserved.    *
+ *                                                               *
+ *****************************************************************/
+#define int1      signed<1>
+#define int2      signed<2>
+#define int4      signed<4>
+#define int8      signed<8>
+#define uint4   unsigned<4>
+#define uint2   unsigned<2>
+#define uint1   unsigned<1>
+
+declare database structuresdb;
+
+struct aPoint { 
+    int4 x;
+    int4 y;
+};
+
+struct aLine { 
+    aPoint begin;
+    aPoint end;
+};
+
+struct aPolygon { 
+     vector<aPoint> points;
+}; 
+
+class aRecord {
+    string s;
+    int2   i2;
+    aPoint p;
+    int1   i1;
+    int8   i8;
+    float  f;
+    double d;
+    aLine  l;
+    int1   ai1[100];
+    vector<aPolygon> vp;
+    aLine  lines[10];
+    int4   i4;
+
+    hash<i4> by_i4[1000];
+
+    list;
+    autoid[1000];
+};

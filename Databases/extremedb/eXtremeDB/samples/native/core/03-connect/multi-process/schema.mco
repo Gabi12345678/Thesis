@@ -1,0 +1,8 @@
+declare database simpledb;
+
+class A {
+    unsigned<4> ui4;
+    
+    list;
+};
+

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The api/perf Resource</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>The <code>api/perf</code> Resource</h1>
+            <blockquote>
+                <p>The <code>api/perf</code> resource reports the performance statistics described below. </p>
+                <h3>For an overview see page <a href="McoREST_Resources_Responses.htm"><i>e</i>X<i>treme</i>DB Web Service Resources</a></h3>
+                <p>In order to enable access to <i>e</i>X<i>treme</i>DB performance statistics the performance monitor must be enabled and the REST server must be started. When using <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> to start the REST server, the performance monitor is explicitly enabled in the configuration file. For example:</p>
+                <div class="code-block"><pre>    &#160;
+    database_name : xsqldb,
+    database_size : 100m, 
+    &#160;
+    perfmon : {
+        database_size : 64m
+    },
+    &#160;
+    rest : {
+        addr : 127.0.0.1,
+        port : 8083
+    }
+    &#160;</pre>
+                </div>
+                <p>Note that, for the <code>perf</code> resource, the <code>perfmon</code> section <i>must be included</i> in the <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> configuration file. (See page <a href="../../xSQL/Startup_Options/Config_File_Sections/Web_Services.htm"><span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> Web Services REST Parameters</a> for further information). </p>
+                <p>With <code>perfmon</code> enabled, and the REST&#160;server started with port 8083, the following http request will return a list of the available performance statistics:</p>
+                <div class="code-block"><pre>&#160;
+    http://localhost:8083/api/perf
+            
+    &#160;</pre>
+                </div>
+                <p>Performance statistics are of two types: <code>counters</code> and <code>timings</code>. The <code>readings</code> array displays the <code>name</code>, <code>description</code> and index number <code>no</code> for each <code>counter</code> and <code>timing</code> in the following format:</p>
+                <div class="code-block"><pre>&#160;
+    {
+
+    "databases":
+
+    [
+        {
+    
+            "name": "xsqldb",
+
+            "no": 0
+  
+        }
+    ],
+    "nodes":
+    [
+    ],
+    "readings":
+    [
+        {
+            "name": "MCO_PERF_ERROR_COUNT",
+            "description": "Error count",
+            "type": "counter",
+            "no": 0
+        },
+        ...
+        {
+            "name": "MCO_PERF_DB_CACHE_PAGES_WRITE_DELAYED",
+            "description": "",
+            "type": "counter",
+            "no": 24
+        },
+        ...
+        {
+            "name": "MCO_PERF_DISK_READ_TIME",
+            "description": "Disk read time",
+            "type": "timing",
+            "no": 100
+        },
+        ...
+        {
+            "name": "MCO_PERF_CLUSTER_NET_RECV_TIME",
+            "description": "",
+            "type": "timing",
+            "no": 107
+        }
+    ]
+
+    }
+&#160;</pre>
+                </div>
+                <p>Individual counter  values can be requested by specifying the index of the counter desired. (See the <a href="#Request">Request Parameters</a> section below for further details.)</p>
+                <h2>Counters</h2>
+                <p>The following table lists the available <code>counters</code>:</p>
+                <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 40px;" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                    <thead>
+                        <tr class="TableStyle-IndentedFunctionReference-Head-Header1">
+                            <th class="TableStyle-IndentedFunctionReference-HeadE-Column1-Header1">Index No</th>
+                            <th class="TableStyle-IndentedFunctionReference-HeadE-Column2-Header1">Name</th>
+                            <th class="TableStyle-IndentedFunctionReference-HeadD-Column1-Header1">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">0</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_ERROR_COUNT</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The error count</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">1</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_CONNECTION_COUNT</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The current number of database connections </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">2</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_CONNECTS</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The number of database connection requests </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">3</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DISCONNECTS</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The number of database disconnection requests </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">4</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_HOST_CPU_LOAD</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The CPU load </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">5</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_HOST_MEMORY</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The host memory usage </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">6</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_OPEN_TRANS_COUNT</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The number of opened transactions </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">7</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_OPEN_CURSOR_COUNT</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The number of cursors </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">8</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_LAST_SNAPSHOT_SIZE</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The size of the last saved database snapshot </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">9</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_MAX_CONNECTIONS</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The maximum number of database connections </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">10</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_TOTAL_PAGES</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The total number of memory pages </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">11</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_FREE_PAGES</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The number of free pages </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">12</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_MEMORY</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The number of used pages </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">13</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_FILE_SIZE</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The total database file size </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">14</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_LOG_FILE_SIZE</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The log file size </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">15</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_USED_FILE_SIZE</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The used database file size </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">16</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_CACHE_HIT_COUNT</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The disk cache hit count </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">17</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_CACHE_MISS_COUNT</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The disk cache miss count </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">18</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_CACHE_PAGES_ALLOCATED</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The total number of allocated cache pages </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">19</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_CACHE_PAGES_USED</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The number of cache pages used </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">20</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_CACHE_PAGES_PINNED</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The number of pinned (non-swappable) cache pages </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">21</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_CACHE_PAGES_MODIFIED</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The number of cache pages modified by active transactions </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">22</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_CACHE_PAGES_DIRTY</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The number of dirty cache pages </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">23</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DB_CACHE_PAGES_COPIED</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The number of copies of original pages </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1" style="text-align: center;">24</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column2-Body1">MCO_PERF_DB_CACHE_PAGES_WRITE_DELAYED</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyA-Column1-Body1">The number of write delayed pages </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2>Timings</h2>
+                <p>The following table lists the available <code>timings</code>:</p>
+                <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 40px;" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 399px;" />
+                    <thead>
+                        <tr class="TableStyle-IndentedFunctionReference-Head-Header1">
+                            <th class="TableStyle-IndentedFunctionReference-HeadE-Column1-Header1">Index No</th>
+                            <th class="TableStyle-IndentedFunctionReference-HeadE-Column2-Header1">Name</th>
+                            <th class="TableStyle-IndentedFunctionReference-HeadD-Column1-Header1">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">100</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DISK_READ_TIME</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The disk read time</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">101</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_DISK_WRITE_TIME</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The disk write time</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">102</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_LOG_WRITE_TIME</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The log write time</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">103</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_COMMIT_TIME</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The commit time</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">104</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_ROLLBACK_TIME_AVG</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The rollback time</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">105</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_SNAPSHOT_DURATION</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The snapshot duration</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1" style="text-align: center;">106</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column2-Body1">MCO_PERF_CLUSTER_NET_SEND_TIME</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column1-Body1">The cluster network data write time</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1" style="text-align: center;">107</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column2-Body1">MCO_PERF_CLUSTER_NET_RECV_TIME</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyA-Column1-Body1">The cluster network data read time</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2><a name="Request"></a>Request Parameters</h2>
+                <p>The <code>/api/perf/counters</code>,<code> /api/perf/timings</code> requests show <i>perf</i> <code>counter</code> and <code>timing</code> readings. These resources support the following query parameters:</p>
+                <ul>
+                    <li value="1"><code>db</code>: database number.</li>
+                    <li value="2"><code>count</code>: maximum number of readings to return.</li>
+                    <li value="3"><code>counter</code>: index of the reading to get from the arrays; all readings if not set.</li>
+                    <li value="4"><code>node</code>: node number.</li>
+                    <li value="5"><code>period</code>: amount of time to return readings for, msec.</li>
+                    <li value="6"><code>since</code>: timestamp to retrieve readings after.</li>
+                </ul>
+                <p>The <code>period</code> and <code>since</code> parameters are mutually exclusive and cannot be used together. If none of the <code>count</code>, <code>since</code> or <code>period</code> parameters are specified, only the latest <i>reading</i> is returned.</p>
+                <p>The <code>counter</code> parameter corresponds to the <code>no</code> key in the reading descriptions above. The <code>db</code> parameter corresponds to the <code>no</code> key in the database description above.</p>
+                <p>The following snippet is an example of a <code>counter</code> reading for the request <code>http://localhost:8083/api/perf/counters?db=0</code>:</p>
+                <div class="code-block"><pre>&#160;
+    {
+        "now": 1514548579967,
+        "counters":
+        [
+            {
+                "stamp": 1514548579792,
+                "db": 0,
+                "node": 0,
+                "values":
+                [
+                    0, 7, 0, 0, 0, 23, 0, 0, 0, 100, 406786, 406735, 3, 122880, 73940
+                ]
+            }
+        ]
+    }
+    &#160;</pre>
+                </div>
+                <p>The following snippet is an example of a <code>timing</code> reading for the request <code>http://localhost:8083/api/perf/timings?db=0</code>::</p>
+                <div class="code-block"><pre>&#160;
+    {
+        "now": 1514548622065,
+        "timings":
+        [
+            {
+                "stamp": 1514548621908,
+                "db": 0,
+                "node": 0,
+                "values":
+                {
+                    "current":
+                    [
+                        0, 0, 0, 0, 0, 0, 0, 0
+                    ],
+                    "min":
+                    [
+                        0, 0, 0, 0, 0, 0, 0, 0
+                    ],
+                    "max":
+                    [
+                        0, 0, 0, 0, 0, 0, 0, 0
+                    ],
+                    "avg":
+                    [
+                        0, 0, 0, 0, 0, 0, 0, 0
+                    ],
+                    "total":
+                    [
+                        0, 0, 0, 0, 0, 0, 0, 0
+                    ],
+                    "count":
+                    [
+                        0, 0, 0, 0, 0, 0, 0, 0
+                    ]
+                }
+            }
+        ]
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

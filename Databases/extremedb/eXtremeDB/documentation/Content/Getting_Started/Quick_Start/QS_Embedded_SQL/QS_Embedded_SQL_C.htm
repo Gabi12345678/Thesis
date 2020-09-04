@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Quick Start with Embedded eXtremeSQL in C</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Quick Start with Embedded <i>e</i>X<i>treme</i>SQL in C</h1>
+            <blockquote>
+                <p>The <i>e</i>X<i>treme</i>SQL C Language API allows developers to call low level C functions to initialize, open and close the SQL engine, and execute  statements directly (without the use of <a href="QS_Embedded_SQL_Cpp.htm">C++ wrapper classes</a>). Once initialized, the SQL&#160;engine is passed to function <code>mcosql_execute_statement()</code> for SQL <code>insert</code>, <code>update</code> and <code>delete</code> statements and to function <code>mcosql_execute_query()</code> for database queries. The following sections will walk through the steps for building a simple C <i>e</i>X<i>treme</i>SQL application. In addition, note that there are many <a href="../../../Programming/C/SDK_Samples/SQL_Samples.htm">C SDK samples</a> that demonstrate specific <i>e</i>X<i>treme</i>SQL features.</p>
+                <h2>Database definition</h2>
+                <p>For C applications,  the database itself is defined in an external <a href="../../../Users_Guides/Core/Schema_Definition/Schemas_C.htm">schema file</a> and  compiled by <code><a href="../../Package_Contents/mcocomp.htm">mcocomp</a></code> to produce the schema-specific database interface files that will be included in our C project. For this example application we will use a schema file <code>schema.mco</code> as follows:</p>
+                <div class="code-block"><pre><a name="kanchor382"></a>&#160;
+    declare database  persondb;
+    &#160;
+    class Person
+    {
+        string name;
+        unsigned&lt;4&gt;  ordinal;
+        &#160;
+        autoid[1000];
+        tree&lt;name&gt; pk;
+    };
+    &#160;</pre>
+                </div>
+                <p>We run <code><a href="../../Package_Contents/mcocomp.htm">mcocomp</a></code> to compile the schema specifying the <code>-sql</code> option as follows:</p>
+                <div class="code-block"><pre>&#160;
+    eXtremeDB/host/bin/mcocomp -sql schema.mco 
+&#160;</pre>
+                </div>
+                <p>This produces files <code>persondb.h</code> which we will include in our application source file <code>main.c</code>, and <code>persondb.c</code> which will be compiled and linked to our application.</p>
+                <h2>Open the database for SQL access</h2>
+                <p>To open the database for SQL access we first create an in-memory database and connect to it as with any <i>e</i>X<i>treme</i>DB application. Then we pass the database connection handle to <code>mcoapi_create_engine()</code> which initializes the SQL interface handle <code>engine</code>. (To avoid unnecessary complication of this example we will hide these details and simply call function <code>initialize_db()</code> to perform the initial database creation and connection.)</p>
+                <p>To complete this step we will call <code>mcoapi_destroy_engine()</code> to terminate the SQL database interface. The sample code for <code>main.c</code> so far looks like this:</p>
+                <div class="code-block"><pre>&#160;
+    #include "persondb.h"
+    &#160;
+    const char * db_name = "persondb";
+    #define DATABASE_SIZE 100 * 1024 * 1024
+    #define MEMORY_PAGE_SIZE 256
+    &#160;
+    int main(int argc, char* argv[])
+    {
+        MCO_RET           rc;
+        mco_db_h          db;
+        database_t        engine;
+        &#160;
+        rc = initialize_db(&amp;db, db_name, DATABASE_SIZE, MEMORY_PAGE_SIZE);
+        &#160;
+        if ( MCO_S_OK == rc ) 
+        {
+            rc = (MCO_RET)mcoapi_create_engine(db, &amp;engine);
+            
+            if ( MCO_S_OK == rc ) 
+            {
+                /* Do database processing ... */
+                &#160;
+                /* Destroy the SQL engine and disconnect from and close database */
+                rc = (MCO_RET)mcoapi_destroy_engine( engine );
+            }
+            rc = mco_db_disconnect(db);
+            rc = mco_db_close(db_name);
+        }
+    }
+&#160;</pre>
+                </div>
+                <h2>Populate and query the database</h2>
+                <p>To populate the database we execute some SQL <code>insert</code> statements by calling the <code>mcosql_execute_statement()</code>&#160;function as follows:</p>
+                <div class="code-block"><pre>        &#160;
+        rc = (MCO_RET)mcosql_execute_statement(engine, NULL, NULL, "insert into Person values('Luke Skywalker', 0)");
+        rc = (MCO_RET)mcosql_execute_statement(engine, NULL, NULL, "insert into Person values('Han Solo', 1)");
+        &#160;</pre>
+                </div>
+                <p>Then to query the database we call <code>mco_execute_query()</code> to return the <code>data_source_t</code> structure <code>result</code>:</p>
+                <div class="code-block"><pre>        &#160;
+        &#160;
+        data_source_t result = NULL;
+        &#160;
+        rc = (MCO_RET)mcosql_execute_query(engine, NULL, &amp;result, "select * from Person") );
+        &#160;</pre>
+                </div>
+                <h2>Processing query results</h2>
+                <p>The <code>data_source_t</code> structure returned from <code>mcosql_execute_query()</code> is a dataset for which there are numerous functions for extracting the result rows and information about the columns, etc. But presenting these details is beyond the scope of this quick start demonstration. Please see <a href="../../../Users_Guides/SQL/C_API/Queries.htm"><i>QueryResult</i> processing</a> for details and the <a href="../../../Programming/C/SDK_Samples/SQL_Samples.htm">SQL_C SDK samples</a> for several examples.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

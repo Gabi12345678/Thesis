@@ -1,0 +1,16 @@
+-include $(call mco_makefile_file, \
+tlogappend/makefile.project.tlogappend \
+tlogapplypartial/makefile.project.tlogapplypartial \
+tlogbasic/makefile.project.tlogbasic \
+tlogbasic_ddl/makefile.project.tlogbasic_ddl \
+tlogcheckpoint/makefile.project.tlogcheckpoint \
+tlogflush/makefile.project.tlogflush \
+tlogiterdualout/makefile.project.tlogiterdualout \
+tlogiterdynpipe/makefile.project.tlogiterdynpipe \
+tlogiterevents/makefile.project.tlogiterevents \
+tlogitermultipipe/makefile.project.tlogitermultipipe \
+tlogiterpipe/makefile.project.tlogiterpipe \
+tlogiterpipe_ddl/makefile.project.tlogiterpipe_ddl \
+tloglabels/makefile.project.tloglabels \
+tlogtruncate/makefile.project.tlogtruncate \
+)

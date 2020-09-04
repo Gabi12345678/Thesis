@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Managing Network Communications in C</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Managing Network Communications in C</h1>
+            <blockquote>
+                <p>As explained in the <a href="../Network_Communications.htm">Network Communications</a> page, <i>e</i>X<i>treme</i>DB release 7.1.1795 and later allow the IPv6 address protocol for specifying node addresses. The following section describes issues that can be important for developers porting applications that used network communications in prior versions of <i>e</i>X<i>treme</i>DB. The <a href="#Enabling">OpenSSL section</a> describes how to enable SSL security for network communications.</p>
+                <h2>IPv4 vs. IPv6 issues</h2>
+                <p> In places where network addresses are represented in the form "&lt;host&gt;:&lt;port&gt;", the IPv6 addresses must be enclosed in the square brackets, for example: "[::1]:5000" or "[fe80::21e:4fff:fe9c:5398%1]:5000". This is to avoid conflicts with ':' in the IPv6 address. In places where IP addresses are represented as <code>uint4</code>, the type was changed from <code>uint4</code> to <code>struct mco_inetaddr_t</code>. This structure is used to represent IPv4 or IPv6 addresses (e.g. in instances such as <code>SqlServer::session_info_t::peer_addr</code>).</p>
+                <p>Doing network name resolution, the <i>e</i>X<i>treme</i>DB Network Layer relies on the function <code>getaddrinfo()</code> and its settings on the target system. (The only exception to this is when turning on the dual stack on the Windows.)</p>
+                <h3>API Changes from Previous Implementation</h3>
+                <p>A full list of the C API changes from previous versions to <i>e</i>X<i>treme</i>DB release 7.1.1795 is as follows:</p>
+                <ul>
+                    <li value="1">The function <code>uint4 mco_HA_get_ip_addr(mco_channel_h chan)</code> is declared deprecated (as it returns IP as <code>uint4</code>). As a replacement, the function<code> void mco_HA_get_inet_addr(mco_channel_h chan, mco_inetaddr_t *addr)</code> was added</li>
+                    <li value="2">The types of <code>SqlServer::session_info_t::peer_addr</code> and <code>SqlServer::query_info_t::peer_addr</code> where changed from <code>uint4</code> to <code>mco_inetaddr_t</code></li>
+                    <li value="3">A new constructor for class <i>SqlServer</i> was added. It takes as a parameter the structure <code>SqlServer::OpenParameters</code>, which combines all existing parameters and adds new parameter <code>const char *netInterface</code> , which is the address of the network interface to listen on. For example: </li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>&#160;
+    "0.0.0.0" (IPv4 ADDR_ANY) 
+    &#160;</pre>
+                    </div>
+                    <p>or</p>
+                    <div class="code-block"><pre>    &#160;
+    "[::1]" (IPv6 localhost)
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <blockquote>
+                    <h3>Internal API changes (in  mconet.h):</h3>
+                    <p>New constants <code>MCO_SOCK_INETV4_DOMAIN</code> and <code>MCO_SOCK_INETV6_DOMAIN</code> were added to the enum <code>MCO_SOCK_DOMAIN</code>. These constants allow explicitly defining a socket as only IPv4 or only IPv6. The old value <code>MCO_SOCK_INET_DOMAIN</code> (which was the default) created a socket where the domain is determined by the network address (at the moment of <code>connect()</code> or <code>bind()</code>).</p>
+                    <p>The following structure was added to represent IP addresses (IPv4 and IPv6) :</p>
+                    <div class="code-block"><pre>&#160;
+    typedef struct mco_inetaddr_t_
+    {
+        union 
+        {
+            uint1 u1[16];
+            uint2 u2[8];
+            uint4 u4[4];
+        };
+        uint4 scope_id;
+    } mco_inetaddr_t;
+    &#160;</pre>
+                    </div>
+                    <p>The following new function was added:</p>
+                    <div class="code-block"><pre>&#160;
+    MCO_RET mco_net_parse_address(const char *address, char *hostname, 
+                        int hostname_len, 
+                        int *port, 
+                        const char * *endptr);
+                        &#160;</pre>
+                    </div>
+                    <p>This function allows parsing an address string in the form "&lt;host&gt;:&lt;port&gt;" (it is aware of square brackets around IPv6)</p>
+                    <p>The function parameters are as follows:</p>
+                    <blockquote>
+                        <p><code>const char *address</code> - the address string</p>
+                        <p><code>char *hostname</code> - a buffer for the &lt;host&gt; part of the address</p>
+                        <p><code>int hostname_len</code> - the size of the hostname buffer</p>
+                        <p><code>int *port</code> - the parsed port number</p>
+                        <p><code>const char * *endptr</code> - If <code>endptr</code> is not NULL, the function stores the address of the first character after the IP address in <code>*endptr</code>. (This can be used to continue parsing after loading the IP address)</p>
+                    </blockquote>
+                    <p>The following new function <code>int mco_net_ntoa(const mco_inetaddr_t *addr, char *str)</code> was added to convert an <code>mco_inetaddr_t</code> structure to a string representation. The length of the buffer pointed to by <code>str</code> must be at least <code>MCO_NET_INETADDR_STRING_LEN.</code></p>
+                    <p>The signature of the <code>mco_socket_t::connect()</code> was changed from</p>
+                    <div class="code-block"><pre>&#160;
+    int (*connect)(struct mco_socket_t *s, 
+                char const* host, 
+                int port, 
+                int max_attempts, 
+                timer_unit delay);
+                &#160;</pre>
+                    </div>
+                    <p>to</p>
+                    <div class="code-block"><pre>&#160;
+    int (*connect)(struct mco_socket_t *s, 
+                char const* host, 
+                int port, 
+                timer_unit timeout);
+                &#160;</pre>
+                    </div>
+                    <p>The signature of <code>mco_socket_t::get_peer_info()</code> was changed from</p>
+                    <div class="code-block"><pre>&#160;
+    int (*get_peer_info)(struct mco_socket_t* s, 
+                uint4 *ip, 
+                int *port);
+                &#160;</pre>
+                    </div>
+                    <p>to</p>
+                    <div class="code-block"><pre xml:space="preserve">&#160;
+    int (*get_peer_info)(struct mco_socket_t* s, 
+                mco_peer_info_t *pinfo ); 
+                &#160;</pre>
+                    </div>
+                    <p>where structure mco_peer_info_t is defined as</p>
+                    <div class="code-block"><pre xml:space="preserve">&#160;
+	typedef struct mco_peer_info_t_
+	{
+		mco_inetaddr_t ip;
+		int            port;
+		mco_size_t     rx_bytes;
+		mco_size_t     tx_bytes;
+	} mco_peer_info_t;
+	&#160;</pre>
+                    </div>
+                    <p>In addition to <code>ip</code> and <code>port</code> it contains two counters <code>rx_bytes</code> and <code>tx_bytes</code> that allow determining the number of bytes sent or received to the wire. (For compressed sockets these are the sizes of compressed data).</p>
+                    <p>Compression can be combined with SSL encryption - in this case, the data is first compressed and then encrypted.</p>
+                    <p>The "compression_level" parameter was also added to corresponding structures and API functions of all <i>e</i>X<i>treme</i>DB modules that use <code>mco_socket_t</code> (i.e. HA, Cluster, IoT, RSQL). Note that all communicating parts must use the same value for the "compression_level" parameter. </p>
+                    <blockquote>
+                        <p>
+                            <img src="../../../Resources/Images/note.png" />Note that if compression is not used (<code>compression_level</code> is set to 0), the Zlib library is not necessary</p>
+                    </blockquote>
+                    <p>The new constant <code>MCO_NET_CAP_IPV6</code> was added. The function <code>mco_net_get_capabilities()</code> returns this flag if IPv6 is supported. The new macro <code>MCO_CFG_NET_SUPPORT_IPV6</code> in file <code>mcocfg.h</code> enables IPv6 support (enabled by default).</p>
+                </blockquote>
+                <h2><a name="Enabling"></a>SSL support</h2>
+                <p>The <code>OpenSSL</code> binary libraries are loaded dynamically by the <i>e</i>X<i>treme</i>DB<a name="kanchor554"></a> runtime (by the <code>mconet</code> library). To build the <code>mconet</code> library with <code>OpenSSL</code> support, the environment variable <code>MCO_OPENSSL_INCLUDE_PATH</code> should be set to <code>OpenSSL</code> include directory, for example:</p>
+                <div class="code-block"><pre>&#160;
+    make x64=on DEBUG=on MCO_OPENSSL_INCLUDE_PATH=/home/user/OpenSSL/include host target
+    &#160;</pre>
+                </div>
+                <p>On <code>Windows</code> systems it is necessary to first install the <code>OpenSSL</code> version 1.0.2 libraries which can be downloaded from <span><a href="https://slproweb.com/products/Win32OpenSSL.html">https://slproweb.com/products/Win32OpenSSL.html</a></span>. Then define the environment variable with a command like the following:</p>
+                <div class="code-block"><pre>&#160;
+    set MCO_OPENSSL_INCLUDE_PATH=c:\OpenSSL-Win64\include
+    &#160;</pre>
+                </div>
+                <blockquote>
+                    <h3>A note on mcossl for Mac OS X</h3>
+                    <p>At the time of writing, the latest stable Mac OS X release ships with OpenSSL 0.9.8, while <code>libmcossl</code> requires OpenSSL 1.1.1. Thus, OpenSSL 1.1.1 must be retrieved and built manually by the user. The <code>MCO_OPENSSL_INCLUDE_PATH</code> environment variable must be set when building the <i>e</i>X<i>treme</i>DB libraries as described above. Moreover, the <code>DYLD_LIBRARY_PATH</code> environment variable must point to the directory containing the OpenSSL 1.1.1 libraries. Otherwise <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> (and mcossl-enabled applications) will fail to launch.</p>
+                </blockquote>
+                <h3><b style="font-style: italic;">Usage</b>
+                </h3>
+                <p>In order to use <code>OpenSSL</code> networking in an application, the user system is required to have a local <code>OpenSSL</code> installation. The <code>OpenSSL</code> headers and the libraries must be available to the compiler.</p>
+                <p>The application must initialize the <code>OpenSSL</code> subsystem by calling function <code style="color: #000000;">mco_ssl_init()</code> and perform cleanup calling function <code style="color: #000000;">mco_ssl_cleanup()</code>. Two other functions are available, <code>mco_ssl_params_init()</code> and <code>mco_ssl_load_verify_locations()</code>. The former initializes a <code><a href="../../../Programming/C/Structures/SSL_Parameters.htm">mco_ssl_params_t</a></code> structure and sets its fields to default values, while the latter allows the application to load CA (Certificate Authority) certificates from a file (using the <code>ca_file</code> parameter), or a directory (using the <code>ca_path</code> parameter). (Please refer to the  <a href="OpenSSL_Parameters.htm">OpenSSL Parameters</a> page for details on setting the values of these parameters.)</p>
+                <p>In order to enable OpenSSL communications, the application must pass SSL settings to the <i>e</i>X<i>treme</i>DB subsystems. The <i>e</i>X<i>treme</i>DB<i> High Availability</i> structure <code><a href="../../../Programming/C/Structures/HA_Parameters.htm">mco_HA_master_params_t</a></code>, the <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> structure <code>mco_clnw_tcp_params_t</code> (and the constructor of the <i>RemoteSqlEngine</i>, <i>DistributedSqlEngine</i> and <i>SqlServer</i> C++ classes) have void pointer parameter <code>ssl_params</code> that must point to a properly configured <code><a href="../../../Programming/C/Structures/SSL_Parameters.htm">mco_ssl_params_t</a></code> structure. When this pointer is set to NULL, ordinary TCP communications are used.</p>
+                <p>Care should be taken to avoid freeing the <code><a href="../../../Programming/C/Structures/SSL_Parameters.htm">mco_ssl_params_t</a></code> structure, since the <i>e</i>X<i>treme</i>DB runtime stores a pointer to it.</p>
+                <p><b style="font-style: italic;">C API functions</b>
+                </p>
+                <p>The <i>e</i>X<i>treme</i>DB OpenSSL API functions are the following:</p>
+                <div class="code-block"><pre>    &#160;
+    MCO_RET mco_ssl_init()
+    &#160;</pre>
+                </div>
+                <p>Initializes the global OpenSSL context and sets up the synchronization primitives required for multi-threaded applications.</p>
+                <div class="code-block"><pre>    &#160;
+    void mco_ssl_cleanup();
+    &#160;</pre>
+                </div>
+                <p>Frees the global OpenSSL context and synchronization primitives.</p>
+                <div class="code-block"><pre>&#160;
+    void mco_ssl_params_init(mco_ssl_params_t *params);
+&#160;</pre>
+                </div>
+                <p>Sets the <code>mco_ssl_params_t</code> structure’s default values.</p>
+                <div class="code-block"><pre>    &#160;
+    MCO_RET mco_ssl_load_verify_locations(const char *ca_file, const char *ca_path);
+    &#160;</pre>
+                </div>
+                <p>Loads the CA verification locations (see <code style="color: #000000;">SSL_CTX_load_verify_locations()</code>). Please note that the contents of the directory specified in <code>ca_path</code> should be set up using the <code>c_rehash</code> utility (see the corresponding OpenSSL manual page for details).</p>
+                <h3><b style="font-style: italic;">Quick start</b>
+                </h3>
+                <p>In order to enable OpenSSL support in your application, please follow these steps:</p>
+                <ul>
+                    <li value="1">Link your application with library <code>libmconet</code>(<code>mconet.lib</code> on Windows);</li>
+                    <li value="2">	Call <code>mco_ssl_init()</code>;</li>
+                    <li value="3">	Call <code>mco_ssl_load_verify_locations()</code> to load CA certificates, peer verification may fail otherwise. Please see the OpenSSL manual page for details;</li>
+                    <li value="4">	Allocate and initialize the <code><a href="../../../Programming/C/Structures/SSL_Parameters.htm">mco_ssl_params_t</a></code> structure. Please be careful not to deallocate the structure after passing it to the <i>e</i>X<i>treme</i>DB runtime. Set at least the following parameters:<ul style="list-style-type: circle;"><li value="1"><code>	tmp_dh</code>: many ciphers will not work without it, see the OpenSSL manual page for details and instructions on configuring it (OpenSSL includes the <code>dhparam</code> utility that can be used);</li><li value="2"><![CDATA[	]]><code>certificate</code>, or <code>certificate_file</code>;</li><li value="3"><code> private_key,</code> or <code>private_key_file</code>.</li><li value="4">	For <i>e</i>X<i>treme</i>DB<i> High Availability</i> applications, pass a pointer to the <code><a href="../../../Programming/C/Structures/SSL_Parameters.htm">mco_ssl_params_t</a></code> structure in parameter <code>ssl_params</code> of  <code><a href="../../../Programming/C/Structures/HA_Parameters.htm">mco_HA_master_params_t</a></code>;	for <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> applications, pass a pointer to the <code><a href="../../../Programming/C/Structures/SSL_Parameters.htm">mco_ssl_params_t</a></code> structure in parameter <code>ssl_params</code> of  <code><a href="../../../Programming/C/Structures/Cluster_Parameters.htm">mco_clnw_tcp_params_t</a></code>; and for <i>RemoteSQL </i>applications, pass a pointer to the <code><a href="../../../Programming/C/Structures/SSL_Parameters.htm">mco_ssl_params_t</a></code> structure in parameter <code>ssl_params</code> of the constructor for the C++ class <i>RemoteSqlEngine</i>, <i>DistributedSqlEngine</i> or <i>SqlServer</i>.</li></ul></li>
+                </ul>
+                <p>It is extremely important to note that although the default <code><a href="../../../Programming/C/Structures/SSL_Parameters.htm">mco_ssl_params_t</a></code> values are chosen to provide optimal security, a careful review and deep understanding of all settings is crucial for safe and reliable communications.</p>
+                <p>There are tutorials available on self-signed certificates generation using OpenSSL. A complicated one: <a href="https://jamielinux.com/docs/openssl-certificate-authority/create-the-root-pair.html">https://jamielinux.com/docs/openssl-certificate-authority/create-the-root-pair.html</a>. A simple one: <a href="http://datacenteroverlords.com/2012/03/01/creating-your-own-ssl-certificate-authority/">http://datacenteroverlords.com/2012/03/01/creating-your-own-ssl-certificate-authority/</a>.</p>
+                <p>&#160;</p>
+                <h2><i style="font-weight: bold;">Debugging OpenSSL</i>
+                </h2>
+                <p>Debugging OpenSSL applications can be tricky. A few approaches may be used.</p>
+                <ul>
+                    <li value="1">	to debug the client functionality, use the OpenSSL <code>s_server</code> utility to start a server and connect to it from your OpenSSL application. Pass the <code>-debug</code>, <code>-msg</code> and <code>-state</code> parameters to this utility to get a more detailed output, and look for error messages;</li>
+                    <li value="2">	alternatively, use the OpenSSL <code>s_client</code> utility to establish a connection to your OpenSSL application. Pass the <code>-debug</code>, <code>-msg</code> and <code>-state</code> parameters for more detailed output;</li>
+                    <li value="3">	as a temporary measure, one may disable peer verification by setting the <code>verify_mode</code> in <code><a href="../../../Programming/C/Structures/SSL_Parameters.htm">mco_ssl_params_t</a></code> to <code>MCO_SSL_VERIFY_NONE</code>. If the application starts working, the certificate and/or private key are probably set incorrectly, or CA certificates are not set. Don’t forget to re-enable peer verification when done.</li>
+                </ul>
+                <p>&#160;</p>
+                <h2><b style="font-style: italic;">Implementation details</b>
+                </h2>
+                <p>In order to avoid massive changes to the existing <i>e</i>X<i>treme</i>DB codebase and to allow it to be built without OpenSSL, the SSL settings (<a href="../../../Programming/C/Structures/SSL_Parameters.htm"><code>mco_ssl_params_t</code></a>) are passed to the <i>e</i>X<i>treme</i>DB<i> High Availability</i> subsystems using a void pointer.</p>
+                <p>Currently, <code>UDP SSL</code> encryption is not supported, as well as local sockets communications. Any applications data that is sent via UDP sockets (including multicast sockets) is not encrypted.</p>
+                <p>The <code>mconet</code> library creates <code>TCP</code> sockets and establishes TCP connections. Once a TCP connection is established, an <code>SSL/TLS</code> handshake is attempted, and upon its successful completion, an SSL connection is established, which is used for further communications.</p>
+                <p>Although it is not obvious from the manual, OpenSSL’s <code>SSL_read()</code> and <code>SSL_write()</code> functions must not be called simultaneously from different threads for the same socket. Thus, all read and write operations are guarded by a latch. Also see <a href="http://stackoverflow.com/questions/14467630/clarifying-openssl-0-9-8l-concurrency-support-can-ssl-instances-be-used-by-mul">http://stackoverflow.com/questions/14467630/clarifying-openssl-0-9-8l-concurrency-support-can-ssl-instances-be-used-by-mul</a></p>
+                <p>In the existing <i>e</i>X<i>treme</i>DB<i> High Availability</i> and <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> codebase, some processes use the <code>select()</code> call to wait for a non-blocking TCP socket’s connection establishment. Obviously, this will not work with SSL connections: while a TCP connection can be established asynchronously, SSL handshake on a non-blocking socket requires a series of <code>SSL_read()</code> and <code>SSL_write()</code> calls. So, when a TCP connection is established (asynchronously), the SSL handshake is done in a blocking manner.</p>
+                <p>OpenSSL requires a number of synchronization primitives to be set up in order for multi-threaded applications to work correctly. This is done in the <code>mco_ssl_init()</code> function, which must be called before any SSL operations are done. Then  <code>mco_ssl_cleanup()</code> deallocates these primitives.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

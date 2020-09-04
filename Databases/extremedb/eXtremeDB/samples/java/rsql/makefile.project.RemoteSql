@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += RemoteSql
+PRJ_TARGET_CLASS += RemoteSql
+PRJ_RemoteSql_TAGS:=sample java sql net
+PRJ_RemoteSql_DIR :=$(call mco_project_dir)
+PRJ_RemoteSql_SRC :=$(call mco_project_file,RemoteSql.java)

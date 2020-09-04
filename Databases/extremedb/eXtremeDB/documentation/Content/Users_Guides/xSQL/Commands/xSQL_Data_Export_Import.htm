@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Data Export and Import Operations</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>xSQL</i> Data Export and Import Operations</h1>
+            <blockquote>
+                <p>In addition the database <a href="../../Core/Database_Backup_Restore/Inc_Backup_Restore_xSQL.htm">backup/restore commands</a>, <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> provides commands to save and load database snapshots, class data and metadata. These operations can also be performed through built-in SQL functions.</p>
+                <h3>For an overview see page <a href="../xSQL_Commands.htm"><i>xSQL</i> Commands</a></h3>
+                <h2>Database snapshots</h2>
+                <p>To save an image of an in-memory database (transient objects) to a specified file <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> provides the following command:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;save &lt;file-path&gt;
+    &#160;</pre>
+                </div>
+                <p>Note that it might be necessary to open a persistent database created by <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> (or another embedded SQL application). In order to be able to do so, <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span><a name="kanchor885"></a> must use the exact same metadata (runtime options, page sizes, devices, database parameters and dictionary) as in the original database. (Note that applications can use the <code>mco_db_save_metadata()</code> function in the C API or equivalent methods in the C++, Java, C# or Python APIs to save the database metadata.) The metadata is saved in the <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> configuration file in the <code>JSON</code> format. To save the database metadata from <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> into a specified file:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;savemeta &lt;file-path&gt;
+    &#160;</pre>
+                </div>
+                <p>To open a database that has been saved as an image file, use the <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> option “-image &lt;filename&gt;” to load the database from a specified file. (Note that the metadata specifications for <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> must be identical to those used to save the image, whether the image file was created by <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> or any of the APIs - C/C++. Java, C# or Python). </p>
+                <p>Suppose that <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> is used to save a database snapshot and metadata as follows:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;save db.img
+    XSQL&gt;savemeta metadata.cfg
+    &#160;</pre>
+                </div>
+                <p>Consequently the metadata and database snapshot can be loaded using a command line like the following:</p>
+                <div class="code-block"><pre>&#160;
+    xsql -c metadata.cfg -image db.img
+    &#160;</pre>
+                </div>
+                <h2>Saving and Loading individual classes</h2>
+                <p>It is sometimes desirable to export/ import only data for an individual database class. The following commands are provided for this purpose:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;saveclass &lt;file-path&gt; &lt;table-name&gt;
+    XSQL&gt;loadclass &lt;file-path&gt; &lt;table-name&gt;
+    &#160;</pre>
+                </div>
+                <h2>Saving the database schema</h2>
+                <p>To save a copy of the currently loaded database schema from <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> into a specified file:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;savedict &lt;file-path&gt;
+    &#160;</pre>
+                </div>
+                <h2>Importing from external files or feeds</h2>
+                <p><i>e</i>X<i>treme</i>DB provides Feed Handlers that receive market data using industry standard frameworks and store this data in an <i>e</i>X<i>treme</i>DB database. (See the <a href="../../Server/Feed_Handler/Using_Feed_Handler.htm"><i>e</i>X<i>treme</i>DB Feed Handlers</a> page for further details.)</p>
+                <p>Often it is useful to import data from external CSV files. This can be done via the import command, which has syntax:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;import TABLE CSV-FILE [(use|skip) header] [commit N]
+    &#160;</pre>
+                </div>
+                <p>Note that the <code>header</code> line indicates the column names to be imported if use is specified, otherwise if <code>skip</code> is specified all of the table columns are expected in each line of the import data; <code>commit N</code>, if present, specifies the transaction blocking factor, the number of lines of input for each database commit. </p>
+                <p>The possible delimiter characters are defined by the string “<code>; , | \t </code>“. The first one of these characters encountered in the input stream will be used as the delimiter for the following data. For example, in the following input strings:</p>
+                <div class="code-block"><pre>&#160;
+    A;B,C;D|E - the ';' will be used as delimiter, there are three fields: 'A', 'B,C' and 'D|E'
+    &#160;
+    A,B,C;D|E - the ';' will be used as delimiter, there are three fields: 'A', 'B' and 'C;D|E'
+    &#160;
+    A|B,C;D|E - the '|' will be used as delimiter, there are three fields: 'A', 'B,C;D'  and 'E'
+    &#160;</pre>
+                </div>
+                <p>If you have purchased the <i>e</i>X<i>treme</i>DB <i>for HPC</i> you can perform a simple sample CSV import by following this <a href="../../../Getting_Started/Quick_Start/QS_xSQL_Embedded/QS_xSQL6.htm">tutorial guide</a>. <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> allows importing data from external files with various formats, including text files with fixed-length records  (eg. from historical NYSE quotes) and comma-delimited variable-length records (eg. from CME Trades).</p>
+                <p>Please view this <a href="../../SQL/SQL_Import.htm">link</a> for a detailed explanation and examples of the import operation. </p>
+                <p>&#160;</p>
+                <h2>Built-in SQL Functions</h2>
+                <p>Note that, in addition to the <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> commands described above, it is possible to call <i>e</i>X<i>treme</i>SQL <a href="../../SQL/SQL_Data_Export_Import.htm">built-in functions</a> to perform these export / import operations using SQL select statements.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

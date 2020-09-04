@@ -1,0 +1,14 @@
+MCO_PRJ_LIST += 13-xml-xml_ops
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 13-xml-xml_ops
+PRJ_13-xml-xml_ops_TAGS:=sample core xml
+PRJ_13-xml-xml_ops_DIR:=$(call mco_project_dir)
+PRJ_13-xml-xml_ops_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_13-xml-xml_ops_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_13-xml-xml_ops_DATABASES:=xmlopdb
+PRJ_13-xml-xml_ops_RUNTIME:=YES
+PRJ_13-xml-xml_ops_MEMDEV:=PRIVATE
+PRJ_13-xml-xml_ops_STORAGE:=TRANSIENT
+PRJ_13-xml-xml_ops_SYNC:=AUTO
+PRJ_13-xml-xml_ops_TRANSMGR:=MURSIW
+PRJ_13-xml-xml_ops_F_XML:=YES

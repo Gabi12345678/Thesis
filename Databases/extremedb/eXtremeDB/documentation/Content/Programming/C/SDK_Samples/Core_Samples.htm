@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|C API Samples">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>C API Core Samples</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>C API Core Samples</h1>
+            <blockquote>
+                <p>The  build procedures for the <a href="../SDK_Samples.htm">C API SDK samples</a> on all supported platforms are described in the "Getting Started" section. Note that the <code>native\core</code> directory contains some C++ sample sub-directories which can be viewed <a href="../../C++/Cpp_Samples.htm">here</a>. By default, all sample executables are built in the <code>target/bin</code> directory, so after building the sample(s) it is convenient to <code>cd</code> to <code>target/bin</code> to run the sample or run it in the development system debugger. </p>
+                <p>Please use the links below to view the description and specific instructions for individual samples in the following sub-directories:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/00-DDL.htm">00-ddl</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates use of the <i>e</i>X<i>treme</i>DB schema compiler</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/01-Rtconfig_Inmem.htm">01-rtconfig_inmem</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a name="kanchor596"></a>Displays runtime information for a simple All-In-Memory database</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/01-Rtconfig_Mixed.htm">01-rtconfig_mixed</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates a database schema with both persistent and transient classes</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/02-Open_Conv.htm">02-open_conv</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Opens a database in conventional memory</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/02-Open_Convhv.htm">02-open_convhv</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Opens a database in conventional memory and allows HTTP access</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/02-Open_Dbextend.htm">02-open_dbextend</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates extending a database in conventional memory</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/02-Open_Disk_File.htm">02-open_disk_file</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Opens a persistent database using FILE memory devices</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/02-Open_Disk_Multifile.htm">02-open_disk_multifile</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Opens a persistent database using MULTIFILE memory devices</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/02-Open_Disk_Raid.htm">02-open_disk_raid</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Opens a persistent database using a RAID memory device </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/02-Open_Hybrid.htm">02-open_hybrid</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Opens a hybrid database (having both transient and persistent classes) </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/02-Open_Nvram.htm">02-open_nvram</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates recovery of a database in non-volatile memory</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/02-Open_Security_Disk_Cipher.htm">02-open_security_disk_cipher</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Opens a database protected by a cipher key</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/02-Open_Security_Disk_CRC.htm">02-open_security_disk_crc</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Opens a database and protects its pages by CRC</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/02-Open_Shared.htm">02-open_shared</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Opens a database in shared memory</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/03-Connect_Multi-process.htm">03-connect_multi-process</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Opens and connects to a database from multiple processes</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/03-Connect_Multi-task.htm">03-connect_multi-task</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Opens and connects to a database from multiple tasks (threads)</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/03-Connect_Single-task.htm">03-connect_single-task</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Opens and connects to a database from a single task</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/04-Operations.htm">04-operations</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Performs basic database insert, read, and update operations</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/05-Indexes_Btree_Fulltext.htm">05-indexes_btree_fulltext</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates full text search operations with <span class="Param">tree</span> indexes</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/05-Indexes_Btree_Locate.htm">05-indexes_btree_locate</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the <code>_locate()</code> and <code>_compare()</code> cursor operations</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/05-Indexes_Btree_Pattern.htm">05-indexes_btree_pattern</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates basic pattern search methods</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/05-Indexes_Btree_Search.htm">05-indexes_btree_search</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates search operations with <code>tree</code> indexes</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/05-Indexes_Collate.htm">05-indexes_collate</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates custom collations for a <code>tree</code> index</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/05-Indexes_Cursor_Basic.htm">05-indexes_cursor_basic</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates basic cursor operations</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/05-Indexes_Cursor_Store.htm">05-indexes_cursor_store</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates storing a cursor shared between transactions</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/05-Indexes_Hash.htm">05-indexes_hash</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates operations on unique and non-unique <code>hash</code> indexes</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/05-Indexes_Kdtree.htm">05-indexes_kdtree</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates <code>kdtree</code> index operations</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/05-Indexes_Patricia_Binary.htm">05-indexes_patricia_binary</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates <code>patricia</code> tree match functions using a binary key (a vector of bits)</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/05-Indexes_Patricia_Character.htm">05-indexes_patricia_character</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates <code>patricia</code> match functions using a character string key</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/05-Indexes_Rtree.htm">05-indexes_rtree</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates <code>rtree</code> index operations</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/05-Indexes_Userdef.htm">05-indexes_userdef</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates user-defined compare functions for a <code>tree</code> index</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/06-Errorhandling_Errorhandler.htm">06-errorhandling_errorhandler</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates registering a fatal error handler</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/06-Errorhandling_Fatalerr.htm">06-errorhandling_fatalerr</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates triggering a user-defined error handler</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/06-Errorhandling_Fatalerrex.htm">06-errorhandling_fatalerrex</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates calling an extended error handler</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/06-Errorhandling_Nonfatalerr.htm">06-errorhandling_nonfatalerr</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates handling of non-fatal error codes</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/06-Errorhandling_Statuscode.htm">06-errorhandling_statuscode</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates handling of status codes</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/07-Transactions_Exclusive.htm">07-transactions_exclusive</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p><a name="kanchor597"></a>Demonstrates use of the exclusive transaction manager</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/07-Transactions_Isolation_Levels.htm">07-transactions_isolation_levels</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the difference in behavior using different isolation levels with the <code><a name="kanchor598"></a>MVCC</code> transaction manager</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/07-Transactions_Iterate.htm">07-transactions_iterate</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates how to iterate through committed objects within a two-phase transaction</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/07-Transactions_Mursiw.htm">07-transactions_mursiw</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the <b>MU</b>lti-<b>R</b>ead <b>SI</b>ngle-<b>W</b>rite transaction manager</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/07-Transactions_MVCC.htm">07-transactions_MVCC</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the <code>MVCC</code> transaction manager</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/07-Transactions_Nested.htm">07-transactions_nested</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates a (pseudo) nested transaction</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/07-Transactions_Ph2commit.htm">07-transactions_ph2commit</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates a two-phase commit transaction to two in-memory databases</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/07-Transactions_Ph2disk.htm">07-transactions_ph2disk</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates a two-phase commit to a disk based database</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/07-Transactions_Policy.htm">07-transactions_policy</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the difference in behavior using different transaction policies</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/07-Transactions_Transaction.htm">07-transactions_transaction</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the different <i>e</i>X<i>treme</i>DB transaction types</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/08-Benchmarks_General.htm">08-benchmarks_general</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates <i>e</i>X<i>treme</i>DB performance for basic database operations using randomized data</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/08-Benchmarks_Perf.htm">08-benchmarks_perf</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates <i>e</i>X<i>treme</i>DB performance for basic database operations using sequential data</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/08-Benchmarks_Perf_Pmon.htm">08-benchmarks_perf_pmon</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates <i>e</i>X<i>treme</i>DB performance using the   Performance Monitor API</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/08-Benchmarks_Perf_Struct.htm">08-benchmarks_perf_struct</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates performance for basic database operations using simple and <code>direct</code> structs</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/08-Benchmarks_Perf_UDA.htm" name="kanchor599">08-benchmarks_perf_UDA</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates performance for basic database operations using the Uniform Data Access API</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/09-Blobs.htm">09-blobs</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates basic BLOB operations</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/10-Events_Asynch.htm">10-events_asynch</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates asynchronous database event handling</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/10-Events_Synch.htm">10-events_synch</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates synchronous database event handling</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/12-Vectors.htm">12-vectors</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the use of vectors and vector-based indexes</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/13-XML_Export_Import.htm">13-xml_export_import</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the use of the <i>e</i>X<i>treme</i>DB XML export and import APIs</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/13-XML_XML_Ops.htm">13-xml_xml_ops</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates basic XML operations</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/13-XML_XML_Policy.htm">13-xml_xml_policy</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the use of the XML Policy API</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/13-XML_XML_Schema.htm">13-xml_xml_schema</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates use of the<code> &lt;classname&gt;_xml_schema()</code> API</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/14-TTL.htm">14-ttl</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates "Time To Live" policies</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/16-UDA_Uda_Mco.htm">16-uda_uda_mco</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates converting between UDA and native object handles</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/16-UDA_Udacoll.htm">16-uda_udacoll</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates custom collations with tree &amp; hash indexes using the UDA API</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/16-UDA_Udaevent.htm">16-uda_udaevent</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates asynchronous and synchronous database event handling using the UDA API</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/16-UDA_Udameta.htm">16-uda_udameta</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates use of the UDA Metadata API</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/16-UDA_Udaopen.htm">16-uda_udaopen</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates use of the basic UDA APIs <code>mco_uda_db_open()</code> and <code>mco_uda_db_close()</code></p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/16-UDA_Udaops.htm">16-uda_udaops</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the UDA API in a variety of database operations</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/16-UDA_Udapsearch.htm">16-uda_udapsearch</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates basic pattern search methods using the UDA API</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/16-UDA_Udaudf.htm">16-uda_udaudf</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates user-defined <span class="Param">tree</span> and <span class="Param">hash</span> indexes with the UDA API</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/17-Statistics_Dbcalc.htm">17-statistics_dbcalc</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates use of the <i>e</i>X<i>treme</i>DB database memory calculation tool (with various command line options)</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/17-Statistics_Dbcalcapi.htm">17-statistics_dbcalcapi</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates simple usage of the <i>e</i>X<i>treme</i>DB database memory calculation tool API</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/17-Statistics_Dbstat.htm">17-statistics_dbstat</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates how to obtain runtime database statistics</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/18-Backup_BSE.htm">18-backup_BSE</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the Binary Schema Evolution of a database</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/18-Backup_Db.htm">18-backup_db</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates saving an image (snapshot) of a database to disk</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/18-Backup_Disk.htm">18-backup_disk</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates recovery of a persistent database from a backup file using the <code>mco_disk_save()</code>and <code>mco_disk_load()</code> APIs  </p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/18-Backup_Disk_File.htm">18-backup_disk_file</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates recovery of a persistent database using the <code>mco_disk_save()</code>and <code>mco_disk_load_file()</code> APIs</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/18-Backup_Inmem.htm">18-backup_inmem</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates recovery of the in-memory portion of a database to disk using the <code>mco_inmem_save()</code> and <code>mco_inmem_load()</code> APIs</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/18-Backup_Migrate.htm">18-backup_migrate</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates migration of an existing disk database to a more recent <i>e</i>X<i>treme</i>DB build or to a different schema</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/18-Backup_Online.htm">18-backup_online</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates incremental backup and restore</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/19-Recovery_Diskrecovery.htm">19-recovery_diskrecovery</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates automatic recovery of a persistent database</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/19-Recovery_Sniffer.htm">19-recovery_sniffer</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates database recovery using <i>sniffer</i> to detect dead connections</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/21-Overflow_Persistent.htm">21-overflow_persistent</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the use of a memory allocation callback for a persistent storage database</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/21-Overflow_Transient.htm">21-overflow_transient</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the use of a memory allocation callback for a transient (in-memory-only) database</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/22-HTTPView.htm">22-httpview</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the database browser</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><a href="Core_Samples/23-HTTPViewpmon.htm">23-httpviewpmon</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Demonstrates the database browser using the <i>e</i>X<i>treme</i>DB performance monitor</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/24-rest_st.htm">24-rest_st</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Demonstrates the use of the <i style="font-style: normal; font-weight: normal;"><a href="../../../Users_Guides/Core/Web_Services.htm">Web Services</a> REST</i> AP in a single-threaded application</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Core_Samples/24-rest_mt.htm">24-rest_mt</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"> Demonstrates the use of the <i style="font-style: normal; font-weight: normal;"><a href="../../../Users_Guides/Core/Web_Services.htm">Web Services</a> REST</i> API with the HTTP server</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><a href="Core_Samples/25-perfmon.htm">25-perfmon</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Demonstrates the use of the <a href="../../../Users_Guides/Server/Performance_Monitor.htm">Performance Monitor</a> C API to retrieve counters from the perfmon database using <a href="../../../Users_Guides/Core/UDA.htm">UDA</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

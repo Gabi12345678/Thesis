@@ -1,3 +1,13 @@
-/home/gabi/Databases/kairosdb-h2/udf/src/main/java/master/KMeansAggregator.java
+/home/gabi/Databases/kairosdb-h2/udf/src/main/java/master/ZScore.java
+/home/gabi/Databases/kairosdb-h2/udf/src/main/java/master/ZScoreJava.java
+/home/gabi/Databases/kairosdb-h2/udf/src/main/java/master/ZScoreAggregator.java
+/home/gabi/Databases/kairosdb-h2/udf/src/main/java/cn/edu/thu/screen/entity/TimePoint.java
 /home/gabi/Databases/kairosdb-h2/udf/src/main/java/master/UdfModule.java
+/home/gabi/Databases/kairosdb-h2/udf/src/main/java/cn/edu/thu/screen/Screen.java
+/home/gabi/Databases/kairosdb-h2/udf/src/main/java/master/RecovAggregator.java
+/home/gabi/Databases/kairosdb-h2/udf/src/main/java/master/ScreenAggregator.java
+/home/gabi/Databases/kairosdb-h2/udf/src/main/java/master/CDAggregator.java
+/home/gabi/Databases/kairosdb-h2/udf/src/main/java/master/KMeansAggregator.java
 /home/gabi/Databases/kairosdb-h2/udf/src/main/java/master/NumpyDataPointGroup.java
+/home/gabi/Databases/kairosdb-h2/udf/src/main/java/cn/edu/thu/screen/entity/TimeSeries.java
+/home/gabi/Databases/kairosdb-h2/udf/src/main/java/master/HotSaxAggregator.java

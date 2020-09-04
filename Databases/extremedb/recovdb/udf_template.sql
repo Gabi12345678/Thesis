@@ -84,7 +84,7 @@ create function import_data() RETURNS string in 'python' as '
 	columns = <columns>
 	for i in range(lines):
 		line = f.readline()[:-1].split(",")
-		time = datetime.datetime.strptime(line[0], "%Y-%m-%dT%H:%M")
+		time = datetime.datetime.strptime(line[0], "%Y-%m-%dT%H:%M:%S")
 		current_line = []
 		for j in range(columns):
 			try:
@@ -121,5 +121,3 @@ SELECT udf();
 INSERT INTO metrics_udf VALUES(current_time());
 SELECT MAX(current_time) - MIN (current_time) as recovery_time FROM metrics_udf;
 
-SELECT * FROM datapoints;
-SELECT * FROM missing_values;

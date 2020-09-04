@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|Java API|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The Java Embedded Database Cluster Parameter Classes</title>
+        <link href="../../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>The Java Embedded <i>Database</i> <i>Cluster Parameter Classes</i><![CDATA[  ]]></h1>
+            <p>The classes and interfaces below define the <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> interface parameters.</p>
+            <h3>For an overview see page <a href="../../Database.htm">Java <i>Database</i> Class</a></h3>
+            <h3>Class Definitions</h3>
+            <div class="code-block"><pre>&#160;
+    public static class ClusterNodeParams
+    {
+        public String addr;
+        public int    qrank;
+&#160;
+        public ClusterNodeParams(String addr, int qrank) 
+        {
+            this.addr  = addr;
+            this.qrank = qrank;
+        };
+        &#160;
+        public ClusterNodeParams(String addr) 
+        {
+            this(addr, 1);
+        }
+    };
+    &#160;
+    public static class ClusterNodeInfo
+    {
+        public String addr;
+        public int qrank;
+        public int nodeId;
+&#160;
+        public ClusterNodeInfo(String addr, int qrank, int nodeId) 
+        {
+            this.addr = addr;
+            this.qrank = qrank;
+            this.nodeId = nodeId;
+        }
+    }
+    &#160;
+    public static class ClusterWindow
+    {
+        public int                  length; /* in transactions */
+        public int                  bsize;  /* in bytes */
+        public int                  timeout;
+&#160;
+        public ClusterWindow(int length, int bsize, int timeout) 
+        {
+            this.length  = length;
+            this.bsize   = bsize;
+            this.timeout = timeout;
+        };
+        &#160;
+        public ClusterWindow(int length) 
+        {
+            this(length, 0, 1);
+        };
+    }
+    &#160;
+    public abstract static class ClusterNWParams { };
+    &#160;
+    public static class ClusterTCPParams extends ClusterNWParams
+    {
+        public int                   socketSendBuf;
+        public int                   socketRecvBuf;
+        public int                   connectTimeout;
+        public int                   connectInterval;
+        public int                   socketDomain;
+        public int                   keepAliveTime;
+        public int                   keepAliveProbes;
+        public int                   compressionLevel;
+        public Database.SSLParameters sslParameters;
+&#160;
+        public ClusterTCPParams() 
+        {
+            socketSendBuf   = 0;
+            socketRecvBuf   = 0;
+            connectTimeout  = 5 * 1000;
+            connectInterval = 200;
+            socketDomain    = SOCK_INET_DOMAIN;
+            keepAliveTime   = 1000;
+            keepAliveProbes = 10;
+            compressionLevel = 0;
+            sslParameters = null;
+        }
+    }
+    &#160;
+    public static class ClusterMPIParams extends ClusterNWParams
+    {
+        public int flags;
+        &#160;
+        public ClusterMPIParams() 
+        {
+            flags = 0;
+        }
+    }
+    &#160;
+    public interface ClusterQuorumCallback 
+    {
+        public boolean checkQuorum(int neighborIds[]);
+    }
+    &#160;
+    public interface ClusterNotifying 
+    {
+        public static final int NODE_CONNECT    = 0;
+        public static final int NODE_DISCONNECT = 1;
+        public void onNotify(int code, ClusterNodeInfo nodeInfo);
+    }
+    &#160;</pre>
+            </div>
+            <h3>  Definitions:</h3>
+            <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                <col class="TableStyle-FunctionReference-Column-Column2" style="width: 89px;" />
+                <col class="TableStyle-FunctionReference-Column-Column2" style="width: 511px;" />
+                <tbody>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2"><span style="font-size: 11pt; font-weight: bold;">ClusterNodeParams and ClusterNodeInfo </span>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>addr</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The IP address of this cluster node</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>qrank</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The Quorum rank of this cluster node</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>nodeId</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The integer identifier of this cluster node</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2"><span style="font-size: 11pt; font-weight: bold;">ClusterWindow</span>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>length </code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The number of in transactions in each window instance</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>bsize</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The window size in bytes </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>timeout</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The window timeout in milliseconds </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2"><span style="font-size: 11pt; font-weight: bold;">ClusterTCPParams </span>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>socketSendBuf </code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The send buffer size in bytes</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>socketRecvBuf </code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The receive buffer size in bytes</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>connectTimeout </code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The connection timeout period in milliseconds</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>connectInterval </code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The interval between connection attempts in milliseconds</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>socketDomain </code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">&#160;</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>keepAliveTime</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The time window for the KEEP_ALIVE message</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>keepAliveProbes </code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The number of keep-alive probes to send before the node disconnects</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>sslParameters </code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The Cluster-specific <a href="../SSL_Parameters.htm">SSL settings</a></td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2"><span style="font-size: 11pt; font-weight: bold;">ClusterMPIParams </span>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>flags </code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Possible combination of <code>CLUSTER_MPI_BUSYWAIT</code> and/or <code>CLUSTER_MPI_SERIALIZED_SEND</code></td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2"><span style="font-size: 11pt; font-weight: bold;">Cluster Callbacks</span>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>ClusterQuorumCallback </code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The callback function to be called when a Cluster Quorum is not reached</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><code>ClusterNotifying </code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">The callback function to receive Cluster notifications</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

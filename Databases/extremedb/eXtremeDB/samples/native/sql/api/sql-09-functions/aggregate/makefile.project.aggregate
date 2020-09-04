@@ -1,0 +1,6 @@
+MCO_PRJ_LIST += api-sql-09-functions-aggregate
+PRJ_TARGET_LIBRARY_DPTR_DYNAMIC += api-sql-09-functions-aggregate
+PRJ_TARGET_LIBRARY_OFFS_DYNAMIC += api-sql-09-functions-aggregate
+PRJ_api-sql-09-functions-aggregate_TAGS:=sample sql xsql
+PRJ_api-sql-09-functions-aggregate_DIR :=$(call mco_project_dir)
+PRJ_api-sql-09-functions-aggregate_SRC :=$(call mco_project_file,udf.cpp)

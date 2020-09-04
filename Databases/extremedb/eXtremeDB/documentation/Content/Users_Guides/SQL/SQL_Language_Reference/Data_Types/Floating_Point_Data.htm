@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeSQL Floating-Point Data</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>SQL Floating-Point Data</h1>
+            <blockquote>
+                <p><i>e</i>X<i>treme</i>SQL provides the SQL data types <code>FLOAT</code>, <code>REAL</code>, <code>DOUBLE</code>, <code>NUMERIC</code> and <code>DECIMAL</code> to manage floating-point values.</p>
+                <h3>For an overview see page <a href="../Data_Types.htm">SQL Data Types</a></h3>
+                <p>The table in page <a href="../Data_Types.htm">SQL Data Types</a> shows the correspondence between these SQL types and their underlying <i>e</i>X<i>treme</i>DB storage types as well as the ranges of values possible for each. As can be seen in this table, <code>REAL</code> and <code>DOUBLE</code> are synonymous, as are <code>NUMERIC</code> and <code>DECIMAL</code>. Note that <code>NUMERIC</code> fields should be declared with the appropriate <code>precision</code> and <code>width</code> for the values they will contain. </p>
+                <p>
+                    <img src="../../../../Resources/Images/note.png" /> Note that <code>NUMERIC</code> fields are implemented internally as integers. As explained in page <a href="../../../../Programming/C/DDL/Base_Data_Types.htm">Base Data Types</a>, the actual storage space occupied is determined by the specified <code>width</code>. The <i>Metatable</i> column <code>FieldSize</code> displays the storage space occupied and the <code>Precision</code> displays the number of digits to the right of the decimal point; however, the <code>Width</code> reported in <i>Metatable</i> queries (<code>-1</code>) for floating-point fields is not relevant.</p>
+                <p>&#160;</p>
+                <p>The following statements demonstrate some floating-point declarations, their storage and precision:</p>
+                <div class="code-block"><pre>    &#160;
+    create table t( f float, d double, r real, n numeric, 
+            dec decimal, n62 numeric(6,2));
+    &#160;
+    select FieldName, FieldTypeName, FieldSize, Precision, Width from Metatable 
+    where TableName = 't';
+    FieldName       FieldTypeName   FieldSize       Precision       Width
+    ------------------------------------------------------------------------------
+    f       Real4   4       -1      -1
+    d       Real8   8       -1      -1
+    r       Real8   8       -1      -1
+    n Numeric 8       0       -1
+    dec     Numeric 8       0       -1
+    n62     Numeric 4       2       -1
+&#160;</pre>
+                </div>
+                <p>The highlighted fields show that <code>REAL</code> and <code>DOUBLE</code> declarations are equivalent, as are <code>NUMERIC</code> and <code>DECIMAL</code>. Note that the <code>Precision</code> for <code>FLOAT</code>, <code>DOUBLE</code> and <code>REAL</code> fields is undefined (<code>-1</code>), and, unless explicitly specified in their declaration, the same applies to <code>NUMERIC</code> and <code>DECIMAL</code> fields. Thus, values stored in these fields can be of any precision that will fit the <code>FieldSize</code>. However, if <code>width</code> and <code>precision</code> are declared for <code>NUMERIC</code>&#160;fields, the values stored will be rounded to the specified <code>precision</code>. Note that, if the <code>width</code> specified in the <code>NUMERIC</code> declaration is too small for the values inserted into the field, <i>unpredictable values can result</i>.</p>
+                <h2>Floating-Point Type Conversion</h2>
+                <p>As explained in page <a href="../Data_Type_Conversion.htm">Data Type Conversion</a>, when floating-point fields are used in expressions, the value of the field will be converted to a <code>Real8</code> or <code>Numeric</code> to successfully perform statements. Also, when performing <code>insert</code> or <code>update</code> operations, <i>e</i>X<i>treme</i>SQL may coerce values  to the appropriate type which can lead to loss of precision. For example:</p>
+                <div class="code-block"><pre>    &#160;
+    create table n( i1 int(1));
+    insert into n(i1) values(16.78);
+    insert into n(i1) values(3.141);
+    &#160;
+    select i1 from n;
+    i1
+    --------------------------------------
+    17
+            
+    3
+            
+    &#160;</pre>
+                </div>
+                <p>Note that the float values <code>16.78</code> and <code>3.141</code> are first rounded to the nearest integer value before inserting into the <code>integer(1)</code> field <code>i1</code> with the consequent loss of precision.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

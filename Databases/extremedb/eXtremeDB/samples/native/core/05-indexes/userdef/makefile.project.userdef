@@ -1,0 +1,13 @@
+MCO_PRJ_LIST += 05-indexes-userdef
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 05-indexes-userdef
+PRJ_05-indexes-userdef_TAGS:=sample core
+PRJ_05-indexes-userdef_DIR:=$(call mco_project_dir)
+PRJ_05-indexes-userdef_SRC:=$(call mco_project_file,main.c udfdb_udf_cstm.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_05-indexes-userdef_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_05-indexes-userdef_DATABASES:=udfdb
+PRJ_05-indexes-userdef_RUNTIME:=YES
+PRJ_05-indexes-userdef_MEMDEV:=PRIVATE
+PRJ_05-indexes-userdef_STORAGE:=TRANSIENT
+PRJ_05-indexes-userdef_SYNC:=AUTO
+PRJ_05-indexes-userdef_TRANSMGR:=MURSIW

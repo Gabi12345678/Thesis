@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|High Availability User's Guide">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>HA Implementation Details</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>HA&#160;Implementation Details</h1>
+            <blockquote>
+                <h2>Synchronous vs. Asynchronous Replication</h2>
+                <p><i>e</i>X<i>treme</i>DB<i> High Availability</i> allows both <a href="HA_Synchronous_Replication.htm">Synchronous</a> and <a href="HA_Asynchronous_Replication.htm">Asynchronous</a> replication between master and replica applications. Because synchronous replication requires a successful transaction commit and <code>ACK</code> response from the replica application, the overall transaction rate is mostly defined by network round-trip delay time (RTT). For this reason it may be preferable for some applications to use asynchronous replication. </p>
+                <p>Asynchronous replication uses a buffer for passing processing transactions at a time; where the master puts transaction data to this buffer and  a separate application thread sends the buffer to replicas (e.g. with C API <code><a href="../../Programming/C/HA_Functions/async_send_data_to_replicas.htm">mco_HA_async_send_data_to_replicas()</a></code>) . In the asynchronous mode, a replica does not confirm the transactions at all. Asynchronous replication is very fast, because it doesn't depend on the network latency (Round Trip Time), only on the bandwidth. But the replica will lag behind the master, because some transactions are committed on the master but not yet sent to the replica. So the maximum lag is defined by the size of the asynchronous buffer.</p>
+                <h3>Transaction Window</h3>
+                <p>A <i>transaction window</i> can be specified for synchronous replication (e.g. using C APIs <code><a href="../../Programming/C/HA_Functions/set_trans_window_size.htm">mco_HA_set_trans_window_size()</a></code> and <code><a href="../../Programming/C/HA_Functions/commit_window.htm">mco_HA_commit_window()</a></code>). The transaction window is a kind of сompromise between synchronous and asynchronous replication. If the size of the window is N, the replica sends an <code>ACK</code> for each N-th transaction. In this case, the RTT becomes less restrictive, but the replica can lag behind the master up to N transactions. (Note that the transaction window has no effect when using asynchronous replication; the asynchronous buffer is a separate memory device allocated by the application and its size is specified to optimize transaction throughput.)</p>
+                <h2>Mixing Synchronous and Asynchronous Replication</h2>
+                <p>A single master application can implement synchronous replication with one or more replicas, and asynchronous replication with other replicas.</p>
+                <p>When the flag <code>MCO_HAMODE_FORCE_SYNC</code> is set, it turns on synchronous replication for a given replica. Typically the flag is set as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    mco_HA_replica_params_t replica_p;
+    ...
+    mco_HA_replica_params_init(&amp;replica_p);
+    ...
+    replica_p.mode_flags = MCO_HAMODE_REPLICA_NOTIFICATION | MCO_HAMODE_FORCE_SYNC;
+    &#160;</pre>
+                </div>
+                <p>Note that if the master is run in synchronous mode, the setting has no effect. (See sample <code><a href="../../Programming/C/SDK_Samples/HA/Asynch.htm">haasync</a></code> component <code><a href="../../Programming/C/SDK_Samples/HA/Asynch.htm"><code>rplsync</code></a></code> for implementation details.)</p>
+                <h2>Replication with a Persistent Database</h2>
+                <p><a name="kanchor725"></a>It may be desirable for a replica to store data in a persistent database. In this case there are performance issues to be considered as the write processes on the replica will block the master if synchronous replication is used. To tune performance the transaction commit policy and timeout parameters on the replica must be adjusted according to application requirements. (For details on the transaction commit policies see the <a href="../Core/Persistent_Databases/Persistent_Database_IO.htm">Persistent Database I/O</a> page.)</p>
+                <p>If the <code>MCO_COMMIT_DELAYED</code> policy is used, the transactions are not written to disk upon the <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/commit.htm">mco_trans_commit()</a></code> call. The data is written to disk only if one of the thresholds is reached. The thresholds are:</p>
+                <blockquote>
+                    <p><code>log_params.delayed_commit_threshold</code> - size of uncommitted data (unwritten to disk)</p>
+                    <p><code>log_params.max_delayed_transactions</code> - the number of unwritten transactions</p>
+                    <p><code>log_params.max_commit_delay</code> – the maximum delay between <code>commit()</code> and writing to disk (in milliseconds)</p>
+                </blockquote>
+                <p>For example, with the following parameter values:</p>
+                <div class="code-block"><pre>    &#160;
+    db_params.log_params.delayed_commit_threshold = 64*1024;
+    db_params.log_params.max_delayed_transactions = 10;
+    db_params.log_params.max_commit_delay = 1000;
+    &#160;</pre>
+                </div>
+                <p>the data will be written to disk if any of the thresholds is reached - every 1 second, or every 10 transactions, or every <code>64K</code> of changed data - whichever comes sooner. </p>
+                <p>Note that these thresholds are checked only in the <a href="../../Programming/C/Core_Functions/Static/Transaction_Control/commit.htm"><code>mco_trans_commit()</code></a> call. For example, if you set <code>max_commit_delay</code> to 1000 (1 second) and perform a single small transaction, the data will not be written to disk until the next <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/commit.htm">mco_trans_commit()</a></code> even if it occurs after a long time (say, 10 seconds). Thus, if you insert 1000 objects, if the total size of the data (changed pages) doesn't exceed the <code>delayed_commit_threshold</code>  then the changes are not written to disk.</p>
+                <p>The only way to cause data to be written to disk on each transaction commit is to use the <code>MCO_COMMIT_SYNC_FLUSH</code> policy. This is the most “durable” transaction commit policy. However, not that when using <code>MCO_COMMIT_SYNC_FLUSH</code> (with synchronous replication)  the <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/commit.htm">mco_trans_commit()</a></code> on the master returns only after the data was written to the replica's persistent media. This can be very slow, so in this case it is advisable to use as long transactions as possible (eg. insert 1000 objects in one transaction, not in 1000 small transactions). (Note that if the master database is on persistent media, the application can  call to <code><a href="../../Programming/C/Core_Functions/Static/Disk_Manager/flush.htm">mco_disk_flush()</a></code> to flush all changes made by committed transactions. But there is currently no way to force the replica database to be flushed to disk.)</p>
+                <p>It is possible to use asynchronous replication with the <code>MCO_COMMIT_SYNC_FLUSH</code> policy on the replica to avoid blocking the master. But note that in asynchronous mode the transaction data is not sent to replica immediately. Instead the data is placed in the async buffer and is sent to the replica after the <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/commit.htm">mco_trans_commit()</a></code> finishes. If the replica spends a lot of time committing (and the size of the data in the master's async buffer can be significant), then if the master dies for some reason, this data will be lost.</p>
+                <h2>Multiple Communication Channels</h2>
+                <p>High Availability applications can communicate on more than one channel. The functions  <code><a href="../../Programming/C/HA_Functions/attach_master.htm">mco_HA_attach_master()</a></code> and <code><a href="../../Programming/C/HA_Functions/attach_replica.htm">mco_HA_attach_replica()</a></code> choose the channel implementation based on connection string content. The connection string is passed to the first registered channel. If the channel implementation recognizes the string (i.e. the string has the right format for the channel implementation), it will be used. Otherwise the string is passed to the next implementation, etc., Each channel has its own unique prefix that identifies the string for the channel (the standard channels have <code>tcp</code>, <code>udp</code> and <code>pipe</code> prefixes). When the prefix is present in the connection string, the string parsing is suspended and the appropriate channel is used.</p>
+                <p>For example:</p>
+                <p style="text-indent: 0.5in;">1.	<code>:tcp:20000</code> - master side, TCP channel, listen port – 20000</p>
+                <p style="text-indent: 0.5in;">2.	<code>:udp:127.0.0.1:30000</code> - replica or master, UDP channel, host - 127.0.0.1, port - 30000</p>
+            </blockquote>
+            <blockquote>
+                <p>Each communication channel must be registered in the master and replica by calling <code style="color: #000000;">mco_HA_channel_implementation_add()</code>after <code><a href="../../Programming/C/HA_Functions/start.htm">mco_HA_start()</a></code> and prior to any other HA function call. For example:</p>
+                <div class="code-block"><pre>    &#160;
+    mco_HA_start();
+    …
+    mco_HA_channel_implementation_add( mco_nw_tcpip_vt() );
+    mco_HA_channel_implementation_add( mco_nw_udpip_vt() );
+    mco_HA_channel_implementation_add( mco_nw_pipe_vt() );
+    &#160;</pre>
+                </div>
+                <p>And the master must create listener threads (the thread that calls <code><a href="../../Programming/C/HA_Functions/attach_replica.htm">mco_HA_attach_replica()</a></code>) for each registered channel implementation. These listener threads differ only in the connection string that is passed to <code><a href="../../Programming/C/HA_Functions/attach_replica.htm">mco_HA_attach_replica()</a></code>.</p>
+                <p>(See sample <code><a href="../../Programming/C/SDK_Samples/HA/Multichan.htm">hamultichan</a></code> for implementation details.)</p>
+                <h2>Replica taking over as Master</h2>
+                <p>In most mission critical HA applications a replica should be able to take over for a failed master.  In this case the master and replica will be copies of the same application, aware that they are operating as master or replica, with the replica able to switch roles if necessary.</p>
+                <p>The essential feature of this type of application is the implementation of code to detect if the master is running, and if so connect to it and run in replica mode.  Otherwise, the master node has failed for some reason and the application must take over as master.</p>
+                <p>The following example code illustrates how a C/C++ application might implement a switch-over from replica to master:</p>
+                <div class="code-block"><pre>    &#160;
+    for (i = 0; i &lt; max_retries; ++i) 
+    {
+        printf("Try to attach master...");
+        master_mode = 0;
+        ReplicaParams.mode_flags = MCO_HAMODE_REPLICA_NOTIFICATION;
+        rc = mco_HA_attach_master(&amp;attach_p.db, &amp;ReplicaParams);
+    &#160;
+        if (rc != MCO_S_OK) 
+        {
+            printf("attempt #%d failed (rc=%d)\n", i + 1, rc);
+            sample_sleep(500);
+        } 
+        else
+         {
+            break;
+        }
+    }
+    &#160;
+    /* switch to MASTER mode */
+    /******* setup HA instance *********/
+    master_mode = 1;
+    stop_flag = exit_flag;
+    init_db = (attach_p.db == 0);
+    if (init_db) /* attach_master not detect "old" master */
+    { 
+    &#160;
+        /* create the master database */
+        printf("Create database for the first time\n");
+        rc = sample_open_database( db_name, switchdb_get_dictionary(),
+                        DATABASE_SIZE, CACHE_SIZE,
+                        MEMORY_PAGE_SIZE, PSTORAGE_PAGE_SIZE, 5,
+                        &amp;attach_p.memory);
+    &#160;
+        if (rc != MCO_S_OK) 
+        {
+            printf("Can't open database, error %d\n", rc);
+            return 1;
+        }
+    &#160;
+        /* connect to the database, obtain a database handle */
+        rc = mco_db_connect(db_name, &amp;attach_p.db);
+    &#160;
+        if (rc != MCO_S_OK) 
+        {
+            printf("Can't connect to database, error %d\n", rc);
+            return 1;
+        }
+    }
+    &#160;
+    MasterParams.mode_flags = MCO_MASTER_MODE;
+    mco_HA_set_master_params(attach_p.db, &amp;MasterParams); // set MASTER mode
+    &#160;
+    sample_start_connected_task(&amp;listen_task, ListenToReplicas, db_name,
+                        &amp;ha ); /* start the ListenToReplicas thread*/
+                        &#160;
+    sample_start_connected_task(&amp;master_task, Master, db_name, (void*)
+                        init_db); /* start the Master thread*/
+                        &#160;
+    sample_join_task (&amp;listen_task);
+    sample_join_task (&amp;master_task);
+    &#160;
+    /****************** master clean up *****************/
+    mco_HA_stop(attach_p.db); /* detach all replicas */
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>Similarly, the following example code illustrates how a Java application might implement a switch-over from replica to master:</p>
+                <div class="code-block"><pre>    &#160;
+    HASwitch() throws Exception
+    {
+        …
+        // prepare replica parameters
+        ReplicaConnection rpl_con = new ReplicaConnection(db);
+        ReplicaConnection.Parameters replParams = new
+        ReplicaConnection.Parameters();
+        &#160;
+        // attach to master. Analog of mco_nw_attach_master
+        try
+         {
+            System.out.println("Try to connect master...");
+            if (!rpl_con.attachMaster("localhost:" + PORT, replParams,
+                            CONNECT_TIMEOUT))
+            {
+                System.err.println("Failed to connect to master : timeout");
+            }
+        } 
+        catch (DatabaseError de)
+         {
+            System.err.println("Failed to connect to master : error " +
+                            de.errorCode);
+        }
+            &#160;
+        //stop &amp; wait working thread
+        running = false;
+        inspectThread.join();
+        System.out.println("Replica is terminated, switch to MASTER mode");
+        rpl_con.disconnect();
+        &#160;
+        /************* Master mode **************/
+        MasterConnection mst_con = new MasterConnection(db);
+        MasterConnection.Parameters mst_params = new
+        MasterConnection.Parameters( MasterConnection.MCO_HAMODE_ASYNCH );
+        mst_params.maxReplicas = MAX_REPLICAS;
+        mst_params.asyncBuf = new
+        Database.PrivateMemoryDevice( Database.Device.Kind.AsyncBuffer,
+                        ASUNC_BUF_SIZE );
+        mst_con.setReplicationMode(mst_params);
+        listening = true;
+        &#160;
+        // start listen and async. commit threads
+        Thread listenThread = new Thread( new Runnable() {
+                            public void run() {
+                                listen(); } } );
+                                &#160;
+        Thread replicateThread = new Thread( new Runnable() {
+                            public void run() {
+                                replicate(); } });
+                                &#160;
+        listenThread.start();
+        replicateThread.start();
+        //////////////////////////////////////////////////////
+        // Insert some data in the database if needed
+        //////////////////////////////////////////////////////
+        mst_con.startTransaction(Database.TransactionType.ReadWrite);
+        …
+        mst_con.commitTransaction();
+    &#160;
+        // stop &amp; wait threads
+        listening = false;
+        listenThread.join();
+        mst_con.stopReplication();
+        replicateThread.join();
+    &#160;
+        mst_con.disconnect();
+        db.close();
+        System.out.println("Master completes it work");
+    }
+    &#160;</pre>
+                </div>
+                <h2>High Availability for Distributed Databases</h2>
+                <p>Replication forms the foundation of high availability in a <code>sharded</code> <i>e</i>X<i>treme</i>DB database. Sharding is supported though <i>e</i>X<i>treme</i>SQL SQL by the <i>DistributedSqlEngine</i>. Each shard consists of an HA master and a certain number of HA replicas. (Please refer to the <a href="../SQL_Users_Guide.htm"><i>e</i>X<i>treme</i>SQL User Guide</a> for further details.)</p>
+                <h2>Partial Replication</h2>
+                <p>It may be desirable for an HA application to replicate a part but not all of the objects in a database. For this purpose, the keyword <code>local</code> in a C/C++ application schema indicates what classes are subject to the partial replication. Local class objects from  the master database don't get replicated to replica nodes; and the content of <code>local</code> class objects from the replica database does not get written into the database when it's  received from the master. <code>Local</code> classes on the master and replicas can be different and it is not necessary to turn on binary evolution to enforce the partial replication.</p>
+                <h3>C/C++ APIs</h3>
+                <p>The function <a href="../../Programming/C/HA_Functions/enable_filter.htm"><code>mco_HA_enable_filter(mco_db_h db, mco_bool enabled)</code></a><a name="kanchor726"></a> turns on and off filtering at runtime. It should be called after <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/connect.htm">mco_db_connect()</a></code> but before calling <code><a href="../../Programming/C/HA_Functions/attach_replica.htm">mco_HA_attach_replica()</a></code> or <code><a href="../../Programming/C/HA_Functions/attach_master.htm">mco_HA_attach_master()</a></code>. If local tables are defined, the filtering is on by default. Consequently <a href="../../Programming/C/HA_Functions/enable_filter.htm"><code>mco_HA_enable_filter(db, MCO_NO);</code></a> turns filtering off – effectively ignoring any local class definitions in the schema. If the schema does not define <code>local</code> tables, the function has no effect.</p>
+                <p>(See sample <code><a href="../../Programming/C/SDK_Samples/HA/Filter.htm">samples/native/ha/hafilter</a></code> for a C/C++ example of partial replication.)</p>
+                <h3>Java and C#</h3>
+                <p>With the <a href="../../Programming/Csharp/Csharp_Schema_Definition.htm">C#</a> and <a href="../../Programming/Java/Java_Schema_Definition.htm">Java</a> APIs <code>local</code> classes are specified using the attribute <code>local</code> and at runtime partial replication can be turned on/off by calling  the <code>enableFilter()</code> method of either the <i>MasterConnection</i> or <i>ReplicaConnection</i>:</p>
+                <div class="code-block"><pre>&#160;
+    MasterConnection::enableFilter(boolean enabled);
+    ReplicaConnection::enableFilter(boolean enabled);
+    &#160;</pre>
+                </div>
+                <h3>Python</h3>
+                <p>The Python wrapper supports partial replication by declaring a class as <code>local</code> in the schema definition, as for C/C++ applications, then calling the <code>load_dictionary()</code> method. For example:</p>
+                <div class="code-block"><pre>&#160;
+    schema = '''
+        #define uint4     unsigned&lt;4&gt;
+        #define uint4   unsigned&lt;4&gt;
+    &#160;
+        declare database filtermstdb;
+        declare auto_oid [2000];
+    &#160;
+        class T1
+        {
+            uint4 key;
+            unique tree&lt;key&gt; tkey;
+        };
+        class T2
+        {
+            uint4 key;
+            unique tree&lt;key&gt; tkey;
+        };
+        class T3
+        {
+            uint4 key;
+            unique tree&lt;key&gt; tkey;
+        };
+        local class T4
+        {
+            uint4 key;
+            unique tree&lt;key&gt; tkey;
+        };
+    '''
+     dict = exdb.load_dictionary(schema)
+    &#160;</pre>
+                </div>
+                <p>Also, as with the Java and C# APIs, at runtime partial replication can be turned on/off by calling  the <code>enableFilter()</code> method of either the <i>MasterConnection</i> or <i>ReplicaConnection</i>:</p>
+                <div class="code-block"><pre>&#160;
+    MasterConnection::enableFilter(boolean enabled);
+    ReplicaConnection::enableFilter(boolean enabled);
+    &#160;</pre>
+                </div>
+                <h2>Setting the Quorum</h2>
+                <p>Under some circumstances it is necessary for the master to perform updates in the database only if some minimal number of replicas (<code>quorum</code>) is connected. If the number of active replicas is less than the <code>quorum</code>, the <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/start.htm">mco_trans_start()</a></code> or <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/commit.htm">mco_trans_commit()</a></code> will return error code <code><a href="../../Programming/C/Return Codes/HA_Error_Codes.htm"><code>MCO_E_HA_NO_QUORUM</code></a></code>. This minimal number of replicas can be set via the <code><a href="../../Programming/C/Structures/HA_Parameters.htm">mco_HA_master_params::quorum</a></code> parameter (the default value is 0).</p>
+                <p>In some cases (e.g. if the network goes down during the commit) it is not possible to determine if the last transaction was received by the replica or not. In this case the <code>commit()</code> applies changes to master's database and returns status code <code><a href="../../Programming/C/Return Codes/HA_Error_Codes.htm">MCO_S_HA_REPLICA_DETACH</a></code>. This code means that if application switches to the replica, this transaction can be missed. (Note that <code><a href="../../Programming/C/Return Codes/HA_Error_Codes.htm">MCO_S_HA_REPLICA_DETACH</a></code> is only possible if <code><a href="../../Programming/C/Structures/HA_Parameters.htm">mco_HA_master_params::quorum</a></code> is greater than 0.)</p>
+                <p>The master parameter <code><a href="../../Programming/C/Structures/HA_Parameters.htm">mco_HA_master_params::quorum</a></code>  sets the initial value of the HA quorum, and the <code><a href="../../Programming/C/HA_Functions/set_quorum.htm">mco_HA_set_quorum()</a></code> C API, or the equivalent Java <code><a href="../../Programming/Java/Classes/HA_Classes/MasterConnection/setQuorum.htm">setQuorum()</a></code>, C# <code><a href="../../Programming/Csharp/HA/SetQuorum.htm">SetQuorum()</a></code> or Python <code><a href="../../Programming/Python/Classes/MasterConnection.htm">setQuorum()</a></code> API, is used to change the HA quorum at runtime. The default quorum value is 0, which means that any number of active replicas is acceptable (including 0). </p>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that a quorum value greater than 0 is allowed only for synchronous replication mode (i.e. flag <code>MCO_HAMODE_ASYNCH</code> is not set) and if transaction window size is 1 (see <code><a href="../../Programming/C/HA_Functions/set_trans_window_size.htm">mco_HA_set_trans_window_size()</a></code>).</p>
+                <h2>Extending Database memory</h2>
+                <p>Extending the memory size for an <i>e</i>X<i>treme</i>DB database is done by calling the core API function <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/extend.htm">mco_db_extend()</a></code>.  However, because this call causes an internal write transaction, it cannot be called from the replica. So the procedure for extending database memory is to first call <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/extend.htm">mco_db_extend()</a></code>from the master, then in a <code>notifying_callback</code> function the replica will respond to a <code>MCO_REPL_NOTIFY_MASTER_DB_EXTENDED</code>  notification code by calling  <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/extend_dev.htm">mco_db_extend_dev()</a></code>. The following code snippet illustrates how such the <code>notifying_callback</code> function is implemented in the replica:</p>
+                <div class="code-block"><pre>&#160;
+    /* replica notification callback function */
+    void replica_notifying(  uint2 notification_code,  /* notification code */
+                    uint4 param1,  /* reserved for special cases */
+                    void* param2,  /* reserved for special cases */
+                    void* context) /* pointer to the user-defined context */
+    {
+        char *context_str = (char*)context; /* get context */
+    &#160;
+        switch (notification_code)  
+        {
+            case MCO_REPL_NOTIFY_CONNECTED:
+                printf("\n** Notification ** Replica's been connected, “
+                “context = %s\n", context_str);
+                break;
+            case MCO_REPL_NOTIFY_DB_LOAD_OK:
+                printf("\n** Notification ** Database's been loaded “
+                    “successfully, context = %s\n", context_str);
+                break;
+            case MCO_REPL_NOTIFY_MASTER_DB_EXTENDED:
+                {
+                    MCO_RET rc;
+                    /* Get the device size passed in param2 */
+                    mco_size_t size = *((mco_size_t*) param2);
+    &#160;
+                    printf("\n** Notification ** Master's database was extended, “
+                            “extend size %d bytes, context = %s\n",
+                    (int)size, context_str);
+                    extend_dev.type       = MCO_MEMORY_CONV;
+                    extend_dev.assignment = MCO_MEMORY_ASSIGN_DATABASE;                     extend_dev.size       = size;
+                    &#160;
+                    /* allocate memory and set device pointer */
+                    extend_dev.dev.conv.ptr = (void*)malloc( extend_dev.size );
+                    &#160;
+                    if (extend_dev.dev.conv.ptr) 
+                    {
+                        rc = mco_db_extend_dev(db_name, &amp;extend_dev);
+                        printf("\nmco_db_extend_dev(), size %d : %s\n",
+                            DATABASE_SIZE, (rc == MCO_S_OK) ? "OK" : "FAILED" );
+                    }
+                    break;
+                }
+            case MCO_REPL_NOTIFY_REPLICA_STOPPED:
+                {
+                    const char* reason = "";
+    &#160;
+                    if (param1 == MCO_HA_REPLICA_MASTER_REQUESTED_DISCONNECT) {
+                    reason = "MCO_HA_REPLICA_MASTER_REQUESTED_DISCONNECT";
+                }
+                printf("\n** Notification ** Replica stopped with the reason: “
+                        “%d (%s), context = %s\n", param1, reason, context_str);
+                break;
+                }
+            default:
+                printf("\n** Notification ** Replica's been notified code = “
+                    “%d, param1 = %u, param2 = %p, context = %s\n",
+                    notification_code, param1, param2, context_str);
+                break;
+        }
+    }
+    &#160;</pre>
+                </div>
+                <p>Note that the size of the device is passed into the notification callback through the third parameter (<code>param2</code>) as a pointer to <code>mco_size_t</code> and the replica extends its storage size by calling <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/extend_dev.htm">mco_db_extend_dev()</a></code>.</p>
+                <p>&#160;</p>
+                <h2>HA sequencer API</h2>
+                <p>Sometimes it may be necessary to determine which of the replica's databases is the most relevant. Suppose we have configuration with the master and two replicas <code>R1</code> and <code>R2</code>. Then <code>R1</code> dies at some moment <code>T1</code>. Later at moment <code>T2 (&gt; T1)</code> the master and <code>R2</code> stop processing due to a power failure. After the cold restart of the <code>R1</code> and <code>R2</code> applications, it must be determined which of the nodes will be the new master. To resolve this issue, <code><a href="../../Programming/C/HA_Functions/get_sequencer.htm">mco_HA_get_sequencer()</a></code>API can be called to return the number of the "db version" (or "current-ness" in the sense of HA). This number can be used to determine which database is the latest.</p>
+                <p>&#160;</p>
+                <h2>A Note on setting detach_timeout</h2>
+                <p>When the master detaches the replica (explicitly or inside <code>mco_HA_stop()</code>), it sends the <code>DETACH</code> message indicating the end of replication. The <code>detach_timeout</code> is used for this <code>send()</code> operation. After sending the message (regardless of the result), the master closes the channel to the replica. Changing the timeout does not affect how quickly the replica will be disconnected; it affects the maximum amount of time inside the <code>mco_HA_detach()</code> call. Setting the <code>detach_timeout</code> to 0 could lead to the <code>DETACH</code> message <i>not being sent at all</i>, and thus the replica will not receive the notification about detaching. Consequently the replica will run into the unexpected closing of the channel (and will return error code <code>MCO_E_NW_RECVERR</code>). <i style="font-weight: bold;">So setting the <code>detach_timeout</code> to 0 is not recommended</i>.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Generated API|Generated Class related functions">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>classname_set_caching_priority</title>
+        <link href="../../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>classname</i>_set_caching_priority</h1>
+            <blockquote>
+                <p>Change the caching priority for this class.</p>
+            </blockquote>
+            <h3>Prototype</h3>
+            <div class="code-block"><pre>&#160;
+    MCO_RET	classname_set_caching_priority(	/*IN*/ mco_trans_h t, 
+                             /*IN*/ int priority );
+&#160;</pre>
+            </div>
+            <h3>Arguments</h3>
+            <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../../../Resources/TableStyles/IndentedFunctionReference.css');" cellspacing="0">
+                <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 59px;" />
+                <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">t</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A MCO_READ_WRITE transaction handle returned by<a href="../../Static/Transaction_Control/start.htm"><code> mco_trans_start()</code></a></td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">priority</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">An integer value specifying the priority (see description below)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Description</h3>
+            <blockquote>
+                <p><i>This function is generated only for persistent classes</i><a name="kanchor631"></a>. A cache priority property value on each cache page improves on the basic Least Recently Used (LRU) cache policy for flushing cache pages by allowing applications to influence how long certain pages remain in the disk manager cache. When the LRU algorithm locates a "victim", instead of immediately releasing the page (removing the page from the tail of the L2 link list), the algorithm inspects its caching_priority field. If the value is not zero, the caching_priority is decremented and the page is re-linked to the beginning of the L2-list. A caching priority of zero means the default behavior. A caching priority of 1 indicates that the page will be moved from the head to the tail of the LRU list twice. A caching priority 2 means three loops through the LRU list, and so on. The higher the priority, the longer the page remains linked to the LRU list (stays in cache).</p>
+                <p>At the time the database is created, the application can assign priorities to indexes, memory allocator bitmap pages and object pages (excluding BLOBs). The priorities are assigned through the <code>mco_db_params_t</code> structure <code>index_caching_priority</code>, <code>allocation_bitmap_caching_priority</code> and <code>objects_caching_priority</code> fields. By default all pages have the same priority (zero).</p>
+                <p><a name="kanchor632"></a>This function makes it possible to change the caching priority for a class at runtime. Using the preset object priority as a baseline, the relative priorities of some classes can be adjusted. For example, large and rarely accessed objects can be assigned lower priority, while small frequently accessed classes can be assigned a higher priority. The caching priority assigned at runtime is stored in the database and is used until it is explicitly overwritten. For further details see the <a href="../../../../../Users_Guides/Core/Persistent_Databases/Persistent_Database_IO.htm">Persistent Database I/O</a> page.</p>
+            </blockquote>
+            <h3>Return Codes</h3>
+            <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../../../Resources/TableStyles/IndentedFunctionReference.css');" cellspacing="0">
+                <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">MCO_S_OK</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">The caching priority was set successfully</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Example</h3>
+            <div class="code-block"><pre>&#160;
+    Schema snippet:
+        
+    &#160;
+    declare database hybriddb;
+    &#160;
+    transient class A 
+    {
+        unsigned&lt;4&gt; ui4;
+        ...
+    };
+    &#160;
+    persistent class B 
+    {
+        unsigned&lt;4&gt; ui4;
+        ...
+    };
+    &#160;
+    Application snippet:
+        
+    &#160;
+    const char * db_name = "hybriddb";
+
+&#160;
+    int main(int argc, char* argv[])
+    {
+        MCO_RET rc = MCO_S_OK;
+        mco_db_h db = 0;
+        mco_trans_h t;
+        ...
+        &#160;
+         B b;
+        ...
+         {
+            rc = mco_trans_start( db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t );
+        &#160;
+            ...
+        &#160;
+            rc = B_set_caching_priority( t, 1 );
+        
+        &#160;
+            ...
+        &#160;
+        }</pre>
+            </div>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

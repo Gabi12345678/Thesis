@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The eXtremeDB MVCC Transaction Manager</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>The <i>e</i>X<i>treme</i><a name="kanchor296"></a><a name="kanchor297"></a>DB MVCC Transaction Manager</h1>
+            <blockquote>
+                <p><a name="kanchor298"></a>The Multi-Versioning Concurrency Control (MVCC) transaction manager enhances applications’ database concurrency management options.  With the MVCC model, while querying a database each transaction sees a snapshot of committed data, regardless of any in-progress transactions belonging to other tasks.  This protects the transaction from viewing inconsistent data that could be caused by other transaction updates on the same set of objects or indexes, thus providing transaction isolation for each transaction.  The MVCC manager allows applications to choose how transactions are isolated from each other by setting the transaction isolation level at runtime.</p>
+                <h2>Isolation Level</h2>
+                <p>When the transaction <b>start</b> API&#160;is called without specifying an isolation level, the transaction isolation level is set to <code>MCO_DEFAULT_ISOLATION_LEVEL</code>, which is by default  <code>MCO_REPEATABLE_READ</code> for MVCC.</p>
+                <h2>Conflict Management</h2>
+                <p>When <code>MVCC</code> is used with other than <code>MCO_SERIALIZABLE</code>, then <code>MCO_READ_WRITE</code> transactions are executed concurrently.  Sometimes concurrent transactions modify the same objects, thus creating transaction conflicts.  The transaction manager resolves those conflicts by aborting one of the conflicting transactions and letting the other one commit its updates to the database.  When a transaction is aborted, the application receives the <code>MCO_E_CONFLICT</code> error code. It is the application’s responsibility to manage this possibility with logic similar to the following:</p>
+                <div class="code-block"><pre>&#160;
+    do {
+        mco_trans_start( db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t);
+        ...&lt;update database&gt;...
+        rc = mco_trans_commit(t);
+    } while ( rc == MCO_E_CONFLICT );
+    &#160;</pre>
+                </div>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that when MVCC is used, the application must be able to tolerate transaction rollbacks due to conflicts as described above.</p>
+                <p>If the number of conflicts is too high, it could lead to sharp performance degradation due to the need to retry transactions.  When this occurs, the transaction manager temporarily changes the isolation level to <code>MCO_SERIALIZABLE</code>.  The application can set the conflicts threshold over which the optimistic control is disabled.  This is done in C applications by calling <code>mco_trans_optimistic_threshold()</code>. (This functionality is only available in the C API.)</p>
+                <p>Also in C applications, if the percentage of transactions that have been aborted because of the transaction conflict exceeds the <code>max_conflicts_percent</code>, the transaction isolation level is changed to <code>MCO_SERIALIZABLE</code> for <code>disable_period</code> successive transactions.  <code>MCO_SERIALIZABLE</code> permits a single <code>MCO_READ_WRITE</code> transaction at a time (eliminating the potential for conflicts), that can run in parallel with <code>MCO_READ_ONLY</code> transactions.  By default the optimistic threshold is set to 100 (which means “never disable optimistic mode no matter how many conflicts occur”).</p>
+                <h2>Object Versions and Cleanup</h2>
+                <p>With MVCC every transaction that changes objects in the database spawns versions of those objects. The versions are visible depending on transaction order and active isolation level. When a version becomes <i>not needed</i> by any transaction it should be deleted as it consumes memory. On the other hand, all object versions are included in the indexes defined for that class, so excluding them requires <i>re-balancing</i> which requires a lock on the indexes and a decrease in performance. This object version cleanup procedure is referred to as <i>Garbage Collection</i>.</p>
+                <h3>Garbage Collection Policies</h3>
+                <p>The Garbage Collection (GC) policy can be set a runtime with the C API <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/set_gc_policy.htm">mco_trans_set_gc_policy()</a></code>. The possible policies are:</p>
+                <ul>
+                    <li value="1"><code>MCO_GC_DISABLED</code>: garbage collection is disabled</li>
+                    <li value="2"><code>MCO_GC_SELF_VERSIONS</code>: each session will perform a cleanup of its own garbage only. This policy can be efficient when each session (connection) works with its own subset of classes (tables)</li>
+                    <li value="3"><code>MCO_GC_ON_MODIFICATION</code>: read-write transactions in any session will trigger garbage collection in all sessions (connections)</li>
+                    <li value="4"><code>MCO_GC_ALWAYS</code>: like <code>MCO_GC_ON_MODIFICATION</code>, but <code>READ_ONLY</code> transactions will trigger garbage collection as well</li>
+                </ul>
+                <p>The default behavior is <code>MCO_GC_ON_MODIFICATION</code>, which is generally the best practice. This means that, for each <code>MCO_READ_WRITE</code> transaction, the <i>e</i>X<i>treme</i>DB runtime tries to collect all "garbage" immediately on completion of the transaction. But if there are long living transactions, then old object versions will not be removed for a long time. In this case GC at each transaction commit will just waste time and CPU. For this reason it is also possible, and can be optimal, to spawn one or more separate GC threads. (It is possible to specify the number of GC threads in the <a href="../xSQL/Startup_Options/Config_File_Sections/ExtremeSQL_Params.htm">configuration file</a> when starting <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> as server.)</p>
+                <p>But consider the case where there are large number of <code>MCO_READ_ONLY</code> transactions and rare update (<code>MCO_READ_WRITE</code>) transactions. The update transaction will not be able to perform cleanup because old versions may still be accessed by <code>MCO_READ_ONLY</code> transactions which in turn do not perform cleanup because of the <code>MCO_GC_ON_MODIFICATION</code> policy. This means that all versions will persist until the next portion of updates which will cause degradation of performance. In this case the <code>MCO_GC_ALWAYS</code> policy is preferable.</p>
+                <p>The <code>MCO_GC_DISABLED</code> policy is intended to be used to limit garbage collection to dedicated sessions (connections). In this scenario, the worker sessions will have this policy, whereas a dedicated session (or multiple sessions) with policy <code>MCO_GC_ALWAYS</code> will collect garbage in separate threads.</p>
+                <h4>Special Case for Persistent Databases</h4>
+                <p>A special case is persistent (disk) objects when one or more GC threads use  policy <code>MCO_GC_ALWAYS</code>. If a <code>MCO_READ_ONLY</code> transaction tries to perform GC and deletes some version(s) then it actually becomes a <code>MCO_READ_WRITE</code> transaction and requires a write to the transaction log. This is why the default policy is <code>MCO_GC_ON_MODIFICATION</code>; so that <code>MCO_READ_ONLY</code> transactions do not try to perform GC.</p>
+                <h3>Recovering unused data storage space</h3>
+                <p>When the MVCC transaction manager is used, in the case of a crash, a persistent database can contain undeleted old versions and working copies.  Their presence will not break the consistency of the database and doesn't prevent the normal working of an application, but does unnecessarily consume space. Detecting these stale object versions requires a complete scan of the database. For this reason the recovery process doesn't perform this function automatically.  Instead, the removal of the unused versions is performed explicitly in C/C++ applications by calling the <code>mco_disk_database_vacuum()</code> function:</p>
+                <div class="code-block"><pre>    &#160;
+    MCO_RET mco_disk_database_vacuum(mco_db_h con);
+    &#160;</pre>
+                </div>
+                <p>Note that <code>mco_disk_database_vacuum()</code> requires exclusive access to the database, so no operations can be performed on the database until the vacuum operation is complete and the function has returned control back to the application.</p>
+                <p>Alternatively, the application can enable the repair process by setting the <code>MCO_DB_MODE_MVCC_AUTO_VACUUM</code> mode mask in the <code><a href="../../Programming/C/Structures/Database_Parameters.htm">mco_db_params_t</a></code> when calling <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm">mco_db_open_dev()</a></code>.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

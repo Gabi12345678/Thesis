@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Getting Started with eXtremeDB|Building eXtremeDB Libraries">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Building eXtremeDB Libraries on Unix-Linux</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Building <i>e</i>X<i>treme</i>DB Libraries on Unix-Linux</h1>
+            <blockquote>
+                <p>As explained in the <a href="../Building_Running_SDK_Samples.htm">Building and running SDK Samples</a> page, makefiles are provided in the <i>e</i>X<i>treme</i>DB root directory and all sample (project) directories. If it is necessary to rebuild the <i>e</i>X<i>treme</i>DB libraries, the build system is a process of running the GNU make utility with a combination of <i>cascade</i> makefiles, <i>project</i> files and possible additional third-party products as described in the following sections.</p>
+                <p>The instructions in the sections below use the following terms: </p>
+                <ul>
+                    <li value="1"><b>The product</b>: McObject's <i>e</i>X<i>treme</i>DB DBMS (DataBase Management System)</li>
+                    <li value="2"><span style="color: #000000; font-weight: bold;">Build system</span>: A computer system used to convert the eXtremeDB source code to executable binary code for host and target systems</li>
+                    <li value="3"><b>Target system</b>: A computer system where the <i>e</i>X<i>treme</i>DB code will to be executed</li>
+                    <li value="4"><b>Host system</b>: A computer system used to develop applications for the target system</li>
+                    <li value="5"><b>Third-party software</b>: Software developed outside of <b style="font-style: italic; font-weight: normal;">McObject </b>used in <i>e</i>X<i>treme</i>DB code</li>
+                    <li value="6"><b>Make</b>: the GNU make utility (v 3.81 and later) used to build <i>e</i>X<i>treme</i>DB code</li>
+                    <li value="7"><b>Toolchain</b>: A set of programs used to produce executable code out of source code (compiler, linker, etc)</li>
+                    <li value="8"><b>Compiler family</b>: A number of toolchains with similar behavior. Compiler family defines compiler/linker executable names, the way to pass control switches to the compiler, parameter conventions and other details on how to make the compiler produce binary code.</li>
+                </ul>
+                <h1>Build systems entry-points</h1>
+                <p>The build system supports the following entry points:</p>
+                <blockquote>
+                    <h3>all</h3>
+                    <p> Build all binaries</p>
+                    <div class="code-block"><pre>&#160;
+    make … all …
+    &#160;</pre>
+                    </div>
+                    <h3>clean</h3>
+                    <p>Clean the tree. This command removes only intermediate files leaving the final products and build-logs intact.</p>
+                    <div class="code-block"><pre>&#160;
+    make … clean …
+    &#160;</pre>
+                    </div>
+                    <h3>distclean</h3>
+                    <p>Total cleanup. This command removes all the intermediate files and directories; the final files and the build logs will be purged out of the directory tree.</p>
+                    <div class="code-block"><pre>&#160;
+    make … distclean …
+    &#160;</pre>
+                    </div>
+                    <p>&#160;</p>
+                    <p>Also, the following old-fashion targets (from <i>e</i>X<i>treme</i>DB releases prior to version 8.0) are left for compatibility:</p>
+                    <h3>host</h3>
+                    <p> Builds only the host-side executables.</p>
+                    <h3>target</h3>
+                    <p> Builds only the target-side utilities and libraries.</p>
+                    <h3>tools</h3>
+                    <p>This is the logical combination <code>host + target</code></p>
+                    <h3>samples</h3>
+                    <p>Builds the samples only.</p>
+                </blockquote>
+                <p>&#160;</p>
+                <h1>Make systems tips</h1>
+                <p>Following are some tips for using the build system:</p>
+                <ul>
+                    <li value="1">Run make with the <code>-j</code> command line option to enable a parallel build. The option has parameter "<code>-j X</code>" where <code>X</code> is the number of CPUs allowed to use. The specification <code>-j 1</code> runs make on a single CPU which is good for build issue investigations. Running <code>-j</code> with no limitation will use all available CPUs in the build system.</li>
+                    <li value="2">In some cases running the build procedure on many CPUs may exhaust the system resources or reach user limitations (quotas). If, during the build process, the system become unresponsive or reports an insufficiency of file or process handles, try to adjust the limits or decrease the number of CPUs used.</li>
+                    <li value="3">Be courteous to other users on your build system if you share one. Do not consume the full machine power at once. A parallel build on a server may affect other users and services on the system.</li>
+                </ul>
+                <p>For MacOS systems:</p>
+                <blockquote>
+                    <p>Make sure your <code>JAVA_HOME</code> environment variable has a valid value. The typical way to initialize the variable is in the <code>~/.profile</code>. Add following line into the file:</p>
+                    <div class="code-block"><pre>    &#160;
+    export JAVA_HOME=$(/usr/libexec/java_home)
+    &#160;</pre>
+                    </div>
+                    <p>Make sure your user has enough resources available. Increase the "number of processes per user" limit using:</p>
+                    <div class="code-block"><pre>&#160;
+    sudo sysctl -w kern.maxprocperuid=4096
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <h2>Templates</h2>
+                <p>Following are some templates for files of the build system, ready for copy-paste. You need to make a unique name for your project and substitute <code>&lt;project-name&gt;</code> with this name.</p>
+                <h3>Sub-directory or Project-directory level makefile</h3>
+                <p>Do not forget to change <code>&lt;offset-path-to-the-root-directory&gt;</code> with your offset path.</p>
+                <div class="code-block"><pre>&#160;
+    MCO_ROOT=$(abspath &lt;offset-path-to-the-root-directory&gt;)
+    include $(MCO_ROOT)/include/settings.makefile
+    include $(if $(findstring yes,$(MCO_QUICK_BUILD))$(findstring on,$(MCO_QUICK_BUILD)),,
+        $(MCO_ROOT)/)makefile.cascade
+    include $(MCO_ROOT)/include/rules.makefile
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h3>Sub-directory level makefile.cascade</h3>
+                <p>Substitute <code>&lt;directory1&gt;…&lt;directoryN&gt;</code> with the names of your directories. If some of the directories are optional put "<code>-</code>" before the <code>include</code> directive.</p>
+                <div class="code-block"><pre>&#160;
+    include $(call mco_makefile_file, \
+        &lt;directory1&gt;/makefile.cascade \
+        ...
+        &lt;directoryN&gt;/makefile.cascade \
+    )
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h3>Project-directory level makefile.cascade</h3>
+                <p>Do not forget to change <code>&lt;project-name&gt;</code> with the unique name of your project. If you have several projects in the same directory and some of them are optional (i.e. the existence of the project depends on features included into the package), then "<code>-</code>" may be specified in front of the <code>include</code> directive.</p>
+                <div class="code-block"><pre>&#160;
+    MCO_FILE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
+    include $(MCO_FILE_DIR)makefile.project.&lt;project-name-1&gt;
+    ...
+    include $(MCO_FILE_DIR)makefile.project.&lt;project-name-N&gt;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h3>Project-directory level makefile.project.&lt;project-name&gt; for a sample program</h3>
+                <p>Do not forget to change <code>&lt;project-name&gt;</code> with the unique name of your project.</p>
+                <div class="code-block"><pre><a name="kanchor106"></a><a name="kanchor107"></a>&#160;
+    MCO_PRJ_LIST += &lt;project-name&gt;
+    PRJ_TARGET_EXECUTABLE_DPTR += &lt;project-name&gt;
+    PRJ_TARGET_EXECUTABLE_OFFS += &lt;project-name&gt;
+    PRJ_&lt;project-name&gt;_TAGS:=&lt;project-name&gt; sample core
+    PRJ_&lt;project-name&gt;_DIR:=$(call mco_project_dir)
+    PRJ_&lt;project-name&gt;_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+    PRJ_&lt;project-name&gt;_SCHEMAS:=$(call mco_project_file,schema.mco)
+    PRJ_&lt;project-name&gt;_DATABASES:=&lt;database-name&gt;
+    PRJ_&lt;project-name&gt;_RUNTIME:=YES
+    PRJ_&lt;project-name&gt;_MEMDEV:=PRIVATE
+    PRJ_&lt;project-name&gt;_STORAGE:=TRANSIENT
+    PRJ_&lt;project-name&gt;_SYNC:=AUTO
+    PRJ_&lt;project-name&gt;_TRANSMGR:=MURSIW
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h3>Project-directory level makefile.project.&lt;project-name&gt; for a library</h3>
+                <p>Do not forget to change <code>&lt;project-name&gt;</code> with the unique name of your project.</p>
+                <div class="code-block"><pre>&#160;
+    MCO_PRJ_LIST += &lt;project-name&gt;
+    PRJ_TARGET_LIBRARY_DPTR_STATIC  += &lt;project-name&gt;
+    PRJ_TARGET_LIBRARY_DPTR_DYNAMIC += &lt;project-name&gt;
+    PRJ_TARGET_LIBRARY_OFFS_STATIC  += &lt;project-name&gt;
+    PRJ_TARGET_LIBRARY_OFFS_DYNAMIC += &lt;project-name&gt;
+    PRJ_&lt;project-name&gt;_TAGS:=&lt;project-name&gt; target core
+    PRJ_&lt;project-name&gt;_DIR :=$(call mco_project_dir)
+    PRJ_&lt;project-name&gt;_SRC :=$(call mco_project_file, mcosrc1.c … mcosrcN.cpp)
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h1>Issues and diagnostics</h1>
+                <p>In most cases, build issues come from the incompatibility of third-party products installed in the build system and <i>e</i>X<i>treme</i>DB requirements. Sometimes the versions of the products are different from those required. Sometimes the build system lacks the development headers of the products.</p>
+                <p>Usually, the process of issue detecting is specific for every case, but a good approach is to:</p>
+                <p>1. Use <code>MCO_EXPLAIN=python,openssl</code> to see why and how the build script decided to use the third-party components:</p>
+                <div class="code-block"><pre>&#160;
+    $ make qqq MCO_EXPLAIN=openssl,python
+    Analyzing build environment...
+    MCO_FORCE_PYTHON=auto
+    MCO_BUILD_PYTHON=/usr/bin/python
+    [X] - OpenSSL 1.1.1 exists on the build system
+    [ ] - Forced to use MCO_OPENSSL_INCLUDE_PATH env. variable
+    [ ] - Forced to use build system OpenSSL installation
+    [ ] - Forced to build and use own OpenSSL installation
+    [ ] - auto-detection enabled, MCO_OPENSSL_INCLUDE_PATH env. variable is 
+        set and development headers are present
+    [ ] - auto-detection enabled, the build system match to the target system 
+        and there are usable development headers in the local OpenSSL installation
+    [X] - auto-detection enabled, build and use own OpenSSL installation if all above failed
+    [ ] - Invalid value of MCO_FORCE_OPENSSL detected, build and use own OpenSSL installation
+    MCO_TARGET_OPENSSL_INCLUDE=/home/x/t1219/eXtremeDB/target/sal/net/openssl-Linux-x86_64/include
+&#160;
+    [X] Python does exist on the build system
+    [X] Target and build-system arch. signatures are the same [+] or Build system is x86_64 
+        and the target is x86 [+] (python is runnable and good for the target usage)
+    [X] DBus width match (otherwise not good for target usage)
+    [X] Build python is 2.7.x (otherwise not good for target/cross usage)
+    [ ] Dev. headers are present (otherwise not good for target usage)
+    BUILD_PYTHON =/usr/bin/python
+    CROSS_PYTHON =/home/x/t1219/eXtremeDB/target/python/Python-2.7.14-Linux-x86_64/bin/python2.7
+    TARGET_PYTHON=/home/x/t1219/eXtremeDB/target/python/Python-2.7.14-Linux-x86_64/bin/python2.7
+&#160;
+    Loading cascade make system...
+    Setting up the build procedure...
+    Processing...
+    make: *** No rule to make target 'qqq'.  Stop.
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p>2. Run make with explanations enabled and gather it's output log and internal database:</p>
+                <div class="code-block"><pre>&#160;
+    $ make MCO_EXPLAIN=openssl,python all -p&gt;issue-log 2&gt;&amp;1
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p>3. For investigation of any compilation, it is good to disable parallel building and enable detailed logging (no <code>-j</code> make option!)</p>
+                <div class="code-block"><pre>&#160;
+    make MCO_BUILD_LOG=full all
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h1>The make utility</h1>
+                <p>The <i>e</i>X<i>treme</i>DB build system utilizes the GNU make utility to build the product's source code into a set of executables and libraries used during development of end-user applications. To do its job, the make utility maintains products and source files dependency information in the form of a dependency tree where the top-level node (target in make's terminology) that depends on several sub-targets, then sub-sub-targets and so on down to the terminal nodes which are the source files. The make utility is able to track source file modifications using the file systems timestamps and file "exist" functions. Thus, make is able to track changes in the dependency chains and update all affected targets that depend on the modified source file.</p>
+                <p>The  build system includes two sub-systems: one is an array of project files that describe each of the <i>e</i>X<i>treme</i>DB components as projects, defines the properties of the project and its dependencies; the other is a set of <i>cascade</i> make files that delivers the project information to the make utility in order to maintain the full dependency tree of all components, source code, headers, and eXtremeDB utilities. This full dependency tree gives the make utility the ability to trace and build (and re-build if necessary) any part of eXtremeDB. The build operations can be run as a series of build actions one-step-at-a-time or in parallel to utilize the full multi-CPU power of the build system.</p>
+                <h2>The <i>cascade</i> part of the build system</h2>
+                <p>The <i>cascade</i> makefile system is a set of <code>makefile.cascade</code> files located in all major directories of the product. The <i>cascade</i> makefile defines the hierarchy of directories and includes other downstream <code>makefile.cascade</code> files and <i>project</i> makefiles.</p>
+                <h2>The build system's project files</h2>
+                <p>Each component of the product is described by a <i>project</i> makefile for the build system. The <i>project</i> makefile defines what the component is, how it is to be built, it's source code files, flags, and properties. There are several types of project in the product: executables (for the host and the target separately), libraries (static and dynamic), JAVA class and jar files, Python modules and third-party modules used in the product.</p>
+                <p>&#160;</p>
+                <h1>Implementation of the build system</h1>
+                <p>The product build system is a set of interconnected makefiles. Among all these build systems files, there are some that are special: the <b style="font-style: italic;">top-level makefile</b>, the <b style="font-style: italic;">include/settings.makefile</b> and the <b style="font-style: italic;">include/rules.makefile</b>.</p>
+                <p>The <i>top-level makefile</i> initiates the build process. First, it includes the <i>include/settings.makefile</i>. This file contains all start-up settings for the build system and the required auto-detection heuristic. A user can override the settings externally or put necessary tunings into the <i>include/settings.makefile</i>. Then, the <i>top-level makefile</i> includes the top-level <i>cascade</i> file which runs (using the cascade inclusion technique) through the all the product's source tree and gathers other <i>cascade</i> and <i>project</i> makefiles. This step delivers the project properties of all the components and samples into the make system. Finally, the <i>top-level makefile</i> includes the <i>include/rules.makefile</i>. This file instructs the make utility how to build all the product files and all necessary intermediate files. This includes the dependency information that instructs the make utility what depends on what. Also, it generates the top-level target for the make command that initiates the build process.</p>
+                <p>All other sub-directory makefiles (those with no extension) are necessary to be able to initiate the build procedure for this sub-directory and downstream directories. Internally the sub-directory makefiles define the current and top-level directory, and include the <i>top-level makefile</i>. This gives the build system the ability to check and, if necessary, rebuild not only the files in the current directory but even those in another parallel (from the source tree's point of view) directories in order to maintain correctness of the build process when one or several of the components was/were modified.</p>
+                <p>The <i>auto-detection heuristic</i> implemented in the <i>include/settings.makefile</i> does the following:</p>
+                <blockquote>
+                    <p>1. Detects the build platforms environment: Hardware architecture and OS.</p>
+                    <p>2. Sets the build utilities (such as echo, copy, make, etc.) used in the build process. (This setting depends on the build system.)</p>
+                    <p>3. Sets the build system's compiler family. The same compiler family is set for both host and target systems if no override is given in form of command line options <code>HOST_COMPILER_FAMILY</code> and <code>TARGET_COMPILER_FAMILY</code> (see section <span style="color: #000000;"><a href="#Make">Make system overrides</a></span> below).</p>
+                    <p>4. Using the compiler family information, the script detects the hardware and OS definition for host and target systems.</p>
+                    <p>5. Defines the default setting for eXtremeDB components such as: default memory drivers, synchronization primitives wrapper, file system drivers, etc.</p>
+                    <p>6. Defines the libraries and feature switches for the command generation for compilation and linking, depending on the project properties (for example the libraries that need to be linked into a program to support SQL functionality; or what needs to be given to the source code to make it aware of "Sequences" support).</p>
+                    <p>7. Finally, the script checks the existence of third-party products in the system and decides if it is possible to use the existing installations or if it is required to build its own. (See the detail below on the test and decision-making procedure.)</p>
+                </blockquote>
+                <p>The dependency-generation code is located in the <i>include/rules.makefile</i>. This code makes the dependency tree for the make utility using the project properties gathered by the cascade sub-system. Each of the projects has a unique name and the set of properties associated with that name. All project properties are defined using make variables, such as <code>PRJ_&lt;project-name&gt;_XXXX:=YYYY</code>, where <code>XXXX</code> is a property identifier and <code>YYYY</code> is a value. Also, there are several special variables named "lists" that contain the project names as references.</p>
+                <p>The project needs to be linked into the <code>MCO_PRJ_LIST</code> list (i.e. its name needs to be added there as <code>MCO_PRJ_LIST += &lt;project-name&gt;</code>) and at least into one of the following lists:</p>
+                <ul>
+                    <li value="1"><code>PRJ_HOST_EXECUTABLE</code> - the list of executable files for the host system. (MCOCOMP, SQL2MCO and etc. are included here.)</li>
+                    <li value="2"><code>PRJ_TARGET_EXECUTABLE_DPTR</code> - the list of executable files for the target system built for the <code>DPTR</code> variant of the <i>e</i>X<i>treme</i>DB runtime. (For example, all of the <code>DPTR</code>-samples are included here.)</li>
+                    <li value="3"><code>PRJ_TARGET_EXECUTABLE_OFFS</code> - the list of executable files for the target system built for the <code>OFFS</code> variant of the <i>e</i>X<i>treme</i>DB runtime. (For example, all the <code>OFFS</code>-samples are included here.)</li>
+                    <li value="4"><code>PRJ_TARGET_LIBRARY_DPTR_STATIC</code> - the list of the static <code>DPTR</code> libraries for the product</li>
+                    <li value="5"><code>PRJ_TARGET_LIBRARY_DPTR_DYNAMIC</code> - the list of the dynamic <code>DPTR</code> libraries for the product</li>
+                    <li value="6"><code>PRJ_TARGET_LIBRARY_OFFS_STATIC</code> - the list of the static <code>OFFS</code> libraries for the product</li>
+                    <li value="7"><code>PRJ_TARGET_LIBRARY_OFFS_DYNAMIC</code> - the list of the dynamic <code>OFFS</code> libraries for the product</li>
+                    <li value="8"><code>PRJ_TARGET_JAR</code> - the list of the Java JARs</li>
+                    <li value="9"><code>PRJ_TARGET_CLASS</code> - the list of the Java programs for the product</li>
+                    <li value="10"><code>PRJ_CUSTOM</code> - the list of the third-party components that need to be built for the product</li>
+                </ul>
+                <p>A project can be added to several suitable <code>PRJ</code>* lists (eg. C/C++ projects are good for libraries and executables, Java-projects - for Classes and Jars). For example, the <code>mcovtmem</code> project is included into the <code>PRJ_TARGET_LIBRARY_DPTR_STATIC</code> and <code>PRJ_TARGET_LIBRARY_DPTR_DYNAMIC</code> lists only, while the <code>mcovtdsk</code> library is present in all four <code>PRJ_TARGET_LIBRARY_*</code> lists. The build system sets up a special build procedure for every project based on these lists.</p>
+                <p>The build script maintains global scope make targets, such as <code style="font-weight: bold;">build all</code> and <code style="font-weight: bold;">clean all</code>, using the <code>MCO_PRJ_LIST</code> list. The build all action is run from the command line <code>make all</code>, and produces all of the product binary files. The <code>clean all</code> action is run from the command line <code>make clean</code>, and removes all of the intermediate files but leaves the final binaries and build logs. The <code>make distclean</code> command line cleans everything. Also, it is possible to build each of the binary files (executables, the libraries, classes, and jars) separately using a command line like <code>make &lt;binary-location-and-name&gt;</code> (for example <code>make /home/user/eXtremeDB/target/bin/08-benchmarks-perf</code>).</p>
+                <p>
+                    <img src="../../Resources/Images/note.png" />Note that the build system uses full file names to avoid "process current directory"-related disambiguate issues for parallel building.</p>
+                <p>The build system includes a mechanism that allows the user to include or exclude selective components of <i>e</i>X<i>treme</i>DB into or out of the build process. The filter is tag-based. Each of the project files defines a set of tags for each of the components and the <code>MCO_ENABLE</code> / <code>MCO_DISABLE</code> controls (see section <a href="#Make2">Make system controls</a> below) let the user determine the way to enumerate which of the target components need to be enabled or disabled. This mechanism not only excludes the named components from the build process, but also makes all of the other components aware of the status of the enabled / disabled components, and updates them accordingly. For example, <code>MCO_DISABLE=openssl</code> will exclude OpenSSL from the build procedure as well as the references to OpenSSL from the <i>e</i>X<i>treme</i>DB crypto-driver and OpenSSL-specific examples.</p>
+                <h2>Third-party products in the eXtremeDB build system</h2>
+                <p><i>e</i>X<i>treme</i>DBuses some third-party software components (such as LUA, Java, Python, and OpenSSL) in its code. The use of these components is pretty version-sensitive: <i>e</i>X<i>treme</i>DB code relies on the components' API and build-procedures. This is why the build script needs to make sure that the pre-installed version of the components located on the build system is suitable (i.e. that the version matches <i>e</i>X<i>treme</i>DB requirements, the required hardware is supported, the development headers are present and so on). To achieve this, there are special precautions implemented in the build script:</p>
+                <ul>
+                    <li value="1"><b>LUA</b>: This component does not require much. <i>e</i>X<i>treme</i>DB has its full source code (+patches) in its source tree. The only thing is the cross-build procedure. The build system needs to build LUA code for every target platform separately.</li>
+                    <li value="2"><b>Java</b>: The build system always uses the build platform java installation. It is required to define the <code>JAVA_HOME</code> environment variable for the current build system.</li>
+                    <li value="3"><b>Python</b>: <i>e</i>X<i>treme</i>DB works with Python 2.7.x only. It has the Python 2.7.14 source code package in its source tree. The build script tests the build system Python installation for the version number and development headers. Also, the target platform needs to match the build platform. If any of these conditions fail, the build script will build a target-specific Python installation and will use it to produce the <i>e</i>X<i>treme</i>DB Python module. In some cases, the build script will need to build a cross-python - a python installation matching with data bus with to the target system and able to be executed on the build system.</li>
+                    <li value="4"><b>OpenSSL</b>: <i>e</i>X<i>treme</i>DB is sensitive to the version of the OpenSSL component. The build system matches the version of the installed OpenSSL, its hardware platform and checks for development headers. If any of these conditions fail, the script builds the target-specific installation of the OpenSSL software out of the source code package existing in the <i>e</i>X<i>treme</i>DB source tree.</li>
+                </ul>
+                <p>Note: it is possible to override the auto-detection for Python and OpenSSL using the <code>MCO_FORCE_OPENSSL</code> and <code>MCO_FORCE_PYTHON</code> controls. (See section <a href="#Make">Make system overrides</a> below.)</p>
+                <h1>Structure of the makefiles</h1>
+                <p>This section explains the internal structure of different kinds of makefiles used in the build system.</p>
+                <h2>root-level and sub-directory makefiles</h2>
+                <p>The root-level makefile defines the location of the <i>e</i>X<i>treme</i>DB installation as an absolute path in the <code>MCO_ROOT</code> variable, includes the required parts of the build system and activates the cascade sub-system and the build process:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_ROOT=$(abspath .)
+    include $(MCO_ROOT)/include/settings.makefile
+    include $(if $(findstring yes,$(MCO_QUICK_BUILD))
+        $(findstring on,$(MCO_QUICK_BUILD)),,$(MCO_ROOT)/)makefile.cascade
+    include $(MCO_ROOT)/include/rules.makefile
+    &#160;</pre>
+                </div>
+                <p>The only difference for a sub-directory makefile is in the way to define <code>MCO_ROOT</code>. It converts an offset path to the root directory to its absolute representation:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_ROOT=$(abspath ..)
+    include $(MCO_ROOT)/include/settings.makefile
+    include $(if $(findstring yes,$(MCO_QUICK_BUILD))
+        $(findstring on,$(MCO_QUICK_BUILD)),,$(MCO_ROOT)/)makefile.cascade
+    include $(MCO_ROOT)/include/rules.makefile
+    &#160;</pre>
+                </div>
+                <p>In most cases, it is enough to copy an existing sub-directory makefile into a new directory and adjust the <code>MCO_ROOT</code> variable to produce a new sub-directory makefile.</p>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that the makefiles have some logic that work according to the <code>MCO_QUICK_BUILD</code> control. (See section <a href="#Make2">Make system controls</a> below for details.)</p>
+                <h2>makefile.cascade</h2>
+                <p>Typical sub-directory <i>makefile.cascade</i> files include all cascade files from the sub-directories below its level:</p>
+                <p>&#160;</p>
+                <div class="code-block"><pre>&#160;
+    -include $(call mco_makefile_file, \
+        crypt/makefile.cascade \
+        mcobackup/makefile.cascade \
+        ...
+        python/makefile.cascade \
+        feedhandler/makefile.cascade \
+    )
+    &#160;</pre>
+                </div>
+                <p>The project-level makefile.cascade file includes the project files and delivers the project properties into the make utility:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_FILE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
+    include $(MCO_FILE_DIR)makefile.project.mcolib
+&#160;</pre>
+                </div>
+                <p>The simplest way to create a new sub-directory or project <i>makefile.cascade</i> file is to copy an existing one and adjust the inclusion of the downstream cascade and project files.</p>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that very few cascade files contain logic that includes downstream projects depending on settings from the <code>include/settings.makefile</code>. For example </p>
+                <div class="code-block"><pre>&#160;
+    target/sal/sync/makefile.cascade: include $(call mco_makefile_file,
+            
+        $(addprefix makefile.project.mcos,$(MCO_TARGET_SYNC_IMPLEMENTATIONS)))
+            
+        &#160;</pre>
+                </div>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that some cascade files have a dash ("-") in front of the "include" directive. This construct of the make utility language defines optional inclusion, which is good for cases when a sub-level <i>makefile.cascade</i> needs to be included (may be or may be not present) in the source tree depending on the features included in a package.</p>
+                <h2>makefile.project.XXXX</h2>
+                <p>A typical project makefile defines the name of the project, its properties (such as source code files, databases, <i>e</i>X<i>treme</i>DB features used etc.) and ties the project to appropriate lists to cause the build system to generate build procedures for the project.</p>
+                <p>Following is a sample of a library-project makefile:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_PRJ_LIST += mcosql
+    PRJ_TARGET_LIBRARY_DPTR_STATIC  += mcosql
+    PRJ_TARGET_LIBRARY_DPTR_DYNAMIC += mcosql
+    PRJ_TARGET_LIBRARY_OFFS_STATIC  += mcosql
+    PRJ_TARGET_LIBRARY_OFFS_DYNAMIC += mcosql
+    PRJ_mcosql_TAGS:=target sql malloc
+    PRJ_mcosql_DIR :=$(call mco_project_dir)
+    PRJ_mcosql_SRC :=$(call mco_project_file, dbapi.cpp compiler.cpp 
+        sqlc.cpp operators.cpp optimizer.cpp nodes.cpp schema.cpp 
+        sql.cpp utils.cpp exceptions.cpp stub.cpp value.cpp hash.cpp 
+        multisql.cpp mcoapi.cpp mcosql.cpp mcoseq.cpp mcoapic.cpp)
+        &#160;</pre>
+                </div>
+                <p>Following is a sample of an executable-project makefile:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_PRJ_LIST += hasimple-master
+    PRJ_TARGET_EXECUTABLE_DPTR +=
+    PRJ_TARGET_EXECUTABLE_OFFS += hasimple-master
+    PRJ_hasimple-master_TAGS:=sample ha
+    PRJ_hasimple-master_DIR:=$(call mco_project_dir)
+    PRJ_hasimple-master_SRC:=$(call mco_project_file, master.c) 
+        $(MCO_SAMPLES_COMMON_DIR)/common.c $(MCO_SAMPLES_COMMON_DIR)/commonha.c
+    PRJ_hasimple-master_SCHEMAS:=$(call mco_project_file,schema.mco)
+    PRJ_hasimple-master_DATABASES:=simplemstdb
+    PRJ_hasimple-master_RUNTIME:=YES
+    PRJ_hasimple-master_MEMDEV:=PRIVATE
+    PRJ_hasimple-master_STORAGE:=TRANSIENT
+    PRJ_hasimple-master_SYNC:=AUTO
+    PRJ_hasimple-master_TRANSMGR:=MURSIW
+    PRJ_hasimple-master_F_HA:=TCP
+    &#160;</pre>
+                </div>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that the project files add the projects to the corresponding build system lists and the defined project properties. For the meaning of the "properties" see section <a href="#Project">Project makefile flags</a> below.</p>
+                <h2>Third-party makefiles</h2>
+                <p>The make system wraps the third-party make systems with special project files. A project file is "special" depending on the details of how the third-party product build process needs to be handled. These files are pretty complicated. For reference see: <code>target/sal/net/makefile.project.openssl</code> or <code>target/python/makefile.project.python</code>. The build procedure, products, build-logs and intermediate files are handled via the <code>PRJ_CUSTOM</code> list. (See section <a href="#Project">Project makefile flags</a> below for details.)</p>
+                <p>&#160;</p>
+                <h1>Control switches and overrides</h1>
+                <p>Following is the full list of available control switches, overrides and project properties.</p>
+                <h2><a name="Project"></a>Project makefile flags</h2>
+                <h3>Build lists</h3>
+                <p>The following lists are common for all project makefiles. A project needs to be included into <code>MCO_PRJ_LIST</code> and into at least one of other <code>PRJ</code>_-lists depending on the meaning of the project. The project can be included in as many <code>PRJ_</code>-lists as required provided the project's code is suitable for it.</p>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that the "+=" operator is used for the inclusion.</p>
+                <p><code style="font-weight: bold;">MCO_PRJ_LIST</code>
+                </p>
+                <p>A project needs to be included into <code>MCO_PRJ_LIST</code> to make the build system aware of it. This list is used to generate global-scope operation code for the <code style="font-weight: bold;">build all</code> and <code style="font-weight: bold;">clean all</code><b> <![CDATA[ ]]></b>operations.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_PRJ_LIST += &lt;project-name&gt;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_HOST_EXECUTABLE</code>
+                </p>
+                <p>This list contains all the projects that generate host-side executable files including <code>mcocomp</code>, <code>sql2mc</code>o <i>e</i>X<i>treme</i>DB host utilities.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_HOST_EXECUTABLE += &lt;project-name&gt;
+&#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_TARGET_EXECUTABLE_DPTR</code>
+                </p>
+                <p><code style="font-weight: bold;">PRJ_TARGET_EXECUTABLE_OFFS</code>
+                </p>
+                <p>These lists include target-side <i>e</i>X<i>treme</i>DB executables such as the <code>regunlock</code> utility and <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>. The project needs to be put in the <code>DPTR</code>-list or <code>OFFS</code>-list depending on its meaning, or possibly into both of them.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_TARGET_EXECUTABLE_DPTR += &lt;project-name&gt;
+    PRJ_TARGET_EXECUTABLE_OFFS += &lt;project-name&gt;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_TARGET_LIBRARY_DPTR_DYNAMIC</code>
+                </p>
+                <p><code style="font-weight: bold;">PRJ_TARGET_LIBRARY_OFFS_DYNAMIC</code>
+                </p>
+                <p><code style="font-weight: bold;">PRJ_TARGET_LIBRARY_DPTR_STATIC</code>
+                </p>
+                <p><code style="font-weight: bold;">PRJ_TARGET_LIBRARY_OFFS_STATIC</code>
+                </p>
+                <p>These lists include all target-side <i>e</i>X<i>treme</i>DB library-projects. If a library is meant to be built as a static code container, it needs to be added to the <code>STATIC</code>-list, and to <code>DYNAMIC</code>-list for dynamic-loaded modules. The <code>DPTR</code>-lists and <code>OFFS</code>-lists separate <code>DPTR</code> and <code>OFFS</code> versions of the libraries. In most cases a library project would be included into all four of the lists but in some cases only a dynamic version is desired (for example <i>feed handlers</i> modules), or only the <code>OFFS</code> version makes sense (eg. the <code>mcovtdsk</code> library).</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_TARGET_LIBRARY_DPTR_DYNAMIC += &lt;project-name&gt;
+    PRJ_TARGET_LIBRARY_OFFS_DYNAMIC += &lt;project-name&gt;
+    PRJ_TARGET_LIBRARY_DPTR_STATIC += &lt;project-name&gt;
+    PRJ_TARGET_LIBRARY_OFFS_STATIC += &lt;project-name&gt;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_TARGET_CLASS</code>
+                </p>
+                <p>This list defines projects meant to be Java-classes. These projects are processed by the Java compiler into separate class-files.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_TARGET_CLASS += &lt;project-name&gt;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_TARGET_JAR</code>
+                </p>
+                <p>The projects from this list produce Java code library JAR files. These projects are compiled using the Java compiler and are then put together with the jar utility.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_TARGET_JAR += &lt;project-name&gt;
+&#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_TARGET_ANALYZE_ONLY</code>
+                </p>
+                <p>This is a quite special list. The build system processes the projects on the list, generates build properties out of the project properties, but does not generate code that produces the project products. The generated build properties may be used for some projects that need a special procedure to build its products.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>    &#160;
+    PRJ_TARGET_ANALYZE_ONLY += &lt;project-name&gt;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_CUSTOM</code>
+                </p>
+                <p>This is another special project list. The projects from this list need to be built using a special custom procedure defined in the project's makefile.</p>
+                <p>Other <code>PRJ</code>-flags are required to be set for projects such as <code>PRJ_&lt;project-name&gt;_PRODUCTS</code>, <code>PRJ_&lt;project-name&gt;_PRODUCT_DIRS</code>, <code>PRJ_&lt;project-name&gt;_INTERMEDIATE_DIRS</code> and <code>PRJ_&lt;project-name&gt;_BUILD_LOGS</code>. In most cases, the project needs to add its build procedure to the <code>PRJ_GENERATE_CUSTOM_RULES</code> list.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_CUSTOM += &lt;project-name&gt;
+    PRJ_GENERATE_CUSTOM_RULES += &lt;project-name-build-proc&gt;
+    PRJ_&lt;project-name&gt;_PRODUCTS         :=$(addprefix $(MCO_PRODUCT_ROOT)/target/bin/&lt;dir&gt;,
+        &lt;project-name&gt;.so &lt;project-name&gt;_debug.so)
+    PRJ_&lt;project-name&gt;_PRODUCT_DIRS     :=$(MCO_PRODUCT_ROOT)/target/bin/&lt;dir&gt;
+    PRJ_&lt;project-name&gt;_INTERMEDIATE_DIRS:=$(subst $(MCO_ROOT),$(MCO_BUILD_ROOT),
+        $(PRJ_&lt;project-name&gt;_DIR)/build-$(MCO_TARGET_ARCH_SFX))
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h3><a name="Common"></a>Common project flags</h3>
+                <p>The following flags define basic project properties and need to be included into every project file. Certainly, every project has to have a unique <code>&lt;project-name&gt;</code>; like "00-ddl" for instance.</p>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that the ":=" operator is used for value assignment. Other kinds of assignment mean value expansion for the make utility and need to be used very carefully due to the asynchronous nature of the build procedure. There is no way to predict the order of the values assignment.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_DIR:=$(call mco_project_dir)</code>
+                </p>
+                <p>This list defines the location of the project as an absolute path. All projects initialize this property via <code>$(call mco_project_dir)</code>. This construct calculates the path out of the <code>makefile.project-file</code> location.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_00-ddl_DIR:=$(call mco_project_dir)
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_TAGS</code>
+                </p>
+                <p>This list assigns tag(s) to the project (as a space-separated list). Using the tags it is possible to define logical groups within the project (by a feature, os-specific, etc). The build system is able to enable/disable the groups by user request or automatically.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_00-ddl_TAGS:=sample core
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_SRC</code>
+                </p>
+                <p>This list defines a set of project source code files (as a space-divided list). It may include C/C++ files and headers and Java files. Each of the files must be specified by its name and absolute filesystem path. The build system construct <code>$(call mco_project_file, &lt;file1.c&gt; &lt;file2.cpp&gt; ... &lt;fileN.h&gt;)</code> helps with the file location.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_00-ddl_SRC:=$(call mco_project_file,oidsize.h main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h3>Project-dependent flags</h3>
+                <p>The following flags are project-dependent and may or may not be specified depending on the meaning of the project.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_RUNTIME</code>
+                </p>
+                <p>Enables or disables the <i>e</i>X<i>treme</i>DB runtime for the project.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>&lt;not set&gt;</code> - do not add the <i>e</i>X<i>treme</i>DB runtime into the project (good for non-<i>e</i>X<i>treme</i>DB projects)</li>
+                    <li value="2"><code>YES</code> - add the runtime libraries into the project</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_00-ddl_RUNTIME:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_STORAGE</code>
+                </p>
+                <p>Defines the type of database storage for the project</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>TRANSIENT</code> - Pure in-memory database, use the <code>mcovtmem</code> component</li>
+                    <li value="2"><code>PERSISTENT</code> - Persistent/hybrid database, use the <code>mcovtdsk</code> component</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_00-ddl_STORAGE:=TRANSIENT
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_MEMDEV</code>
+                </p>
+                <p>Defines the memory device used for the project as the database memory storage</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>&lt;not set&gt;</code> - no memory driver on the linker line</li>
+                    <li value="2"><code>PRIVATE</code> - use the default private memory driver for current platform (defined in <code>include/settings.makefile</code>)</li>
+                    <li value="3"><code>SHARED</code> - use the default shared memory driver for current platform (defined in <code>include/settings.makefile</code>)</li>
+                    <li value="4"><code>&lt;other&gt;</code> - use a special memory drive, put the value to the linker line as the memory driver</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_00-ddl_MEMDEV:=PRIVATE
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_STORAGEDEV</code>
+                </p>
+                <p>Defines the persistent storage driver for the project. This works for persistent and hybrid database based projects.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>AUTO</code> - use the default persistent storage driver for the current platform (defined in <code>include/settings.makefile</code>)</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no storage driver</li>
+                    <li value="3"><code>&lt;other&gt;</code> - put the specified value to the linker line as the storage driver</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_02-open-disk_file_STORAGEDEV:=AUTO
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_SYNC</code>
+                </p>
+                <p>Defines the synchronization implementation for the project. In the most cases, AUTO will serve the project well.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>AUTO</code> - use the default synchronization implementation for the current platform depending on <code>PRJ_&lt;project_name&gt;_MEMDEV</code> setting.</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - use no synchronization. implementation on the linker line</li>
+                    <li value="3"><code>&lt;other&gt;</code> - put the specified value to the linker line as the synchronization implementation library</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_00-ddl_SYNC:=AUTO
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_TRANSMGR</code>
+                </p>
+                <p><a name="kanchor108"></a>Defines the transaction manager for the project.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>MURSIW</code> - use the <code>MURSIW</code> TM implementation library</li>
+                    <li value="2"><code>MURSIW_READ</code> - use the Read-optimized <code>MURSIW</code> TM implementation library</li>
+                    <li value="3"><code><a name="kanchor109"></a>MVCC</code> - use the <code>MVCC</code> TM implementation library</li>
+                    <li value="4"><code>EXCLUSIVE</code> - use the <code>Exclusive</code> TM implementation library</li>
+                    <li value="5"><code>&lt;not set&gt;</code> - no TM library on the linker line</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_00-ddl_TRANSMGR:=MURSIW
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_DATABASES</code>
+                </p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_SCHEMAS</code>
+                </p>
+                <p>These two flags define the project databases (names) and the schema files. There can be several database names/schemas divided by spaces in the list. The number of items in the lists must match. The schema files must be represented by the file names with absolute path ( <code>$(call mco_project_file,&lt;schema.mco&gt;</code> helps here).</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>PRJ_&lt;project-name&gt;_SCHEMAS:=$(call mco_project_file,&lt;schema1.mco&gt; ... &lt;schemaN.mco&gt;)</code>
+                    </li>
+                    <li value="2"><code>PRJ_16-uda-udameta_DATABASES:=&lt;database1-name&gt; ... &lt;databaseN-name&gt;</code>
+                    </li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_16-uda-udameta_SCHEMAS:=$(call mco_project_file,
+        uda1.mco uda2.mco uda3.mco uda4.mco uda5.mco)
+    PRJ_16-uda-udameta_DATABASES:=uda1 uda2 uda3 uda4 uda5
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_BACKUP</code>
+                </p>
+                <p>Indicates that the project uses Inline <i>Backup</i> feature.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - Enable the Incremental Backup feature (and the libraries) for the project.</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no support for Incremental Backup in the project.</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_18-backup-online_F_BACKUP:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_CLUSTER</code>
+                </p>
+                <p>Enables the Cluster feature for the project.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>TCP</code> - enable Cluster support and set TCP as the transport</li>
+                    <li value="2"><code>MPI</code> - enable Cluster support and set MPI as the transport</li>
+                    <li value="3"><code>&lt;not set&gt;</code> - do not enable the Cluster feature</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_cluster_attach_F_CLUSTER:=TCP
+    &#160;</pre>
+                </div>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note: do not forget to put <code>PRJ_&lt;project-name&gt;_TRANSMGR:=MVCC</code> for Cluster-enabled projects.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_CPP</code>
+                </p>
+                <p>Instructs the build system to generate the C++ interface for the project's databases (equivalent to setting the <code>-hpp</code> flag for <code>mcocomp</code>).</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - enable C++ interface</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no C++ interface</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_20-languages-cpp_smartptr_F_CPP:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_CRT</code>
+                </p>
+                <p>Defines whether to use the C Runtime Library CRT wrappers for the project.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>&lt;not set&gt;</code> - automatically use <code>mcouwrt</code> if the <i>e</i>X<i>treme</i>DB runtime is enabled or none otherwise</li>
+                    <li value="2"><code>WRT </code>- use <code>mcouwrt</code> (CRT implementation of utility routines) unconditionally</li>
+                    <li value="3"><code>NRT</code> - use <code>mcounrt</code> (own CRT-independent implementation of utility routines) unconditionally</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_fh_F_CRT:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_CRYPT</code>
+                </p>
+                <p>Enables cryptography support for the project.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - Adds the <code>mcocryptaes</code> library to the linkage</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - automatically adds <code>mcocryptstub</code> for <i>FeedHandler</i>-enabled or <i>e</i>X<i>treme</i>DB-enabled projects, or none otherwise</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_02-open-security-disk_cipher_F_CRYPT:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_DBCALC</code>
+                </p>
+                <p>Enables the <i>DBCALC</i> feature for the project</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - adds the <i>DBCALC</i> library to the linkage</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - does nothing</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_17-statistics-dbcalc-conv_F_DBCALC:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_FHLIB</code>
+                </p>
+                <p>Enables <i>FeedHandler</i> support for the project</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YE</code>s - the <i>FeedHandler</i> feature is enabled</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - the <i>FeedHandler</i> feature is not enabled</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_fh_F_FHLIB:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_HA</code>
+                </p>
+                <p>Enables <i>High Availability</i> feature support for the project</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>TCP</code> - enables <i>High Availability</i> and sets TCP as the transport channel. Adds the default socket library to the linkage.</li>
+                    <li value="2"><code>UDP</code> - enables <i>High Availability</i> and sets UDP as the transport channel. Adds the default socket library to the linkage.</li>
+                    <li value="3"><code>PIPES</code> - enables <i>High Availability</i> and sets PIPES as the transport channel. Adds the default socket library to the linkage.</li>
+                    <li value="4"><code>&lt;not set&gt;</code> - no <i>High Availability</i> support for the project</li>
+                </ul>
+                <p>Note: there can be multiple space-divided values for this setting.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_hasimple-master_F_HA:=TCP
+    PRJ_hamultichan-master_F_HA:=TCP UDP
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_HV</code>
+                </p>
+                <p>Enables <i>HttpView</i> feature support for the project</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - enable the <i>HttpView</i> feature support. Automatically adds SQL support if the SQL feature is enabled.</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no support for the <i>HttpView</i> feature</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_22-httpview-sql_F_HV:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_IOT</code>
+                </p>
+                <p>Enables <i>IoT</i> feature support</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - enable the <i>IoT</i> feature support.</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no support for the <i>IoT</i> feature</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_iot_simple_dev_F_IOT:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_LOG</code>
+                </p>
+                <p>Enable the <i>Transaction Logging</i> feature for the project</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - enable <i>Transaction Logging</i> feature support</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no support for the <i>Transaction Logging</i> feature</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_tlogbasic_F_LOG:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_NATIVE</code>
+                </p>
+                <p>Force native fields ordering for the <code>mcocomp</code> utility (equivalent to setting the <code>-nosort</code> option).</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - Do not reorder fields in the database schema structs</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - usual behavior</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_createdb_sniffer_F_NATIVE:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_ODBC</code>
+                </p>
+                <p>Enable ODBC support for the project</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - enable ODBC support</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no support for ODBC</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_simpleodbc_F_ODBC:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_PERFMON</code>
+                </p>
+                <p>Enable the <i>Performance Monitor</i> feature for the project</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - enable the <i>Performance Monitor</i> feature support</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no support for the <i>Performance Monitor</i> feature</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_25-perfmon_F_PERFMON:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_REST</code>
+                </p>
+                <p>Enable REST interface feature support  (for Web Services) for the project</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - enable the REST feature support</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no support for the REST feature</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_24-rest-mt_F_REST:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_SEQUENCES</code>
+                </p>
+                <p>Enable <i>Sequence</i> calculations support for the project</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - enable the <i>Sequence</i> feature support</li>
+                    <li value="2"><code>RLE</code> - enable support of RLE compression version of the <i>Sequence</i> feature</li>
+                    <li value="3"><code>&lt;not set&gt;</code> - no support for the <i>Sequence</i> feature</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_sequences-basic_F_SEQUENCES:=RLE
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_SERI</code>
+                </p>
+                <p>Enable serialization for the project</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - enable serialization support</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no support for serialization</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_18-backup-bse-conv_F_SERI:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_SMARTPTR</code>
+                </p>
+                <p>Enable generation of the <i>SmartPtr</i> interface for the C++ interface to the projects database (equivalent to setting the <code>-smartptr</code> option for <code>mcocomp</code>)</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - enable <i>SmartPtr</i> support</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no support for <i>SmartPtr</i></li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_20-languages-cpp_smartptr_F_SMARTPTR:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_SQL</code>
+                </p>
+                <p>Enable the SQL feature support for the project.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>LOCAL</code> - support for the local SQL engine</li>
+                    <li value="2"><code>REMOTE</code> - support for the RSQL engine + default socket library for the platform</li>
+                    <li value="3"><code>REMOTE_STANDALONE</code> - support for the RSQL client engine only + default socket library for the platform</li>
+                    <li value="4"><code>&lt;not set&gt;</code> - no SQL feature on the linker line</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_api-sql-01-c-api-mursimul_F_SQL:=LOCAL
+    PRJ_tpcodbc_F_SQL:=REMOTE
+    PRJ_api-sql-10-rsql-client-standalone_F_SQL:=REMOTE_STANDALONE
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;"><a name="kanchor110"></a>PRJ_&lt;project-name&gt;_F_UDA</code>
+                </p>
+                <p>Enables UDA database interface feature for the project</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - enable the UDA support</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no support for UDA</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_16-uda-udaops_F_UDA:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_XML</code>
+                </p>
+                <p>Enable the XML database serialization feature for the project (equivalent to setting the <code>-x</code> option for <code>mcocomp</code>)</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - enable the XML feature support</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - no support for the XML feature</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_16-uda-udaopen_F_UDA:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h3>Overrides</h3>
+                <p>The following flags override default build system behavior on the project level.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_DEFINES</code>
+                </p>
+                <p>Adds special defines for the project in the form <code>&lt;define-name&gt;[=&lt;define-value&gt;]</code>. The build script will add the necessary compiler declaration directives automatically.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_mcoews_DEFINES:=MCOEWS_BUILD_RUNTIME MCO_HTTP_OVERRIDE_CONFIG 
+        MCO_HTTP_CGI MCO_SECURITY_NONE MCO_HTTP_CONNECTION_USER_DATA
+        &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_INCLUDE</code>
+                </p>
+                <p>Additional include locations for the project as directory paths. The build script will add the necessary compiler include path declaration directives.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_mcocomplib_INCLUDE:=$(MCO_ROOT)/host/mcocomp
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_DEBUG</code>
+                </p>
+                <p>Force the project to be linked with the debug version of the <i>e</i>X<i>treme</i>DB libraries.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - set the debug libraries unconditionally</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - normal behavior (equjvalent to setting the <code>MCO_DEBUG=on</code> command line option for debug libraries)</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_fhdbg_DEBUG:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_F_USE_DYNAMIC_LIBRARIES</code>
+                </p>
+                <p>Force the project to be linked with the dynamic version of the <i>e</i>X<i>treme</i>DB libraries.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - set the dynamic libraries unconditionally</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - normal behavior</li>
+                </ul>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_fh_F_USE_DYNAMIC_LIBRARIES:=YES
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_ADDITIONAL_LIBRARIES</code>
+                </p>
+                <p>Add special libraries to the linkage of the project. The script will add all necessary library directives for the compiler.</p>
+                <p>Examples:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_mcoluaload_ADDITIONAL_LIBRARIES:=luajit
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_SKIP_AUTO_BUILD</code>
+                </p>
+                <p>Exclude this project from the auto-build sequence. The project build procedure needs to be initiated by another project (specify the product of the project as a required file for another project).</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>YES</code> - exclude this project from the auto-build list</li>
+                    <li value="2"><code>&lt;not set&gt;</code> - normal behavior</li>
+                </ul>
+                <p>Examples:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_openssl_SKIP_AUTO_BUILD  :=YES
+    &#160;</pre>
+                </div>
+                <p style="color: #cd5c5c;">&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_BUILD_SFX</code>
+                </p>
+                <p>This defines a custom suffix for the products intermediate directory. Good for projects with custom build procedure.</p>
+                <p style="color: #cd5c5c;">&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_RESULT_NAME_BASE</code>
+                </p>
+                <p>Overrides the name of the product of the project. The build script will use this value instead of <code>&lt;project-name&gt;</code> during product file name generation. The script will add all necessary prefixes and suffixes according to the projects product nature.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    PRJ_mcocomplib_RESULT_NAME_BASE:=mcocomp
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h3>Custom-build flags</h3>
+                <p>The following flags are good for custom-build projects only.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_PRODUCTS</code>
+                </p>
+                <p>The list of the products of the project. </p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_PRODUCT_DIRS</code>
+                </p>
+                <p>The list of directories where the products of the project will be created (if the location is not the default bin directory). </p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_BUILD_LOGS</code>
+                </p>
+                <p>The list of build logs for the project. </p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_INTERMEDIATE_DIRS</code>
+                </p>
+                <p>The list of directories where the intermediate files of the project will be created during the build procedure.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PRJ_&lt;project-name&gt;_MAKEFUNC</code>
+                </p>
+                <p>Defines the name of the custom build procedure that generates the build target for the project.</p>
+                <p style="color: #cd5c5c;">&#160;</p>
+                <h2><a name="Make2"></a>Make system controls</h2>
+                <p>The following flags are defined to control the make system build process. </p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">MCO_BUILD_ROOT</code>
+                </p>
+                <p>Defines the directory where the script will put all the build activities and intermediate files. It must be an absolute path to the directory. The default is the same directory as <code>MCO_ROOT</code>. Using this control it is possible to build <i>e</i>X<i>treme</i>DB binaries out of the source tree.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">MCO_PRODUCT_ROOT</code>
+                </p>
+                <p>Defines the directory where the build script will create products of the build process. It must be an absolute path to the directory. The default is <code>MCO_BUILD_ROOT</code>. Using this control it is possible to separate the final products from the intermediate files and the source code tree.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">MCO_QUICK_BUILD</code>
+                </p>
+                <p>Values: on or yes. Disables the detailed dependency tracking mechanism but makes the build process faster overall. When the override is active, the script starts the cascade import not from the <code>MCO_ROOT</code> but from the current directory, so the build procedure will cover only the current and all downstream directories.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">MCO_BUILD_LOG</code>
+                </p>
+                <p>Defines how to show the build process log. There are three settings: <code>on</code>, <code>off</code> and <code>full</code>. The default setting is <code>on</code> and it displays only brief progress information. The <code>off</code> setting makes the build script quiet (see the result code and the build logs for results). The <code>full</code> setting prints all of the output immediately and does not maintain build logs. For the <code>on</code> and <code>off</code> settings the build scrip puts all the commands and the output into the build log files located in the projects intermediate directories. Usually the build log is named the same as the project's product name with the "<code>.build-log</code>" extension. Also the build script produces separate build logs for object files naming them as <code>&lt;object-file-name&gt;.o.build-log</code>. </p>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that it is highly <i style="font-weight: bold;">not</i> recommended to use the <code>full</code> setting for a parallel build. The asynchronous nature of the process makes a mess in the output. It is very tricky to find the actual error message in this build log.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">MCO_EXTRA_CHECKS</code>
+                </p>
+                <p>The <code>on</code> setting enables extra checks (equivalent to <code>-Wall</code> and <code>-pedantic</code> options) for gcc-based builds.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">MCO_ENABLE_EVAL_BINARIES</code>
+                </p>
+                <p>The <code>yes</code> setting enables producing the evaluation version of <i>e</i>X<i>treme</i>DB binaries in bin-directories with the "<code>.eval</code>" suffix.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">MCO_DISABLE</code>
+                </p>
+                <p>This control switch allows the user to exclude groups of or specific projects / features out of the build process. The value of this control is a comma-separated or space-separated list of project tags that need to be disabled. Disabling a tag results not only in excluding the specified projects from the build process, but also disabling compilation defines indicating the presence of disabled features.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_DISABLE:=sequences
+    MCO_DISABLE:=java python lua
+    MCO_DISABLE:=net, fsystem
+    &#160;</pre>
+                </div>
+                <p style="color: #cd5c5c;">&#160;</p>
+                <p><code style="font-weight: bold;">MCO_ENABLE</code>
+                </p>
+                <p>This control switch enables projects / features that are normally disabled. </p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_ENABLE :=wchar 
+    MCO_ENABLE :=rtree
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h3>Additional switches</h3>
+                <p>The following switch settings have the effect of setting other build system controls.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">SHOW_BUILD_LOG=on</code>
+                </p>
+                <p>Uses <code>MCO_BUILD_LOG=full</code>.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">x64=on|off</code>
+                </p>
+                <p>The build system detects the target databus width automatically (with the target compiler's help). It is necessary to specify <code>x64=off</code> to make the build script produce 32-bit code.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">MCO_SKIP_PERFMON=yes</code>
+                </p>
+                <p>Skips the <i>Performance Monitor</i> (<code>perfmon</code>) build.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">MCO_SKIP_SEQ_LIB=yes</code>
+                </p>
+                <p>Disables <i>sequences</i> support.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">MCO_SKIP_LUA_UDF=yes</code>
+                </p>
+                <p>Disables UDF for Lua support.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">MCO_SKIP_XSQL_BIN=yes</code>
+                </p>
+                <p>Skips the <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> build.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">JAVA=off</code>
+                </p>
+                <p>Skips Java-related code.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">PYTHON=off</code>
+                </p>
+                <p>Skips Python-related code.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">LUA=off</code>
+                </p>
+                <p>Skips Lua-related code.</p>
+                <p>&#160;</p>
+                <p><code style="font-weight: bold;">FEEDHANDLER=off</code>
+                </p>
+                <p>Skip <i>FeedHandler</i> code.</p>
+                <p style="color: #cd5c5c;">&#160;</p>
+                <h2><a name="Make"></a>Make system overrides</h2>
+                <p>The following switches override the gcc/g++ compiler name for GCC-based toolchains. This makes it possible to use alternative compilers.</p>
+                <p><code style="font-weight: bold;">MCO_BUILD_GCC_OVERRIDE=&lt;gcc-executable-name&gt;</code>
+                </p>
+                <p><code style="font-weight: bold;">MCO_BUILD_GXX_OVERRIDE=&lt;g++-executable-name&gt;</code>
+                </p>
+                <p><code style="font-weight: bold;">MCO_HOST_GCC_OVERRIDE=&lt;gcc-executable-name&gt;</code>
+                </p>
+                <p><code style="font-weight: bold;">MCO_HOST_GXX_OVERRIDE=&lt;g++-executable-name&gt;</code>
+                </p>
+                <p><code style="font-weight: bold;">MCO_TARGET_GCC_OVERRIDE=&lt;gcc-executable-name&gt;</code>
+                </p>
+                <p><code style="font-weight: bold;">MCO_TARGET_GXX_OVERRIDE=&lt;g++-executable-name&gt;</code>
+                </p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_TARGET_GCC_OVERRIDE=gcc456
+    MCO_TARGET_GXX_OVERRIDE=g++456
+    &#160;</pre>
+                </div>
+                <p style="color: #cd5c5c;">&#160;</p>
+                <p><code style="font-weight: bold;">MCO_FORCE_OPENSSL</code>
+                </p>
+                <p>Overrides auto-detection of the OpenSSL package.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>MCO_FORCE_OPENSSL=auto</code> - (Default) Try to use an OpenSSL installation pointed to by the <code>MCO_OPENSSL_INCLUDE_PATH</code> environment variable if it is set; otherwise try to use the build system's OpenSSL headers if the build architecture is the same as the target and the build system has the necessary headers; finally, use the OpenSSL package from the source tree to build the OpenSSL installation for the target system and use it to build <i>e</i>X<i>treme</i>DB</li>
+                    <li value="2"><code>MCO_FORCE_OPENSSL=envpath</code> - Unconditionally force the use of $(MCO_OPENSSL_INCLUDE_PATH) to look for OpenSSL headers for the target</li>
+                    <li value="3"><code>MCO_FORCE_OPENSSL=buildsys</code> - Unconditionally force the use of the build system's OpenSSL installation</li>
+                    <li value="4"><code>MCO_FORCE_OPENSSL=sourcetree</code> - Force building the target-specific OpenSSL package from the source code archive located in <code>target/sal/net</code></li>
+                </ul>
+                <p style="color: #cd5c5c;">&#160;</p>
+                <p><code style="font-weight: bold;">MCO_FORCE_PYTHON</code>
+                </p>
+                <p>Overrides auto-detection of the Python package.</p>
+                <p>Possible values:</p>
+                <ul>
+                    <li value="1"><code>MCO_FORCE_PYTHON=auto</code> - (Default) try to use the Python installation pointed to by the <code>PYTHONBIN</code> environment variable if it is set; otherwise try to find the Python installation by the path. Next check if the Python version is sufficient, is runnable, that the architecture matches and it has the necessary header file. Otherwise, build Python from the package in the source tree.</li>
+                    <li value="2"><code>MCO_FORCE_PYTHON=envpath</code>- Unconditionally force the use of <code>$(PYTHONBIN)</code> to look for Python</li>
+                    <li value="3"><code>MCO_FORCE_PYTHON=buildsys</code> - Unconditionally force the use of the build system's Python installation</li>
+                    <li value="4"><code>MCO_FORCE_PYTHON=sourcetree</code> - Force building the Python package from the source code archive located in <code>target/python</code></li>
+                </ul>
+                <p style="color: #cd5c5c;">&#160;</p>
+                <p><code style="font-weight: bold;">HOST_COMPILER_FAMILY</code>
+                </p>
+                <p><code style="font-weight: bold;">TARGET_COMPILER_FAMILY</code>
+                </p>
+                <p>Overrides the auto-detected <code>host/target</code> compiler family. The auto-detection is based on the <code>host/target</code> platform OS.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    TARGET_COMPILER_FAMILY=gcc
+    &#160;</pre>
+                </div>
+                <p style="color: #cd5c5c;">&#160;</p>
+                <p><code style="font-weight: bold;">HOST_ARCH</code>
+                </p>
+                <p><code style="font-weight: bold;">TARGET_ARCH</code>
+                </p>
+                <p>Overrides the auto-detection of the <code>host/target</code> hardware architecture. The auto-detection is based on the host/target compilers information.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    TARGET_ARCH=aarch64
+    &#160;</pre>
+                </div>
+                <p style="color: #cd5c5c;">&#160;</p>
+                <p><code style="font-weight: bold;">HOST_DBUS_WIDTH</code>
+                </p>
+                <p><code style="font-weight: bold;">TARGET_DBUS_WIDTH</code>
+                </p>
+                <p>Overrides auto-detection of the <code>host/target</code> databus width. The auto-detection is based on the <code>host/target</code> compilers and architecture information.</p>
+                <p>Possible values are <code>16</code>, <code>32</code> or <code>64</code>.</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    TARGET_DBUS_WIDTH=32
+    &#160;</pre>
+                </div>
+                <p><code style="font-weight: bold;">HOST_FLAGS</code>
+                </p>
+                <p><code style="font-weight: bold;">TARGET_FLAGS</code>
+                </p>
+                <p>Unconditionally adds arguments  to the compiler/linker command line for HOST / TARGET code compilation. (Arguments are added exactly as they appear - no checks are applied.)</p>
+                <p>Example:</p>
+                <div class="code-block"><pre>&#160;
+    TARGET_FLAGS="--sysroot=/opt/toolchains/arm-unknown-linux/"
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h1>Test Suite makefile.test compatibility notes</h1>
+                <p>The build system includes compatibility support for the Test Suite <code>run.py</code> script. Keep in mind that the <code>makefile.test</code> files are not good for parallel processing. Do not try to use <code>make -j</code> for them.</p>
+                <p>There are two cases of possible usage of the build system from <code>run.py</code>:</p>
+                <p><b>Method 1.</b> Run <code>makefile.test</code> directly as a project makefile.</p>
+                <p>Example of the makefile:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_ROOT=$(abspath ../../..)
+    include $(MCO_ROOT)/include/settings.makefile
+    TEST_TAGS        = disk in-memory callback threads
+    TEST_COMMENT     = Allocation callback test. It checks callback 
+        notification about exceded in-mamory or disk database space
+    TEST_TIMEOUT     = 300
+    MCO_ROOT        ?= ../../..
+    PRJ_TYPE         = APP
+    PRJ_SHOW_BUILD   = YES
+    PRJ_SIDE         = TARGET
+    PRJ_SOURCES      = main.c
+    PRJ_SCHEMAS      = schema.mco
+    PRJ_INTERFACES   =
+    PRJ_DBNAMES      = allocclbkdb
+    PRJ_STORAGE     ?= MEMORY
+    PRJ_MEMDEV      ?= CONV
+    PRJ_STORAGEDEV   = AUTO
+    PRJ_SYNC         = AUTO
+    PRJ_TRANSMGR    ?= MURSIW
+    PRJ_DIRECTPTR   ?= NO
+    PRJ_HA          ?= NONE
+    PRJ_RPC          = NONE
+    PRJ_F_CPP        = NO
+    PRJ_F_SQL        = NO
+    PRJ_F_LOG        = NO
+    PRJ_F_DBCALC     = NO
+    PRJ_F_UDA        = NO
+    PRJ_F_XML        = NO
+    PRJ_F_SERI       = NO
+    PRJ_F_HV         = NO
+    PRJ_F_CLUSTER    = NO
+    PRJ_RMFILES      =
+    PRJ_TITLE        = allocclbk_$(PRJ_SUFFIX)
+    THIS_MAKEFILE := $(lastword $(MAKEFILE_LIST))
+    # include $(MCO_ROOT)/include/header.mak
+    include $(MCO_ROOT)/include/rules.makefile
+    &#160;</pre>
+                </div>
+                <p>The build system detects this kind of <code>makefile.test</code> files by the presence of <code>PTR_TYPE = APP</code> and <code>TEST_NAME</code>. For this kind of <code>makefile.test</code> the build system creates a virtual project makefile using <code>PRJ_TITLE</code> as the project name (<code>&lt;project-name&gt;</code> mentioned above) and sets all of the build properties as <code>PRJ_$(PRJ_TITLE)_XXXX</code> where <code>XXXX</code> is the property name. Project tags come from the <code>TEST_TAGS</code> variable. The <i>e</i>X<i>treme</i>DB runtime is always enabled. The final executable name is set as the value of <code>PRJ_TITLE</code> because the value includes <code>PRJ_SUFFIX</code> already. <code>PRJ_DIRECTPTR</code> controls the inclusion into the <code>PRJ_TARGET_EXECUTABLE_</code>-list. All other build properties are set according to the rules of the old build system.</p>
+                <p>&#160;</p>
+                <p><b>Method 2.</b> Run the normal build systems makefile from under <code>makefile.test</code> control.</p>
+                <p>Example of the <code>makefile.test</code>:</p>
+                <div class="code-block"><pre>&#160;
+    TEST_NAME        = 08-benchmarks-perf-conv
+    TEST_TAGS        = samples fast perf
+    TEST_COMMENT     = 08-benchmarks perf sample
+    TEST_TIMEOUT     = 300
+    TEST_STORAGE     = MEMORY
+    &#160;
+    MCO_ROOT        ?= ../../../../..
+    &#160;
+    all:
+        $(MAKE) -C . $(MAKEFLAGS) $(MAKECMDGOALS) PRJ_TITLE=$(TEST_NAME)_$(PRJ_SUFFIX)
+&#160;
+    clean:
+        $(MAKE) -C . $(MAKEFLAGS) $(MAKECMDGOALS)
+        &#160;</pre>
+                </div>
+                <p>The build system detects this kind of makefile.test by the presence of the <code>PRJ_TYPE</code> and <code>TEST_NAME</code> variables. As the <code>makefile.test</code> actually runs a typical makefile there is no need to create a virtual project. All the build properties come from the makefile and the script cares about the <code>PRJ_STORAGE</code>, <code>PRJ_MEMDEV</code>, <code>PRJ_TRANSMGR</code>, <code>PRJ_DIRECTPTR</code>, <code>PRJ_SUFFIX</code> and <code>TEST_TAGS</code> overrides only. <code>PRJ_DIRECTPTR</code> controls inclusion into the <code>PRJ_TARGET_EXECUTABLE_</code>-lists. Project tags comes from <code>TEST_TAGS</code>. The final executable name <code>PRJ_&lt;project-name&gt;_RESULT_NAME_BASE</code> is constructed from <code>&lt;project-name&gt;_$(PRJ_SUFFIX)</code>. The values of the <code>PRJ_STORAGE</code>, <code>PRJ_MEMDEV</code>, <code>PRJ_TRANSMGR</code> controls override normal values of the project build settings <code>PRJ_&lt;project-name&gt;_STORAGE</code>, <code>PRJ_&lt;project-name&gt;_F_MCOCOMP_FORCE</code>, <code>PRJ_&lt;project-name&gt;_STORAGEDEV</code>, <code>PRJ_&lt;project-name&gt;_MEMDEV</code>, <code>PRJ_&lt;project-name&gt;_TRANSMGS</code> and <code>PRJ_&lt;project-name&gt;_F_SEQUENCES</code> according to the rules described above (see section <a href="#Common">Common project flags</a> above).</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

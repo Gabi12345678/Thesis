@@ -1,0 +1,26 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.     *
+ *                                                               *
+ *****************************************************************/
+
+#define int1      signed<1>
+#define int2      signed<2>
+#define int4      signed<4>
+#define uint8   unsigned<8>
+#define uint4   unsigned<4>
+#define uint2   unsigned<2>
+#define uint1   unsigned<1>
+
+declare database udaudf;
+
+class Record
+{
+    string name;
+    uint4  value;
+	
+    unique tree <name> tstd;
+
+    userdef unique tree <name> tudf;
+};
+

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Using Sequences in SQL</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Using Sequences in SQL</h1>
+            <h2>Inserting and Updating Sequences with SQL </h2>
+            <blockquote>
+                <p><a href="../Core/Sequences.htm">Sequences</a> can be  inserted or updated through SQL in four different ways:</p>
+                <blockquote>
+                    <p>1)	As a scalar value:</p>
+                    <div class="code-block"><pre>    &#160;
+    INSERT OR UPDATE INTO t VALUES (1, 1);
+    &#160;</pre>
+                    </div>
+                    <p>2)	As an array:</p>
+                    <div class="code-block"><pre>&#160;
+    INSERT OR UPDATE INTO t VALUES (1, [1,2,3]);
+    &#160;</pre>
+                    </div>
+                    <p>3)	As a string:</p>
+                    <div class="code-block"><pre>&#160;
+    INSERT OR UPDATE INTO t VALUES (1, '{1,2,3}');
+    &#160;</pre>
+                    </div>
+                    <p>4)	As a result of a subquery:</p>
+                    <div class="code-block"><pre>&#160;
+    INSERT OR UPDATE INTO t SELECT * FROM tt;
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>In <i>e</i>X<i>treme</i>SQL releases prior to 7.1, when methods 1 through 3 were used, the sequence was appended to, while in the 4th method (subquery) the sequence was overwritten. With release 7.1 and later this behavior has been changed and is now regulated through the <code>append_mode</code> parameter: if <code>append_mode == true</code>, the sequence is appended to (which is the default behavior), otherwise overwritten. The <code>append_mode</code> parameter is modified via the SQL set command:</p>
+                <div class="code-block"><pre>    &#160;
+    set append_mode true
+    &#160;</pre>
+                </div>
+                <p>The <code>INSERT OR UPDATE</code> statement can also be used to insert elements at random positions inside sequences. This feature is useful for filling the "gaps" in ordered sequences (e.g. when some records in a time series are missing and must be filled in later). However, it is subject to the following limitations:</p>
+                <ul>
+                    <li value="1">the <code>append_mode</code> parameter must be set to <code>true</code>, otherwise the sequences will be overwritten with the new data;</li>
+                    <li value="2">the first field (or fields) of the table must be the primary key;</li>
+                    <li value="3">the first sequence must be ordered;</li>
+                    <li value="4">when inserting a range of elements, it must not overlap with existing elements;</li>
+                    <li value="5">as a corollary, multiple ranges cannot be inserted with a single query if they overlap with existing elements;</li>
+                    <li value="6">the elements may only be inserted from another (intermediate) table.</li>
+                </ul>
+                <p>Furthermore, consistency of the sequences must be ensured by the application; <i>e</i>X<i>treme</i>SQL does not enforce any constraints (apart from ordering where explicitly defined), which means that it is up to the application to define the semantics of the data. For example, given three sequences <code>timestamp</code>, <code>bid</code>, and <code>ask</code>, the application must see to it that all three of them are updated (appended to) when needed.</p>
+                <p>The <code>seq_remove()</code> function may be used to remove elements from sequences. It accepts a single argument which must be a projection of elements to be removed from the sequence, and returns the number of elements removed.</p>
+                <p>&#160;</p>
+                <h2>Inserting and Removing from Sequences Example</h2>
+                <h3>Step 1: Create and populate table <i>Quote</i></h3>
+                <p>Create and populate table <i>Quote</i> with <code>day</code>, <code>open</code> and <code>close</code> sequences, indexed by symbol name (<code>sym</code>). As per the aforementioned requirements, the first field of the table (<code>sym</code>) is the primary key, others are sequences; the first sequence (<code>day</code>) is ordered (ascending). Notice that the sequence data contains a gap between <code>20170505</code> and <code>20170509</code>, which we will fill in, in Step 2. Also notice that the parameter <code>append_mode</code> is explicitly set to <code>true</code>.</p>
+                <div class="code-block"><pre>&#160;
+    set append_mode true;
+    create table Quotes(sym string primary key, 
+        day sequence(int asc), 
+        open sequence(int), 
+        close sequence(int));
+    insert into Quotes values('AAA', 
+        [20170501, 20170502, 20170503, 20170504, 20170505, 20170509, 20170510], 
+        [101, 102, 103, 104, 105, 109, 110], 
+        [111, 112, 113, 114, 115, 119, 120]);
+    insert into Quotes values('BBB', 
+        [20170501, 20170502, 20170503, 20170504, 20170505, 20170509, 20170510], 
+        [201, 202, 203, 204, 205, 209, 210], 
+        [211, 212, 213, 214, 215, 219, 220]);
+    insert into Quotes values('CCC', 
+        [20170501, 20170502, 20170503, 20170504, 20170505, 20170509, 20170510], 
+        [301, 302, 303, 304, 305, 309, 310], 
+        [311, 312, 313, 314, 315, 319, 320]);
+    &#160;</pre>
+                </div>
+                <h3>Step 2: Create temporary table <i>QuoteHorizontal</i></h3>
+                <p>Create a temporary table <i>QuoteHorizontal</i> containing the missing elements and populate table <i>Quotes</i> from <i>QuoteHorizontal</i> using the <code>insert or update</code> statement with <code>order by</code> clause (notice that the <code>order by day</code> clause is required to properly order the elements):</p>
+                <div class="code-block"><pre>&#160;
+    create table QuotesHorizontal(sym string , day int, open int, close int);
+    insert into QuotesHorizontal values('AAA', 20170506, 106, 116), 
+        ('BBB', 20170506, 206, 216), ('CCC', 20170506, 306, 316);
+    insert into QuotesHorizontal values('AAA', 20170507, 107, 117), 
+        ('BBB', 20170507, 207, 217), ('CCC', 20170507, 307, 317);
+    insert into QuotesHorizontal values('AAA', 20170508, 108, 118), 
+        ('BBB', 20170508, 208, 218), ('CCC', 20170508, 308, 318);
+    insert or update into Quotes select * from QuotesHorizontal order by day;
+    &#160;</pre>
+                </div>
+                <h3>Step 3: Drop some data from the sequences</h3>
+                <p>At this point there are no gaps in the sequence data. We will use the <code>seq_remove()</code> function to drop some data from the sequences, e.g. from May 1st to May 3rd. Note that the <code>for update</code>  clause is required to modify the sequences (see the <a href="../../Programming/SQL/DML_Statements/Select.htm">SQL DML Select</a> page for further details regarding the <code>for update</code> clause):</p>
+                <div class="code-block"><pre>&#160;
+    select !seq_search(day, 20170501, 20170503) as daterange, 
+        seq_remove(day@daterange), seq_remove(open@daterange), 
+        seq_remove(close@daterange) 
+    from Quotes for update;
+    &#160;</pre>
+                </div>
+                <p>(Note that the operator "!" is a shortcut for <code>seq_ignore()</code>. The ignored column may be used in other calculated columns but will not appear in the actual statement output.)</p>
+                <h2>Parallel processing with sequences</h2>
+                <p>Support for the parallel processing of sequences is implemented through a thread pool in the SQL engine that can optimize performance for sequence operations in multi-processor environments. The thread pool allows sequence functions to split sequences into equal parts across threads and perform calculations on the threads in parallel reducing the total execution time.</p>
+                <p>The size of the thread pool can be regulated by the environment variable <code>MCO_CPU_NUMBER</code>. If no <code>MCO_CPU_NUMBER</code> environment variable is present, then the total number of CPU cores on the system is used as the pool size. If the hardware allows Hyper-Threading (HT) - and most modern CPUs do - the number of threads in the pool is equal to the number of HT cores (normally two per physical core). So if the machine has 4 real cores, the number of threads is 8. This can actually hurt performance sometimes.</p>
+                <p>The <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> configuration file the parameter <code><a href="../xSQL/Startup_Options/Config_File_Sections/ExtremeSQL_Params.htm">sql_use_connection_pool</a></code> can disable the use of the thread pool. Note that the default value of this parameter is true (meaning the thread pool is created on startup).</p>
+                <div class="code-block"><pre>&#160;
+    sql_use_connection_pool:false
+    &#160;</pre>
+                </div>
+                <p><a name="kanchor907"></a>At runtime the function <code>seq_parallelism()</code> can be used to limit the number of threads utilized to run queries. The function accepts a number of threads to use as a parameter and returns the total number of threads in the pool.</p>
+                <div class="code-block"><pre>&#160;
+    seq_parallelism(&lt;n_threads&gt;)
+    &#160;</pre>
+                </div>
+                <p>The value 1 for <code>n_threads</code> will effectively turn off the thread pool processing. For example, the following command sets the thread pool size to use 4 CPU cores:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt; SELECT seq_parallelism(4);
+    &#160;</pre>
+                </div>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that function <code>seq_parallelism()</code> affects the entire server, not just a single client’s session. So <code>seq_parallelism()</code> should not be executed from different clients running concurrently. Also note that if the number of parallel threads requested by functions <code>seq_parallelism()</code> exceeds the size of the pool specified in the environment variable <code>MCO_CPU_NUMBER</code> (the default is the number of available cores), the SQL engine will use the number specified in <code>MCO_CPU_NUMBER</code>.</p>
+                <h3>A Note on thread pool management on Windows</h3>
+                <p>Support for the parallel processing of sequences is implemented thorough the class <i>ThreadPool</i>, which instantiates a global variable <code>ThreadPool</code>. Thus the destructor for the <i>ThreadPool</i> class is called upon exit from the <code>main()</code> automatically. The destructor obviously frees up all resources associated with the pool: memory, synchronization primitives, and tasks. This implementation presents a problem with the Windows C++ runtime. The Windows C++ runtime is implemented so that it stops all threads except for the main thread when the application exits from its <code>main().</code> The C runtime then calls the destructors for all global objects, which in the case of the <code>ThreadPool</code> tasks is too late - those tasks were already stopped by the <i>ThreadPool</i> destructor.</p>
+                <p>A partial solution has been implemented to simply not call the <i>ThreadPool</i> destructor (only when running on Windows). It is remotely possible to introduce a resource leak in a scenario in which the database is created in the context of the <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> server (or a .Net or JNI server application) that loads the database DLL (<code>mcoxsql.dll</code> or <code>mcoxsql_debug.dll</code>) dynamically at runtime. If the database makes use of sequences and the server reloads the DLL multiple times, each time a resource leak is created.</p>
+                <p>A more resilient solution for this problem is forthcoming in a future release, but at present Windows developers should be aware of this potential problem.</p>
+                <h2>Null Values in Sequences</h2>
+                <p><i>Null</i> values can be inserted into or appended to sequences. For example:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;set append_mode true;
+    XSQL&gt;create table hor(i integer, f float);
+    XSQL&gt;insert into hor values(1, 100.0);
+    XSQL&gt;insert into hor values(1, NULL);
+    XSQL&gt;insert into hor values(1, 300.0);
+    XSQL&gt;insert into hor values(1, NULL);
+    XSQL&gt;create table ver(i integer primary key, f sequence(float));
+    XSQL&gt;insert or update into ver select * from hor;
+    &#160;</pre>
+                </div>
+                <p>Now the sequence field <code>f</code> in table <code>ver</code> has the expected values:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;select * from ver;
+    i	f
+    ----------------------------------------------------------------
+    1	{100, null, 300, null}
+    &#160;</pre>
+                </div>
+                <p>Using the <code>FLATTENED</code> keyword, the sequence can be displayed as follows:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;select flattened * from ver;
+    i	f
+    ----------------------------------------------------------------
+    1	100
+    1	null
+    1	300
+    1	null
+    &#160;</pre>
+                </div>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that it is not allowed to insert <i>null</i> values into ordered sequences, which is expected behavior. An attempt to do so will cause the SQL compiler to emit an error. For example:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;insert into ver values(1, [1,2,3,null,5]);
+    ERROR: Sequence item is out of order
+    &#160;</pre>
+                </div>
+                <h3>Null Values with Sequence Functions</h3>
+                <p>Where it makes sense, <a href="../../Programming/SQL/Analytics_Functions/Functions_By_Category.htm">sequence functions</a> support <i>null</i> values. For example, using the table <code>ver</code> defined above with the same inserted values:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;select seq_last(f) from ver where i=1;
+    #1
+    ----------------------------------------------------------------
+    null
+&#160;
+    XSQL&gt;select seq_first(f) from ver where i=1;
+    #1
+    ----------------------------------------------------------------
+    100
+    &#160;</pre>
+                </div>
+                <p>The following SQL functions (and their <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> counterparts) <i style="font-weight: bold;">do not</i> support sequences with <i>null</i> values, and hence will return <code>MCO_E_SEQ_NULL_VALUE</code> if called on a sequence with <i>nulls</i>:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 186px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 125px;" />
+                    <thead>
+                        <tr class="TableStyle-FunctionReference-Head-Header1">
+                            <th class="TableStyle-FunctionReference-HeadE-Column2-Header1">SQL</th>
+                            <th class="TableStyle-FunctionReference-HeadD-Column2-Header1"><i>xSQL</i>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">mco_seq_window_agg*()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">seq_window_agg*()</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p>mco_seq_group_agg*()</p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>seq_group_agg*()</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p>mco_seq_diff()</p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>seq_diff()</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">mco_seq_map()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">seq_map()</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">mco_seq_union()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">seq_union()</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">mco_seq_cross()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">seq_cross()</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">mco_seq_extrema()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">seq_extrema()</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">mco_seq_stretch*()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">seq_stretch*()</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">mco_seq_asof_join()</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">seq_asof_join()</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Inserting Null Values with Array Syntax</h3>
+                <p>There is a use case which is potentially confusing when inserting null values into sequences: when a single literal null value is inserted using the <code>INSERT OR UPDATE</code> clause, it sets the sequence field's value to null, instead of appending the null to the sequence. For example:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;set append_mode true;
+    XSQL&gt;create table ver(i integer primary key, f sequence(float));
+    XSQL&gt;insert or update into ver values(1, [1,2,3]);
+    XSQL&gt;insert or update into ver values(1, null);
+    XSQL&gt;select * from ver;
+&#160;
+    i	f
+    ----------------------------------------------------------------
+    1	null
+    &#160;</pre>
+                </div>
+                <p>If the null value needs to be appended to the sequence, the <i>array syntax</i> must be used. For example:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;set append_mode true;
+    XSQL&gt;create table ver(i integer primary key, f sequence(float));
+    XSQL&gt;insert or update into ver values(1, [1,2,3]);
+    XSQL&gt;insert or update into ver values(1, [null]);
+    XSQL&gt;select * from ver;
+    &#160;
+    i	f
+    ----------------------------------------------------------------
+    1	{1, 2, 3, null}
+    &#160;</pre>
+                </div>
+                <p>If the initial sequence is empty, the latter syntax will yield a sequence with single null element. For example:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;set append_mode true;
+    XSQL&gt;create table ver(i integer primary key, f sequence(float));
+    XSQL&gt;insert or update into ver values(1, [null]);
+    XSQL&gt;select * from ver;
+    i	f
+    ----------------------------------------------------------------
+    1	{null}
+    &#160;</pre>
+                </div>
+                <p>Please note how this is different from the very first case. The first case sets the sequence field's value to null, while using the array syntax results in a sequence with one null element.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

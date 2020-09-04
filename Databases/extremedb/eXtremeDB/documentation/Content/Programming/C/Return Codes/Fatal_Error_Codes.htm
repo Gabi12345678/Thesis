@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|C API Return Codes">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeDB Fatal Error Codes</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/ReturnCodes.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>DB Fatal Error Codes</h1>
+            <blockquote>
+                <p>The following table lists fatal error code <b style="font-style: italic;">bases</b> that indicate bugs in the application code that render the <i>e</i>X<i>treme</i>DB<a name="kanchor593"></a> runtime unable to safely continue execution. In Java, C# and Python applications fatal errors will raise exceptions.  In C and C++ applications, the <b>ERR</b> type return codes are passed to the runtime function <code>mco_stop()</code> to terminate execution. <code>mco_stop()</code>in turn calls the internal function <code>mco_stop__()</code> with the actual <i>file name and line number in the source code</i> where the error condition was detected. If a <a href="../../../Users_Guides/Core/Error_Handling/Error_Handling_C.htm">fatal error handler</a> has been registered, a break point can be set there in the debugger and the filename and line number can be seen by examining the call stack to further aid in locating the source of the bug. </p>
+                <p>The error code base values identify the type of error. But the actual value of the return code will be composed of the base value for this type of error plus the source code line number in the runtime where the error was detected. <i style="font-weight: bold;">For this reason the error code value cannot be searched by number</i>. But the cause of the error can often be determined by recognizing its base, then lookup that base value in the table below. </p>
+                <p>For example, suppose your application terminates with error code 530040. Subtracting away the runtime source code line number (40 in this case) gives the  error code base 530000. As can be seen in the table below, this base code indicates an invalid object handle. Very often this type of bug can be found by simply examining the call stack to see where in the application code the <i>e</i>X<i>treme</i>DB API&#160;that trapped the error was called. </p>
+                <p>If the programming error is not obvious, please send the error code along with an explanation to <a href="mailto:Support@McObject.com" title="McObject Technical Support email address" alt="McObject Technical Support email address">McObject Technical Support</a>.</p>
+                <table style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../Resources/TableStyles/ReturnCodes.css');" class="TableStyle-ReturnCodes" cellspacing="0">
+                    <col class="TableStyle-ReturnCodes-Column-Column1" />
+                    <col class="TableStyle-ReturnCodes-Column-Column2" />
+                    <col class="TableStyle-ReturnCodes-Column-Column3" />
+                    <thead>
+                        <tr class="TableStyle-ReturnCodes-Head-Header1">
+                            <th class="TableStyle-ReturnCodes-HeadE-Column1-Header1">Mnemonic Constant Name</th>
+                            <th style="text-align: center;" class="TableStyle-ReturnCodes-HeadE-Column2-Header1">Value</th>
+                            <th class="TableStyle-ReturnCodes-HeadD-Column3-Header1">Meaning </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DB</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">100000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Database head</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DICT</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">110000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Dictionary</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_CURSOR</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">120000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Cursors</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_PMBUF</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">130000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Page manager (internal allocator) buffer</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_COMMON</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">140000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Common routines</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_HEAP</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">150000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Heap manager</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_OBJ</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">160000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Object allocator</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_BLOB</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">170000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Blob operation</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_FREC</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">180000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Record allocator</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_VOLUNTARY</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">190000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Voluntary index</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_LOADSAVE</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">200000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Db save and load</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_PGMEM</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">210000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Page memory</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_EV_SYN</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">220000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Synchronous events</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_EV_ASYN</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">230000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Asynchronous events</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_EV_W</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">240000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Event wrappers</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_XML_W</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">250000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">XML serialization</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_XML_SC</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">260000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">XML schema</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_BTREE</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">270000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Btree</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_HASH</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">280000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Hash</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_RECOV                      </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">290000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Recovery</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_INST                       </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">330000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Db instance</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_TRN                        </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">340000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Transaction</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_TMGR                       </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">370000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Trans. manager</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_SYNC                       </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">400000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">General sync</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_ORDER                      </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">450000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Ordering and hash</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_SEM                        </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">460000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Semaphores</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_SHM                        </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">470000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Shared memory</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_SER                        </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">500000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Serialization</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_HA                         </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">510000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">High Availability</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DB_NOMEM                   </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">520000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Insufficient memory</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_OBJECT_HANDLE </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">530000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Invalid object handle</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_UNSUPPORTED_FLOAT</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">540000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Support of float and double types is disabled</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_UNSUPPORTED_DOUBLE</td>
+                            <td style="color: #ff0000;text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">550000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Double unsupported. DEPRECATED</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DB_NOMEM_HASH              </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">560000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Insufficient memory in hash index</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DB_NOMEM_HEAP              </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">570000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Insufficient memory in heap manager</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DB_NOMEM_TRANS             </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">580000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1"><a name="kanchor594"></a>Insufficient memory in transaction manager</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DB_NAMELONG                </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">590000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Database name is too long</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DB_VERS_MISMATCH           </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">600000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Version of <i>e</i>X<i>treme</i>DB runtime mismatch. (Be sure to recompile the schema and link your application with the new generated .h and .c files when moving a schema from one installation of <i>e</i>X<i>treme</i>DB to another distribution package.)</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_RUNTIME                    </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">610000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Invalid type of sync. library</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_INMEM_ONLY_RUNTIME         </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">620000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">There are persistent classes in the schema but runtime in-memory only</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK                       </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">700000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">General disk error</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_WRITE                 </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">710000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Unable to write to persistent storage</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_READ                  </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">720000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Unable to read from persistent storage</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_FLUSH                 </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">730000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Unable to commit file system buffers to disk</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_CLOSE                 </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">740000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Error closing persistent storage</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_TRUNCATE              </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">750000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Unable to truncate persistent storage</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_SEEK                  </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">760000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Unable to seek in persistent storage</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_OPEN                  </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">770000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Unable to open persistent storage</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_ALREADY_OPENED        </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">780000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Persistent storage already opened</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_NOT_OPENED            </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">790000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Persistent storage has not been opened</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_INVALID_PARAM         </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">800000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Invalid parameters value</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_PAGE_ACCESS           </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">810000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Error reading a page from persistent media</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_INTERNAL_ERROR        </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">820000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Internal fatal error</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_OPERATION_NOT_ALLOWED </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">830000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Operation not allowed fatal error</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_ALREADY_CONNECTED     </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">840000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Persistent storage already connected</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_TOO_MANY_INDICES      </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">850000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Too many indexes in persistent classes</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_TOO_MANY_CLASSES                </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">860000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Too many persistent classes</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_SPACE_EXHAUSTED       </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">870000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Persistent storage device out of space</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_PAGE_POOL_EXHAUSTED   </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">880000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Too many pinned disk pages</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_INCOMPATIBLE_LOG_TYPE </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">890000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Incompatible database log type</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_BAD_PAGE_SIZE         </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">900000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Page size is not acceptable</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_SYNC                  </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">910000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Failed operation on sync. primitive</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_CRC                   </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">920000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Wrong CRC code of disk page</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DISK_FORMAT_MISMATCH       </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">930000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">
+                                <p>Incompatible configuration changes affecting disk database format. All incompatible changes of configuration which affect format of the database on the disk:
+</p>
+                                <ul>
+                                    <li value="1">
+CRC checking mode
+
+</li>
+                                    <li value="2">maximal size of classes
+</li>
+                                    <li value="3">
+incompatible transaction manager
+
+</li>
+                                </ul>
+                                <p>See also MCO_ERR_DISK_BAD_PAGE_SIZE (reported when in-memory or disk page size were changed) </p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_CHECKPIN                   </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">940000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Unbalanced pin / unpin</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_CONN                       </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">950000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Connection processing</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_REGISTRY                   </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">960000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Registry processing</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_INDEX                      </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">970000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Index processing</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_VTMEM                      </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">980000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">In-memory only runtime</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_VTDSK                      </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">990000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">mixed runtime</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_RTREE                      </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1000000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">rtree index</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1"><a name="kanchor595"></a>MCO_ERR_UDA                        </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1010000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Uniform Data Access</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_PTREE                      </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1020000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Patricia tree index</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_TL                         </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1030000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Transaction log</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_CLUSTER                    </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1040000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Cluster</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_CLNWTCP                    </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1050000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Cluster TCP transport</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_SEQ                        </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1060000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Sequence errors</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_NESTED_TRANS_TRAP          </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1090000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Attempt to start nested transaction detected</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_PERFMON                    </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1100000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Performance monitoring</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_AIO                        </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1110000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Asynchronous IO</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_CLNWMPI                    </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1120000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Cluster MPI transport</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_DDL                        </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1130000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">DDL errors</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_SQL_EXCEPTION              </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1140000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">SQL exception</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_BACKUP</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1150000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">BACKUP exception</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_ERR_ACTIVE_TRANSACTION</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1160000</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Attempt to disconnect an active transaction</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">Invalid return codes</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">1170000-1999998</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Values between 1170000 and 1999998 are not valid <i>e</i>X<i>treme</i>DB return codes</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyB-Column1-Body1">MCO_ERR_LAST</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyB-Column2-Body1">1999999</td>
+                            <td class="TableStyle-ReturnCodes-BodyA-Column3-Body1">Marker for the last possible error code</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><a href="javascript:void(0);" class="MCHelpControl MCHelpControl-Related relatedTopics" data-mc-topics="eXtremeDB Cluster Error Codes|Cluster_Error_Codes.htm||eXtremeDB Data Definition Language Error Codes|DDL_Error_Codes.htm||eXtremeDB Disk Manager Error Codes|Disk_Manager_Error_Codes.htm||eXtremeDB Fatal Error Codes|Fatal_Error_Codes.htm||eXtremeDB HA Error Codes|HA_Error_Codes.htm||eXtremeDB Network Error Codes|Network_Error_Codes.htm||eXtremeDB Non-fatal Error Codes|Non_Fatal_Error_Codes.htm||eXtremeDB Performance Monitor and Miscellaneous Error Codes|PMon_Misc_Error_Codes.htm||eXtremeDB Sequence Error Codes|Sequence_Error_Codes.htm||eXtremeDB Status Codes|Status_Codes.htm||eXtremeDB Transaction Logging Error Codes|Transaction_Logging_Error_Codes.htm||eXtremeDB UDA Error Codes|UDA_Error_Codes.htm||eXtremeDB XML Error Codes|XML_Error_Codes.htm"><span class="MCHelpControl-RelatedHotSpot_"><img class="MCHelpControl_Image_Icon" src="../../../../Skins/Default/Stylesheets/Images/transparent.gif" height="16" width="16" alt="Related Topics Link Icon" />Related Topics</span></a>
+                </p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,70 @@
+// preprocessor directives
+
+// include file
+#include "oidsize.h"
+
+// define macro
+#define int1      signed<1>
+#define int2      signed<2>
+#define int4      signed<4>
+#define int8      signed<8>
+#define uint1   unsigned<1>
+#define uint2   unsigned<2>
+#define uint4   unsigned<4>
+#define uint8   unsigned<8>
+
+
+// Database elements
+// declare database
+declare database sampleddl;
+
+// declare OID
+struct oid_struct {
+    uint4 a;
+    int1  b;
+};
+
+declare oid oid_struct[OID_SIZE];
+
+// Basic elements
+// declare structure
+struct header {
+    char<16> char_id;
+    uint1    type;
+};
+
+// declare fixed size class with OID and scalar fields
+class A {
+    
+    uint4 id;
+    char<256> name;
+    
+    // OID index
+    oid;
+};
+
+// declare fixed class without OID and structure
+class B {
+    header h;
+    uint8  data;
+
+    // List index
+    list;
+};
+
+// declare variable length class with dynamic length fields
+class C {
+    int2   seq_no;
+    string seq_name;
+    vector <uint1> flags;
+    
+    // regular index declaration
+    hash <seq_no>   by_seq_no[1000];
+    tree <seq_name> by_seq_name;
+};
+
+// declare compact class with dynamic length fields and autoid
+compact class D {
+    string str;
+    autoid[100];
+};

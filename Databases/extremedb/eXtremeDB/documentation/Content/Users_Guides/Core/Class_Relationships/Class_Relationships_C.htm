@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Database Class Relationships in C</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Database Class Relationships in C</h1>
+            <blockquote>
+                <p>As explained in the <a href="../Class_Relationships.htm">Class Relationships page</a>, <i>e</i>X<i>treme</i>DB provides a number of ways to implement relationships (joins) between tables, each having distinct advantages and costs in terms of memory overhead and performance. The different techniques available to C developers are presented in the following sections.</p>
+                <h2>OID references</h2>
+                <p>In the "satellite radio receiver" <a href="OID_Reference_Example_C.htm">example</a>, an <code>OID</code> is used to join two classes. This is a special case that can be optimal when the data model contains a reasonable set of data that uniquely identifies the principal object. Please use this link to view details of this <a href="OID_Reference_Example_C.htm">example</a>. </p>
+                <p>In this case the <code>OID</code>&#160;is struct <i>ProgId</i> which contains a single 4-byte integer. But the actual data set that uniquely identifies a class could be quite complex, containing several fields of different types. The <i>e</i>X<i>treme</i>DB<a name="kanchor293"></a> runtime has no knowledge of the internal structure of the <code>OID</code>. They are represented by byte arrays and accessed via a hash index over that array. The <code>ref</code> field that references the <code>OID</code> in class <i>ProgramData</i> (<code>TimeSlot.pId</code> in this example) has the same structure as the <code>OID</code> and is used as key in the <code>OID</code>-based lookup operations. (It is important to note that the <code>oid</code>/<code>ref</code> relationship joins this <i>TimeSlot</i> object to a specific <i>ProgramData</i> object but does not include any cascade-type operations or sanity (referential integrity) verifications of any kind.)</p>
+                <p>Effectively this "<code>OID</code>-join” is implemented by an internal hash index created by the <i>e</i>X<i>treme</i>DB runtime through the <code>oid</code>/<code>ref</code> declaration. Joins can also be implemented explicitly without using an <code>OID</code>. Three such techniques are explained below.</p>
+                <h2>Index join</h2>
+                <p>A simple one-to-many relationship between two tables, <i>Department</i> and <i>Employee</i>, could be implemented in SQL as follows:</p>
+                <div class="code-block"><pre>&#160;
+    select e.name, d.name from Employee e 
+    inner join Department d d.dept_no = d.dept_no;
+    &#160;</pre>
+                </div>
+                <p>To implement a one-to-many relationship like the <i>Department</i> &gt; <i>Employee</i> example, we might define an <i>e</i>X<i>treme</i>DB database schema as follows:</p>
+                <div class="code-block"><pre>&#160;
+    #define uint2     unsigned&lt;2&gt;
+    declare database  index_join_db;
+&#160;
+    class Department
+    {
+        string name;
+        string code;
+        uint2  dept_no;
+&#160;
+        unique tree&lt;name&gt; Iname;
+        unique tree&lt;code&gt; Icode;
+        unique hash&lt;dept_no&gt; Idept_no[1000];
+    };
+    &#160;
+    class Employee
+    {
+        string name;
+        uint2  dept_no;
+&#160;
+        unique tree&lt;name&gt; Iname;
+        unique tree&lt;dept_no,name&gt; Idept_name;
+    };
+    &#160;</pre>
+                </div>
+                <p>Here the unique hash index <code>Idept_no</code> acts as the “primary key” on the <i>Department</i> class, and the unique B-Tree index <code>Idept_name</code> acts as the “foreign key” in the <i>Employee</i> class. Note that <code>Idept_name</code> is a compound index consisting of two field values in the <i>Employee</i> class: <code>dept_no</code> and <code>name</code>. It is not necessary that a “foreign key” be compound. A simple B-Tree index on field <code>dept_no</code> would be sufficient to form the join, but with the compound index we have the additional advantage that we are able to order all instances with the same <code>dept_no</code> value in alphabetical order by the <code>name</code> field.</p>
+                <p>To demonstrate how the join is implemented, consider the following code snippets (taken from the SDK sample "05_indexes/joins/index_join”) that manage <i>Department</i> and <i>Employee</i> objects. First we populate the <i>Department</i> class with some sample data:</p>
+                <div class="code-block"><pre>&#160;
+    // The struct corresponding to class Department
+    struct department_data 
+    {
+        char name[20];
+        char code[10];
+        uint2 dept_no;
+    };
+&#160;
+    struct department_data departments[] = 
+    {
+        { "Accounting", "Acct", 101 },
+        { "Engineering", "Eng", 102 },
+        { "Customer Service", "CS", 103 },
+        { "Technical Support", "TS", 104 }
+    };
+    ...
+&#160;
+    printf("\nCreate departments:\n");
+    for (i = 0; i &lt; sizeof(departments) / sizeof(departments[0]) &amp;&amp; MCO_S_OK == rc; ++i) 
+    {
+        rc = mco_trans_start(db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t);
+        if (MCO_S_OK == rc)  
+        {
+            Department dept;
+            Department_new(t, &amp;dept);
+            Department_name_put(&amp;dept, departments[i].name, strlen(departments[i].name));
+            Department_code_put(&amp;dept, departments[i].code, strlen(departments[i].code));
+            Department_dept_no_put(&amp;dept, departments[i].dept_no);
+            printf("\n\t%d) %s, %s, dept_no=%d", i,
+                departments[i].code, departments[i].name,
+                departments[i].dept_no );
+                rc = mco_trans_commit(t);
+        }
+    }
+    &#160;</pre>
+                </div>
+                <p>Then we insert <i>Employee</i> objects associating them with the appropriate <i>Department</i> object:</p>
+                <div class="code-block"><pre>&#160;
+    // The struct corresponding to class Employee
+    struct employee_data 
+    {
+        char name[20];
+        uint2 dept_no;
+    };
+    &#160;
+    // Define the relationship of Employees to Departments
+    struct employee_department 
+    {
+        char name[20];
+        char dept_code[10];
+    };
+    &#160;
+    struct employee_department employee_departments[] = 
+    {
+        { "John", "Acct" }, { "Samuel", "Acct" }, { "Thomas", "Acct" },
+        { "David", "Eng" }, { "James", "Eng" }, { "Robert", "Eng" },
+        { "William", "CS" }, { "Kevin", "CS" }, { "Alex", "CS" },
+        { "Daniel", "CS" }, { "Diego", "CS" }, { "Brandon", "TS" }
+    };
+    ...
+    &#160;
+    printf("\n\nCreate employees and join each to a department:\n");
+    for (i = 0; i &lt; sizeof(employee_departments) / sizeof(employee_departments[0])
+            &amp;&amp; MCO_S_OK == rc; ++i) 
+    {
+        rc = mco_trans_start(db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t);
+        if (MCO_S_OK == rc) 
+        {
+            // Find Department by code; extract dept_no;
+            // create Employee and assign name, dept_no
+            Department dept;
+            rc = Department_Icode_find(t, employee_departments[i].dept_code, 
+                        strlen(employee_departments[i].dept_code), &amp;dept);
+            if (MCO_S_OK == rc)
+            {
+                uint2 dept_no = 0;
+                rc = Department_dept_no_get(&amp;dept, &amp;dept_no);
+                if (MCO_S_OK == rc)
+                {
+                    Employee emp;
+                    Employee_new(t, &amp;emp);
+                    Employee_name_put(&amp;emp,
+                    employee_departments[i].name, strlen(employee_departments[i].name));
+                    Employee_dept_no_put(&amp;emp, dept_no);
+                    printf("\n\t%d) %s, dept_no=%d", i, employee_departments[i].name, dept_no);
+                    rc = mco_trans_commit(t);
+                }
+                ...
+            }
+            ...
+        }
+        ...
+    }
+    &#160;</pre>
+                </div>
+                <p>Note that we use the <code>Department_Icode</code> index to find the <i>Department</i> object with the specified code; then the <i>Department</i>’s <code>dept_no</code> is extracted to be stored in the new <i>Employee</i> object. This creates the association (relationship) between the <i>Department</i> object with the <i>Employee</i> object upon which the join is implemented during a subsequent query.</p>
+                <p>Now to navigate the relationship between (i.e. “join”) these two classes we might use code like the following to display all of a given employee’s coworkers in their department:</p>
+                <div class="code-block"><pre>&#160;
+    // 1. Find the Employee object by name and extract dept_no
+    rc = Employee_Iname_find(t, search_name, (uint2)strlen(search_name), &amp;emp1);
+    if (MCO_S_OK == rc) 
+    {
+        printf("\n\n%s's co-workers in ", search_name);
+        Employee_dept_no_get(&amp;emp1, &amp;dept_no1);
+        Employee_Idept_name_index_cursor(t, &amp;csr);
+        // 2. Find the Department object by its dept_no and display Department name
+        rc = Department_Idept_no_find(t, dept_no1, &amp;dept1);
+        if (MCO_S_OK == rc) 
+        {
+            Department_name_get(&amp;dept1, name, sizeof(name), &amp;len);
+            printf("%s are:\n", name);
+            // 3. Position the cursor in the Idept_name index to the first object with
+            // this dept_no
+            rc = Employee_Idept_name_search(t, &amp;csr, MCO_GE, dept_no1, "", 0);
+            // Scroll forward through the cursor and display the names found...
+            while (MCO_S_OK == rc) 
+            {
+                // Check if the current Employee is same as the found Employee
+                Employee_from_cursor(t, &amp;csr, &amp;emp2);
+                Employee_name_get(&amp;emp2, name, sizeof(name), &amp;len);
+                // If the two names are not equal, display the name (if dept_no is
+                // still the same)
+                if (0 != strcmp(name, search_name)) 
+                {
+                    // Verify that the dept_no is still the same, otherwise break out
+                    Employee_dept_no_get(&amp;emp2, &amp;dept_no2);
+                    if (dept_no1 != dept_no2) break;
+                    printf("\n\t%s", name);
+                }
+                rc = mco_cursor_next(t, &amp;csr);
+            }
+        }
+    }
+    &#160;</pre>
+                </div>
+                <p>Note that we use the <code>Employee_Iname</code> index to find the <i>Employee</i> object with the specified name; then the <i>Employee</i>’s <code>dept_no</code> is extracted to perform a search on index <code>Employee_Idept_name</code>, which positions the cursor to the first node in the index tree having this <code>dept_no</code>. Then we scroll through the cursor until the <code>dept_no</code> is different. For each index node we get the <i>Employee</i> object from the cursor and extract its <code>name</code> field. If this is not the <code>name</code> of the original employee we are searching coworkers for, we display the name and call <code>mco_cursor_next()</code> to go to the next node in the index tree.</p>
+                <h3>Pros and Cons:</h3>
+                <p>This is a typical “relational” style join familiar to many developers. While it is intuitive and straightforward to implement, it incurs significant overhead to manage several indexes. When an <b>insert</b> transaction is committed, a hash index and two B-Tree index nodes are created for each <i>Department</i> object, and two B-Tree index nodes are created for each <i>Employee</i> object. This results in memory consumption in addition to the space occupied by the database objects themselves and the B-Tree index structures require “balancing” which can incur significant processor cycles. Hence, the overall performance for inserting objects is not optimal.</p>
+                <p>Lookup of <i>Department</i> objects by <code>dept_no</code> is efficient due to the hash index <code>Idept_no</code>. And the cursor created on the <i>Employee</i> objects through compound index <code>Employee_Idept_name</code> facilitates “scrolling” through the index tree to list employees in alphabetical order by <code>name</code>. Note that to display the <code>name</code> field, an additional function call, <code>Employee_from_cursor()</code>, is required to access the database object.</p>
+                <h2><a name="kanchor294"></a>Autoid reference</h2>
+                <p>An alternative technique to the index-join example above is to implement the “foreign key” relationship with a direct <code>reference</code> from the <i>Employee</i> object to its <i>Department</i>. An <code>autoid</code> field can serve this purpose. For example, we might define a database schema as follows:</p>
+                <div class="code-block"><pre>&#160;
+    #define uint2     unsigned&lt;2&gt;
+    declare database  autoid_ref_db;
+&#160;
+    class Department
+    {
+        autoid[1000];
+        string name;
+        string code;
+&#160;
+        unique tree&lt;name&gt; Iname;
+        unique tree&lt;code&gt; Icode;
+    };
+&#160;
+    class Employee
+    {
+        string name;
+        autoid_t dept;
+&#160;
+        unique tree&lt;name&gt; Iname;
+        unique tree&lt;dept,name&gt; Idept_name;
+    };
+    &#160;</pre>
+                </div>
+                <p>Note that the <i>Department</i> class no longer has the <code>dept_no</code> field and thus no index <code>Idept_no</code>. Instead it has the declaration <code>autoid[1000];</code>. This actually causes a “hidden” hash index to be maintained for the <i>Department</i> object <code>autoid</code> values that are automatically incremented as new objects are created. And note the field <code>dept</code> in the <i>Employee</i> class which will store the <code>autoid</code> of the associated  <i>Department</i> object.</p>
+                <blockquote>
+                    <p>
+                        <img src="../../../Resources/Images/note.png" /> Note that there is an alternative form of the <code>autoid_t</code> field declaration that is useful when an SQL interface is used to access the referenced table. For example the <i>Employee</i> class could be defined:</p>
+                    <div class="code-block"><pre>    &#160;
+    class Employee
+    {
+        string name;
+        autoid_t&lt;Department&gt; dept;
+&#160;
+        unique tree&lt;name&gt; Iname;
+        unique tree&lt;dept,name&gt; Idept_name;
+    };
+    &#160;</pre>
+                    </div>
+                    <p>This syntax specifies the class being referenced by the field value. The <i>e</i>X<i>treme</i>DB runtime does not verify this declaration and does not use it in any way (in fact it could be any integer value). However, the <i>e</i>X<i>treme</i>SQL runtime “trusts" the declaration and makes use of it to implement references in SQL. Again, there are no cascading provisions or referential integrity checks of any kind. So care must be taken if, for example, an attempt is made to delete a <i>Department</i> object that is referenced by one or more <i>Employee</i> objects.</p>
+                </blockquote>
+                <p>To demonstrate how this join is implemented, consider the following code snippets (taken from the SDK sample “05_indexes/joins/autoid_ref”). We populate the <i>Department</i> class as in the index_join sample above, but note that when inserting <i>Employee</i> objects we extract the <code>autoid</code> from the corresponding <i>Department</i> object:</p>
+                <div class="code-block"><pre>&#160;
+    printf("\nCreate employees and join each to a department:\n");
+    for (i = 0; i &lt; sizeof(employee_departments) / sizeof(employee_departments[0])
+            &amp;&amp; MCO_S_OK == rc; ++i) 
+    {
+        rc = mco_trans_start(db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t);
+        if (MCO_S_OK == rc) 
+        {
+            // Find Department by code; extract autoid; create Employee and
+            // assign name, dept (autoid)
+            Department dept;
+            rc = Department_Icode_find(t, employee_departments[i].code,
+                strlen(employee_departments[i].code), &amp;dept);
+            if (MCO_S_OK == rc)
+            {
+                autoid_t dept_id = 0;
+                rc = Department_autoid_get(&amp;dept, &amp;dept_id);
+                if (MCO_S_OK == rc)
+                {
+                    Employee emp;
+                    Employee_new(t, &amp;emp);
+                    Employee_name_put(&amp;emp, employee_departments[i].name,
+                        strlen(employee_departments[i].name));
+                    Employee_dept_put(&amp;emp, dept_id);
+                    printf("\n\t%d) %s, Department.Autoid=%ld", i,
+                        employee_departments[i].name, (long)dept_id);
+                    rc = mco_trans_commit(t);
+                }
+                ...
+            }
+        }
+    }
+    &#160;</pre>
+                </div>
+                <p>The code to display all of a given employee’s coworkers in their department would be nearly identical to that in the index_join sample above with the exception that we call <code>Department_autoid_find()</code> to lookup the <i>Department</i> object by its <code>autoid</code>. This is equivalent to the call of <code>Department_Idept_no_find()</code> which uses hash index <code>Idept_no</code>, the difference is that the autoid is automatically generated whereas a unique value must be specified for the no <code>dept_no</code> field. The same technique of scrolling through a cursor on compound index <code>Employee_Idept_name</code> is used to display the employee names in alphabetical order:</p>
+                <div class="code-block"><pre>&#160;
+    // 1. find employee record by name
+    rc = Employee_Iname_find(t, search_name, (uint2)strlen(search_name), &amp;emp);
+    if (MCO_S_OK == rc) 
+    {
+        printf("\n\n%s's co-workers in ", search_name);
+        Employee_dept_get(&amp;emp, &amp;dept_id1);
+        // 2. Find the Department object by its autoid and display the
+        // Department name
+        rc = Department_autoid_find(t, dept_id1, &amp;dept1);
+        if (MCO_S_OK == rc) 
+        {
+            Department_name_get(&amp;dept1, name, sizeof(name), &amp;len);
+            printf("%s are:\n", name);
+            // 3. Position the cursor in the Idept_name index to the first object
+            // with this autoid
+            Employee_Idept_name_index_cursor(t, &amp;csr);
+            rc = Employee_Idept_name_search(t, &amp;csr, MCO_GE, dept_id1, "", 0);
+            if (MCO_S_OK == rc) 
+            {
+                while (MCO_S_OK == rc) 
+                {
+                    // Check if the current Employee is same as the found Employee
+                    Employee_from_cursor(t, &amp;csr, &amp;emp2);
+                    Employee_name_get(&amp;emp2, name, sizeof(name), &amp;len);
+                    // If the two names are not equal, display the name (if dept_id is
+                    // still the same)
+                    if (0 != strcmp(name, search_name)) 
+                    {
+                        // Verify that the dept_id is still the same, otherwise break
+                        // out of loop
+                        Employee_dept_get(&amp;emp2, &amp;dept_id2);
+                        if (dept_id1 != dept_id2) 
+                            break;
+                        printf("\n\t%s", name);
+                    }
+                    rc = mco_cursor_next(t, &amp;csr);
+                }
+            }
+        }
+    }
+    &#160;</pre>
+                </div>
+                <h3>Pros and Cons:</h3>
+                <p>This implementation uses somewhat less memory by eliminating the field <code>dept_no</code> and the lookup of <i>Department</i> objects is likewise efficient due to the hash index generated for the <code>autoid</code>. But some optimization might be gained by relaxing the application requirements.</p>
+                <p>Note that the major drawback for performance and memory consumption, both for this and the index_join relational approach, is incurred by the B-Tree indexes: <code>Employee_Idept_name</code>, <code>Employee_Iname</code> and <code>Department_Iname</code>. For example, if it is not necessary to lookup a <code>Department</code> object by its name, the <code>Department_Iname</code> could be eliminated. And further, if it is not necessary to display the employees of a given department in alphabetical order, then we can eliminate the compound index  <code>Employee_Idept_name</code>. The following example illustrates this approach.</p>
+                <h2>Vector of autoids</h2>
+                <p>Instead of storing the <code>autoid</code> of the <i>Employee</i> object’s <i>Department</i> in the <i>Employee</i> object, we could instead store an array or <code>vector</code> of <i>Employee</i> <code>autoids</code> in the <i>Department</i> object. For example (see the SDK sample “05_indexes/joins/autoid_vector”), we might define a database schema as follows:</p>
+                <div class="code-block"><pre>&#160;
+    #define uint2     unsigned&lt;2&gt;
+    declare database  autoid_vector_db;
+&#160;
+    class Department
+    {
+        autoid[1000];
+        string name;
+        string code;
+&#160;
+        vector&lt;autoid_t&gt; employees;
+&#160;
+        unique hash&lt;code&gt; Icode[1000];
+    };
+&#160;
+    class Employee
+    {
+        autoid[1000];
+        string name;
+        autoid_t dept;
+&#160;
+        unique tree&lt;name&gt; Iname;
+    };
+    &#160;</pre>
+                </div>
+                <p>Note that both classes are defined with <code>autoid</code>. The <i>Employee</i> <code>autoid</code> will be stored in the <i>Department</i> class vector <code>employees</code>. We will use the <i>Department</i> <code>autoid</code> in <i>Employee</i> field <code>dept</code>, as in the autoid_ref example above, to efficiently access the <i>Department</i> object from the <i>Employee</i>.</p>
+                <p>The code to populate the database becomes a little more complicated as we need to allocate space for the dynamic vector of <code>autoid</code> values in the <i>Department</i> objects and assign these <code>autoids</code> when we insert the <i>Employee</i> objects. So for each <i>Employee</i> object we execute the following code to allocate space and insert an <i>Employee</i> <code>autoid</code> into the <i>Department</i> <code>employees</code> vector:</p>
+                <div class="code-block"><pre>&#160;
+    // Get the autoid of this Department then create the new Employee object
+    // and insert its autoid into the vector
+    Department_autoid_get(&amp;dept, &amp;dept_id);
+    Employee_new(t, &amp;emp);
+    Employee_name_put(&amp;emp, employee_departments[i].name,
+        strlen(employee_departments[i].name));
+    Employee_dept_put(&amp;emp, dept_id);
+    Employee_autoid_get(&amp;emp, &amp;emp_id);
+    &#160;
+    // Allocate space for a new vector element and insert this
+    // Employee object's autoid
+    Department_employees_size(&amp;dept, &amp;vector_size);
+    Department_employees_alloc(&amp;dept, vector_size + 1);
+    Department_employees_put(&amp;dept, vector_size, emp_id);
+    &#160;</pre>
+                </div>
+                <p>Now the code to display all of a given employee’s coworkers in their department will simply find the Department object as in the autoid_ref sample above by calling <code>Department_autoid_find()</code> and then list this department’s employees from the vector as follows:</p>
+                <div class="code-block"><pre>&#160;
+    Department_name_get(&amp;dept1, name, sizeof(name), &amp;len);
+    printf("%s are:\n", name);
+    // 3. Scroll through the vector of Employee autoids, find the Employee
+    // object and display its name
+    Department_employees_size(&amp;dept1, &amp;vector_size);
+    for (short j = 0; j &lt; vector_size; j++)
+    {
+        rc = Department_employees_at(&amp;dept1, j, &amp;emp_id2);
+        // End loop when the value of this vector element is 0
+        if (0 == emp_id2) 
+            break;
+        &#160;
+        // Skip if this is the autoid of the "search_name" object
+        if (emp_id1 != emp_id2)
+        {
+            // Find the Employee object by autoid and display the name
+            rc = Employee_autoid_find(t, emp_id2, &amp;emp2);
+            if (MCO_S_OK == rc)
+            {
+                Employee_name_get(&amp;emp2, name, sizeof(name), &amp;len);
+                printf("\t%s\n", name);
+            }
+        }
+    }
+&#160;</pre>
+                </div>
+                <h3>Pros and Cons:</h3>
+                <p>This implementation uses significantly less memory and reduces behind-the-scenes tree structure maintenance by eliminating two B-Tree indexes with the small sacrifice of not ordering the list of <i>Employees</i> in alphabetical order. However, it could be a simple matter to introduce a sorting algorithm into the application to address this; but it should be noted that this approach could become untenable if the number of <i>Employees</i> per <i>Department</i> is very large.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,12 @@
+#define jbyte  signed<1>
+#define jshort signed<2>
+#define jint   signed<4>
+#define jlong  signed<8>
+#define jchar  unsigned<2>
+#define HASH_SIZE 10000
+declare database tlogdb;
+declare auto_oid[HASH_SIZE];
+class RecordObj {
+    jint key;
+    unique tree<key> key_index;
+};

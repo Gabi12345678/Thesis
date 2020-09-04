@@ -1,0 +1,6 @@
+-include $(call mco_makefile_file, \
+export_import/makefile.project.export_import \
+xml_ops/makefile.project.xml_ops \
+xml_policy/makefile.project.xml_policy \
+xml_schema/makefile.project.xml_schema \
+)

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Getting Started with eXtremeDB">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Building and running SDK Samples</title>
+        <link href="../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Building and running SDK Samples</h1>
+            <blockquote>
+                <p>The <i>e</i>X<i>treme</i>DB SDK samples are grouped according to API and to the components of your package.  All of the necessary source code, tools and scripts are provided to make building and running these samples simple and easy. The build procedure will vary slightly depending on your development platform. Please follow the steps outlined below for your development environment.</p>
+                <h2>Unix-Linux build procedure</h2>
+                <p>For Unix-Linux packages, a makefile is provided in the installation root directory as well as in each sample sub-directory. The makefile has the following build targets:</p>
+                <ul>
+                    <li value="1"><code>samples</code>: build all samples</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>&#160;
+    make samples
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <ul>
+                    <li value="1"><code>clean</code>: Clean the directory tree. This command removes only intermediate files leaving the final products and build-logs intact.</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>&#160;
+    make clean
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <ul>
+                    <li value="1"><code>distclean</code>: Total cleanup. This command removes all the intermediate files and directories; the final files and the build logs will be purged out of the directory tree.</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>&#160;
+    make distclean
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <h3>Compatibility with previous <i>e</i>X<i>treme</i>DB versions</h3>
+                <p>For compatibility with <i>e</i>X<i>treme</i>DB releases prior to version 8.0, the build system provides partial support for the major command line controls from the previous versions. The makefiles from <i>e</i>X<i>treme</i>DB version 7.x need to be edited manually with the following changes:</p>
+                <blockquote>
+                    <p>1. The <code>MCO_ROOT</code> variable must be set as an absolute path to the eXtremeDB root directory (this can be done using <code>$(abspath &lt;path&gt;)</code> or by manually specifying the root directory)</p>
+                    <p>2. The inclusion “<code>include/header.mak</code>”  must be removed; instead specify “<code>include/settings.makefile</code>” just after the <code>MCO_ROOT</code> definition</p>
+                    <p>3. Include the line “<code>include/rules.makefile</code>” as the last line (after all other content)</p>
+                </blockquote>
+                <p>
+                    <img src="../Resources/Images/note.png" /> Note that the resulting makefile is not valid for parallel compilation (i.e. the “<code>-j</code>” option is <i style="font-weight: bold;">not</i> supported) and can be used only from the directory of the project (or sample).</p>
+                <p>Following is an example of an edited makefile from <i>e</i>X<i>treme</i>DB version 7.x for sample "<code>samples/native/core/08-benchmarks/perf-conv</code>":</p>
+                <div class="code-block"><pre><a name="kanchor337"></a><a name="kanchor338"></a>&#160;
+    # root directory of eXtremeDB installation
+    MCO_ROOT        := $(abspath ../../../../..)
+    include $(MCO_ROOT)/include/settings.makefile
+&#160;
+    PRJ_TYPE         = APP
+    PRJ_SHOW_BUILD   = AUTO
+    PRJ_TITLE        = 08-benchmarks-perf
+    PRJ_SIDE         = TARGET
+    PRJ_SOURCES      = main.c
+    PRJ_SCHEMAS      = perf.mco
+    PRJ_INTERFACES   =
+    PRJ_DBNAMES      = perf
+    PRJ_STORAGE     ?= MEMORY
+    PRJ_MEMDEV      ?= CONV
+    PRJ_STORAGEDEV   = NONE
+    PRJ_SYNC         = AUTO
+    PRJ_TRANSMGR    ?= MURSIW
+    PRJ_DIRECTPTR   ?= AUTO
+    PRJ_HA           = NONE
+    PRJ_RPC          = NONE
+    PRJ_F_CPP        = NO
+    PRJ_F_SQL        = NO
+    PRJ_F_LOG        = NO
+    PRJ_F_DBCALC     = NO
+    PRJ_F_UDA        = NO
+    PRJ_F_XML        = NO
+    PRJ_F_SERI       = NO
+    PRJ_F_HV         = NO
+    PRJ_F_CLUSTER    = NO
+    PRJ_RMFILES      =
+&#160;
+    # Common definitions
+    THIS_MAKEFILE := $(lastword $(MAKEFILE_LIST))
+    include $(MCO_ROOT)/include/rules.makefile
+    &#160;</pre>
+                </div>
+                <h2>Windows build procedure</h2>
+                <p>Windows packages are built for the specific version of <i>Visual Studio</i> requested in the purchase order. Solution files are provided in the installation root directory, and individual project files are provided in each sample directory according to the components of your package. The solution file can be opened directly in <i>Visual Studio</i> to build the individual sample projects or "Batch build" the entire group of projects. </p>
+                <h2>Native Language APIs</h2>
+                <p>Please use the following links to view specific instructions for the API of interest:</p>
+                <table class="TableStyle-FunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../Resources/TableStyles/FunctionReference.css');" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1" style="height: 27px;">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Samples_Startup/C_API_Samples.htm">C</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">C API samples</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Samples_Startup/Cpp_API_Samples.htm">C++</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">C++ samples</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Samples_Startup/SQL_Samples.htm">SQL</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Embedded SQL API and <i>xSQL</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Samples_Startup/Java_Samples.htm">Java</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Java Native Interface (JNI) samples</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="../Programming/JDBC/SDK_Samples/Simple_JDBC.htm">JDBC</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">JDBC samples</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Samples_Startup/Dot_Net_Samples.htm">C#</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">.NET (C#)&#160;samples</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><a href="Samples_Startup/Python_Samples.htm">Python</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Python API samples</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><a href="javascript:void(0);" class="MCHelpControl MCHelpControl-Related relatedTopics" data-mc-topics="eXtremeDB Documentation|../eXtremeDB_Documentation_Map.htm||eXtremeDB Supported Platforms|../eXtremeDB_Supported_platforms.htm||What's New in This Release|../eXtremeDB_New_Features.htm"><span class="MCHelpControl-RelatedHotSpot_"><img class="MCHelpControl_Image_Icon" src="../../Skins/Default/Stylesheets/Images/transparent.gif" height="16" width="16" alt="Related Topics Link Icon" />Related Topics</span></a>
+                </p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

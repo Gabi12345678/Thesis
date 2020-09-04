@@ -1,0 +1,4 @@
+-include $(call mco_makefile_file, \
+binary/makefile.project.binary \
+character/makefile.project.character \
+)

@@ -1,0 +1,14 @@
+MCO_PRJ_LIST += 16-uda-udaops
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 16-uda-udaops
+PRJ_16-uda-udaops_TAGS:=sample core uda
+PRJ_16-uda-udaops_DIR:=$(call mco_project_dir)
+PRJ_16-uda-udaops_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_16-uda-udaops_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_16-uda-udaops_DATABASES:=udaops
+PRJ_16-uda-udaops_RUNTIME:=YES
+PRJ_16-uda-udaops_MEMDEV:=PRIVATE
+PRJ_16-uda-udaops_STORAGE:=TRANSIENT
+PRJ_16-uda-udaops_SYNC:=AUTO
+PRJ_16-uda-udaops_TRANSMGR:=MURSIW
+PRJ_16-uda-udaops_F_UDA:=YES

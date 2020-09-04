@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += Hashtable
+PRJ_TARGET_CLASS += Hashtable
+PRJ_Hashtable_TAGS:=sample core java
+PRJ_Hashtable_DIR :=$(call mco_project_dir)
+PRJ_Hashtable_SRC :=$(call mco_project_file,Hashtable.java)

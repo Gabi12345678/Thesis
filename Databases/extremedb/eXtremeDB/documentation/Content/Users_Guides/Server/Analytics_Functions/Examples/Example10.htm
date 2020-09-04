@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Analytics Functions Example 10: Group Aggregate</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Analytics Functions Example 10: Group Aggregate</h1>
+            <blockquote>
+                <h2>Group Aggregate Sum</h2>
+                <p>Get the total <code>volume</code> for each month of the first quarter of 2013:</p>
+                <div class="code-block"><pre>    &#160;
+    SELECT symbol, 
+        seq_search(day, 20130101, 20130331) as trade_date,
+        volume@trade_date as "volume",
+        seq_group_agg_sum(volume@trade_date, trade_date/100) as "month_vol"
+    FROM Quote WHERE symbol='IBM';
+    &#160;
+    symbol
+    trade_date{}
+    volume{}
+    month_vol{}
+    ------------------------------------------------------------------------------
+    IBM
+    {20130102, 20130103, 20130104, 20130107, 20130108,
+    20130109, 20130110, 20130111, 20130114, 20130115,
+    20130116, 20130117, 20130118, 20130122, 20130123,
+    20130124, 20130125, 20130128, 20130129, 20130130,
+    20130131,
+    20130201, 20130204, 20130205, 20130206, 20130207,
+            
+    20130208, 20130211, 20130212, 20130213, 20130214,
+            
+    20130215, 20130219, 20130220, 20130221, 20130222,
+            
+    20130225, 20130226, 20130227, 20130228,
+            
+    20130301, 20130304, 20130305, 20130306, 20130307,
+    20130308, 20130311, 20130312, 20130313, 20130314,
+    20130315, 20130318, 20130319, 20130320, 20130321,
+    20130322, 20130325, 20130326, 20130327, 20130328}
+    {4234226, 3644876, 3380159, 2862276, 3028071,
+    3211997, 3608049, 3880567, 4172922, 4172034,
+    2962820, 3884254, 4559773, 7159219, 12530410,
+    4447108, 3358887, 2823615, 3617058, 2998524,
+    3091406,
+    3371154, 3188819, 3636837, 3624103, 3076793,
+            
+    2893254, 2944651, 2461779, 2169757, 3294126,
+            
+    3627887, 2998317, 3715311, 3923051, 3107976,
+            
+    3845476, 3391562, 4185545, 4689998,
+            
+    3309434, 3693365, 3807706, 3594899, 3884317,
+    3700786, 3049701, 3592096, 3356946, 5505584,
+    7936544, 3006125, 3198577, 3020648, 5830566,
+    3031457, 3242463, 2300240, 3223381, 3752999}
+    {87628251, 64146396, 76037834}
+    &#160;</pre>
+                </div>
+                <p>We can analyze the output above as follows:</p>
+                <ul>
+                    <li value="1">The output values for sequences <code>trade_date</code> and <code>volume</code> are divided by month for convenience.</li>
+                    <li value="2">The sequence <code>month_vol</code> shows the “group_aggregate sum“ for each of the months (calculated as <code>trade_date/100</code>, eg. <code>20130101/100 = 201301</code>).</li>
+                    <li value="3">The volumes for the month of February are totaled as follows to produce the corresponding value <span style="background-color: #ffff00;">64146396</span> in sequence <code>month_vol</code>:</li>
+                </ul>
+                <table style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../../Resources/TableStyles/FunctionReference.css');" class="TableStyle-FunctionReference" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <thead>
+                        <tr class="TableStyle-FunctionReference-Head-Header1">
+                            <th class="TableStyle-FunctionReference-HeadE-Column2-Header1" style="text-align: left;">Trade Date</th>
+                            <th style="text-align: left;" class="TableStyle-FunctionReference-HeadD-Column2-Header1">Volume</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130201</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">3371154</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130204</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">3188819</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130205</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">3636837</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130206</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">3624103</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130207</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">3076793</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130208</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">2893254</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130211</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">2944651</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130212</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">2461779</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130213</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">2169757</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130214</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">3294126</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130215</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">3627887</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130219</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">2998317</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130220</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">3715311</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130221</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">3923051</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130222</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">3107976</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130225</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">3845476</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130226</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">3391562</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130227</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">4185545</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1" style="text-align: left;">20130228</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyD-Column2-Body1">4689998</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1" style="font-weight: bold;text-align: left;">Feb. Total</td>
+                            <td style="text-align: left;" class="TableStyle-FunctionReference-BodyA-Column2-Body1"><span style="background-color: #ffff00;">64146396</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2>To run this example</h2>
+                <p>A sample script to demonstrate this <code>select</code> statement using <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> can be run from the <code>samples/xsql/scripts/financial</code> directory with the following command:</p>
+                <div class="code-block"><pre>    &#160;
+    x 10
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

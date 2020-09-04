@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|C++ API|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Dynamic Object Allocators in C++</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Dynamic Object Allocators in C++</h1>
+            <blockquote>
+                <p>The <i>e</i>X<i>treme</i>SQL engine manages dynamic data objects like <i>Blob, String, Array</i> etc. with an object of class <i>Allocator</i> as an argument in order to construct (and make a copy of) the dynamic object using memory managed by the <i>Allocator</i>. There are three types of <i>Allocator</i> provided by the <i>e</i>X<i>treme</i>SQL engine:</p>
+                <ul>
+                    <li value="1">Session allocator: <code>SqlEngine::getAllocator()</code> or <code>McoSqlSession::getAllocator()</code> -  covers the lifetime of the session (application thread).</li>
+                    <li value="2">Prepared statement allocator: <code>PreparedStatement::getAllocator()</code> - covers the lifetime of the prepared statement.</li>
+                    <li value="3">Result-set allocator: <code>QueryResult::allocator</code> – covers the lifetime of the result-set.</li>
+                </ul>
+                <p>Alternatively, the developer can manually create an object of class <i>Allocator</i> via C++ dynamic memory allocation or on the stack and use it to construct SQL dynamic objects.</p>
+                <p>Any dynamic object created by any allocator can be explicitly deleted at any moment by calling <code>DELETE_OBJ(Allocator *allocator, DynamicObject *object);</code></p>
+                <p>All dynamic objects that are not deleted explicitly are alive as long as their <i>Allocator</i> object is alive. And all of these objects are automatically deleted when allocator is destroyed.</p>
+                <p>Below is a code snippet showing usage of <i>Allocators</i> with explanatory comments:</p>
+                <div class="code-block"><pre>&#160;
+    {
+        SqlEngine engine;
+        ... // Some initialization code
+        {
+            QueryResult result( engine-&gt;executeQuery(query));
+            Cursor* iterator = result-&gt;records();
+            while ( iterator-&gt;hasNext() ) 
+            {
+                // Locally created Allocator object
+                Allocator on_stack_variable_allocator;
+                Record* rec = iterator-&gt;next();
+                &#160;
+                // Get the string value of result-set column 0
+                // Create object 'on_stack_alloc_string' using
+                // locally created Allocator
+                String* on_stack_alloc_string = rec-&gt;get(0)
+                    -&gt;stringValue(&amp;on_stack_variable_allocator);
+&#160;
+                // Create object 'result_set_alloc_string' using
+                // result-set allocator. This is actually field
+                // ResultSet::allocator returned by wrapper class
+                // QueryResult
+                String* result_set_alloc_string = rec-&gt;get(0)
+                    -&gt;stringValue(result-&gt;allocator);
+&#160;
+                // Create object 'session_alloc_string' using session allocator.
+                // Please note that this Allocator object is not re-entrant.
+                // So in separated threads methods getAllocator of a
+                // specific object of class McoSqlSession must be used.
+                String* session_alloc_string = rec-&gt;get(0)
+                    -&gt;stringValue(engine.getAllocator());
+                ...
+                // Use string objects here
+                &#160;
+                // Explicitly delete object on_stack_alloc_string (otherwise its
+                // memory would be released at point 1)
+                DELETE_OBJ(&amp;on_stack_variable_allocator, on_stack_alloc_string);
+&#160;
+                // Explicitly delete object result_set_alloc_string (otherwise its
+                // memory would be released at point 2)
+                DELETE_OBJ(result-&gt;allocator, result_set_alloc_string);
+&#160;
+                // Explicitly delete object session_alloc_string (otherwise its
+                // memory would be released at point 3)
+                DELETE_OBJ(engine.getAllocator(), session_alloc_string);
+&#160;
+            } 	// Point 1. Here local Allocator 'on_stack_variable_allocator' is
+            // destroyed and all its remaining allocated objects are deleted, too
+        &#160;
+        } 	// Point 2. Here result-set Allocator 'result-&gt;allocator' is destroyed and
+        // all its remaining allocated objects are deleted, too
+        &#160;
+        ... // Some more code
+    } 	// Point 3. Here session Allocator 'engine.getAllocator()' is destroyed and
+    // all its remaining allocated objects are deleted, too
+    &#160;</pre>
+                </div>
+                <h2>Using <i>ValueRef </i>and<i> String </i>classes</h2>
+                <p>Alternatively, to work with dynamic objects, the template class <i>ValueRef</i> can be used. This helper class automatically uses the allocator of the original object to construct a copy. For example:</p>
+                <div class="code-block"><pre>&#160;
+    QueryResult result(engine.executeQuery(query));
+    Cursor* iterator = result-&gt;records();
+    while ( iterator-&gt;hasNext() ) 
+    {
+        Record* rec = iterator-&gt;next();
+        ValueRef nameRef(rec-&gt;get(0));
+        String * pName = nameRef.as&lt;String&gt;();
+        // Object pName is constructed using the result-set Allocator object
+    }
+    &#160;</pre>
+                </div>
+                <p>Specifically about the <code>stringValue()</code> method and <i>String</i> classes, it should be noted that every class inherited from base class <i>Value</i> implements a method <code>String *stringValue()</code>. In all implementations of this method (except for the class <i>String</i>) a new object of type <code>*String</code> is created, and it should be deleted after its use. The class <i>String</i> method returns its "this" pointer instead.</p>
+                <p>Thus if the application deletes the string object, and then also deletes the object that the current object was inherited from, the object is deleted twice! Also once deleted, it is not possible to use the parent object either.</p>
+                <p>So, to avoid confusion, instead of using the <code>String *stringValue()</code> method for converting the <i>Value</i> to a string, it is recommended to use the <code>Ref&lt;String&gt; stringRef(Allocator* allocator)</code> method that takes care of correct deletion. There are two ways to use it:</p>
+                <div class="code-block"><pre>&#160;
+    Ref&lt;String&gt; strval(v-&gt;stringRef(allocator));
+    &#160;</pre>
+                </div>
+                <p>or</p>
+                <div class="code-block"><pre>&#160;
+    Ref&lt;String&gt; str = v-&gt;stringRef(allocator);
+    &#160;</pre>
+                </div>
+                <p>The scope and usage of the reference is illustrated as follows:</p>
+                <div class="code-block"><pre>&#160;
+    {
+        Ref&lt;String&gt; strval(v-&gt;stringRef(allocator));
+        /* use a reference as a local object String */
+        printf("%s", strval.cstr());
+    } 	/* Ref is automatically deleted here */
+    &#160;</pre>
+                </div>
+                <p>or</p>
+                <div class="code-block"><pre>&#160;
+    {
+        Ref&lt;String&gt; str = v-&gt;stringRef(allocator);
+        /* use reference as a pointer to the String object*/
+        printf("%s", str-&gt;cstr());
+    } 	/* Ref is automatically deleted here */
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

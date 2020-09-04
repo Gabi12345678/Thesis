@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Analytics Functions Example 8: Window Aggregate</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Analytics Functions Example 8: Window Aggregate</h1>
+            <blockquote>
+                <h2>Window Aggregate</h2>
+                <p>Compute the 5 day moving average <code>close</code> for March 2013:</p>
+                <div class="code-block"><pre>&#160;
+    SELECT symbol, 
+        seq_search(day, 20130225, 20130331) as Mar_2013,
+        close@Mar_2013 as "close",
+        seq_window_agg_avg(close@Mar_2013, 5) as "5-day-average"
+    FROM Quote WHERE symbol='IBM';
+    &#160;
+    symbol
+    Mar_2013{}
+    close{}
+    5-day-average{}
+    ------------------------------------------------------------------------------
+    IBM
+    {20130225, 20130226, 20130227, 20130228,
+    20130301, 20130304, 20130305, 20130306, 20130307,
+    20130308, 20130311, 20130312, 20130313, 20130314,
+    20130315, 20130318, 20130319, 20130320, 20130321,
+    20130322, 20130325, 20130326, 20130327, 20130328}
+    {197.509995, 199.139999, 202.330002, 200.830002,
+    202.910004, 205.190002, 206.529999, 208.380005, 209.419998,
+    210.380005, 210.080002, 210.550003, 212.059998, 215.800003,
+            
+    214.919998, 213.210007, 213.440002, 215.059998, 212.259995,
+    212.080002, 210.740005, 212.360001, 210.889999, 213.300003}
+    {39.501999, 79.329999, 119.795999, 159.962000,
+    200.544000, 202.080002, 203.558002, 204.768002, 206.486002,
+    207.980002, 208.958002, 209.762003, 210.498001, 211.774002,
+    212.682001, 213.308002, 213.886002, 214.486002, 213.778000,
+    213.210001, 212.716000, 212.500000, 211.666000, 211.874002}
+    &#160;</pre>
+                </div>
+                <p>Note that the first 4 average values are invalid because there are not 5 values to average, so the following computations do not give true 5-day averages:</p>
+                <div class="code-block"><pre>&#160;
+    197.509995 / 5 =  39.501999
+    (197.509995 + 199.139999) / 5 = 79.329999
+    (197.509995 + 199.139999 + 202.330002) / 5 = 119.795999
+    (197.509995 + 199.139999 + 202.330002 + 200.830002) / 5 = 159.962000
+    &#160;</pre>
+                </div>
+                <p>(See page <a href="../../../../Programming/Common/Analytics/Window_v_Grid_Agg_Functions.htm">Window versus Grid Aggregate Functions</a> for an explanation of “incomplete intervals”.) This is why we defined the date range as <code>20130225</code> thru <code>20130331</code> so that the last 4 days of February could be discarded. The 5-day average for March 1 and all successive days of March are however valid. For example, we can verify that the 5 values up to and including the trade date of March 14 compute the average as follows:</p>
+                <ul>
+                    <li value="1">The date <code style="background-color: #32cd32;">20130314</code> in sequence <code>Mar_2013</code> is the 14th element.</li>
+                    <li value="2">The five close values (highlighted) that comprise the 5-day window are for the five trade dates preceding and including March 14th: <code>20130308, 20130311, 20130312, 20130313, and 20130314</code>.</li>
+                    <li value="3">The value in sequence 5-day-average (highlighted) that corresponds to March 14th (the 14th element) is then calculated as follows:</li>
+                </ul>
+                <div class="code-block"><pre>&#160;
+    (210.380005 + 210.080002 + 210.550003 + 212.059998 + 215.800003) / 5 = 211.774002
+    &#160;</pre>
+                </div>
+                <h2>To run this example</h2>
+                <p>A sample script to demonstrate this <code>select</code> statement using <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> can be run from the <code>samples/xsql/scripts/financial</code> directory with the following command:</p>
+                <div class="code-block"><pre>    &#160;
+    x 8
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

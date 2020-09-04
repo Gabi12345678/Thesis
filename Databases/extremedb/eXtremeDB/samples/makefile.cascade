@@ -1,0 +1,6 @@
+-include $(call mco_makefile_file,\
+native/makefile.cascade\
+xsql/makefile.cascade\
+java/makefile.cascade\
+jdbc/makefile.cascade\
+)

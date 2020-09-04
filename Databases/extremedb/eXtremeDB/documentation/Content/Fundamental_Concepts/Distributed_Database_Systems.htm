@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="eXtremeDB Fundamental Concepts">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Distributed Database Topologies</title>
+        <link href="../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Distributed Database Topologies</h1>
+            <blockquote>
+                <p><i>e</i>X<i>treme</i>DB extension modules provide the tools to implement a variety of distributed data solutions. A distributed database system allows applications to access data from local and remote databases. General goals of a distributed database management design are to:</p>
+                <ul>
+                    <li value="1">Provide high availability of data</li>
+                    <li value="2">Provide reliability of the data and the data management solution</li>
+                    <li value="3">Provide functionality and scalability</li>
+                    <li value="4">Fit into an existing environment and provide cost-saving solutions</li>
+                </ul>
+                <p>The terms "distributed database" and "distributed processing" are closely related, yet have distinct meanings. A <i style="font-weight: bold;">distributed database</i> is a set of databases in a distributed system that <i>appear to applications as a single database</i>. A <i style="font-weight: bold;">distributed processing</i> solution distributes its tasks among different computers in a network. In the context of database systems and applications, it means that database tasks are distributed amongst two or more nodes in a cluster that cooperate to maintain a single logical database instance.</p>
+                <p>Similarly, the terms "distributed database system" and "database replication" are related, yet distinct. In a “pure” (i.e., not replicated) distributed database, the system manages a <i>single copy of all database objects,</i> and a given database object exists in only one database instance. Typically, distributed database applications use distributed transactions to access both local and remote data and modify the global database in real-time. The term <i style="font-weight: bold;">replication</i> refers to the operation of copying and maintaining database objects in multiple database instances belonging to a distributed system. While replication relies on distributed database technology, database replication offers benefits that are not possible within a pure distributed database environment.</p>
+                <p>Replication is used either to improve local database performance (<i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i>) or improve the availability of the database (<i>e</i>X<i>treme</i>DB<i> High Availability</i>). For example, with <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i>, each process on a node of a cluster works with a local database to minimize network traffic and achieve maximum performance. With <i>e</i>X<i>treme</i>DB<i> High Availability</i>, a standby system  can continue to function if the primary server experiences a failure.</p>
+                <h2><i>e</i>X<i>treme</i>DB Distributed Database solutions</h2>
+                <p>The <i>e</i>X<i>treme</i>DB extension modules offer three <i>distributed database</i> solution architectures:</p>
+                <blockquote>
+                    <h3>High Availability</h3>
+                    <p>The purpose of <i>e</i>X<i>treme</i>DB<i> High Availability</i> is to preserve the availability of a mission critical system.  To accomplish this, a master database instance is replicated (distributed) to one or more standby instances, usually on separate physical devices.  In the <i>e</i>X<i>treme</i>DB<i> High Availability</i> usage, there are also master and standby instances of the processes that use the database.  In the event the device that hosts the master database fails, the main replica task initiates the failover process (becomes the master) and causes all other replica tasks to assume normal processing.</p>
+                    <p><i>e</i>X<i>treme</i>DB<i> High Availability</i> provides a “master-slave” architecture where the master application has <code>READ_WRITE</code> capability and replica applications have <code>READ_ONLY</code> capability. Accordingly, only the master database instance can be modified, but all transactions are replicated to the slave (read-only) copies of the database. Various communication channels are available, and replication can be synchronous or asynchronous. <i>e</i>X<i>treme</i>DB<i> High Availability</i> provides extremely fast failover where a replica application takes over as master in the event of an unexpected failure of the node hosting the original master database instance. (Please refer to the <a href="../Users_Guides/High_Availability_Users_Guide.htm"><i>e</i>X<i>treme</i>DB<i> High Availability</i> User's Guide</a> for further details.)</p>
+                    <h3>Cluster</h3>
+                    <p>The purpose of <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> is to provide scalability for a group of devices that work cooperatively on a single logical database. Unlike High Availability, each node in a cluster is a peer to every other node, i.e. there is no master-standby relationship.  <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> has in common with <i>e</i>X<i>treme</i>DB<i> High Availability</i> the fact that the physical database is replicated (distributed) to each node in the cluster, but still represents a single logical database.  Because each node has its own replicated copy of the database, read requests (queries) execute very fast because there is no network communication involved.  Insert, update and delete operations, however, <i>must be replicated to each node in the cluster</i>, which causes these operations to be slower compared to operations against a single (not distributed) local database.  However, in the aggregate, the insert, update, and delete operations on all nodes in the cluster taken together can exceed the performance of any single node.  For example, a node in a cluster may only perform at 40% of the speed of a stand-alone node, but three nodes operating at 40% of the theoretical maximum will outperform the single node.  This, combined with the fact that queries are always local, creates a platform for scaling processing with the addition of cost-effective commodity hardware. Scalability is limited by replication, however, as replicating to 2, 3, 4, … nodes in a cluster introduces incremental latency to <code>READ_WRITE</code> transactions.</p>
+                    <p><i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> provides a “node-to-node” replication architecture where all nodes in a cluster are peers, e.g. each node can perform <code>READ_WRITE </code>and <code>READ_ONLY</code> operations; <code>READ_ONLY</code> transactions are always local (no network access, so very fast) while <code>READ_WRITE</code> transactions are, by default, distributed by the <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i><a name="kanchor144"></a> runtime to all nodes in the cluster. The Cluster implementation automatically controls the availability of nodes using configurable timeouts and keep-alive messages. There are a number of ways to improve scalability with <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i>, such as using “local tables” or a scatter/gather API in lieu of automatic (default) replication. (Please refer to the <a href="../Users_Guides/Cluster_Users_Guide.htm"><i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> User's Guide</a> for further details.)</p>
+                    <h3>Sharding (aka <a href="Horizontal_Database_Partitioning.htm">horizontal partitioning</a>) and distributed query processing.</h3>
+                    <p>Whereas <i>e</i>X<i>treme</i>DB<i> High Availability</i> and <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> provide replication-based distributed processing solutions, data distribution is supported through <i>e</i>X<i>treme</i>SQL by the <i>DistributedSql</i> Engine.</p>
+                    <p>Distributed databases are often implemented through “Sharding”. The concept of database <i style="font-weight: bold;">sharding</i> has been gaining popularity over the past several years due to the enormous growth in transaction volume and size of business application databases for services such as:</p>
+                    <ul>
+                        <li value="1">Online service providers</li>
+                        <li value="2">Software as a Service (SaaS) companies</li>
+                        <li value="3">Social networking Web sites</li>
+                        <li value="4">Capital Market applications</li>
+                    </ul>
+                    <p>Sharding can be simply defined as “shared-nothing” horizontal partitioning of a database into a number of smaller database instances that collectively comprise one logical database. What drives the need for sharding is the fact that as the size and transaction volume of the database incurs linear growth, response times tend to grow logarithmically. Distributed queries allow far faster processing due to performing parallel execution of on each shard.</p>
+                    <p>It is well known that database performance drops in concert with an increase in database size.  This is due in large part to the increasing size (depth) of index structures such as b-trees.  When a database exists on a spinning disk, then mechanical artifacts exacerbate the problem (greater “rotational latency” waiting for the platter to spin or the disk head to slew to the proper track as the database occupies more of the disk).  Partitioning a logical database into, e.g., five physical databases means that each physical database is only 20% the size of the same logical database if it existed as a single physical database.  Consequently, index structures are more shallow and the effects of spinning disk geometry (if any) are mitigated.  Furthermore, instead of a single database server providing query execution for a single physical database, we can allow for (e.g., again) five server processes to provide the query execution.  This is called distributed query processing, and is transparent to a database client application.  The client application merely opens the logical database and the database configuration (described in a JSON document) determines the physical makeup of the database (i.e. whether logical and physical mean the same thing, or whether the logical database consists of 2, 5 or 100 physical partitions, etc).  Once connected, the client application begins/commits/aborts its transactions and queries in the normal way.  If the database is physically partitioned, the <i>e</i>X<i>treme</i>SQL query engine takes care of distributing the query on behalf of the client application and gathering (appending) the result sets from each partition to present a single (logical) view to the client application.</p>
+                    <p>Sharding and <i>e</i>X<i>treme</i>DB<i> High Availability</i> can be combined. In this configuration, a single logical database is horizontally partitioned into two or more physical database instances.  Each shard (physical database instance) then has a master and replica server process, and the replica can be promoted to master in the event of an unexpected termination of the original master.  In this way, we can preserve the availability of the single logical database that would otherwise not be possible if any of the servers processing the shards were to fail. (Please refer to the <a href="../Users_Guides/SQL_Users_Guide.htm"><i>e</i>X<i>treme</i>SQL User's Guide</a> for further details.)</p>
+                </blockquote>
+            </blockquote>
+            <p>&#160;</p>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,483 @@
+09-04|09:13:44.419 [main] INFO  [Main.java:119] - Loading plugin properties: kairosdb_guid.properties
+09-04|09:13:44.433 [main] INFO  [Main.java:119] - Loading plugin properties: udf.properties
+09-04|09:13:45.247 [main] INFO  [TelnetServerModule.java:38] - Configuring module TelnetServerModule
+09-04|09:13:46.415 [main] INFO  [StdSchedulerFactory.java:1175] - Using default implementation for ThreadExecutor
+09-04|09:13:46.436 [main] INFO  [SchedulerSignalerImpl.java:61] - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+09-04|09:13:46.436 [main] INFO  [QuartzScheduler.java:243] - Quartz Scheduler v.2.1.7 created.
+09-04|09:13:46.437 [main] INFO  [RAMJobStore.java:154] - RAMJobStore initialized.
+09-04|09:13:46.439 [main] INFO  [QuartzScheduler.java:268] - Scheduler meta-data: Quartz Scheduler (v2.1.7) 'QuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 4 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+09-04|09:13:46.439 [main] INFO  [StdSchedulerFactory.java:1324] - Quartz scheduler 'QuartzScheduler' initialized from an externally provided properties instance.
+09-04|09:13:46.440 [main] INFO  [StdSchedulerFactory.java:1328] - Quartz scheduler version: 2.1.7
+09-04|09:13:46.440 [main] INFO  [QuartzScheduler.java:2247] - JobFactory set to: org.kairosdb.core.scheduler.KairosDBJobFactory@1800a575
+09-04|09:13:46.441 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|09:13:46.441 [main] INFO  [QuartzScheduler.java:534] - Scheduler QuartzScheduler_$_NON_CLUSTERED started.
+09-04|09:13:46.442 [main] INFO  [KairosDBSchedulerImpl.java:68] - Starting job: org.kairosdb.core.jobs.CacheFileCleaner
+09-04|09:13:46.450 [main] INFO  [H2Datastore.java:105] - Starting H2 database in ./build/h2db
+09-04|09:13:46.538 [main] INFO  [Jdk14MLog.java:124] - MLog clients using java 1.4+ standard logging.
+09-04|09:13:46.660 [main] INFO  [Jdk14MLog.java:318] - Initializing c3p0-0.9.1.2 [built 21-May-2007 15:04:56; debug? true; trace: 10]
+09-04|09:13:46.729 [main] INFO  [KairosDBSchedulerImpl.java:68] - Starting job: org.kairosdb.core.reporting.MetricReporterService
+09-04|09:13:46.736 [main] INFO  [KairosDBSchedulerImpl.java:84] - *** Scheduled job org.kairosdb.core.jobs.CacheFileCleaner to execute next on Sun Sep 06 12:00:00 CEST 2020
+09-04|09:13:46.736 [main] INFO  [KairosDBSchedulerImpl.java:84] - *** Scheduled job org.kairosdb.core.reporting.MetricReporterService to execute next on Fri Sep 04 09:14:00 CEST 2020
+09-04|09:13:46.736 [main] INFO  [H2Datastore.java:105] - Starting H2 database in ./build/h2db
+09-04|09:13:46.762 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.HostManager
+09-04|09:13:46.763 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.http.WebServer
+09-04|09:13:46.963 [HostManagerService-0] INFO  [Jdk14MLog.java:318] - Initializing c3p0 pool... com.mchange.v2.c3p0.PoolBackedDataSource@4e1a2d38 [ connectionPoolDataSource -> com.mchange.v2.c3p0.WrapperConnectionPoolDataSource@ebdd6801 [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 0, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, debugUnreturnedConnectionStackTraces -> false, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> 117bemtacoencr81ozpv93|49d3c823, idleConnectionTestPeriod -> 0, initialPoolSize -> 3, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 0, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 15, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, nestedDataSource -> ds1: url=jdbc:h2:./build/h2db/kairosdb user=sa, preferredTestQuery -> null, propertyCycle -> 0, testConnectionOnCheckin -> false, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, usesTraditionalReflectiveProxies -> false; userOverrides: {} ], dataSourceName -> null, factoryClassLocation -> null, identityToken -> 117bemtacoencr81ozpv93|436bc36, numHelperThreads -> 3 ]
+09-04|09:13:47.120 [main] INFO  [Server.java:272] - jetty-8.1.16.v20140903
+09-04|09:13:47.417 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.health.HealthCheckResource as a root resource class
+09-04|09:13:47.418 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.MetricsResource as a root resource class
+09-04|09:13:47.422 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.MetadataResource as a root resource class
+09-04|09:13:47.423 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.FeaturesResource as a root resource class
+09-04|09:13:47.424 [main] INFO  [GuiceComponentProviderFactory.java:113] - Registering com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider as a provider class
+09-04|09:13:47.424 [main] INFO  [GuiceComponentProviderFactory.java:113] - Registering org.kairosdb.core.http.exceptionmapper.InvalidServerTypeExceptionMapper as a provider class
+09-04|09:13:47.455 [main] INFO  [WebApplicationImpl.java:815] - Initiating Jersey application, version 'Jersey: 1.18.3 12/01/2014 08:23 AM'
+09-04|09:13:47.552 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.exceptionmapper.InvalidServerTypeExceptionMapper to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:13:47.555 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:13:47.944 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.health.HealthCheckResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:13:47.956 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.MetricsResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:13:48.106 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.MetadataResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:13:48.107 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.FeaturesResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:13:48.136 [main] INFO  [AbstractConnector.java:338] - Started SelectChannelConnector@0.0.0.0:8080
+09-04|09:13:48.140 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.telnet.TelnetServer
+09-04|09:13:48.233 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.reporting.DataPointsMonitor
+09-04|09:13:48.234 [main] INFO  [Main.java:405] - ------------------------------------------
+09-04|09:13:48.234 [main] INFO  [Main.java:406] -      KairosDB service started
+09-04|09:13:48.234 [main] INFO  [Main.java:407] - ------------------------------------------
+09-04|09:13:49.321 [qtp611289995-34] INFO  [CDJavaAggregator.java:71] - All expected data has been received.
+09-04|09:13:49.442 [qtp611289995-34] INFO  [CDJavaAggregator.java:94] - Applied CD
+09-04|09:13:49.522 [Thread-1] INFO  [Main.java:559] - Shutting down
+09-04|09:13:49.523 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|09:13:49.524 [Thread-1] INFO  [QuartzScheduler.java:653] - Scheduler QuartzScheduler_$_NON_CLUSTERED shutting down.
+09-04|09:13:49.524 [Thread-1] INFO  [QuartzScheduler.java:572] - Scheduler QuartzScheduler_$_NON_CLUSTERED paused.
+09-04|09:13:49.923 [Thread-1] INFO  [QuartzScheduler.java:725] - Scheduler QuartzScheduler_$_NON_CLUSTERED shutdown complete.
+09-04|09:13:49.923 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|09:13:49.924 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.HostManager
+09-04|09:13:49.924 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.HostManager
+09-04|09:13:49.924 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.http.WebServer
+09-04|09:13:49.949 [Thread-1] INFO  [ContextHandler.java:843] - stopped o.e.j.s.ServletContextHandler{/,null}
+09-04|09:13:50.000 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.http.WebServer
+09-04|09:13:50.001 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.telnet.TelnetServer
+09-04|09:13:50.005 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.telnet.TelnetServer
+09-04|09:13:50.006 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.reporting.DataPointsMonitor
+09-04|09:13:50.007 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.reporting.DataPointsMonitor
+09-04|09:13:50.007 [Thread-1] INFO  [Main.java:575] - Stopping Datastore
+09-04|09:47:51.705 [main] INFO  [Main.java:119] - Loading plugin properties: kairosdb_guid.properties
+09-04|09:47:51.711 [main] INFO  [Main.java:119] - Loading plugin properties: udf.properties
+09-04|09:47:52.211 [main] INFO  [TelnetServerModule.java:38] - Configuring module TelnetServerModule
+09-04|09:47:52.678 [main] INFO  [StdSchedulerFactory.java:1175] - Using default implementation for ThreadExecutor
+09-04|09:47:52.695 [main] INFO  [SchedulerSignalerImpl.java:61] - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+09-04|09:47:52.696 [main] INFO  [QuartzScheduler.java:243] - Quartz Scheduler v.2.1.7 created.
+09-04|09:47:52.697 [main] INFO  [RAMJobStore.java:154] - RAMJobStore initialized.
+09-04|09:47:52.698 [main] INFO  [QuartzScheduler.java:268] - Scheduler meta-data: Quartz Scheduler (v2.1.7) 'QuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 4 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+09-04|09:47:52.699 [main] INFO  [StdSchedulerFactory.java:1324] - Quartz scheduler 'QuartzScheduler' initialized from an externally provided properties instance.
+09-04|09:47:52.699 [main] INFO  [StdSchedulerFactory.java:1328] - Quartz scheduler version: 2.1.7
+09-04|09:47:52.700 [main] INFO  [QuartzScheduler.java:2247] - JobFactory set to: org.kairosdb.core.scheduler.KairosDBJobFactory@14fc1f0
+09-04|09:47:52.701 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|09:47:52.701 [main] INFO  [QuartzScheduler.java:534] - Scheduler QuartzScheduler_$_NON_CLUSTERED started.
+09-04|09:47:52.702 [main] INFO  [KairosDBSchedulerImpl.java:68] - Starting job: org.kairosdb.core.jobs.CacheFileCleaner
+09-04|09:47:52.711 [main] INFO  [H2Datastore.java:105] - Starting H2 database in ./build/h2db
+09-04|09:47:52.730 [main] INFO  [Jdk14MLog.java:124] - MLog clients using java 1.4+ standard logging.
+09-04|09:47:52.808 [main] INFO  [Jdk14MLog.java:318] - Initializing c3p0-0.9.1.2 [built 21-May-2007 15:04:56; debug? true; trace: 10]
+09-04|09:47:52.865 [main] INFO  [KairosDBSchedulerImpl.java:68] - Starting job: org.kairosdb.core.reporting.MetricReporterService
+09-04|09:47:52.872 [main] INFO  [KairosDBSchedulerImpl.java:84] - *** Scheduled job org.kairosdb.core.jobs.CacheFileCleaner to execute next on Sun Sep 06 12:00:00 CEST 2020
+09-04|09:47:52.873 [main] INFO  [KairosDBSchedulerImpl.java:84] - *** Scheduled job org.kairosdb.core.reporting.MetricReporterService to execute next on Fri Sep 04 09:48:00 CEST 2020
+09-04|09:47:52.874 [main] INFO  [H2Datastore.java:105] - Starting H2 database in ./build/h2db
+09-04|09:47:52.900 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.HostManager
+09-04|09:47:52.901 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.http.WebServer
+09-04|09:47:52.923 [HostManagerService-0] INFO  [Jdk14MLog.java:318] - Initializing c3p0 pool... com.mchange.v2.c3p0.PoolBackedDataSource@ff785343 [ connectionPoolDataSource -> com.mchange.v2.c3p0.WrapperConnectionPoolDataSource@8096c3f2 [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 0, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, debugUnreturnedConnectionStackTraces -> false, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> 117bemtacofv7lcjbbgo9|6b8d96d9, idleConnectionTestPeriod -> 0, initialPoolSize -> 3, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 0, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 15, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, nestedDataSource -> ds1: url=jdbc:h2:./build/h2db/kairosdb user=sa, preferredTestQuery -> null, propertyCycle -> 0, testConnectionOnCheckin -> false, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, usesTraditionalReflectiveProxies -> false; userOverrides: {} ], dataSourceName -> null, factoryClassLocation -> null, identityToken -> 117bemtacofv7lcjbbgo9|69653e16, numHelperThreads -> 3 ]
+09-04|09:47:52.970 [main] INFO  [Server.java:272] - jetty-8.1.16.v20140903
+09-04|09:47:53.154 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.health.HealthCheckResource as a root resource class
+09-04|09:47:53.155 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.MetricsResource as a root resource class
+09-04|09:47:53.155 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.MetadataResource as a root resource class
+09-04|09:47:53.155 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.FeaturesResource as a root resource class
+09-04|09:47:53.156 [main] INFO  [GuiceComponentProviderFactory.java:113] - Registering com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider as a provider class
+09-04|09:47:53.156 [main] INFO  [GuiceComponentProviderFactory.java:113] - Registering org.kairosdb.core.http.exceptionmapper.InvalidServerTypeExceptionMapper as a provider class
+09-04|09:47:53.158 [main] INFO  [WebApplicationImpl.java:815] - Initiating Jersey application, version 'Jersey: 1.18.3 12/01/2014 08:23 AM'
+09-04|09:47:53.235 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.exceptionmapper.InvalidServerTypeExceptionMapper to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:47:53.238 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:47:53.545 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.health.HealthCheckResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:47:53.558 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.MetricsResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:47:53.664 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.MetadataResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:47:53.665 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.FeaturesResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:47:53.694 [main] INFO  [AbstractConnector.java:338] - Started SelectChannelConnector@0.0.0.0:8080
+09-04|09:47:53.697 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.telnet.TelnetServer
+09-04|09:47:53.736 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.reporting.DataPointsMonitor
+09-04|09:47:53.737 [main] INFO  [Main.java:405] - ------------------------------------------
+09-04|09:47:53.737 [main] INFO  [Main.java:406] -      KairosDB service started
+09-04|09:47:53.737 [main] INFO  [Main.java:407] - ------------------------------------------
+09-04|09:47:55.512 [qtp201274566-33] INFO  [RecovJavaAggregator.java:71] - All expected data has been received.
+09-04|09:47:55.577 [qtp201274566-33] ERROR [MetricsResource.java:627] - Query failed.
+org.apache.commons.math3.exception.NoDataException: empty selected row index array
+	at org.apache.commons.math3.linear.MatrixUtils.checkSubMatrixIndex(MatrixUtils.java:547)
+	at org.apache.commons.math3.linear.AbstractRealMatrix.getSubMatrix(AbstractRealMatrix.java:325)
+	at master.Recovdb.zcd_recovery(Recovdb.java:84)
+	at master.Recovdb.recovery(Recovdb.java:44)
+	at master.RecovJavaAggregator.aggregate(RecovJavaAggregator.java:92)
+	at org.kairosdb.core.datastore.KairosDatastore$DatastoreQueryImpl.execute(KairosDatastore.java:556)
+	at org.kairosdb.core.http.rest.MetricsResource.runQuery(MetricsResource.java:566)
+	at org.kairosdb.core.http.rest.MetricsResource.postQuery(MetricsResource.java:525)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at com.sun.jersey.spi.container.JavaMethodInvokerFactory$1.invoke(JavaMethodInvokerFactory.java:60)
+	at com.sun.jersey.server.impl.model.method.dispatch.AbstractResourceMethodDispatchProvider$ResponseOutInvoker._dispatch(AbstractResourceMethodDispatchProvider.java:205)
+	at com.sun.jersey.server.impl.model.method.dispatch.ResourceJavaMethodDispatcher.dispatch(ResourceJavaMethodDispatcher.java:75)
+	at com.sun.jersey.server.impl.uri.rules.HttpMethodRule.accept(HttpMethodRule.java:302)
+	at com.sun.jersey.server.impl.uri.rules.RightHandPathRule.accept(RightHandPathRule.java:147)
+	at com.sun.jersey.server.impl.uri.rules.ResourceClassRule.accept(ResourceClassRule.java:108)
+	at com.sun.jersey.server.impl.uri.rules.RightHandPathRule.accept(RightHandPathRule.java:147)
+	at com.sun.jersey.server.impl.uri.rules.RootResourceClassesRule.accept(RootResourceClassesRule.java:84)
+	at com.sun.jersey.server.impl.application.WebApplicationImpl._handleRequest(WebApplicationImpl.java:1542)
+	at com.sun.jersey.server.impl.application.WebApplicationImpl._handleRequest(WebApplicationImpl.java:1473)
+	at com.sun.jersey.server.impl.application.WebApplicationImpl.handleRequest(WebApplicationImpl.java:1419)
+	at com.sun.jersey.server.impl.application.WebApplicationImpl.handleRequest(WebApplicationImpl.java:1409)
+	at com.sun.jersey.spi.container.servlet.WebComponent.service(WebComponent.java:409)
+	at com.sun.jersey.spi.container.servlet.ServletContainer.service(ServletContainer.java:558)
+	at com.sun.jersey.spi.container.servlet.ServletContainer.service(ServletContainer.java:733)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:848)
+	at com.google.inject.servlet.ServletDefinition.doServiceImpl(ServletDefinition.java:286)
+	at com.google.inject.servlet.ServletDefinition.doService(ServletDefinition.java:276)
+	at com.google.inject.servlet.ServletDefinition.service(ServletDefinition.java:181)
+	at com.google.inject.servlet.ManagedServletPipeline.service(ManagedServletPipeline.java:91)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:85)
+	at org.kairosdb.core.http.MonitorFilter.doFilter(MonitorFilter.java:81)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:82)
+	at org.kairosdb.core.http.LoggingFilter.doFilter(LoggingFilter.java:48)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:82)
+	at org.eclipse.jetty.servlets.UserAgentFilter.doFilter(UserAgentFilter.java:82)
+	at org.eclipse.jetty.servlets.GzipFilter.doFilter(GzipFilter.java:294)
+	at com.google.inject.servlet.FilterChainInvocation.doFilter(FilterChainInvocation.java:82)
+	at com.google.inject.servlet.ManagedFilterPipeline.dispatch(ManagedFilterPipeline.java:120)
+	at com.google.inject.servlet.GuiceFilter.doFilter(GuiceFilter.java:135)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1467)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:501)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1086)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:429)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1020)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:135)
+	at org.eclipse.jetty.server.handler.HandlerList.handle(HandlerList.java:52)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:116)
+	at org.eclipse.jetty.server.Server.handle(Server.java:370)
+	at org.eclipse.jetty.server.AbstractHttpConnection.handleRequest(AbstractHttpConnection.java:494)
+	at org.eclipse.jetty.server.AbstractHttpConnection.content(AbstractHttpConnection.java:982)
+	at org.eclipse.jetty.server.AbstractHttpConnection$RequestHandler.content(AbstractHttpConnection.java:1043)
+	at org.eclipse.jetty.http.HttpParser.parseNext(HttpParser.java:865)
+	at org.eclipse.jetty.http.HttpParser.parseAvailable(HttpParser.java:240)
+	at org.eclipse.jetty.server.AsyncHttpConnection.handle(AsyncHttpConnection.java:82)
+	at org.eclipse.jetty.io.nio.SelectChannelEndPoint.handle(SelectChannelEndPoint.java:696)
+	at org.eclipse.jetty.io.nio.SelectChannelEndPoint$1.run(SelectChannelEndPoint.java:53)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:608)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:543)
+	at java.lang.Thread.run(Thread.java:748)
+09-04|09:47:55.915 [Thread-1] INFO  [Main.java:559] - Shutting down
+09-04|09:47:55.916 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|09:47:55.916 [Thread-1] INFO  [QuartzScheduler.java:653] - Scheduler QuartzScheduler_$_NON_CLUSTERED shutting down.
+09-04|09:47:55.916 [Thread-1] INFO  [QuartzScheduler.java:572] - Scheduler QuartzScheduler_$_NON_CLUSTERED paused.
+09-04|09:47:56.184 [Thread-1] INFO  [QuartzScheduler.java:725] - Scheduler QuartzScheduler_$_NON_CLUSTERED shutdown complete.
+09-04|09:47:56.185 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|09:47:56.185 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.HostManager
+09-04|09:47:56.186 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.HostManager
+09-04|09:47:56.186 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.http.WebServer
+09-04|09:47:56.209 [Thread-1] INFO  [ContextHandler.java:843] - stopped o.e.j.s.ServletContextHandler{/,null}
+09-04|09:47:56.263 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.http.WebServer
+09-04|09:47:56.263 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.telnet.TelnetServer
+09-04|09:47:56.270 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.telnet.TelnetServer
+09-04|09:47:56.270 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.reporting.DataPointsMonitor
+09-04|09:47:56.270 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.reporting.DataPointsMonitor
+09-04|09:47:56.271 [Thread-1] INFO  [Main.java:575] - Stopping Datastore
+09-04|09:47:56.271 [main] INFO  [Main.java:420] - --------------------------------------
+09-04|09:47:56.272 [main] INFO  [Main.java:421] -      KairosDB service is now down!
+09-04|09:47:56.272 [main] INFO  [Main.java:422] - --------------------------------------
+09-04|09:54:14.790 [main] INFO  [Main.java:119] - Loading plugin properties: kairosdb_guid.properties
+09-04|09:54:14.797 [main] INFO  [Main.java:119] - Loading plugin properties: udf.properties
+09-04|09:54:15.280 [main] INFO  [TelnetServerModule.java:38] - Configuring module TelnetServerModule
+09-04|09:54:15.743 [main] INFO  [StdSchedulerFactory.java:1175] - Using default implementation for ThreadExecutor
+09-04|09:54:15.760 [main] INFO  [SchedulerSignalerImpl.java:61] - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+09-04|09:54:15.760 [main] INFO  [QuartzScheduler.java:243] - Quartz Scheduler v.2.1.7 created.
+09-04|09:54:15.761 [main] INFO  [RAMJobStore.java:154] - RAMJobStore initialized.
+09-04|09:54:15.762 [main] INFO  [QuartzScheduler.java:268] - Scheduler meta-data: Quartz Scheduler (v2.1.7) 'QuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 4 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+09-04|09:54:15.763 [main] INFO  [StdSchedulerFactory.java:1324] - Quartz scheduler 'QuartzScheduler' initialized from an externally provided properties instance.
+09-04|09:54:15.763 [main] INFO  [StdSchedulerFactory.java:1328] - Quartz scheduler version: 2.1.7
+09-04|09:54:15.764 [main] INFO  [QuartzScheduler.java:2247] - JobFactory set to: org.kairosdb.core.scheduler.KairosDBJobFactory@14fc1f0
+09-04|09:54:15.764 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|09:54:15.764 [main] INFO  [QuartzScheduler.java:534] - Scheduler QuartzScheduler_$_NON_CLUSTERED started.
+09-04|09:54:15.765 [main] INFO  [KairosDBSchedulerImpl.java:68] - Starting job: org.kairosdb.core.jobs.CacheFileCleaner
+09-04|09:54:15.773 [main] INFO  [H2Datastore.java:105] - Starting H2 database in ./build/h2db
+09-04|09:54:15.792 [main] INFO  [Jdk14MLog.java:124] - MLog clients using java 1.4+ standard logging.
+09-04|09:54:15.868 [main] INFO  [Jdk14MLog.java:318] - Initializing c3p0-0.9.1.2 [built 21-May-2007 15:04:56; debug? true; trace: 10]
+09-04|09:54:15.923 [main] INFO  [KairosDBSchedulerImpl.java:68] - Starting job: org.kairosdb.core.reporting.MetricReporterService
+09-04|09:54:15.927 [main] INFO  [KairosDBSchedulerImpl.java:84] - *** Scheduled job org.kairosdb.core.jobs.CacheFileCleaner to execute next on Sun Sep 06 12:00:00 CEST 2020
+09-04|09:54:15.927 [main] INFO  [KairosDBSchedulerImpl.java:84] - *** Scheduled job org.kairosdb.core.reporting.MetricReporterService to execute next on Fri Sep 04 09:55:00 CEST 2020
+09-04|09:54:15.928 [main] INFO  [H2Datastore.java:105] - Starting H2 database in ./build/h2db
+09-04|09:54:15.954 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.HostManager
+09-04|09:54:15.954 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.http.WebServer
+09-04|09:54:16.016 [HostManagerService-0] INFO  [Jdk14MLog.java:318] - Initializing c3p0 pool... com.mchange.v2.c3p0.PoolBackedDataSource@787435a6 [ connectionPoolDataSource -> com.mchange.v2.c3p0.WrapperConnectionPoolDataSource@f992a655 [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 0, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, debugUnreturnedConnectionStackTraces -> false, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> 117bemtacog3f5wdmvv5x|6b8d96d9, idleConnectionTestPeriod -> 0, initialPoolSize -> 3, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 0, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 15, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, nestedDataSource -> ds1: url=jdbc:h2:./build/h2db/kairosdb user=sa, preferredTestQuery -> null, propertyCycle -> 0, testConnectionOnCheckin -> false, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, usesTraditionalReflectiveProxies -> false; userOverrides: {} ], dataSourceName -> null, factoryClassLocation -> null, identityToken -> 117bemtacog3f5wdmvv5x|69653e16, numHelperThreads -> 3 ]
+09-04|09:54:16.032 [main] INFO  [Server.java:272] - jetty-8.1.16.v20140903
+09-04|09:54:16.201 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.health.HealthCheckResource as a root resource class
+09-04|09:54:16.202 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.MetricsResource as a root resource class
+09-04|09:54:16.202 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.MetadataResource as a root resource class
+09-04|09:54:16.202 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.FeaturesResource as a root resource class
+09-04|09:54:16.202 [main] INFO  [GuiceComponentProviderFactory.java:113] - Registering com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider as a provider class
+09-04|09:54:16.202 [main] INFO  [GuiceComponentProviderFactory.java:113] - Registering org.kairosdb.core.http.exceptionmapper.InvalidServerTypeExceptionMapper as a provider class
+09-04|09:54:16.205 [main] INFO  [WebApplicationImpl.java:815] - Initiating Jersey application, version 'Jersey: 1.18.3 12/01/2014 08:23 AM'
+09-04|09:54:16.270 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.exceptionmapper.InvalidServerTypeExceptionMapper to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:54:16.272 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:54:16.571 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.health.HealthCheckResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:54:16.584 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.MetricsResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:54:16.689 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.MetadataResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:54:16.690 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.FeaturesResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:54:16.719 [main] INFO  [AbstractConnector.java:338] - Started SelectChannelConnector@0.0.0.0:8080
+09-04|09:54:16.723 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.telnet.TelnetServer
+09-04|09:54:16.763 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.reporting.DataPointsMonitor
+09-04|09:54:16.764 [main] INFO  [Main.java:405] - ------------------------------------------
+09-04|09:54:16.764 [main] INFO  [Main.java:406] -      KairosDB service started
+09-04|09:54:16.764 [main] INFO  [Main.java:407] - ------------------------------------------
+09-04|09:54:17.547 [qtp201274566-33] INFO  [RecovAggregator.java:72] - Insuficient data. Got 20, but expected 30. Waiting for more.
+09-04|09:54:17.549 [qtp201274566-33] INFO  [RecovAggregator.java:75] - All expected data has been received.
+09-04|09:54:18.312 [qtp201274566-33] INFO  [RecovAggregator.java:107] - Applied Recov
+09-04|09:54:18.365 [Thread-1] INFO  [Main.java:559] - Shutting down
+09-04|09:54:18.366 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|09:54:18.366 [Thread-1] INFO  [QuartzScheduler.java:653] - Scheduler QuartzScheduler_$_NON_CLUSTERED shutting down.
+09-04|09:54:18.366 [Thread-1] INFO  [QuartzScheduler.java:572] - Scheduler QuartzScheduler_$_NON_CLUSTERED paused.
+09-04|09:54:18.749 [Thread-1] INFO  [QuartzScheduler.java:725] - Scheduler QuartzScheduler_$_NON_CLUSTERED shutdown complete.
+09-04|09:54:18.749 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|09:54:18.750 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.HostManager
+09-04|09:54:18.751 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.HostManager
+09-04|09:54:18.751 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.http.WebServer
+09-04|09:54:18.774 [Thread-1] INFO  [ContextHandler.java:843] - stopped o.e.j.s.ServletContextHandler{/,null}
+09-04|09:54:18.826 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.http.WebServer
+09-04|09:54:18.829 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.telnet.TelnetServer
+09-04|09:54:18.835 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.telnet.TelnetServer
+09-04|09:54:18.836 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.reporting.DataPointsMonitor
+09-04|09:54:18.836 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.reporting.DataPointsMonitor
+09-04|09:54:18.836 [Thread-1] INFO  [Main.java:575] - Stopping Datastore
+09-04|09:54:44.015 [main] INFO  [Main.java:119] - Loading plugin properties: kairosdb_guid.properties
+09-04|09:54:44.022 [main] INFO  [Main.java:119] - Loading plugin properties: udf.properties
+09-04|09:54:44.564 [main] INFO  [TelnetServerModule.java:38] - Configuring module TelnetServerModule
+09-04|09:54:45.036 [main] INFO  [StdSchedulerFactory.java:1175] - Using default implementation for ThreadExecutor
+09-04|09:54:45.053 [main] INFO  [SchedulerSignalerImpl.java:61] - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+09-04|09:54:45.054 [main] INFO  [QuartzScheduler.java:243] - Quartz Scheduler v.2.1.7 created.
+09-04|09:54:45.055 [main] INFO  [RAMJobStore.java:154] - RAMJobStore initialized.
+09-04|09:54:45.056 [main] INFO  [QuartzScheduler.java:268] - Scheduler meta-data: Quartz Scheduler (v2.1.7) 'QuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 4 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+09-04|09:54:45.056 [main] INFO  [StdSchedulerFactory.java:1324] - Quartz scheduler 'QuartzScheduler' initialized from an externally provided properties instance.
+09-04|09:54:45.056 [main] INFO  [StdSchedulerFactory.java:1328] - Quartz scheduler version: 2.1.7
+09-04|09:54:45.057 [main] INFO  [QuartzScheduler.java:2247] - JobFactory set to: org.kairosdb.core.scheduler.KairosDBJobFactory@14fc1f0
+09-04|09:54:45.057 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|09:54:45.058 [main] INFO  [QuartzScheduler.java:534] - Scheduler QuartzScheduler_$_NON_CLUSTERED started.
+09-04|09:54:45.059 [main] INFO  [KairosDBSchedulerImpl.java:68] - Starting job: org.kairosdb.core.jobs.CacheFileCleaner
+09-04|09:54:45.067 [main] INFO  [H2Datastore.java:105] - Starting H2 database in ./build/h2db
+09-04|09:54:45.086 [main] INFO  [Jdk14MLog.java:124] - MLog clients using java 1.4+ standard logging.
+09-04|09:54:45.163 [main] INFO  [Jdk14MLog.java:318] - Initializing c3p0-0.9.1.2 [built 21-May-2007 15:04:56; debug? true; trace: 10]
+09-04|09:54:45.217 [main] INFO  [KairosDBSchedulerImpl.java:68] - Starting job: org.kairosdb.core.reporting.MetricReporterService
+09-04|09:54:45.223 [main] INFO  [KairosDBSchedulerImpl.java:84] - *** Scheduled job org.kairosdb.core.jobs.CacheFileCleaner to execute next on Sun Sep 06 12:00:00 CEST 2020
+09-04|09:54:45.223 [main] INFO  [KairosDBSchedulerImpl.java:84] - *** Scheduled job org.kairosdb.core.reporting.MetricReporterService to execute next on Fri Sep 04 09:55:00 CEST 2020
+09-04|09:54:45.224 [main] INFO  [H2Datastore.java:105] - Starting H2 database in ./build/h2db
+09-04|09:54:45.250 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.HostManager
+09-04|09:54:45.250 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.http.WebServer
+09-04|09:54:45.277 [HostManagerService-0] INFO  [Jdk14MLog.java:318] - Initializing c3p0 pool... com.mchange.v2.c3p0.PoolBackedDataSource@88c4c12a [ connectionPoolDataSource -> com.mchange.v2.c3p0.WrapperConnectionPoolDataSource@9e331d9 [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 0, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, debugUnreturnedConnectionStackTraces -> false, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> 117bemtacog41roybymb0|6b8d96d9, idleConnectionTestPeriod -> 0, initialPoolSize -> 3, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 0, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 15, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, nestedDataSource -> ds1: url=jdbc:h2:./build/h2db/kairosdb user=sa, preferredTestQuery -> null, propertyCycle -> 0, testConnectionOnCheckin -> false, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, usesTraditionalReflectiveProxies -> false; userOverrides: {} ], dataSourceName -> null, factoryClassLocation -> null, identityToken -> 117bemtacog41roybymb0|69653e16, numHelperThreads -> 3 ]
+09-04|09:54:45.318 [main] INFO  [Server.java:272] - jetty-8.1.16.v20140903
+09-04|09:54:45.507 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.health.HealthCheckResource as a root resource class
+09-04|09:54:45.508 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.MetricsResource as a root resource class
+09-04|09:54:45.508 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.MetadataResource as a root resource class
+09-04|09:54:45.508 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.FeaturesResource as a root resource class
+09-04|09:54:45.509 [main] INFO  [GuiceComponentProviderFactory.java:113] - Registering com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider as a provider class
+09-04|09:54:45.509 [main] INFO  [GuiceComponentProviderFactory.java:113] - Registering org.kairosdb.core.http.exceptionmapper.InvalidServerTypeExceptionMapper as a provider class
+09-04|09:54:45.511 [main] INFO  [WebApplicationImpl.java:815] - Initiating Jersey application, version 'Jersey: 1.18.3 12/01/2014 08:23 AM'
+09-04|09:54:45.584 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.exceptionmapper.InvalidServerTypeExceptionMapper to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:54:45.587 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:54:45.893 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.health.HealthCheckResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:54:45.904 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.MetricsResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:54:46.009 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.MetadataResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:54:46.011 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.FeaturesResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|09:54:46.039 [main] INFO  [AbstractConnector.java:338] - Started SelectChannelConnector@0.0.0.0:8080
+09-04|09:54:46.042 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.telnet.TelnetServer
+09-04|09:54:46.081 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.reporting.DataPointsMonitor
+09-04|09:54:46.081 [main] INFO  [Main.java:405] - ------------------------------------------
+09-04|09:54:46.082 [main] INFO  [Main.java:406] -      KairosDB service started
+09-04|09:54:46.082 [main] INFO  [Main.java:407] - ------------------------------------------
+09-04|09:54:47.801 [qtp201274566-35] INFO  [RecovJavaAggregator.java:71] - All expected data has been received.
+09-04|09:54:47.832 [qtp201274566-35] INFO  [RecovJavaAggregator.java:94] - Applied Recovdb
+09-04|09:54:47.894 [Thread-1] INFO  [Main.java:559] - Shutting down
+09-04|09:54:47.894 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|09:54:47.894 [Thread-1] INFO  [QuartzScheduler.java:653] - Scheduler QuartzScheduler_$_NON_CLUSTERED shutting down.
+09-04|09:54:47.895 [Thread-1] INFO  [QuartzScheduler.java:572] - Scheduler QuartzScheduler_$_NON_CLUSTERED paused.
+09-04|09:54:48.042 [Thread-1] INFO  [QuartzScheduler.java:725] - Scheduler QuartzScheduler_$_NON_CLUSTERED shutdown complete.
+09-04|09:54:48.042 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|09:54:48.042 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.HostManager
+09-04|09:54:48.043 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.HostManager
+09-04|09:54:48.043 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.http.WebServer
+09-04|09:54:48.066 [Thread-1] INFO  [ContextHandler.java:843] - stopped o.e.j.s.ServletContextHandler{/,null}
+09-04|09:54:48.119 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.http.WebServer
+09-04|09:54:48.119 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.telnet.TelnetServer
+09-04|09:54:48.126 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.telnet.TelnetServer
+09-04|09:54:48.127 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.reporting.DataPointsMonitor
+09-04|09:54:48.127 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.reporting.DataPointsMonitor
+09-04|09:54:48.127 [Thread-1] INFO  [Main.java:575] - Stopping Datastore
+09-04|11:02:00.530 [main] INFO  [Main.java:119] - Loading plugin properties: kairosdb_guid.properties
+09-04|11:02:00.535 [main] INFO  [Main.java:119] - Loading plugin properties: udf.properties
+09-04|11:02:00.994 [main] INFO  [TelnetServerModule.java:38] - Configuring module TelnetServerModule
+09-04|11:02:01.463 [main] INFO  [StdSchedulerFactory.java:1175] - Using default implementation for ThreadExecutor
+09-04|11:02:01.479 [main] INFO  [SchedulerSignalerImpl.java:61] - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+09-04|11:02:01.480 [main] INFO  [QuartzScheduler.java:243] - Quartz Scheduler v.2.1.7 created.
+09-04|11:02:01.481 [main] INFO  [RAMJobStore.java:154] - RAMJobStore initialized.
+09-04|11:02:01.482 [main] INFO  [QuartzScheduler.java:268] - Scheduler meta-data: Quartz Scheduler (v2.1.7) 'QuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 4 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+09-04|11:02:01.482 [main] INFO  [StdSchedulerFactory.java:1324] - Quartz scheduler 'QuartzScheduler' initialized from an externally provided properties instance.
+09-04|11:02:01.482 [main] INFO  [StdSchedulerFactory.java:1328] - Quartz scheduler version: 2.1.7
+09-04|11:02:01.483 [main] INFO  [QuartzScheduler.java:2247] - JobFactory set to: org.kairosdb.core.scheduler.KairosDBJobFactory@1800a575
+09-04|11:02:01.484 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|11:02:01.484 [main] INFO  [QuartzScheduler.java:534] - Scheduler QuartzScheduler_$_NON_CLUSTERED started.
+09-04|11:02:01.485 [main] INFO  [KairosDBSchedulerImpl.java:68] - Starting job: org.kairosdb.core.jobs.CacheFileCleaner
+09-04|11:02:01.493 [main] INFO  [H2Datastore.java:105] - Starting H2 database in ./build/h2db
+09-04|11:02:01.511 [main] INFO  [Jdk14MLog.java:124] - MLog clients using java 1.4+ standard logging.
+09-04|11:02:01.586 [main] INFO  [Jdk14MLog.java:318] - Initializing c3p0-0.9.1.2 [built 21-May-2007 15:04:56; debug? true; trace: 10]
+09-04|11:02:01.640 [main] INFO  [KairosDBSchedulerImpl.java:68] - Starting job: org.kairosdb.core.reporting.MetricReporterService
+09-04|11:02:01.644 [main] INFO  [KairosDBSchedulerImpl.java:84] - *** Scheduled job org.kairosdb.core.jobs.CacheFileCleaner to execute next on Sun Sep 06 12:00:00 CEST 2020
+09-04|11:02:01.644 [main] INFO  [KairosDBSchedulerImpl.java:84] - *** Scheduled job org.kairosdb.core.reporting.MetricReporterService to execute next on Fri Sep 04 11:03:00 CEST 2020
+09-04|11:02:01.645 [main] INFO  [H2Datastore.java:105] - Starting H2 database in ./build/h2db
+09-04|11:02:01.670 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.HostManager
+09-04|11:02:01.670 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.http.WebServer
+09-04|11:02:01.727 [HostManagerService-0] INFO  [Jdk14MLog.java:318] - Initializing c3p0 pool... com.mchange.v2.c3p0.PoolBackedDataSource@596bc6b5 [ connectionPoolDataSource -> com.mchange.v2.c3p0.WrapperConnectionPoolDataSource@4abefe24 [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 0, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, debugUnreturnedConnectionStackTraces -> false, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> 117bemtacoiikakfe69bb|49d3c823, idleConnectionTestPeriod -> 0, initialPoolSize -> 3, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 0, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 15, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, nestedDataSource -> ds1: url=jdbc:h2:./build/h2db/kairosdb user=sa, preferredTestQuery -> null, propertyCycle -> 0, testConnectionOnCheckin -> false, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, usesTraditionalReflectiveProxies -> false; userOverrides: {} ], dataSourceName -> null, factoryClassLocation -> null, identityToken -> 117bemtacoiikakfe69bb|436bc36, numHelperThreads -> 3 ]
+09-04|11:02:01.740 [main] INFO  [Server.java:272] - jetty-8.1.16.v20140903
+09-04|11:02:01.928 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.health.HealthCheckResource as a root resource class
+09-04|11:02:01.928 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.MetricsResource as a root resource class
+09-04|11:02:01.928 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.MetadataResource as a root resource class
+09-04|11:02:01.929 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.FeaturesResource as a root resource class
+09-04|11:02:01.929 [main] INFO  [GuiceComponentProviderFactory.java:113] - Registering com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider as a provider class
+09-04|11:02:01.929 [main] INFO  [GuiceComponentProviderFactory.java:113] - Registering org.kairosdb.core.http.exceptionmapper.InvalidServerTypeExceptionMapper as a provider class
+09-04|11:02:01.931 [main] INFO  [WebApplicationImpl.java:815] - Initiating Jersey application, version 'Jersey: 1.18.3 12/01/2014 08:23 AM'
+09-04|11:02:02.000 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.exceptionmapper.InvalidServerTypeExceptionMapper to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|11:02:02.003 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|11:02:02.303 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.health.HealthCheckResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|11:02:02.314 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.MetricsResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|11:02:02.416 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.MetadataResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|11:02:02.418 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.FeaturesResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|11:02:02.445 [main] INFO  [AbstractConnector.java:338] - Started SelectChannelConnector@0.0.0.0:8080
+09-04|11:02:02.449 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.telnet.TelnetServer
+09-04|11:02:02.489 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.reporting.DataPointsMonitor
+09-04|11:02:02.489 [main] INFO  [Main.java:405] - ------------------------------------------
+09-04|11:02:02.489 [main] INFO  [Main.java:406] -      KairosDB service started
+09-04|11:02:02.490 [main] INFO  [Main.java:407] - ------------------------------------------
+09-04|11:02:04.439 [qtp663466110-35] INFO  [HotSaxJavaAggregator.java:71] - All expected data has been received.
+09-04|11:02:04.442 [qtp663466110-35] INFO  [HotSaxJavaAggregator.java:106] - Applied HotSax
+09-04|11:02:04.470 [Thread-1] INFO  [Main.java:559] - Shutting down
+09-04|11:02:04.470 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|11:02:04.470 [Thread-1] INFO  [QuartzScheduler.java:653] - Scheduler QuartzScheduler_$_NON_CLUSTERED shutting down.
+09-04|11:02:04.471 [Thread-1] INFO  [QuartzScheduler.java:572] - Scheduler QuartzScheduler_$_NON_CLUSTERED paused.
+09-04|11:02:04.970 [Thread-1] INFO  [QuartzScheduler.java:725] - Scheduler QuartzScheduler_$_NON_CLUSTERED shutdown complete.
+09-04|11:02:04.970 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|11:02:04.970 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.HostManager
+09-04|11:02:04.971 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.HostManager
+09-04|11:02:04.971 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.http.WebServer
+09-04|11:02:04.994 [Thread-1] INFO  [ContextHandler.java:843] - stopped o.e.j.s.ServletContextHandler{/,null}
+09-04|11:02:05.048 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.http.WebServer
+09-04|11:02:05.048 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.telnet.TelnetServer
+09-04|11:02:05.055 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.telnet.TelnetServer
+09-04|11:02:05.055 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.reporting.DataPointsMonitor
+09-04|11:02:05.056 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.reporting.DataPointsMonitor
+09-04|11:02:05.056 [Thread-1] INFO  [Main.java:575] - Stopping Datastore
+09-04|11:02:05.057 [main] INFO  [Main.java:420] - --------------------------------------
+09-04|11:02:05.057 [main] INFO  [Main.java:421] -      KairosDB service is now down!
+09-04|11:02:12.908 [main] INFO  [Main.java:119] - Loading plugin properties: kairosdb_guid.properties
+09-04|11:02:12.913 [main] INFO  [Main.java:119] - Loading plugin properties: udf.properties
+09-04|11:02:13.386 [main] INFO  [TelnetServerModule.java:38] - Configuring module TelnetServerModule
+09-04|11:02:13.852 [main] INFO  [StdSchedulerFactory.java:1175] - Using default implementation for ThreadExecutor
+09-04|11:02:13.869 [main] INFO  [SchedulerSignalerImpl.java:61] - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+09-04|11:02:13.869 [main] INFO  [QuartzScheduler.java:243] - Quartz Scheduler v.2.1.7 created.
+09-04|11:02:13.870 [main] INFO  [RAMJobStore.java:154] - RAMJobStore initialized.
+09-04|11:02:13.871 [main] INFO  [QuartzScheduler.java:268] - Scheduler meta-data: Quartz Scheduler (v2.1.7) 'QuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 4 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+09-04|11:02:13.871 [main] INFO  [StdSchedulerFactory.java:1324] - Quartz scheduler 'QuartzScheduler' initialized from an externally provided properties instance.
+09-04|11:02:13.871 [main] INFO  [StdSchedulerFactory.java:1328] - Quartz scheduler version: 2.1.7
+09-04|11:02:13.872 [main] INFO  [QuartzScheduler.java:2247] - JobFactory set to: org.kairosdb.core.scheduler.KairosDBJobFactory@1800a575
+09-04|11:02:13.873 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|11:02:13.873 [main] INFO  [QuartzScheduler.java:534] - Scheduler QuartzScheduler_$_NON_CLUSTERED started.
+09-04|11:02:13.874 [main] INFO  [KairosDBSchedulerImpl.java:68] - Starting job: org.kairosdb.core.jobs.CacheFileCleaner
+09-04|11:02:13.882 [main] INFO  [H2Datastore.java:105] - Starting H2 database in ./build/h2db
+09-04|11:02:13.901 [main] INFO  [Jdk14MLog.java:124] - MLog clients using java 1.4+ standard logging.
+09-04|11:02:13.978 [main] INFO  [Jdk14MLog.java:318] - Initializing c3p0-0.9.1.2 [built 21-May-2007 15:04:56; debug? true; trace: 10]
+09-04|11:02:14.031 [main] INFO  [KairosDBSchedulerImpl.java:68] - Starting job: org.kairosdb.core.reporting.MetricReporterService
+09-04|11:02:14.035 [main] INFO  [KairosDBSchedulerImpl.java:84] - *** Scheduled job org.kairosdb.core.jobs.CacheFileCleaner to execute next on Sun Sep 06 12:00:00 CEST 2020
+09-04|11:02:14.036 [main] INFO  [KairosDBSchedulerImpl.java:84] - *** Scheduled job org.kairosdb.core.reporting.MetricReporterService to execute next on Fri Sep 04 11:03:00 CEST 2020
+09-04|11:02:14.036 [main] INFO  [H2Datastore.java:105] - Starting H2 database in ./build/h2db
+09-04|11:02:14.062 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.HostManager
+09-04|11:02:14.062 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.http.WebServer
+09-04|11:02:14.094 [HostManagerService-0] INFO  [Jdk14MLog.java:318] - Initializing c3p0 pool... com.mchange.v2.c3p0.PoolBackedDataSource@a1c763ca [ connectionPoolDataSource -> com.mchange.v2.c3p0.WrapperConnectionPoolDataSource@dd703af [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 0, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, debugUnreturnedConnectionStackTraces -> false, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> 117bemtacoiituq11u7408|49d3c823, idleConnectionTestPeriod -> 0, initialPoolSize -> 3, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 0, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 15, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, nestedDataSource -> ds1: url=jdbc:h2:./build/h2db/kairosdb user=sa, preferredTestQuery -> null, propertyCycle -> 0, testConnectionOnCheckin -> false, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, usesTraditionalReflectiveProxies -> false; userOverrides: {} ], dataSourceName -> null, factoryClassLocation -> null, identityToken -> 117bemtacoiituq11u7408|436bc36, numHelperThreads -> 3 ]
+09-04|11:02:14.135 [main] INFO  [Server.java:272] - jetty-8.1.16.v20140903
+09-04|11:02:14.333 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.health.HealthCheckResource as a root resource class
+09-04|11:02:14.333 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.MetricsResource as a root resource class
+09-04|11:02:14.334 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.MetadataResource as a root resource class
+09-04|11:02:14.334 [main] INFO  [GuiceComponentProviderFactory.java:116] - Registering org.kairosdb.core.http.rest.FeaturesResource as a root resource class
+09-04|11:02:14.334 [main] INFO  [GuiceComponentProviderFactory.java:113] - Registering com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider as a provider class
+09-04|11:02:14.334 [main] INFO  [GuiceComponentProviderFactory.java:113] - Registering org.kairosdb.core.http.exceptionmapper.InvalidServerTypeExceptionMapper as a provider class
+09-04|11:02:14.336 [main] INFO  [WebApplicationImpl.java:815] - Initiating Jersey application, version 'Jersey: 1.18.3 12/01/2014 08:23 AM'
+09-04|11:02:14.403 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.exceptionmapper.InvalidServerTypeExceptionMapper to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|11:02:14.409 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|11:02:14.696 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.health.HealthCheckResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|11:02:14.709 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.MetricsResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|11:02:14.816 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.MetadataResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|11:02:14.818 [main] INFO  [GuiceComponentProviderFactory.java:168] - Binding org.kairosdb.core.http.rest.FeaturesResource to GuiceManagedComponentProvider with the scope "Singleton"
+09-04|11:02:14.847 [main] INFO  [AbstractConnector.java:338] - Started SelectChannelConnector@0.0.0.0:8080
+09-04|11:02:14.850 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.telnet.TelnetServer
+09-04|11:02:14.890 [main] INFO  [Main.java:549] - Starting service class org.kairosdb.core.reporting.DataPointsMonitor
+09-04|11:02:14.891 [main] INFO  [Main.java:405] - ------------------------------------------
+09-04|11:02:14.891 [main] INFO  [Main.java:406] -      KairosDB service started
+09-04|11:02:14.891 [main] INFO  [Main.java:407] - ------------------------------------------
+09-04|11:02:18.575 [qtp663466110-33] INFO  [HotSaxJavaAggregator.java:71] - All expected data has been received.
+09-04|11:02:18.641 [qtp663466110-33] INFO  [HotSaxJavaAggregator.java:106] - Applied HotSax
+09-04|11:02:18.658 [Thread-1] INFO  [Main.java:559] - Shutting down
+09-04|11:02:18.658 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|11:02:18.659 [Thread-1] INFO  [QuartzScheduler.java:653] - Scheduler QuartzScheduler_$_NON_CLUSTERED shutting down.
+09-04|11:02:18.659 [Thread-1] INFO  [QuartzScheduler.java:572] - Scheduler QuartzScheduler_$_NON_CLUSTERED paused.
+09-04|11:02:18.858 [Thread-1] INFO  [QuartzScheduler.java:725] - Scheduler QuartzScheduler_$_NON_CLUSTERED shutdown complete.
+09-04|11:02:18.858 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.scheduler.KairosDBSchedulerImpl
+09-04|11:02:18.859 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.HostManager
+09-04|11:02:18.860 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.HostManager
+09-04|11:02:18.860 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.http.WebServer
+09-04|11:02:18.883 [Thread-1] INFO  [ContextHandler.java:843] - stopped o.e.j.s.ServletContextHandler{/,null}
+09-04|11:02:18.936 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.http.WebServer
+09-04|11:02:18.937 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.telnet.TelnetServer
+09-04|11:02:18.943 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.telnet.TelnetServer
+09-04|11:02:18.943 [Thread-1] INFO  [Main.java:563] - Stopping org.kairosdb.core.reporting.DataPointsMonitor
+09-04|11:02:18.943 [Thread-1] INFO  [Main.java:567] - Stopped  org.kairosdb.core.reporting.DataPointsMonitor
+09-04|11:02:18.944 [Thread-1] INFO  [Main.java:575] - Stopping Datastore

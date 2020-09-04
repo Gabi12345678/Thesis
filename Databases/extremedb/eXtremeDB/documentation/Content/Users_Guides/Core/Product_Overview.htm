@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Product Overview</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Product Overview</h1>
+            <blockquote>
+                <p><i>e</i>X<i>treme</i>DB is first and foremost an in-memory embedded database system (IMDS) ideally suited for embedded systems and other application domains that require extremely high performance / low latency, small footprint, compact storage, zero memory allocations, or any combination of these attributes.  <i>e</i>X<i>treme</i>DB provides superior performance by means of a very short code path, without sacrificing necessary DBMS features such as transactions that enforce the ACID properties, a data definition language, and support for SQL when needed.  <i>e</i>X<i>treme</i>DB also exhibits very small RAM, CPU and storage overhead.  Designed for all-in-memory optimization, it boosts speed by eliminating file I/O, multiple data copies, and redundant logical processes, such as caching. When used with non-volatile (e.g. battery-backed) RAM, <i>e</i>X<i>treme</i>DB delivers unsurpassed speed and persistence.
+</p>
+                <p>The <i>e</i>X<i>treme</i>DB core   provides  data persistence with optimal performance through <b>transaction logging</b>, <b>backup</b> and database <b>snapshot</b> features. Or, by simply declaring database classes <b>persistent</b>, databases can be stored, entirely or partially, on persistent media. </p>
+                <p>Operations on “transient” (in-memory) database objects eliminate the complex and performance-draining tasks of cache and file management which has several beneficial side effects:</p>
+                <ul>
+                    <li value="1">Eliminating the complex logic associated with cache and file management reduces the code size (footprint) and execution path, and also eliminates multiple redundant copies of any given piece of data (i.e. a copy in the application, a copy in the database cache, a copy in the file system cache, and a copy in the file system itself).</li>
+                    <li value="2">An all-in-memory database is optimized with different strategies than a disk-based database. The latter is concerned with minimizing file I/O operations, and will trade great use of memory and CPU instructions to avoid file I/O. An all-in-memory database doesn’t worry about disk I/O so is optimized to reduce CPU instructions and to maximize the amount of data that can be stored in a given amount of space.  Consequently, eXtremeDB requires a fraction of the space of disk-based databases to store a given amount of data.</li>
+                    <li value="3"><i>e</i>X<i>treme</i>DB provides two libraries for all-in-memory databases: the optimized “Direct Pointer Arithmetic” library which accesses the memory locations of database records by simple pointer arithmetic (offering a 5% -15% performance advantage) or the “Offset” library which calculates record locations by first obtaining their offsets from the beginning address of the database then converting these to proper pointers (incurring a slight additional performance cost).  Both libraries implement these calculations internally; in other words, the difference is transparent to application code. The advantages of the “Offset” library are A) that a saved binary image of an in-memory database can be loaded to a different starting address in memory, and, B) two (or more) applications that share an in-memory database in shared memory do not have to map the shared memory segment to the same address space in their local process (which is sometimes impossible). The advantage of the Direct Pointer Arithmetic library is better performance, and is ideal for in-memory databases within a single (possibly multi-threaded) process.</li>
+                    <li value="4">Some embedded systems, such as flight safety related systems, are not permitted to use dynamic memory allocation because it can lead to memory leaks that could ultimately cause system failure. <i>e</i>X<i>treme</i>DB is given a block of memory to use for the in-memory storage at start-up, so that no dynamic memory is allocated. An in-memory database can be increased in size, at the application’s discretion, but <i>e</i>X<i>treme</i>DB itself will never allocate memory dynamically.</li>
+                    <li value="5">To allow access to an all-in-memory database from multiple processes, an <i>e</i>X<i>treme</i>DB database can be created in shared-memory so other applications can share the data directly.</li>
+                </ul>
+                <p>&#160;</p>
+                <p><i>e</i>X<i>treme</i>DB is available for a variety of embedded, real-time, desktop, and server operating systems.  For operating systems with a single-process, multi-task architecture (for example, VxWorks 5.5 and  INTEGRITY OS), <i>e</i>X<i>treme</i>DB manages data in any dedicated region of memory and coordinates access by multiple tasks (threads).  For multi-process architectures (for example, Sun Solaris, Linux, Windows, QNX Neutrino, etc.), <i>e</i>X<i>treme</i>DB can manage a database in shared memory and coordinate access by multiple processes, each potentially with multiple threads.</p>
+                <p>&#160;</p>
+                <p><i>e</i>X<i>treme</i>DB is a development tool that database-enables applications providing programming interfaces for a wide variety of programming languages and development environments, including:</p>
+                <ul>
+                    <li value="1">C/C++: C programmers on virtually all platforms will find the native C language API optimal, while C++ provides the means to encapsulate the database functionality in convenient application specific classes.</li>
+                    <li value="2">Python: <i>e</i>X<i>treme</i>DB provides a Python  extension module "exdb.py" for the "core" C language APIs and a number of Python classes to facilitate application implementation using the  popular Python language and interactive tools.</li>
+                    <li value="3">Java Native Interface: a seamless integration of <i>e</i>X<i>treme</i>DB with the Java programming language.  Java programmers simply annotate Java class definitions with <i>e</i>X<i>treme</i>DB attributes, and the database dictionary is implemented through the “reflection” capability of Java; no external schema language or compilation step is needed.  The standard Java object oriented language is thus enhanced with optimal persistent data storage – whether all-in-memory, on-disk, or both.</li>
+                    <li value="4">C# (.NET): Windows developers will find the C# API ideal for incorporating high performance database functionality into .NET applications. As with the Java API, the “persistent” attribute marks native C# classes for storage in an <i>e</i>X<i>treme</i>DB database. Then <i>e</i>X<i>treme</i>DB database functionality is implemented through classes like <i>Database</i>, <i>Connection</i>, and <i>Cursor</i> either by directly invoking their specialized methods or through <span class="Param">LINQ</span> queries. Also, the <i>e</i>X<i>treme</i>DB .NET LINQ provider allows the powerful variety of <i>e</i>X<i>treme</i>DB indexes to significantly improve the performance of <span class="Param">LINQ</span> queries.</li>
+                    <li value="5"><i>e</i>X<i>treme</i>SQL: a high performance implementation of the industry standard SQL database language with C/C++ (proprietary and ODBC) and Java language interfaces (JDBC).</li>
+                    <li value="6">All of the programming interfaces of <i>e</i>X<i>treme</i>DB can be used within the same application and/or with the same database for complete programming flexibility.</li>
+                </ul>
+                <p>Beyond the core <i>e</i>X<i>treme</i>DB package, the following features extend the core functionality to meet specialized system requirements:</p>
+                <ul>
+                    <li value="1"><i>e</i>X<i>treme</i>DB<i> Transaction Logging</i>: supports database persistence by transaction logging, a process that journals changes made to a database as the transactions are committed. With transaction logging enabled, the <i>e</i>X<i>treme</i>DB<i> Transaction Logging</i><a name="kanchor1044"></a> runtime appends  database changes to a transaction log file so writes are always sequential, and never random. In the event of a hardware or software failure, the <i>e</i>X<i>treme</i>DB runtime can recover the database from the log file.  This edition also includes the “Data Relay” feature, an open replication scheme, that facilitates forwarding of <i>e</i>X<i>treme</i>DB transactions to external systems (such as another middleware, or an enterprise DBMS).</li>
+                    <li value="2"><i>e</i>X<i>treme</i>DB<i> High Availability</i>: an optional module of <i>e</i>X<i>treme</i>DB designed for applications that require the highest degree of reliability in case of system failures.  The <i>e</i>X<i>treme</i>DB<i> High Availability</i> libraries implement a time-cognizant two-phase commit (aka 2-safe or synchronous) protocol to guarantee that a master database instance and one or more replica database instances are perfectly synchronized, or a faster 1-safe/asynchronous protocol with lower consistency but much faster performance.  It extends the core <i>e</i>X<i>treme</i>DB programming interfaces with additional functions to allow replica databases to connect to and synchronize with the master, or for a replica to become the master in a “fail-over” scenario. Replica database instances are readable, facilitating load balancing of queries across all available database instances.</li>
+                    <li value="3"><i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i>: an optional module of <i>e</i>X<i>treme</i>DB for distributed database implementations. Applications running on different nodes in a network cluster all have the same copy of the database and all database modifications are automatically replicated across all nodes. Each node can perform <code>READ_WRITE</code> and <code>READ_ONLY</code> operations, facilitating load-balancing and enabling cost-effective scalability through the exploitation of commodity hardware..</li>
+                    <li value="4"><i>e</i>X<i>treme</i>SQL: an option of <i>e</i>X<i>treme</i>DB that includes a high-performance implementation of the SQL database programming language.   Applications can use standard SQL through a Windows ODBC driver, by linking to the <i>e</i>X<i>treme</i>DB API library (bypassing the ODBC driver and driver manager), through JDBC, through an <i>e</i>X<i>treme</i>DB proprietary C-language call level interface (CLI), or through a set of streamlined C++ classes.  Built on the unsurpassed performance of <i>e</i>X<i>treme</i>DB, and a SQL optimizer tuned to take advantage of the <i>e</i>X<i>treme</i>DB runtime, <i>e</i>X<i>treme</i>SQL delivers a fast interface for SQL programmers.</li>
+                </ul>
+                <h2>Product evolution</h2>
+                <p><i>e</i>X<i>treme</i>DB has played a significant role in the success of thousands of real-time applications.  Driven by requests from developers and enthusiastic customers, additional features have been added to extend the basic <i>e</i>X<i>treme</i>DB core technology to address evolving user requirements, as can be seen from the list of versions and optional modules above.  However, great care has been taken in each stage of the product evolution to make no compromises with our basic extreme performance goals.  Each addition, be it <i>e</i>X<i>treme</i>DB<i> Transaction Logging</i>, <i>e</i>X<i>treme</i>DB<i> High Availability</i>, <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i>, <i>e</i>X<i>treme</i>SQL or the Java, C# and Python APIs, is provided in the form of separate libraries that can be linked into an application, as desired, to address specific application needs.</p>
+                <p>While developers who need the absolute best performance for mission critical applications are reassured to know that the underlying core runtime remains the fastest, most robust in the industry, they also appreciate knowing that less demanding applications can interface with the same <i>e</i>X<i>treme</i>DB databases through SQL, for example, to generate reports or allow a flexible query interface.</p>
+                <p>As more diverse application data persistence features were requested, a number of features were added to extend functionality and developer control for all-in-memory as well as persistent databases including the following:</p>
+                <blockquote>
+                    <h3>Choice of “optimistic” or “pessimistic” transaction management by simply linking the appropriate library:</h3>
+                    <ul>
+                        <li value="1">The Multi-Version Concurrency Control (<a href="MVCC_Transaction_Manager.htm" name="kanchor1045">MVCC</a><a name="kanchor1046"></a>) Transaction Manager, an optimistic (lockless) transaction manager which maximizes concurrency and scales excellently on multi-core systems, and allows choice of isolation levels when querying and updating the database</li>
+                        <li value="2">The Multiple Readers Single Writer (<a href="MURSIW_Transaction_Manager.htm" name="kanchor1047">MURSIW</a>) Transaction Manager which is an extremely lightweight transaction manager that is ideal for in-memory databases on systems with relatively few concurrent tasks and/or with a high ratio of <code>READ_ONLY</code> to <code>READ_WRITE</code> operations</li>
+                    </ul>
+                    <h3>Binary Schema Evolution (BSE)</h3>
+                    <blockquote>
+                        <p>BSE provides the ability to load a pre-existing database into a newer database format and transform existing data objects automatically (e.g. new/dropped classes or fields, new/dropped indexes)</p>
+                    </blockquote>
+                    <h3>Transaction Logging</h3>
+                    <blockquote>
+                        <p>The Transaction Logging feature adds data persistence:</p>
+                        <ul>
+                            <li value="1">logging can be turned on/off at runtime</li>
+                            <li value="2">Data Relay: open replication to share data with external systems</li>
+                        </ul>
+                    </blockquote>
+                    <h3>Active Replication Fabric</h3>
+                    <blockquote>
+                        <p><i>e</i>X<i>treme</i>DB<i> Active Replication Fabric</i> provides automatic replication of data between server and edge devices.</p>
+                    </blockquote>
+                    <h3>XML Capability</h3>
+                    <blockquote>
+                        <p>The XML implementation provides additional data import / export capability.</p>
+                    </blockquote>
+                    <h3>Enhanced Database Security</h3>
+                    <ul>
+                        <li value="1">AES and	CRC checking is provided for reliability when reading data from persistent storage</li>
+                        <li value="2">Page-level Data Encryption for robust data security</li>
+                    </ul>
+                    <h3>NVRAM support</h3>
+                    <blockquote>
+                        <p>Support for database recovery from battery-backed memory.</p>
+                    </blockquote>
+                    <h3>Caching options</h3>
+                    <blockquote>
+                        <p><i>e</i>X<i>treme</i>DB provides performance optimization application-managed caching options, such as:</p>
+                        <ul>
+                            <li value="1">Prioritized Cache: employing an enhanced LRU algorithm that allows applications to influence how long certain pages remain in the database cache</li>
+                            <li value="2"><a name="kanchor1048"></a>Connection Cache: the database runtime makes sure that pages loaded for a given transaction stay in the cache until the transaction is committed</li>
+                        </ul>
+                    </blockquote>
+                </blockquote>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

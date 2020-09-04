@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Data Relay and Persistent Event Queue Strategies and Implementation</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Data Relay and Persistent Event Queue Strategies and Implementation</h1>
+            <blockquote>
+                <p>A transaction log that is usable for restoring the main <i>e</i>X<i>treme</i>DB database (which is often the primary purpose of Transaction Logging) may or may not be created. Data to potentially be passed to an external data store is read by the function  <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> which calls in its turn a user-defined call-back function.  The data  <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> passes to this call-back function are objects that were created, deleted or modified in the <i>e</i>X<i>treme</i>DB database inside logged transactions. (Note that this is comparable to using the standard <i>e</i>X<i>treme</i>DB function <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/iterate.htm">mco_trans_iterate()</a></code> to iterate through the objects effected by a transaction, except that  <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/iterate.htm">mco_trans_iterate()</a></code> only iterates though the objects in the current transaction, and thus provides the capability of exporting this data synchronously, whereas with <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> a log file can be read and “exported” at any time.)</p>
+                <p>There are two ways to supply data from a writer process (the process that started transaction logging and is currently processing data inside the database) to a <code>reader</code> process (the process reading data and transferring it to the external data store by calling the user-defined callback).</p>
+                <p>The first method is to create a log file.  After the log file has been closed by the log writer, this log can be opened and read for export just as it could be opened to restore the main database as in ordinary TL usage.</p>
+                <p>The second method is to use the pipe mechanism supplied by <i>e</i>X<i>treme</i>DB<i> Transaction Logging</i>.  In this case, data is being transferred through a memory buffer, either in conventional memory or in shared memory. This method is faster than the file-based method, but can create a race situation: if the <code>reader</code> process (which is calling the function <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code>) does not read data fast enough, then the <code>writer</code> process blocks with the result that there is no available memory in the pipe buffer.  This causes the <code>writer</code> process to be blocked until the pipe buffer has available memory (that is, until the <code>reader</code> process releases the necessary amount of pipe buffer). This problem can be solved by extending the main pipe buffer with a temporary file in case of buffer overflow; then no blocking occurs inside the <code>writer</code> process.</p>
+                <p>The two methods can be combined by setting the flag <code>MCO_TRANSLOG_DUAL_OUT</code>.</p>
+                <p><a name="kanchor667"></a>Be aware that when using TL with hybrid databases, performance can be improved by turning off disk manager logging (passing the <code>NO_LOG</code> log type into the <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm">mco_db_open_dev()</a></code> API).  If a database contains only persistent classes, then the only reason to use TL is to export transactions to an external system because r<i>e</i>X<i>treme</i>DB has its own integral transaction logging implementation that is separate from the <i>e</i>X<i>treme</i>DB<i> Transaction Logging</i> optional module.</p>
+                <p>The asynchronous export is started by calling the function <code><a href="../../Programming/C/TL_Functions/start.htm">mco_translog_start()</a></code> with the flag <code>MCO_TRANSLOG_ITERABLE</code>. This allows reading and then iterating the log by calling the function  <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code>.</p>
+                <p>Whether a file or pipe is used between the reader and writer processes the flag <code>MCO_TRANSLOG_ITERABLE</code> is necessary to start the relay process correctly. The <code>writer</code> and <code>reader</code> may be threads of a single process or they may be different processes (applications) running on a single computer. When using the file-based method, these applications may even be on different computers – if the process that is applying the logged transactions to the external data store is on a different computer, then the file-based method, though slower, is the only option.</p>
+                <h2 style="font-style: italic;font-weight: normal;"><i style="font-weight: bold; font-style: normal;">Ordinary log file as a transport to a reader</i>
+                </h2>
+                <p>To use an ordinary log file for exporting transactions to an external data store, the file must be opened by function <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code>.  To be a valid log file, it has to have been closed by <code><a href="../../Programming/C/TL_Functions/stop.htm">mco_translog_stop()</a></code> on the <code>writer</code> side, or it has to have been indirectly closed by calling <code><a href="../../Programming/C/TL_Functions/start.htm">mco_translog_start()</a></code> with  <code>MCO_TRANSLOG_RESTART</code>.  (Note that it is possible to use additional files as semaphores to indicate that a log file was properly closed by a writer.)</p>
+                <h4><b style="font-style: italic;">Opening simple file based log:</b>
+                </h4>
+                <div class="code-block"><pre>    &#160;
+    #define DISK_PAGE_SIZE 4096
+    #define LOG_FILE       "/tmp/mylog"
+    mco_TL_start_data_t log_parms;
+    log_parms.flags = MCO_TRANSLOG_ITERABLE;
+    log_parms.disk_page_size = DISK_PAGE_SIZE;
+    mco_translog_start (db, LOG_FILE, &amp;log_parms);
+    &#160;</pre>
+                </div>
+                <h4>Reading and iteration of log file:</h4>
+                <div class="code-block"><pre>    &#160;
+    #define TEMP_BUFFER_SIZE (32*1024*1024)
+    #define LOG_FILE       "/tmp/mylog"
+    MCO_RET iteration_proc (mco_trans_h trans, MCO_Hf* obj, int cid, int obj_state, void* user_ctx)
+    {
+        return MCO_S_OK;
+    }
+    ...
+    mem_buff = malloc (TEMP_BUFFER_SIZE);
+    mco_translog_iterate (LOG_FILE, 0, iteration_proc, user_ctx, mydatabase_get_dictionary (),
+            
+                    mem_buff, TEMP_BUFFER_SIZE);
+            
+    &#160;</pre>
+                </div>
+                <h3><b style="font-style: italic;">Partitioning the log into multiple files</b>
+                </h3>
+                <p>To reduce the delay between the moment when a transaction is written into the log and when it is passed to the user-defined iteration callback, and also to reduce the disk space used by log files, it is possible to limit the maximum size of a log file and switch logging to another file when that limit has been reached.</p>
+                <p>There are two ways to implement this file size limit.  The first method is by starting the logging with flag <code>MCO_TRANSLOG_SIZE_CLBK</code>, a maximum log file size and the address of a user-defined file-size callback function.  This implements a kind of <code>interrupt</code> strategy; when the specified log file size is exceeded the callback function is called.</p>
+                <p>The second method is a <code>polling</code> strategy.  The current log file size can be periodically checked by function <code><a href="../../Programming/C/TL_Functions/get_info.htm">mco_translog_get_info()</a></code>.</p>
+                <p>With both of these methods the log file size is being checked from the <code>writer</code> process.</p>
+                <p>When the log file needs to be switched to another, simply call the function <code><a href="../../Programming/C/TL_Functions/start.htm">mco_translog_start()</a></code> again but with the additional flag <code>MCO_TRANSLOG_RESTART</code>.  This causes the log file to be switched to another without the necessity of calling the function <code><a href="../../Programming/C/TL_Functions/stop.htm">mco_translog_stop()</a></code>, and also without having to freeze transaction activity for this period, which is very advantageous for multithreaded applications.</p>
+                <h4><b style="font-style: italic;">Example of writing a multiple file log – method 1: “interrupt”</b>
+                </h4>
+                <div class="code-block"><pre>    &#160;
+    #define DISK_PAGE_SIZE 4096
+    #define MAX_LOG_SIZE   128*1024*1024
+    #define LOG_FILE1       "/tmp/mylog1"
+    #define MARK_FILE1      "/tmp/mymark1"
+    #define LOG_FILE2       "/tmp/mylog2"
+    #define MARK_FILE2      "/tmp/mymark2"
+    volatile int            size_exceeded = 0;
+&#160;
+    void warn_sz_proc (mco_size_t log_size)
+    {
+        size_exceeded = 1;
+    }
+    &#160;
+    ...
+    &#160;
+    mco_TL_current_info_t log_info;
+    mco_TL_start_data_t log_parms;
+    log_parms.flags = MCO_TRANSLOG_ITERABLE | MCO_TRANSLOG_SIZE_CLBK;
+    log_parms.disk_page_size = DISK_PAGE_SIZE;
+    log_parms.max_size = MAX_LOG_SIZE;
+    log_parms.warn_sz_proc = warn_sz_proc;
+    mco_translog_start (db, LOG_FILE1, &amp;log_parms);
+    &#160;
+    /* Work with database. Current log is the file LOG_FILE1 */
+    while (!size_exceeded)
+    {
+        ...
+    }
+    log_parms.flags |= MCO_TRANSLOG_RESTART;
+    mco_translog_start (db, LOG_FILE2, &amp;log_parms);
+    create_file (MARK_FILE1);
+    &#160;
+    /* Work with database further. Current log is the file LOG_FILE2 */
+    ...
+    mco_translog_stop (db);
+    create_file (MARK_FILE2);
+    &#160;</pre>
+                </div>
+                <h4><b style="font-style: italic;">Example of writing a multiple file log – method 2: “polling”</b>
+                </h4>
+                <div class="code-block"><pre>    &#160;
+    #define DISK_PAGE_SIZE 4096
+    #define MAX_LOG_SIZE   128*1024*1024
+    #define LOG_FILE1       "/tmp/mylog1"
+    #define MARK_FILE1      "/tmp/mymark1"
+    #define LOG_FILE2       "/tmp/mylog2"
+    #define MARK_FILE2      "/tmp/mymark2"
+    &#160;
+    mco_TL_current_info_t log_info;
+    mco_TL_start_data_t log_parms;
+    log_parms.flags = MCO_TRANSLOG_ITERABLE;
+    log_parms.disk_page_size = DISK_PAGE_SIZE;
+    mco_translog_start (db, LOG_FILE1, &amp;log_parms);
+    &#160;
+    /* Work with database. Current log is the file LOG_FILE1 */
+    while (mco_translog_get_info (db, &amp;log_info) == MCO_S_OK
+            &amp;&amp; log_info.log_size &lt; MAX_LOG_SIZE)
+    {
+        ...
+    }
+    log_parms.flags |= MCO_TRANSLOG_RESTART;
+    mco_translog_start (db, LOG_FILE2, &amp;log_parms);
+    create_file (MARK_FILE1);
+    &#160;
+    /* Work with database further. Current log is the file LOG_FILE2 */
+    ...
+    mco_translog_stop (db);
+    create_file (MARK_FILE2);
+    &#160;</pre>
+                </div>
+                <h3><b style="font-style: italic;">Reading and iteration of multiple log files</b>
+                </h3>
+                <p>Reading from multiple log files is quite simple.  The application simply switches log files by sequentially calling function <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code>.</p>
+                <h4><b style="font-style: italic;">Example of reading and iteration of multiple log files</b>
+                </h4>
+                <div class="code-block"><pre>    &#160;
+    #define TEMP_BUFFER_SIZE (32*1024*1024)
+    #define LOG_FILE1       "/tmp/mylog1"
+    #define MARK_FILE1      "/tmp/mymark1"
+    #define LOG_FILE2       "/tmp/mylog2"
+    #define MARK_FILE2      "/tmp/mymark2"
+    MCO_RET iteration_proc (mco_trans_h trans, MCO_Hf* obj, int cid, int obj_state, void* user_ctx)
+    {
+        /* Note "trans" is always 0 in case of asynchronous export */
+        return MCO_S_OK;
+    }
+    ...
+    mem_buff = malloc (TEMP_BUFFER_SIZE);
+    &#160;
+    wait_while_no_file (MARK_FILE1);
+    &#160;
+    mco_translog_iterate (LOG_FILE1, 0, iteration_proc, user_ctx, mydatabase_get_dictionary (), 
+                    mem_buff, TEMP_BUFFER_SIZE);
+    &#160;
+    unlink (MARK_FILE1);
+    wait_while_no_file (MARK_FILE2);
+    &#160;
+    mco_translog_iterate (LOG_FILE2, 0, iteration_proc, user_ctx, mydatabase_get_dictionary (), 
+                    mem_buff, TEMP_BUFFER_SIZE);
+    unlink (MARK_FILE2);
+    &#160;</pre>
+                </div>
+                <p>Please note that the function <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> returns only after it has completed reading of a log file or if the user defined call-back returns a value other than <code>MCO_S_OK</code> or if some other internal error occurs.  Also note that it is necessary to call <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> repeatedly to read the next log file.</p>
+                <p>&#160;</p>
+                <h2>Using a pipe to transport data</h2>
+                <p>When pipe mode is used as a transport for exporting transaction data to an external database, a pipe-buffer is placed in shared or conventional memory (depending on the memory settings used in the main <i>e</i>X<i>treme</i>DB database being used as the data source).  If the <code>reader</code> process is processing data faster than the <code>writer</code> process is placing it into the pipe, then this mode is clearly the fastest.  However, if the reader is slower than the writer process, the pipe buffer will overflow and the writer process will be blocked inside the transaction commit until the reader releases enough memory to store the transaction.</p>
+                <p>It is possible to avoid this blocking by using an optional overflow file.  This file is specified in the <code>file_path</code> argument of functions <code><a href="../../Programming/C/TL_Functions/start.htm">mco_translog_start()</a></code> and <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code>.  If a file is specified, it is used if pipe buffer overflow occurs and, therefore, the writer process is never blocked.</p>
+                <p>Naturally, the <code>writer</code> and <code>reader</code> processing with this overflow file will be much slower.   This is a consideration when determining the pipe buffer size.  Another consideration is that, in any case, pipe mode does not generate log files that can be used for recovery of a database.</p>
+                <p>&#160;</p>
+                <p>The reader process must open a database handle (by calling <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/connect.htm">mco_db_connect()</a></code>) of the database for which some or all transactional data is to be exported.  This database handle, in turn, must be passed to the function <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code>.  This allows access to the pipe from the reader.</p>
+                <p>The pipe buffer is an instance of type <code>mco_device_t</code> and must be specified when the database is created.  It will be assigned <code>MCO_MEMORY_ASSIGN_PIPE_BUF</code> and type <code>MCO_MEMORY_NAMED</code> or <code>MCO_MEMORY_CONV</code>, which must be the same memory type as that used by the main database device.</p>
+                <p>It is also possible to specify more than one pipe buffering device. In this case transactions will automatically be broadcast to all pipe instances as separate pipe buffers. This implies that the count of readers (processes or threads calling function <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> or <code><a href="../../Programming/C/TL_Functions/play.htm">mco_translog_play()</a></code>) must be equal to the count of pipe devices.  It is useful to check the field <code>pipe_readers_connected</code> of the <code>mco_TL_current_info</code> structure to verify that all readers are connected. As all of the pipe devices work concurrently, it is recommended to specify the same size for all of the pipes. And likewise for all temporary buffers passed into <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code>. (See sample <a href="../../Programming/C/SDK_Samples/TL/Iter_Multipipe.htm">tlogitermultipipe</a> for an example implementation of multiple pipes.)</p>
+                <p>The temporary buffer passed into  <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> should be allocated by <code>malloc()</code> if the main database device is of type conventional memory.  But if shared (named) memory is used by the main database device, then the pointer to a temporary buffer passed to <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> must be 0. In this case, <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> will create a temporary buffer in shared memory automatically. </p>
+                <blockquote>
+                    <p>
+                        <img src="../../Resources/Images/note.png" /> Note that, when using shared memory, it is important to distinguish between the 'offset' and 'direct pointer' nature of the <i>e</i>X<i>treme</i>DB core. If the 'dptr' core is used then all memory devices (objects of structure <code>mco_device_t</code>) must specify some unique 'hint' field which is actually the beginning address of the requested shared memory block. Regarding functions <a href="../../Programming/C/TL_Functions/play.htm">mco_translog_play(</a>),and <a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a> , the argument (or corresponding field of structure <code>mco_TL_play_params_h</code>) <code>void *mem_ptr</code> is actually related to an internally used memory device which temporarily holds database objects read from a log stream. Thus the argument <code>mem_ptr</code> here is the same 'hint' for that memory device. It should be zero in the case of the 'offset' core or should be a valid address value in the case of 'dptr' core. </p>
+                </blockquote>
+                <h3>Pre-buffering</h3>
+                <p>When initializing the pipe, the application can specify the <code>MCO_TRANSLOG_SYNC_INSTANTLY</code> flag in the <code>data_flags</code><a name="kanchor668"></a> structure. If specified, then each transaction is written into the pipe immediately. Otherwise the Transaction Logging runtime buffers transactions in its internal intermediate buffer (the default size is <code>64K</code>). When the buffer becomes full it is written into the pipe all at once. The flag values <code>MCO_TRANSLOG_SYNC_COUNT</code> and <code>MCO_TRANSLOG_SYNC_TIMER</code> are not allowed when using multiple pipes and dual out mode (see below).</p>
+                <p>The user-defined callback <code>iteration_proc</code> may report an error by returning a value different from <code>MCO_S_OK</code>. In this case <a href="../../Programming/C/TL_Functions/iterate.htm"><code>mco_translog_iterate()</code></a> returns immediately with the same return code that the <code>iteration_proc</code> has just returned.  On the writer side the transaction commit (<code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/commit.htm">mco_trans_commit()</a></code> or <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/commit_phase2.htm">mco_trans_commit_phase2()</a></code>) will return error code <code>MCO_E_TL_PIPE_TERM</code>.  This informs the writer process that the reader has broken its loop.  In this case, the transaction log should be stopped by calling <code><a href="../../Programming/C/TL_Functions/stop.htm">mco_translog_stop()</a></code> before any further actions.</p>
+                <h3>Option Mark_Last_Object</h3>
+                <p>The runtime flag <code>MCO_RT_OPTION_MARK_LAST_OBJ</code> can be set (by function <code><a href="../../Programming/C/Core_Functions/Static/Runtime_Control/runtime_setoption.htm">mco_runtime_setoption()</a></code>) to specify that notification of ”end-of-transaction” is required. Transactions in a log file or pipe stream are output in their original order. By default while reading and iterating the log or pipe there is no simple way to understand if the object passed into the user-defined iteration callback is the latest in the current transaction. For this purpose the runtime option <code>MCO_RT_OPTION_MARK_LAST_OBJ</code> is used to enable the runtime to notify the user-defined callback about the end of each transaction. If it is set then user-defined iteration callback will be called one additional time with a zeroed object handle to indicate that the current transaction has finished.</p>
+                <p>Further implementation details are demonstrated in samples <a href="../../Programming/C/SDK_Samples/TL/Iter_Pipe.htm">tlogiterpipe</a>, <a href="../../Programming/C/SDK_Samples/TL/Iter_Multipipe.htm">tlogitermultipipe</a> and <a href="../../Programming/C/SDK_Samples/TL/Iter_Dualout.htm">tlogiterdualout</a>.</p>
+                <h4>Opening a pipe-based log</h4>
+                <div class="code-block"><pre>    &#160;
+    #define LOG_PAGE_SIZE 128
+    #define PIPE_BUFFER_SIZE (16*1024*1024)
+    mco_device_t dev[];
+    mco_TL_start_data_t log_parms;
+    ...
+    &#160;
+    /* assign pipe buffer as mco device. It will be automatically
+    passed to a reader */
+    dev[x].assignment = MCO_MEMORY_ASSIGN_PIPE_BUF;
+    dev[x].size = PIPE_BUFFER_SIZE;
+    dev[x].type = MCO_MEMORY_NAMED;
+    &#160;
+    sprintf( dev[x].dev.named.name, "%s-pipe", databaseName_ );
+    dev[x].dev.named.flags = 0;
+    dev[x].dev.named.hint  = 0;
+    ...
+    &#160;
+    mco_db_open_dev (DATABASE_NAME, mydatabase_get_dictionary(), dev, x, &amp;db_params);
+    mco_db_connect (DATABASE_NAME, &amp;db);
+    log_parms.flags = MCO_TRANSLOG_ITERABLE | MCO_TRANSLOG_PIPE;
+    log_parms.disk_page_size = LOG_PAGE_SIZE;
+    &#160;
+    mco_translog_start (db, 0, &amp;log_parms);
+    &#160;</pre>
+                </div>
+                <h4>Reading and iteration of a pipe-based log</h4>
+                <div class="code-block"><pre>    &#160;
+    #define TEMP_BUFFER_SIZE (32*1024*1024)
+    #define PIPE_BUFFER_SIZE (16*1024*1024)
+    &#160;
+    MCO_RET iteration_proc (mco_trans_h trans, MCO_Hf* obj, int cid, int obj_state, void* user_ctx)
+    {
+        mco_trans_counter_t trans_no;
+        mco_trans_no (trans, &amp;trans_no);
+        if (all_ok)
+        return MCO_S_OK;
+        else
+        return MCO_ERR_LAST + 1;
+    }
+    ...
+    &#160;
+    MCO_RET rc;
+    void *mem_buff;
+    &#160;
+    mco_db_connect (mydatabase_name, &amp;db);
+    &#160;
+    /* if used memory management library is different from mcomconv */
+    #ifdef USE_SHARED_MEMORY
+    mem_buff = 0;
+    #else
+    mem_buff = malloc (TEMP_BUFFER_SIZE);
+    #endif
+    &#160;
+    mco_translog_iterate (0, db, iteration_proc, user_ctx, mydatabase_get_dictionary (), mem_buff, TEMP_BUFFER_SIZE);
+    &#160;</pre>
+                </div>
+                <h4>Opening a pipe-based log with overflow file</h4>
+                <div class="code-block"><pre>    &#160;
+    #define LOG_PAGE_SIZE 128
+    #define PIPE_BUFFER_SIZE (16*1024*1024)
+    #define PIPE_OVEFLOW_FILE "/tmp/overflow_file"
+    mco_device_t dev[];
+    mco_TL_start_data_t log_parms;
+    ...
+    &#160;
+    /* assign pipe buffer as mco device. It will be automatically
+    passed to a reader */
+    dev[x].assignment = MCO_MEMORY_ASSIGN_PIPE_BUF;
+    dev[x].size = PIPE_BUFFER_SIZE;
+    dev[x].type = MCO_MEMORY_NAMED;
+    sprintf( dev[x].dev.named.name, "%s-pipe", databaseName_ );
+    dev[x].dev.named.flags = 0;
+    dev[x].dev.named.hint  = 0;
+    &#160;
+    ...
+    &#160;
+    mco_db_open_dev (DATABASE_NAME, mydatabase_get_dictionary(), dev, x, &amp;db_params);
+    &#160;
+    mco_db_connect (DATABASE_NAME, &amp;db);
+    &#160;
+    log_parms.flags = MCO_TRANSLOG_ITERABLE | MCO_TRANSLOG_PIPE;
+    log_parms.disk_page_size = LOG_PAGE_SIZE;
+    &#160;
+    mco_translog_start (db, PIPE_OVEFLOW_FILE, &amp;log_parms);
+    &#160;</pre>
+                </div>
+                <h4>Reading and iteration of a pipe-based log with overflow file</h4>
+                <div class="code-block"><pre>    &#160;
+    #define TEMP_BUFFER_SIZE (32*1024*1024)
+    #define PIPE_BUFFER_SIZE (16*1024*1024)
+    #define PIPE_OVEFLOW_FILE "/tmp/overflow_file"
+    &#160;
+    MCO_RET iteration_proc (mco_trans_h trans, MCO_Hf* obj, int cid, int obj_state, void* user_ctx)
+    {
+        mco_trans_counter_t trans_no;
+        mco_trans_no (trans, &amp;trans_no);
+        ...
+        &#160;
+        if (all_ok)
+        return MCO_S_OK;
+        else
+        return MCO_ERR_LAST + 1;
+    }
+    &#160;
+    ...
+    &#160;
+    MCO_RET rc;
+    void *mem_buff;
+    &#160;
+    mco_db_connect (mydatabase_name, &amp;db);
+    &#160;
+    /* if used memory management library is different from mcomconv */
+    #ifdef USE_SHARED_MEMORY
+    mem_buff = 0;
+    #else
+    mem_buff = malloc (TEMP_BUFFER_SIZE);
+    #endif
+    &#160;
+    mco_translog_iterate (PIPE_OVEFLOW_FILE, db, iteration_proc, user_ctx, mydatabase_get_dictionary (), mem_buff, TEMP_BUFFER_SIZE);
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h3>Endian conversion</h3>
+                <p>It is possible to mix little-endian and big-endian architectures using Transaction Logging. In other words, applications can create a transaction log on a little-endian system and replay the log to a big-endian system, or vice-versa. There is proper auto-detection and auto-conversion which does not require further configuration or user intervention. However, note that mixing of different word-size platforms, i,e, <code>x32</code> vs. <code>x64</code><a name="kanchor669"></a>, is not allowed. Also, note that the same transaction manager (<a href="../Core/MURSIW_Transaction_Manager.htm" name="kanchor670">MURSIW</a> or <a href="../Core/MVCC_Transaction_Manager.htm" name="kanchor671">MVCC</a>) must be used in both the writer (log creator) and reader applications.</p>
+                <h2>Dual out logging mode</h2>
+                <p><i>e</i>X<i>treme</i>DB<i> Transaction Logging</i> allows writing a copy of the transaction log to a file while the pipe mode is used as a transport for exporting transaction data. This file may be used, for instance, to restore a database or to store it in log form on persistent media. The stored log file may then be processed by the API function <code><a href="../../Programming/C/TL_Functions/apply.htm">mco_translog_apply()</a></code>. Or it can be iterated by functions <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> and <code><a href="../../Programming/C/TL_Functions/play.htm">mco_translog_play()</a></code>. Dual out logging  is enabled by specifying flag <a href="../../Programming/C/Structures/TL_Parameters.htm"><code>MCO_TRANSLOG_DUALOUT</code></a> in addition to flag <code><a href="../../Programming/C/Structures/TL_Parameters.htm"><code>MCO_TRANSLOG_PIPE</code></a></code>. Field <code>dual_log_path</code> of structure <code><a href="../../Programming/C/Structures/TL_Parameters.htm">mco_TL_start_data</a></code> specifies the destination log file. (Sample <a href="../../Programming/C/SDK_Samples/TL/Iter_Dualout.htm">tlogiterdualout</a> demonstrates this functionality.)</p>
+                <h2>Dynamic Pipes</h2>
+                <p>This feature (in <i>e</i>X<i>treme</i>DB<i> Transaction Logging</i> version 6.5 and later) allows applications to create / remove pipes as well as connect to and disconnect from them at runtime. Database events are logged to the pipe and the connected applications are able to process these logs as necessary; they may also stop processing them and remove the associated resources (pipes and connections) at will. The following application scenario is supported through the dynamic pipes:</p>
+                <blockquote>
+                    <p>1.	The primary process creates a shared memory database and starts the transaction logging.</p>
+                    <p>2.	Secondary processes connect to the database at any given time, create a pipe using this connection and then process the log that the primary application writes into the pipe.</p>
+                </blockquote>
+                <p>In reality the secondary processes are asynchronously listening to the database events written into the log, and also have access to the content of the modified database objects that triggered those events. The secondary processes are free to disconnect from the database, and destroy their pipe at any time.</p>
+                <p>Naturally if the primary process stops the transaction logging via <code><a href="../../Programming/C/TL_Functions/stop.htm">mco_translog_stop()</a></code>, all connected readers get the appropriate return code. The primary application does not receive or process any notifications from the secondary applications, but merely commits its transactions as usual, logging events if required. Multiple pipes can be created at a time and multiple readers can be connected to those pipes.</p>
+                <h3>Implementation</h3>
+                <blockquote>
+                    <p>1. If the flag <code><a href="../../Programming/C/Structures/TL_Parameters.htm">MCO_TRANSLOG_DYNAMIC_PIPE</a></code> for <code><a href="../../Programming/C/TL_Functions/start.htm">mco_translog_start()</a></code> is set, then readers can attach and detach to pipes at any time without affecting the writers (threads from which the transactions are committed). Each reader must create its own pipe - <b>two or more readers cannot be connected to the same pipe</b>.</p>
+                    <p>2. The API <code style="color: #000000;"><a href="../../Programming/C/TL_Functions/play_ex.htm">mco_translog_play_ex()</a></code> is similar to <code><a href="../../Programming/C/TL_Functions/play.htm">mco_translog_play()</a></code>, except that it takes a single structure <code><a href="../../Programming/C/Structures/TL_Parameters.htm">mco_TL_play_params_t</a></code> as parameter. The fields of the structure correspond to parameters of <code><a href="../../Programming/C/TL_Functions/play.htm">mco_translog_play()</a></code> with one additional field:</p>
+                </blockquote>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    mco_device_t *pipe_device;
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <blockquote>
+                    <p>The <code>pipe_device</code> is a descriptor of the pipe device to be used by the readers. If the value of the <code>pipe_device</code> is <code>NULL</code> then the transaction logging runtime chooses the first pipe that does not have any connected readers. The same happens when the old style <code><a href="../../Programming/C/TL_Functions/play.htm">mco_translog_play()</a></code>and <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> APIs are used.</p>
+                </blockquote>
+                <blockquote>
+                    <p>3. The <code style="color: #000000;"><a href="../../Programming/C/TL_Functions/play_params_init.htm">mco_translog_play_params_init()</a></code> function zeroes out the <code><a href="../../Programming/C/Structures/TL_Parameters.htm">mco_TL_play_params_t</a></code> structure.</p>
+                    <p>4. The runtime option <code><a href="../../Programming/C/Structures/TL_Parameters.htm">MCO_RT_MAX_DYNAMIC_PIPES</a></code> has the default value of <code>0</code>. This value defines the maximum number of the <code>PIPE_BUF</code> type devices that can be added through <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/extend_dev.htm">mco_db_extend_dev()</a></code>. <b>This limit does not include the pipe devices created via</b> <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm">mco_db_open_dev()</a></code>. In other words, if the application sets <a href="../../Programming/C/Structures/TL_Parameters.htm"><code>MCO_RT_MAX_DYNAMIC_PIPES</code></a> to 3 and defines 5 pipe devices at the time the database was created, then it will be able to have up to 8 pipe devices at any moment in time.</p>
+                </blockquote>
+                <h2>Using event handlers during iteration of log file or pipe</h2>
+                <p>If the database schema defines events, their handlers may be registered and fired during the reading of the log file or pipe in addition to or instead of iterating the objects themselves. This technique is called 'persistent events queue' and can be used as a method of asynchronous event handling by the current process or by a separate process.</p>
+                <p>To use this feature, the database schema must define one or more events, and the application must define the handlers for these events, and a function which registers the handlers must be defined in the application. Then function <code><a href="../../Programming/C/TL_Functions/play.htm">mco_translog_play()</a></code> is used instead of function <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> to iterate the log. (Sample <a href="../../Programming/C/SDK_Samples/TL/Iter_Events.htm">tlogiterevents</a> demonstrates this functionality.)</p>
+                <h3>Filtering data stored in the log by events</h3>
+                <p>An events mask may be specified to limit the data written to the logging stream transferred to the log file or pipe. Note that this mode does not allow the use of the log for database recovery due to the filtering. However, it can be useful for specific purposes to reduce the amount of data transferred to the log. For example, if event handlers are used on the reader's side and it is not necessary to transfer all of the data to the log except notification of the event itself.</p>
+                <p>Flag <code><a href="../../Programming/C/Structures/TL_Parameters.htm"><code>MCO_TRANSLOG_EVENT_MASK</code></a></code> is specified to enable this feature and the <code>event_mask</code>  field of structure <code><a href="../../Programming/C/Structures/TL_Parameters.htm">mco_TL_start_data</a></code> is used to define the desired mask. There are two predefined mask values: <a href="../../Programming/C/Structures/TL_Parameters.htm"><code>MCO_LOG_MASK_ALL_CHANGES</code></a> stores all data in the log, which is equivalent to disabling events mask filtering; <code><a href="../../Programming/C/Structures/TL_Parameters.htm">MCO_LOG_MASK_ALL_EVENTS</a></code> stores only the data related to events defined in the database schema. If these predefined values are not used, the mask must be composed from the event handler identifiers generated by the database schema compiler. (Note that event handler identifiers are not zero-based, i.e. they are natural numbers starting from one, and must be decremented by one to use it in a mask. For example <code>new</code>, <code>delete</code> and <code>delete all</code> events could be specified in a mask as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    tl_parms.event_mask = (1 &lt;&lt; (MCO_EVENT_newEvent - 1)) |
+                    (1 &lt;&lt; (MCO_EVENT_deleteEvent - 1)) |
+                    (1 &lt;&lt; (MCO_EVENT_deleteAllEvent - 1));
+    &#160;</pre>
+                </div>
+                <p>(Sample <a href="../../Programming/C/SDK_Samples/TL/Iter_Events.htm">tlogiterevents</a> demonstrates the use of filtering.)</p>
+                <h2>User-defined iteration callback</h2>
+                <p>Consider the following schema:</p>
+                <div class="code-block"><pre>    &#160;
+    class Record_A
+    {
+        uint4 key;
+    };
+&#160;
+    class Record_B
+    {
+        uint4 key;
+    };
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <p>Part of the code generated by the schema compiler would be:</p>
+                <div class="code-block"><pre>    &#160;
+    typedef struct Record_A_   { MCO_Hf h; }  Record_A;
+    #define                  Record_A_code          1
+&#160;
+    typedef struct Record_B_   { MCO_Hf h; }  Record_B;
+    #define                  Record_B_code          2
+    &#160;</pre>
+                </div>
+                <p>The user-defined callback <code>iteration_proc</code> is called by <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_translog_iterate()</a></code> for each object one by one.  This <code>iteration_proc</code> has the following definition:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p><b>Prototype</b>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>MCO_RET</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>iteration_proc (</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>mco_trans_h trans,                                     
+MCO_Hf* obj, 
+int cid,
+int obj_state,
+void* user_ctx )
+</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">&#160;</td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><b>Arguments</b>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>trans</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Transaction handle.  (It is possible to get the transaction number by calling <code>mco_trans_no()</code> with this handle.)
+
+Could be 0 to indicate that function <code>mco_db_clean()</code> was called in source database. See sample <a href="../../Programming/C/SDK_Samples/TL/Iter_Pipe.htm">tlogiterpipe</a> for details.
+</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">&#160;</td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">&#160;</td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>obj</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Object handle of the object that was actually created, deleted or updated inside the transaction.
+This handle may be used to access the fields of the object with calls like:
+  <code>Record_A_key_get((Record_A*)obj, &amp;key);</code><![CDATA[
+]]><code>  Record_B_key_get((Record_B*)obj, &amp;key);</code>
+
+Could be 0 if end of transaction state is indicated. (See section <code>Option Mark_Last_Object</code> for details).
+
+</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">&#160;</td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">&#160;</td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>cid</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The class Id of this object.  This will have the same value as the definitions <code>Record_A_code</code> or <code>Record_B_code</code>.  Compare this code to <code>Record_A_code</code> or <code>Record_B_code</code> to determine which type of object is present before attempting to access its fields.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">&#160;</td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">&#160;</td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>obj_state</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The type of operation that was performed on the object:
+    <code>MCO_TRANS_OBJ_ALL_DELETED</code> – 
+               delete all objects of this class.
+    <code>MCO_TRANS_OBJ_DELETED</code> – 
+               the object was deleted.
+    <code>MCO_TRANS_OBJ_CREATED</code> – 
+               the object was created.
+    0 - the object was updated.
+
+</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">&#160;</td>
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">&#160;</td>
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><code>user_ctx</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">A pointer to user data passed into the function <code><a href="../../Programming/C/TL_Functions/iterate.htm">mco_trans_iterate()</a></code>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>Note: If the <code>obj_state</code> value is <code>MCO_TRANS_OBJ_ALL_DELETED</code>, then obj is the first object of its class in the database for which the function <code><a href="../../Programming/C/Core_Functions/Generated/Class/delete_all.htm">classname_delete_all()</a></code> was called inside a transaction.  For example: <code><a href="../../Programming/C/Core_Functions/Generated/Class/delete_all.htm">Record_A_delete_all()</a></code>.  If there were no such objects in the database at the moment <a href="../../Programming/C/Core_Functions/Generated/Class/delete_all.htm"><code>classname_delete_all()</code></a> was called, then the current iteration callback will not be called. So it is impossible to have an empty <code>obj</code> argument.</p>
+                <h4>Example of user-defined callback implementation for the above schema:</h4>
+                <div class="code-block"><pre>    &#160;
+    MCO_RET iteration_proc (mco_trans_h trans, MCO_Hf* obj, int cid, int obj_state, void* user_ctx)
+    {
+        mco_trans_counter_t trans_no;
+        if (trans == 0)
+        {
+            /* handle call of mco_db_clean called in source DB */
+            return MCO_S_OK;
+        }
+        &#160;
+        mco_trans_no (trans, &amp;trans_no);
+        if (cid == Record_A_code)
+        {
+            uint4 key;
+    &#160;
+            if (obj_state == MCO_TRANS_OBJ_ALL_DELETED)
+            {
+                /* Delete all objects of class Record_A */
+            }
+            else if (obj_state == MCO_TRANS_OBJ_DELETED)
+            {
+                /* Delete current object by the key */
+                Record_A_key_get ((Record_A *)obj, &amp;key);
+            }
+            else if (obj_state == MCO_TRANS_OBJ_CREATED)
+            {
+                /* Create new object with the key */
+                Record_A_key_get ((Record_A *)obj, &amp;key);
+            }
+            else
+            {
+                /* Update object with the key */
+                Record_A_key_get ((Record_A *)obj, &amp;key);
+            }
+        }
+        else if (cid == Record_B_code)
+        {
+            uint4 key;
+&#160;
+            if (obj_state == MCO_TRANS_OBJ_ALL_DELETED)
+            {
+                /* Delete all objects of class Record_B */
+            }
+            else if (obj_state == MCO_TRANS_OBJ_DELETED)
+            {
+                /* Delete current object by the key */
+                Record_B_key_get ((Record_B *)obj, &amp;key);
+            }
+            else if (obj_state == MCO_TRANS_OBJ_CREATED)
+            {
+                /* Create new object with the key */
+                Record_B_key_get ((Record_B *)obj, &amp;key);
+            }
+            else
+            {
+                /* Update object with the key */
+                Record_B_key_get ((Record_B *)obj, &amp;key);
+            }
+        }
+    &#160;
+        return MCO_S_OK;
+    }
+    &#160;</pre>
+                </div>
+                <h2>User-defined register event handlers callback</h2>
+                <p>Consider the following schema:</p>
+                <div class="code-block"><pre>    &#160;
+    class Record
+    {
+        uint4 key;
+        event &lt;new&gt;         newEvent;
+    };
+    &#160;</pre>
+                </div>
+                <p>Part of the code generated by the schema compiler would be:</p>
+                <div class="code-block"><pre>    &#160;
+    #define MCO_EVENT_newEvent  1
+    typedef MCO_RET (*mco_newEvent_handler)( mco_trans_h t, Record * obj, MCO_EVENT_TYPE et, /*INOUT*/ void *param);
+    MCO_RET  mco_register_newEvent_handler       ( mco_trans_h t, mco_newEvent_handler handler, void * param );
+    MCO_RET  mco_unregister_newEvent_handler     ( mco_trans_h t, mco_newEvent_handler handler);
+&#160;</pre>
+                </div>
+                <p>The user-defined callback <code>register_callback()</code> is called by <code><a href="../../Programming/C/TL_Functions/play.htm">mco_translog_play()</a></code> just before starting the iteration of objects. This <code>register_callback()</code> has the following definition:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><b>Prototype</b>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>MCO_RET</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>register_callback (</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>mco_trans_h trans,                                     
+void* user_ctx )
+</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">&#160;</td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><b>Arguments</b>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>trans</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Transaction handle.  This handle should be passed to event registering function.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">&#160;</td>
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">&#160;</td>
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><code>user_ctx</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">A pointer to user data passed into argument <code>regevent_user_ctx</code> of the function <code>mco_trans_play()</code>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h4>Example of user-defined register callback implementation for the above schema:</h4>
+                <div class="code-block"><pre>    &#160;
+    MCO_RET register_callback(mco_trans_h t, void *param)
+    {
+        return mco_register_newEvent_handler(t, my_newEvent_handler, param);
+    }
+    &#160;
+    MCO_RET my_newEvent_handler( mco_trans_h t, Record * obj, MCO_EVENT_TYPE et, /*INOUT*/ void *param)
+    {
+        ev_stat_t *s = (ev_stat_t *)param;
+        printf("my_newEvent_handler %d\n", ++(s-&gt;new_cnt));
+        return MCO_S_OK;
+    }
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2>Precautions for a potential system failure</h2>
+                <p>If Transaction Logging is employed in a multi-process scenario using pipes, and one of the processes crashes (for example the reader) then the writer process may be suspended waiting on internal locks used in a pipe. To resolve this situation a “sniffer” task can be run alongside the Transaction Logging processes; the <code>sniffer</code> task will clean up locks left over from the <code>dead</code> connections left by the crashed processes. (Please refer to the “Database Recovery from Failed Processes” section of the <i>e</i>X<i>treme</i>DB User Guide for details regarding the <code>sniffer</code> API.)</p>
+                <p>Regardless of the method of Transaction Logging (TL) being used (<code>pipe</code>, <code>multi-pipe</code> or <code>dynamic-pipe</code>), the following steps are recommended:</p>
+                <blockquote>
+                    <p>1.	Run sniffer in the context of a separate thread in the main application:</p>
+                    <div class="code-block"><pre>    &#160;
+    #define SNIFFER_INTERVAL 100
+    MCO_RET sniffer_callback(mco_db_h db, void* context, mco_trans_counter_t trans_no)
+    {
+        SAMPLE_OS_TASK_ID pid = *(SAMPLE_OS_TASK_ID *)context;
+        if ( sample_os_task_id_check( pid ) == 0 ) 
+        {
+            return MCO_S_OK;
+        }
+        printf("Process %d is crashed\n", pid);
+        return MCO_S_DEAD_CONNECTION;
+    }
+    void sniffer_loop( sample_task_t * descriptor )
+    {
+        mco_db_h db;
+        SAMPLE_OS_TASK_ID pid = sample_os_task_id_get();
+        &#160;
+        /* Connect using mco_db_connect_ctx() and pass &amp;pid as parameter */
+        MCO_RET rc = mco_db_connect_ctx(db_name, &amp;pid, &amp;db);
+        if ( MCO_S_OK == rc ) 
+        {
+        &#160;
+            /* Descriptor-&gt;stopped flag is set to 1 by sample_stop_task() in main thread*/
+            while ( MCO_S_OK == rc &amp;&amp; descriptor-&gt;stopped == 0 ) 
+            {
+                rc = mco_db_sniffer(db, sniffer_callback, MCO_SNIFFER_INSPECT_ACTIVE_CONNECTIONS);
+                sample_sleep(SNIFFER_INTERVAL);
+            }
+            mco_db_disconnect(db);
+        }
+    }
+    &#160;</pre>
+                    </div>
+                    <p>Note that the sniffer is executed in the task that contains the <code>sniffer_loop()</code> function. The callback itself merely makes sure that all tasks connected to the database are alive (see for example <a href="../../Programming/C/SDK_Samples/Core_Samples/19-Recovery_Sniffer.htm">samples/native/core/19-recovery/sniffer</a>).</p>
+                    <p>2a) For the <code>pipe</code> case the main program will initialize the TL processing and watch for any errors reported by TL. If any errors are reported, the main application will terminate the TL processing (which will free all locks set by the TL runtime) and, if necessary, restart TL to allow other TL clients to continue processing the pipe, for example:</p>
+                    <div class="code-block"><pre>    ...
+    &#160;
+    /* allocate pipe memory device */
+    dev[1].type       = MCO_MEMORY_NAMED;
+    dev[1].assignment = MCO_MEMORY_ASSIGN_PIPE_BUF;
+    sprintf( dev[1].dev.named.name, "%s-pipe", db_name );
+    dev[1].size       = DATABASE_SIZE / 2;
+    dev[1].dev.named.flags = 0;
+    dev[1].dev.named.hint  = 0;
+    ...
+    &#160;
+    /* Set up and run transaction logging (pipe is created here) */
+    tl_parms.flags = MCO_TRANSLOG_ITERABLE | MCO_TRANSLOG_PIPE;
+    tl_parms.disk_page_size = PSTORAGE_PAGE_SIZE;
+    rc = mco_translog_start( connection, 0, &amp;tl_parms );
+    &#160;
+    /* Wait for TL-client connection */
+    printf("\n\n\tWaiting for log reader ...\n" );
+    while(1) 
+    {
+        mco_TL_current_info_t tl_info;
+        mco_translog_get_info ( connection, &amp;tl_info );
+        if (tl_info.pipe_readers_connected)
+            break;
+        else
+            sample_sleep (100);
+    }
+    ...
+    while ( data processing ) 
+    {
+        while (1) 
+        {
+            /* process database transaction */
+            if (rc == MCO_S_OK) 
+            {
+                ...
+            }
+             else if (rc == MCO_E_TL_IO_ERROR || rc == MCO_E_TL_PIPE_TERM ) 
+            {
+                /* TL processing error detected */
+                &#160;
+                /* force logging to stop */
+                rc = mco_translog_terminate( connection );
+                &#160;
+                /* wait for TL connection */
+                printf("\n\n\tWaiting for log reader ...\n" );
+                while(1) 
+                {
+                    mco_TL_current_info_t tl_info;
+                    mco_translog_get_info ( connection, &amp;tl_info );
+                    if (tl_info.pipe_readers_connected)
+                        break;
+                    else
+                        sample_sleep (100);
+                }
+                &#160;
+                /* restart TL processing  */
+                tl_parms.flags |= MCO_TRANSLOG_RESTART;
+                rc = mco_translog_start( connection, 0, &amp;tl_parms );
+                sample_rc_check( "\tRe-start logging", rc );
+                break;
+            } 
+            else
+                ...
+        }
+    }
+    &#160;</pre>
+                    </div>
+                    <p>2b. For the <code>Multi-pipe</code> case the TL handling is similar, except that it is necessary to create several pipe-devices:</p>
+                    <div class="code-block"><pre>    &#160;
+    ...
+    for ( i=1; i&lt;=PIPES_COUNT; i++ ) {
+        dev[i].type       = MCO_MEMORY_NAMED;
+        dev[i].assignment = MCO_MEMORY_ASSIGN_PIPE_BUF;
+        sprintf( dev[i].dev.named.name, "%s-pipe-%u", db_name, i );
+        dev[i].size       = DATABASE_SIZE / 2;
+        dev[i].dev.named.flags = 0;
+        dev[i].dev.named.hint  = 0;
+    }
+    ...
+    rc = mco_translog_start( connection, 0, &amp;tl_parms );
+    &#160;
+    sample_rc_check( "\tStart logging", rc );
+    &#160;
+    /* Wait while iterator thread is alive */
+    printf("\n\n\tWaiting for log reader ...\n" );
+    while(1) 
+    {
+        mco_TL_current_info_t tl_info;
+        mco_translog_get_info ( connection, &amp;tl_info );
+        if (tl_info.pipe_readers_connected == PIPES_COUNT)
+            break;
+        else
+            sample_sleep (100);
+    }
+    ...
+    while ( data processing ) 
+    {
+        while (1) 
+        {
+            /* process database transaction */
+            if (rc == MCO_S_OK) 
+            {
+                ...
+            } 
+            else if (rc == MCO_E_TL_IO_ERROR || rc == MCO_E_TL_PIPE_TERM ) 
+            {
+                /* TL processing error detected */
+                /* force logging to stop */
+                rc = mco_translog_terminate( connection );
+                &#160;
+                /* wait for TL connection */
+                printf("\n\n\tWaiting for log reader ...\n" );
+                while(1) 
+                {
+                    mco_TL_current_info_t tl_info;
+                    mco_translog_get_info ( connection, &amp;tl_info );
+                    if (tl_info.pipe_readers_connected == PIPES_COUNT)
+                        break;
+                    else
+                        sample_sleep (100);
+                }
+                /* restart TL processing  */
+                tl_parms.flags |= MCO_TRANSLOG_RESTART;
+                rc = mco_translog_start( connection, 0, &amp;tl_parms );
+                sample_rc_check( "\tRe-start logging", rc );
+                break;
+            } else
+            ...
+        }
+    }
+    &#160;</pre>
+                    </div>
+                    <p>2c. The <code>dynamic-pipes</code> case is trivial, for example:</p>
+                    <div class="code-block"><pre>    &#160;
+    ...
+    /* Set maximum number of dynamic pipe segments */
+    mco_runtime_setoption(MCO_RT_MAX_DYNAMIC_PIPES, PIPES_COUNT);
+    ...
+    /* Set default database parameters */
+    mco_db_params_init ( &amp;db_params );
+    &#160;
+    /* Customize the params according to the application */
+    db_params.mem_page_size            = MEMORY_PAGE_SIZE;
+    db_params.disk_page_size           = 0;            /* Pure in-memory database */
+    db_params.db_max_connections       = 10 + PIPES_COUNT;
+    db_params.connection_context_size  = sizeof(SAMPLE_OS_TASK_ID);
+    ...
+    &#160;
+    /* Set up and run transaction logging (pipe is created here) */
+    tl_parms.flags = MCO_TRANSLOG_ITERABLE | MCO_TRANSLOG_PIPE |
+    MCO_TRANSLOG_DYNAMIC_PIPE | MCO_TRANSLOG_SYNC_INSTANTLY;
+    tl_parms.disk_page_size = PSTORAGE_PAGE_SIZE;
+    rc = mco_translog_start( connection, 0, &amp;tl_parms );
+    sample_rc_check( "\tStart logging", rc );
+    &#160;
+    /* Wait while iterator thread is alive */
+    printf("\n\n\tWaiting for log reader ...\n" );
+    while(1) 
+    {
+        mco_TL_current_info_t tl_info;
+        mco_translog_get_info ( connection, &amp;tl_info );
+        if (tl_info.pipe_readers_connected)
+            break;
+        else
+            sample_sleep (100);
+    }
+    ...
+    &#160;</pre>
+                    </div>
+                    <h2>Possible Data Relay Deadlock</h2>
+                    <p>There are some possible situations where data relay deadlock may happen. For instance:</p>
+                    <ul>
+                        <li value="1"> When there are two database (or more) connections, the first connection might flood the database with new records while the second connection is used to start the transaction logging reader (e.g. calling <code>mco_translog_play()</code> etc.). Then inside a user-defined reader callback function there might be some data processing that results in writing back into the same database from this second connection. Under heavy load  it is possible that a write transaction in a user-defined reader callback (on the second connection) could not be completed and is locked because there is no room in the pipe to write data. But at the same time the pipe could not be read (to free some space in it) because the reading procedure is performing in the same thread where commit operation is already blocked. </li>
+                        <li value="2">Under heavy load  without a pipe overflow file when the thread committing objects in response to reading by the iterator fails to perform a commit because the pipe is full. It blocks waiting for the reader to free space in the pipe. But the reader thread fails to do that being blocked itself waiting for the first thread to write  and free the queue which is also limited and full. Actually any of the threads (connections) that is trying to commit a transaction will be blocked if the pipe is full and the reader is not able to read data as reader thread is blocked in one of the hung commits itself.</li>
+                    </ul>
+                    <p>This is non-obvious yet natural behavior of the closed loop system (commit - log - pipe - reader's analyzer - commit again). Trying to split the pipe reading procedure and the commit of new data which is some derivative of read data (eg. commit - log - pipe - reader's analyzer - some data queue - another application thread and DB connection - commit again)  may cause deadlock. Basically if the application is committing some data to a database which is the result of reading the transaction logging pipe, dead-lock is possible under heavy load situations. </p>
+                    <p>This can be moderated at the application level by artificially throttling the initial commits. In fact, initially the Data Relay feature was designed to transfer data from <i>e</i>X<i>treme</i>DB to another DBMS or to some data processor. So it was not assumed that processed data would be committed back to <i>e</i>X<i>treme</i>DB. Fortunately the pipe overflow files resolve this problem of "data loop-back". The important fact is <i>the only reliable way to avoid deadlock is to use a pipe overflow file</i> (which does imply a penalty to the overall performance).</p>
+                    <h2>Possible Error Conditions for MCO_E_TL_PIPE_TERM</h2>
+                    <p>There are two cases when error code <code>MCO_E_TL_PIPE_TERM</code> could be returned both by a reader call to <code>mco_translog_iterate()</code> and a writer performing a transaction commit operation. The two scenarios could be as follows:</p>
+                    <h3>Case A: MCO_E_TL_PIPE_TERM in reader and writer</h3>
+                    <blockquote>
+                        <p>1. Call <code>mco_translog_start()</code> to start logging</p>
+                        <p>2. Call <code>mco_translog_iterate()</code> in an iteration thread to start reading</p>
+                        <p>3. The user-defined iteration procedure returns an error code (anything but <code>MCO_S_OK</code>) to terminate function <code>mco_translog_iterate()</code></p>
+                        <p>4. When function <code>mco_translog_iterate()</code> returns with the code specified by iteration procedure, the pipe gets terminated</p>
+                        <p>5. The writer tries to commit a transaction and function <code>mco_trans_commit()</code> will return <code>MCO_E_TL_PIPE_TERM</code> because the pipe has already been terminated</p>
+                        <p>6. Start <code>mco_translog_iterate()</code> again without first calling function <code>mco_translog_stop()</code></p>
+                        <p>7. Now <code>mco_translog_iterate()</code> returns <code>MCO_E_TL_PIPE_TERM</code> because the pipe has terminated</p>
+                    </blockquote>
+                    <h3>Case B:  <code>MCO_E_TL_PIPE_TERM</code> in reader and writer after <code>mco_translog_terminate()</code></h3>
+                    <blockquote>
+                        <p>1 Call <code>mco_translog_start()</code> to start logging</p>
+                        <p>2 Call <code>mco_translog_iterate()</code> in an iteration thread to start reading</p>
+                        <p>3 Call <code>mco_translog_terminate()</code> in a writer thread (or the main instance) and the pipe gets terminated</p>
+                        <p>4 Now function <code>mco_translog_iterate()</code> returns <code>MCO_E_TL_PIPE_TERM</code></p>
+                        <p>5 Trying to commit a transaction causes function <code>mco_trans_commit()</code> to return <code>MCO_E_TL_PIPE_TERM</code> because the pipe has already terminated</p>
+                    </blockquote>
+                    <p>Note that if the user-defined iteration callback always returns <code>MCO_S_OK</code>, then scenario A is not possible; scenario B is possible if function <code>mco_translog_terminate()</code> is called when error code <code>MCO_E_TL_IO_ERROR</code> is returned by <code>mco_trans_commit()</code>.</p>
+                </blockquote>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

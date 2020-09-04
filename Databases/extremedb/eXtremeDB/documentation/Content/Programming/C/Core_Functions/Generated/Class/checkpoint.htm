@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Generated API|Generated Class related functions">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>classname_checkpoint</title>
+        <link href="../../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>classname</i>_checkpoint</h1>
+            <blockquote>
+                <p>This function creates index nodes with the object’s new or updated values. </p>
+            </blockquote>
+            <h3>Prototype</h3>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    MCO_RET	classname_checkpoint(	/*IN*/ classname * handle  );
+&#160;</pre>
+                </div>
+            </blockquote>
+            <h3>Arguments</h3>
+            <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../../../Resources/TableStyles/IndentedFunctionReference.css');" cellspacing="0">
+                <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">handle</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">The address of a variable of type <code><a href="../../../Generated.htm"><code>class handle</code></a></code></td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Description</h3>
+            <p style="text-indent: 0.5in;">This function completes one or more put methods by creating index nodes and/or other tasks necessary to incorporate the object’s new or updated values into the database.</p>
+            <h3>Return Codes</h3>
+            <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../../../Resources/TableStyles/IndentedFunctionReference.css');" cellspacing="0">
+                <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 181px;" />
+                <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_S_OK</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The object was updated successfully</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_E_ACCESS</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The transaction handle is <code>MCO_READ_ONLY</code></td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_E_TRANSACT</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Transaction is in error state</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>MCO_E_DELETED</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>This object has been deleted</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_E_NOMEM</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>Database memory allocation error</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>MCO_S_DUPLICATE</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>Attempt to insert a duplicate value into a unique index</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>MCO_ERR_OBJECT_HANDLE</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>Invalid object handle</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">
+                            <p>MCO_ERR_TRN</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>Error in the enclosing transaction</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">
+                            <p>MCO_ERR_INDEX</p>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">
+                            <p>Error inserting into the index structure</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Example</h3>
+            <blockquote>
+                <p>The following code snippets demonstrate how <code>classname_checkpoint()</code> can be used to update indexes to be able to lookup newly created or updated database objects within a transaction; ie. before the transaction is committed. </p>
+            </blockquote>
+            <div class="code-block"><pre>&#160;
+    Snippet from schema file:
+        
+    &#160;
+    class A {
+        uint4 id;
+        char&lt;256&gt; name;
+&#160;
+        tree &lt;id&gt; idx;
+    };
+    &#160;
+    Application snippet:
+        
+    &#160;
+    int main(int argc, char* argv[])
+    {
+         MCO_RET         rc;
+        ...
+        mco_db_h        db = 0;
+        mco_trans_h     t;
+        mco_cursor_t    csr;
+        A a1, a2;
+        A a_out;
+        char * name = "Test #N";
+        uint4 id = 999;
+        uint4 id_out = 0;
+        char name_out[64] = "";
+                &#160;
+        ...
+        rc = mco_trans_start(connection, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t);
+        if ( MCO_S_OK == rc ) 
+        {
+            // Insert two instances of A
+            A_new(t, &amp;a1);
+            A_id_put(&amp;a1, id);
+            name[6] = '1';
+            A_name_put(&amp;a1, name, strlen(name));
+            A_new(t, &amp;a2);
+            A_id_put(&amp;a2, id + 1);
+            name[6] = '2';
+            A_name_put(&amp;a2, name, strlen(name));
+            &#160;
+            // Checkpoint to create index entries
+            A_checkpoint(&amp;a1);
+        
+            A_checkpoint(&amp;a2);
+        
+            &#160;
+            // Lookup inserted objects by index
+            rc = A_idx_index_cursor(t, &amp;csr);
+            if (MCO_S_OK == rc)
+            {
+                printf("\nInside transaction; objects inserted into index: \n");
+                for (rc = mco_cursor_first(t, &amp;csr); rc == MCO_S_OK; rc = mco_cursor_next(t, &amp;csr)) 
+                {
+                    A_from_cursor(t, &amp;csr, &amp;a_out);
+                    A_id_get(&amp;a_out, &amp;id_out);
+                    A_name_get(&amp;a_out, name_out, sizeof(name_out));
+                    printf("\tid=%d, name {%s} \n", id_out, name_out);
+                }
+            }
+            // Rollback the transaction so no inserts are committed
+            mco_trans_rollback(t);
+        }
+        &#160;
+        // Start a new transaction to check for inserted items
+        rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+        if (MCO_S_OK == rc)
+        {
+            // Lookup to verify that no objects were inserted - transaction rolled back
+            rc = A_idx_index_cursor(t, &amp;csr);
+            if (MCO_S_OK == rc)
+            {
+                printf("\nObjects inserted: \n");
+                for (rc = mco_cursor_first(t, &amp;csr); rc == MCO_S_OK; rc = mco_cursor_next(t, &amp;csr))
+                {
+                    A_from_cursor(t, &amp;csr, &amp;a_out);
+                    A_id_get(&amp;a_out, &amp;id_out);
+                    A_name_get(&amp;a_out, name_out, sizeof(name_out));
+                    printf("\tid=%d, name {%s} \n", id_out, name_out);
+                }
+            }
+            else
+            {
+                sample_rc_check("\n Attempt to open a cursor after rollback:", rc);
+            }
+        }
+        mco_trans_rollback(t);
+        ...
+    }
+&#160;</pre>
+            </div>
+            <blockquote>
+                <p><a href="javascript:void(0);" class="MCHelpControl MCHelpControl-Related relatedTopics" data-mc-topics="mco_trans_commit|../../Static/Transaction_Control/commit.htm"><span class="MCHelpControl-RelatedHotSpot_"><img class="MCHelpControl_Image_Icon" src="../../../../../../Skins/Default/Stylesheets/Images/transparent.gif" height="16" width="16" alt="Related Topics Link Icon" />Related Topics</span></a> <![CDATA[ ]]></p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Analytics Functions Example 5: Filter</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Analytics Functions Example 5: Filter</h1>
+            <blockquote>
+                <h2>Filter Sequence Elements</h2>
+                <p>Filter elements of a <code>sequence</code> - extract the days of February 2013 when the  <code>close</code> value was greater than <code>open</code>:</p>
+                <div class="code-block"><pre>&#160;
+    SELECT symbol, seq_search(day, 20130201, 20130228) as Feb_2013,
+        close@Feb_2013 as Feb_Close, open@Feb_2013 as Feb_Open,
+        seq_filter(Feb_Close &gt; Feb_Open, Feb_2013) as "up_Feb",
+        seq_filter(Feb_Close &gt; Feb_Open, Feb_Open) as "up_Open",
+        seq_filter(Feb_Close &gt; Feb_Open, Feb_Close) as "up_Close"
+    FROM Quote WHERE symbol='IBM';
+    &#160;
+    symbol
+    Feb_2013{}
+    Feb_Close{}
+    Feb_Open{}
+    up_Feb{}
+    up_Open{}
+    up_Close{}
+    ------------------------------------------------------------------------------
+    IBM
+    {20130201, 20130204, 20130205, 20130206, 20130207, 20130208,
+    20130211, 20130212, 20130213, 20130214, 20130215, 20130219,
+    20130220, 20130221, 20130222, 20130225, 20130226, 20130227,
+    20130228}
+    {205.179993, 203.789993, 202.789993, 201.020004, 199.740005, 201.679993,
+    200.160004, 200.039993, 200.089996, 199.649994, 200.979996, 200.320007,
+    199.309998, 198.330002, 201.089996, 197.509995, 199.139999, 202.330002,
+    200.830002}
+    {204.649994, 204.190002, 204.309998, 200.389999, 200.619995, 199.970001,
+    200.979996, 200.009995, 200.649994, 199.729996, 199.979996, 200.600006,
+    200.619995, 198.630005, 199.229996, 201.669998, 198.630005, 198.889999,
+    202.179993}
+    {20130201, 20130206, 20130208, 20130212, 20130215, 20130222,
+    20130226, 20130227}
+    {204.649994, 200.389999, 199.970001, 200.009995, 199.979996, 199.229996,
+    198.630005, 198.889999}
+    {205.179993, 201.020004, 201.679993, 200.039993, 200.979996, 201.089996,
+    199.139999, 202.330002}
+    &#160;</pre>
+                </div>
+                <p>The <code>up_Feb</code> sequence contains the dates when the <code>close</code> value was greater than the <code>open</code> for February of 2013. To illustrate we have highlighted the date value for February 8, 2013 in the <code>up_Feb</code> sequence which corresponds with the 3rd element of the <code>up_Open</code> and <code>up_Close</code> sequences and that satisfy the filter condition; i.e. <code>201.68 &gt; 199.97</code>.</p>
+                <p>(Note that the repeated calls of function <code>seq_filter()</code> are necessary to produce the filtered <code>open</code> and <code>close</code> sequences which make the output more easily understandable, as the <code>Feb_2013,</code> <code>Feb_Open</code> and  <code>Feb_Close</code> sequences (which cannot be suppressed)  somewhat obscure the essential information.)</p>
+                <h2>To run this example</h2>
+                <p>A sample script to demonstrate this <code>select</code> statement using <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> can be run from the <code>samples/xsql/scripts/financial</code> directory with the following command:</p>
+                <div class="code-block"><pre>    &#160;
+    x 5
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

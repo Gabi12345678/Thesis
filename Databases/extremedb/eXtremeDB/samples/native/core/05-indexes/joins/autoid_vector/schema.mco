@@ -1,0 +1,28 @@
+/****************************************************************
+ *                                                              *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.    *
+ *                                                              *
+ ****************************************************************/
+
+#define uint2     unsigned<2>
+
+declare database  autoid_vector_db;
+
+class Department 
+{
+    autoid[1000];
+    string name;
+    string code;
+    vector<autoid_t> employees;
+
+    unique hash<code> Icode[1000];
+};
+
+class Employee 
+{
+    autoid[1000];
+    string name;
+    autoid_t dept;
+
+    unique tree<name> Iname;
+};

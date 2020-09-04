@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title> Importing Data From External Files in SQL</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1> Importing Data From External Files in SQL</h1>
+            <blockquote>
+                <p>As explained in the  page <i><a href="../xSQL/xSQL_Data_Export_Import.htm"><i>xSQL</i> Data Export and Import Operations</a></i>, it can be useful to import external data  from CSV files using the <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> <code>import</code> command. Data can also be imported using the embedded <i>e</i>X<i>treme</i>SQL APIs. The SQL statement syntax and implementation are described in the following sections.</p>
+                <h2>Data file formats</h2>
+                <p><i>e</i>X<i>treme</i>SQL allows importing data from external files having various formats:</p>
+                <ul>
+                    <li value="1">text files with fixed-length records -- for example (from historical NYSE quotes):</li>
+                </ul>
+                <div class="code-block"><pre>&#160;
+    N12182013 Record Count :    728040656
+    040000459PA               000000000000000000000000000000000000R    PP000000000000001122 C
+    070109890TA               000003600000000001000000000000000000R    TT000000000007250312 C
+    080000362KA               000005480000000002000006000000000002R    KK000000000008758212 C
+    ...
+    &#160;</pre>
+                </div>
+                <ul>
+                    <li value="1">comma-delimited variable-length records - for example (from CME Trades):</li>
+                </ul>
+                <div class="code-block"><pre>&#160;
+    20140109-04:49:26.003353392 [INFO] Build version 1.7.0.5
+    TradeDate,TradeTime,SeqNum,SecurityID,GroupCode,ProductCode,InstrumentName,EntryPrice,EntryQuantity,AggressorSide,TickDirection
+    20131215,19:29:58.432385699,501109,4143,CT,RBT,RBTF4,0,10,2,
+    20131216,00:54:49.081829959,864415,4143,CT,RBT,RBTF4,1,2,1,0
+    ...</pre>
+                </div>
+                <h2>Implementation</h2>
+                <p>The data is loaded into the database through the use of a "foreign table" concept: the data in the file is viewed as a SQL data set and is used in SQL statements. Optional data conversion such as remapping columns is supported and the database schema does not have to reflect the CSV data layout precisely. <i>e</i>X<i>treme</i>SQL<a name="kanchor22"></a> allows specifying the database layout at runtime (see <a href="SQL_DDL.htm">Dynamic DDL</a>). The ability to load data from CSV files and convert them into various internal layouts is especially useful when importing historical market data from different market data providers (such as NYSE TAQ, Reuters, etc.).</p>
+                <p>The <i>e</i>X<i>treme</i>SQL engine represents the CSV files as an external virtual (or foreign) table. The database table that is populated from the content of the file is referred to as a <i>target table</i>. The database table that is used to read the layout of the target table is referred to as a <i>pattern table</i>. It is important to note that the foreign table is not materialized, but merely creates a conveyer through which the data flows from the input text file into the database and is formatted at runtime as desired by the application. The foreign table can be defined implicitly through a SQL statement by providing the input filename as a table name and the <i>target</i> table layout via an existing <i>pattern</i> table, for example:</p>
+                <div class="code-block"><pre>&#160;
+    insert into TargetTable select * from foreign table (path='/some_directory/file.csv', delimiter='|', skip=2, nostop=1) 
+    as PatternTable;
+    &#160;</pre>
+                </div>
+                <p>The foreign table parameters are as follows:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">path </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"> 		Input file path</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">delimiter </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A character delimiter which can be used instead of the comma.*</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">skip </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">		Optionally skip N records from the beginning of file (default=0)</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">nostop </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Optionally ignore errors including embedded ‘\n’ (default=0)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>*Note that when the delimiter character is not specified explicitly, then if the skip parameter is set to zero (meaning that the CSV file has no header) the delimiter will be a comma; otherwise (i.e. the skip parameter is greater than zero) the database runtime reads the first line in the input file and looks for the first character from the following string to be used as the delimiter character: "<code>; , | \t </code>". The first one of these characters encountered in the input stream will be used as the delimiter for the following data. Following are some example input strings explaining how they will be interpreted:</p>
+                <div class="code-block"><pre>&#160;
+    A;B,C;D|E - the ';' will be used as delimiter, there are three fields: 'A', 'B,C' and 'D|E'
+    &#160;
+    A,B,C;D|E - the ';' will be used as delimiter, there are three fields: 'A', 'B' and 'C;D|E'
+    &#160;
+    A|B,C;D|E - the '|' will be used as delimiter, there are three fields: 'A', 'B,C;D'  and 'E'
+    &#160;</pre>
+                </div>
+                <p>In the example <code>insert</code> statement above the data is loaded from the <code>/some_directory/file.csv</code> file (the foreign table) and inserted into the <i>target</i> table <code>TargetTable</code>. The pattern table <code>PatternTable</code> is used to specify the database <i>target</i> table layout,. i.e. its column names and data types. Both <code>TargetTable</code> and the <code>PatternTable</code> must be present in the database prior to the import operation. The <i>pattern</i> table is not modified by the statement. </p>
+                <p>If desired, both the <i>target</i> table and the <i>pattern</i> table could reference the same database table (but they don't have to). For example:</p>
+                <div class="code-block"><pre>&#160;
+    insert into TAQTrade select * from foreign table (path='taqtrade20141030', skip=1, nostop=1) 
+     as TAQTrade;
+    &#160;</pre>
+                </div>
+                <p>Here  <code>‘taqtrade20141030’</code> is the input file and <code>TAQTrade</code> is used to define the data layout and the <i>target</i> database table.</p>
+                <h2>Importing files with fixed-size records</h2>
+                <p>In order to import files with fixed length records, the <i>pattern</i> table fields must be defined as fixed length character type (<code>CHAR (N)</code> ) of the size defined by the input file format. For example:</p>
+                <div class="code-block"><pre>&#160;
+    create table TAQTradeIN (
+        tTime char(9), -- Time of trade with milliseconds (HHMMSSXXX)
+        Exchange char(1), -- The Exchange where the trade took place
+        Symbol char(16), -- Security symbol (six-character root, ten- character suffix)
+        SaleCondition char(4), -- A Sale Condition (applies to all exchanges)
+        TradeVolume char(9), -- The total volume of shares traded in the trade line
+        TradePrice char(11), -- The price of the trade
+        TradeStopStock char(1), -- This value indicates that this Trade (NYSE only)
+        TradeCorrectionIndicator char(2), -- Trade Correction Indications
+        TradeSequenceNumber char(16),
+        SourceofTrade char(1),
+        TradeReportingFacility char(1)
+    );
+    &#160;</pre>
+                </div>
+                <p>If a conversion is required by the application, such as adding user defined fields, removing some of the fields that are present in the input file, etc., the <i>target</i> table columns should be explicitly specified. For example, given the <code>TAQTradeIN</code> fixed-size foreign table above, we can convert the input data into a table <code>TAQTrade</code> defined as follows:</p>
+                <div class="code-block"><pre>&#160;
+    create table TAQTrade (
+        tTime int, -- Time of trade with milliseconds (HHMMSSXXX)
+        Exchange char(1), -- The Exchange where the trade took place
+        Symbol char(16), -- Security symbol
+        SaleCondition char(4), -- A Sale Condition
+        TradeVolume int, -- The total volume of shares traded
+        TradePrice DECIMAL(11,4), -- The price of the trade
+        TradeStopStock char(1), -- Indicates a Stop Stock
+        TradeCorrectionIndicator char(2), -- Trade Correction Indications
+        TradeSequenceNumber int,
+        SourceofTrade char(1),
+        TradeReportingFacility char(1)
+);</pre>
+                </div>
+                <p>The <code>insert</code> statement to perform this import and conversion would look like the following:</p>
+                <div class="code-block"><pre>&#160;
+    insert into TAQTrade(tTime, Exchange, Symbol, SaleCondition,
+        TradeVolume, TradePrice, TradeStopStock,
+        TradeCorrectionIndicator,
+        TradeSequenceNumber, SourceofTrade,
+        TradeReportingFacility )
+        &#160;
+        select 	int(tTime), Exchange, Symbol, SaleCondition, int(TradeVolume),
+            cast((substr(TradePrice, 1, 7) || '.' ||
+            substr(TradePrice, 8,4)) as decimal),
+            TradeStopStock, TradeCorrectionIndicator,
+            int(TradeSequenceNumber),
+            SourceofTrade, TradeReportingFacility
+        from foreign table (path='taqtrade20141030', skip=2,nostop=1)
+        as TAQTradeIN;
+        &#160;</pre>
+                </div>
+                <h2>Importing files into a vertical (sequence) representation</h2>
+                <p>If the data being imported is to be inserted into fields of type <code>sequence</code>, then the <code>INSERT OR UPDATE</code> statement must be used. For example:</p>
+                <div class="code-block"><pre>&#160;
+    INSERT OR UPDATE INTO TOBSeq (Book, SecurityID,EntryType,
+        TradeDateTime, SeqNum, GroupCode, ProductCode, I
+        nstrumentName, EntryPrice, 
+        EntryQuantity, AggressorSide,TickDirection)
+        &#160;
+        SELECT Book, SecurityID, EntryType, cnvtime(TradeDate, TradeTime),
+            SeqNum, GroupCode, ProductCode, InstrumentName,
+            EntryPrice, EntryQuantity, AggressorSide, TickDirection
+        FROM  foreign table(path='tob.csv', delimiter=',', skip=2,nostop=1)
+        as FlatTOB;
+        &#160;</pre>
+                </div>
+                <h2><a name="kanchor23"></a>Importing autoid fields</h2>
+                <p>By definition the <code>autoid</code> is a database-generated counter and cannot be imported. If the source foreign table (CSV file, etc.,) includes an <code>autoid</code> column, the values are ignored. The <code>autoid</code> values for the <i>target</i> table are generated by the database runtime.</p>
+                <h2>Some considerations</h2>
+                <p>It is important to be aware of the following:</p>
+                <ul>
+                    <li value="1">Keep in mind that the input files are loaded in a single transaction and the input file could be quite large. The <code>REDO_LOG</code> transaction mode (which is normally the default mode) requires that the entire transaction is kept in the page pool. This makes it impossible to load files with more than the page pool size in the <code>REDO_LOG</code> mode.</li>
+                    <li value="2">If the <code>UNDO_LOG</code> mode is used, the database memory device should be large enough to keep the transaction list.</li>
+                    <li value="3">In the <code>UNDO_LOG</code> mode the amount of I/O is quite large -- roughly twice the amount of I/O in the <code>REDO_LOG</code> mode. To mitigate this the following <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>configuration file definition  is recommended:</li>
+                </ul>
+                <div class="code-block"><pre>&#160;
+    db_params: {
+        db_log_type: undo,
+        log_params: {
+            default_commit_policy : no_sync
+        },
+        mode_mask : bulk_write_modified_pages
+    }
+    &#160;</pre>
+                </div>
+                <h2>Batch Insert</h2>
+                <p>Batch insert with partial sorting of inserted objects can greatly increase both <code>insert</code> and <code>select</code> speed for disk objects with a single index. If objects are inserted in more or less sorted order, then the locality of references for B-Tree pages increases significantly during the <code>insert</code>. And search operations with this index become much faster because the objects are stored mostly in the same order as they are present in the index.</p>
+                <p>When data is inserted into a database table from a CSV file, or from another table, the physical order in which the rows (objects) are stored on disk does not match the logical order defined for the table via indexes. While inserting the data, the database runtime must build the index (usually tree-based), which causes it to read data and index pages from disk and re-sort the data on the fly, impacting the insert speed. Furthermore any lookup / search returns a dataset, the physical layout of which does not match the order in which the objects are read. Consequently, when the objects are retrieved, the database runtime must access pages scattered across the database physical media.</p>
+                <p>The batch insert improves the locality of references by storing the data in the order defined by the single index. Whenever a search is done using that index, the lookup will be much faster because of the fact that the records in the result set are physically stored right next to each other on disk.</p>
+                <p>The size of the buffer used by the batch insert is controlled in the C++ API by the <code>batchInsertBufferSize</code> field of the <code>SqlOptimizerParameters</code> class. This buffer size must be set prior to creating the SQL engine (through the <code>engine::open(database)</code> method). Batch insert is disabled by assigning zero to the <code>batchInsertBufferSize</code>. (<span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> also supports batch insert through the <code><a href="../xSQL/Startup_Options/Config_File_Sections/ExtremeSQL_Params.htm">sql_optimizer_params</a></code> configuration file option).</p>
+                <p>To use batch insert, the data must be inserted from a CSV file (or other source table) using an <code>insert select from</code> statement into a persistent table (the target table). For example:</p>
+                <div class="code-block"><pre>&#160;
+    insert into Quote 
+        select * from foreign table (path='IBM-q1-2013.csv', skip=1 ) 
+        as Quote;
+    &#160;</pre>
+                </div>
+                <p>or</p>
+                <div class="code-block"><pre>&#160;
+    insert into Quote (symbol,date, time, price ) 
+        select symbol, date, time, price
+        from foreign table (path='IBM-q1-2013.csv', skip=1) 
+        as Quote;
+    &#160;</pre>
+                </div>
+                <p>Note that the index that the batch insert algorithm makes use of must be a B-Tree index. Also, note that the batch insert algorithm utilizes the first B-Tree index in the list of all indexes created for the target table to pre-sort the input data stream. For example, if multiple indexes are created as follows:</p>
+                <div class="code-block"><pre>&#160;
+    create table Quote (symbol varchar, date int, time int, price numeric);
+    create index Quote.MyIndex on Quote (symbol, data, time);
+    create index Quote.MyOtherIndex on Quote (symbol, price);
+    &#160;</pre>
+                </div>
+                <p>Here, the <code>MyIndex</code> index is used. The same would result from using the following schema file:</p>
+                <div class="code-block"><pre>&#160;
+    class Quote {
+        string symbol;
+        uint4 date;
+        uint4 time;
+        float price;
+        tree&lt;symbol, date, time&gt; MyIndex;
+        tree&lt;symbol, price&gt; MyOtherIndex;
+    };
+    &#160;</pre>
+                </div>
+                <p>Note that any <code>autoid</code>, <code>list</code> index or any <code>hash</code> indexes defined for the table are not taken into account by the batch insert algorithm. By definition the <code>autoid</code> is a database-generated counter and can't be imported. If the source foreign table (CSV file, etc.,) includes an <code>autoid</code> column, the values are ignored. The <code>autoid</code> values for the target table are generated by the database runtime.</p>
+                <h2>Example</h2>
+                <p>Please see SDK sample <a href="../../Programming/xSQL/SDK_Samples/xSQL_Data_Loaders.htm">xSQL import</a> for a practical example of importing securities trading data from external files.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

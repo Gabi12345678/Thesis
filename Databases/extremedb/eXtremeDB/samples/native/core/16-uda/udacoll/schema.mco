@@ -1,0 +1,21 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.     *
+ *                                                               *
+ *****************************************************************/
+
+#define uint4   unsigned<4>
+
+declare database udacoll;
+
+class Record
+{
+    string name;
+    uint4  value;
+	
+    unique tree <name> tstd;
+
+    unique tree <name collate C1> tcoll;
+//    hash <name collate C1> tcoll[100];
+};
+

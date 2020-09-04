@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Indexes and Cursors in C</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Indexes and Cursors in C</h1>
+            <blockquote>
+                <p>As explained in the <a href="../../../Fundamental_Concepts/Indexes.htm">Indexes and Cursors</a> page, <i>e</i>X<i>treme</i>DB  supports a variety of index types. The following sections give  C API implementation details for managing each of these index types: <a href="#B-Tree">B-Tree</a>, <a href="#Patricia">Patricia</a>, <a href="#RTree">R-Tree</a>, <a href="#KDTree">KD-Tree</a>, <a href="#Hash">Hash</a>, <a href="#OID">OID</a>, <a href="#Autoid" name="kanchor862">Autoid</a>, <a href="#User-def">User-defined</a>.</p>
+                <p>An <i>e</i>X<i>treme</i>DB class can not be accessed without an index, so a class must have at least one index. If no index is explicitly defined, and the class has no dynamic-size fields (such as strings, vectors, optional structs and etc.), then a <i>list</i> index will be created for this class using the <i>fixedrec allocator</i>. Via the fixedrec allocator the location of all the database object instances is well known, which permits access to these objects through a chain of objects instead of a B-tree for this <i>list</i> index implementation. This  index implementation has a minimal performance cost compared to a normal B-tree index. </p>
+                <p>However, note that the implicit creation of a list index happens only for classes with fixed size. If the class contains one or more dynamic fields, the <i>fixedrec allocator</i> cannot be used to generate the "chain of objects". So when dynamic field(s) are present the application must explicitly define a <i>list</i> or some other type of index.</p>
+                <h3>C-Specific Features </h3>
+                <p>C applications can optimize B-Tree index performance using the <code>inclusive</code> declaration.  (Please refer to the <a href="#Optimizi">Optimizing tree Indexes</a> section below.)</p>
+                <p>Another additional feature available to C  applications is the ability to use the <code>voluntary</code><a name="kanchor863"></a> qualifier in schema definitions for an index to indicate that the index can be created or dropped at runtime. In other words, <code>voluntary</code> indexes are not built until the application explicitly calls the generated function <code>&lt;classname_indexname&gt;_create()</code>. In the same fashion, the application can remove a <code>voluntary</code> index by calling the generated function <code>&lt;classname_indexname&gt;_drop()</code>. </p>
+                <p>Also the <i>e</i>X<i>treme</i>DB specialized Object ID (<code>oid</code>) index is possible in C&#160;applications. (Please refer to the <a href="#OID">OID Indexes</a> section below.)</p>
+                <p>Another significant feature available for C developers is the ability to define custom indexes. (Please refer to the <a href="#User-def">Userdef Indexes</a> section below.)</p>
+                <h2>Persistent Databases</h2>
+                <p>For persistent databases there are optimization features that pertain to particularly to B-Tree indexes. Please refer to the <a href="../Persistent_Databases/Persistent_Indexes_Cursors_C.htm">Persistent Database Index Optimization in C</a> page for further details.</p>
+                <h2><a name="B-Tree"></a>B-Tree Indexes</h2>
+                <p>As explained in the <a href="BTree.htm">B-Tree Indexes</a> page, <code>tree</code> indexes can be used for ordered (sorted) retrieval, range retrieval and pattern matching. A B-Tree index is specified in the schema file with the <code>tree</code> declaration and optional modifiers <code>unique</code> or <code>nonunique</code>. If no modifier is specified the default is <code>nonunique</code>. </p>
+                <p>For example:</p>
+                <div class="code-block"><pre>&#160;
+    class anObject
+    {
+        uint4 value;
+        &#160;
+        tree &lt;value&gt; Idx;
+    };
+    &#160;</pre>
+                </div>
+                <p>The <a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a> schema compiler generates cursor functions and search functions for <code>tree</code> indexes.</p>
+                <p>To obtain a <code>cursor</code> for a <code>tree</code> index:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET classname_indexname_index_cursor( /*IN*/  mco_trans_h t, /*OUT*/ mco_cursor_h c );
+    &#160;</pre>
+                </div>
+                <p>The <code>_search()</code> functions generated for all <code>tree</code> indexes are of the following form:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET classname_indexname_search( /*IN*/ mco_trans_h trans,
+                        /*INOUT*/ mco_cursor_h cursor,
+                        /*IN*/ MCO_OPCODE op,
+                        /*IN*/ [const] &lt;type&gt; [*]param1,
+                        [[/*IN*/ uint2 len1,]
+                        [/*IN*/ [const] &lt;type&gt; [*]param2,
+                        [/*IN*/ uint2 len2,] …]);
+                        &#160;</pre>
+                </div>
+                <p>Here <code>MCO_OPCODE</code> represents a compare operation as defined in <a href="../../../Programming/C/Structures/Cursor.htm">cursor operator codes</a>.</p>
+                <p>To obtain the object handle from the current cursor position:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET classname_from_cursor( /*IN*/  mco_trans_h t,
+                        /*IN*/  mco_cursor_h c,
+                        /*OUT*/ classname *object);
+                        &#160;</pre>
+                </div>
+                <p>Note that the cursor must be properly initialized with a cursor positioning function (see the following <a href="#Cursors">section</a>) to retrieve a valid database object handle.</p>
+                <p>The <code>_locate()</code> function is used to position a <code>tree</code> index cursor based on an object reference.  The cursor must have been previously instantiated using the <code>_index_cursor()</code> function. (Note that the <code>_locate()</code> function applies only to <code>tree</code>-based cursors, not to <code>list</code> or <code>hash</code> cursors):</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET classname_indexname_locate( /*IN*/    mco_trans_h t,
+                        /*INOUT*/ mco_cursor_h c,
+                        /*IN*/    classname * handle);
+                        &#160;</pre>
+                </div>
+                <h3><a name="Cursors"></a>Cursors and Searches</h3>
+                <p>The standard cursor positioning functions <code><a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/first.htm">mco_cursor_first()</a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/last.htm">mco_cursor_last()</a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/next.htm">mco_cursor_next()</a></code> and <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/prev.htm"><code>mco_cursor_prev()</code></a> are used to initialize the cursor to the first or last and iterate through the result sets of searches. </p>
+                <p>Searches are performed using the generated <a href="../../../Programming/C/Core_Functions/Generated/Index/search.htm"><code>_search()</code></a> function. Please refer to the <a href="Searches_C.htm">Searches</a> page for implementation details. Also, as explained in the <a href="Searches_C.htm">Searches</a> page, <code>tree</code> indexes can be used for pattern matching, range retrieval and ordered (sorted) retrieval.</p>
+                <h3><a name="Optimizi"></a>Optimizing tree indexes</h3>
+                <p>Normally, the B-Tree implementation doesn't store key values in the index. However, for in-memory databases, sometimes it is beneficial to keep the key value on the index pages. </p>
+                <p>As explained in the <a href="Inclusive_Covering_Indexes.htm">Inclusive and Covering Indexes</a> page, B-Tree index performance can be optimized by declaring the index <code>inclusive</code>.</p>
+                <p>A “key-value-inclusive” index for a class is defined in a C API schema through the <code>inclusive</code> keyword, for example:</p>
+                <div class="code-block"><pre>    &#160;
+    class Tab
+    {
+        string name;
+        int4   code;
+        string body;
+        &#160;
+        inclusive tree&lt;name,code&gt; pk;
+    };
+    &#160;</pre>
+                </div>
+                <p>If it is desired to make all B-Tree indexes for transient classes “key-value-inclusive”, the <code>MCO_DB_INCLUSIVE_BTREE</code> option can be specified in the <code>db_params</code> argument to C API <code>mco_db_open_dev()</code>, for example:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET            rc;
+    mco_db_h           db = 0;
+    mco_device_t       dev[N_DEVICES];
+    mco_db_params_t    db_params;
+    &#160;
+    ...
+&#160;
+    db_params.mode_mask |= MCO_DB_INCLUSIVE_BTREE;
+&#160;
+    ...
+&#160;
+    rc = mco_db_open_dev(db_name, mydb_get_dictionary(), dev, N_DEVICES, &amp;db_params );
+    &#160;</pre>
+                </div>
+                <p>In addition, a “covering” index (which contains all of the fields of interest in a class) can be also declared inclusive to leverage CPU cache usage, for example:</p>
+                <div class="code-block"><pre>&#160;
+    class Tab
+    {
+        string name;
+        int4   code;
+        string body;
+&#160;
+        inclusive tree&lt;*&gt; pk;
+    };
+    &#160;</pre>
+                </div>
+                <p>(Note that a “key-value-inclusive” or “covering” index can only be a B-Tree index so the inclusive declaration can only precede the <code>tree</code> keyword.)</p>
+                <p>&#160;</p>
+                <h2><a name="Patricia"></a>Patricia trie Indexes</h2>
+                <p>As explained in the <a href="Patricia.htm">Patricia Indexes</a> page, the <i>e</i>X<i>treme</i>DB <code>patricia</code> index is particularly useful for network and telecommunications applications. A <code>patricia</code> index can be declared over scalar and <code>boolean</code> data types as well as arrays and vectors of those types.  In fact, the <code>boolean</code> data type allows bit arrays to be used to store IP addresses.  A <code>patricia</code> index can also be declared <code>unique</code>; in the absence of the <code>unique</code> keyword it defaults to allowing duplicates. Unlike other <i>e</i>X<i>treme</i>DB indexes, the <code>patricia</code> index <i>cannot be compound</i>; it is always declared for a single field. </p>
+                <p>The following schema illustrates some possible declarations:</p>
+                <div class="code-block"><pre>&#160;
+    class xyz
+    {
+        boolean			b1[32];
+        vector&lt;boolean&gt;		b2;
+        uint4			b3;
+        char&lt;10&gt;		b4[10];
+        vector&lt;string&gt;		b5;
+&#160;
+        patricia &lt;b1&gt;		Ib1;
+        patricia &lt;b2&gt;		Ib2;
+        patricia &lt;b3&gt;		Ib3;
+        patricia &lt;b4&gt;		Ib4;
+        patricia &lt;b5&gt;		Ib5;
+        unique patricia &lt;b1&gt;	Ib1U;
+        unique patricia &lt;b2&gt;	Ib2U;
+        unique patricia &lt;b3&gt;	Ib3U;
+        unique patricia &lt;b4&gt;	Ib4U;
+        unique patricia &lt;b5&gt;	Ib5U;
+    }
+    &#160;</pre>
+                </div>
+                <p>Note that <code>boolean</code> fields <code>b1</code>, <code>b2</code> are used as bit arrays for <code>patricia</code> indexes <code>Ib1U</code> and <code>Ib2U</code>. The <code>boolean</code> data type is treated in a special way by the <code><a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a></code> schema compiler and requires some explanation in the following section. Also, in addition to the standard tree index generated functions, the following section discusses functions that are generated for each <code>patricia</code> index. </p>
+                <h3>Boolean Data Type</h3>
+                <p>The <code>boolean</code> data type can be used to define a single bit field, a fixed size array of bits, or a variable length array of bits. The only index type possible for the <code>boolean</code> data type is the <code>patricia</code> index. A single-bit field cannot be indexed, nor is it advisable to index a short array of bits. </p>
+                <p>For example:</p>
+                <div class="code-block"><pre>&#160;
+    class xyz
+    {
+        boolean b1;  		// a bit field
+        boolean b2[32]; 	// fixed-size array of 32 bits
+&#160;
+        vector&lt;boolean&gt;  b3; 	// variable-length bit array
+    };
+    &#160;</pre>
+                </div>
+                <p>For C applications, the following functions are generated for fields of type <code>boolean</code>:</p>
+                <div class="code-block"><pre>&#160;
+    classname_fieldname_get(classname *handle, /*OUT*/ uint1 * result);
+    &#160;
+    classname_fieldname_put(classname *handle, uint1 value);
+    &#160;</pre>
+                </div>
+                <p>For a fixed-size bit array the following interfaces are also generated:</p>
+                <div class="code-block"><pre>&#160;
+    // reads the specified bit out of the array.
+    // Note: It’s OK to read one bit, but in order
+    // to read several bits it’s better to read the
+    // entire array and mask it.
+    classname_fieldname_at(classname* handle, uint2 index, /*OUT*/ uint1 *result);
+&#160;
+    // read range of bits.
+    // Note the start_index bit number must be a power of 8
+    classname_fieldname_get_range(classname* handle, uint2 start_index, uint2 num,
+                        /*OUT*/ uint1 *dest );
+&#160;
+    // again, the bit-by-bit _put is not the most effective
+    // way of writing the array.  Better to mask the entire
+    // array and use _put_range
+    classname_fieldname_put(classname* handle, uint2 index, uint1 value );
+    &#160;
+    // write range of bits.
+    // Note the start_index bit number must be a power of 8
+    classname_fieldname_put_range(classname* handle, uint2 start_index,
+                        uint2 num, const uint1 *src );
+&#160;
+    // read the entire field
+    classname_fieldname_get(classname *handle, /*OUT*/ uint1 * result);
+    &#160;</pre>
+                </div>
+                <p>For variable-size arrays (<code>vectors</code>), the following interfaces are also generated:</p>
+                <div class="code-block"><pre>&#160;
+    // vector size (in bits)
+    classname_fieldname_size(classname* handle, /*OUT*/ uint2 *result );
+&#160;
+    // allocate a vector (size in bits)
+    classname_fieldname_alloc(classname* handle, uint2 size);
+    &#160;
+    // read an element at a specified position
+    classname_fieldname_at(classname* handle, uint2 index,
+                    /*OUT*/ uint1 *result);
+&#160;
+    // read range of bits.
+    // Note the start_index bit number must be a power of 8
+    classname_fieldname_get_range(classname* handle, uint2 start_index,
+                        uint2 num, /*OUT*/ uint1 *dest );
+&#160;
+    // write range of bits.
+    // Note the start_index bit number must be a power of 8
+    classname_fieldname_put_range(classname* handle, uint2 start_index,
+                        uint2 num, const uint1 *src );
+&#160;
+    // write an element (not very efficient)
+    classname_fieldname_put(classname* handle, uint2 index, uint1 value );
+    &#160;</pre>
+                </div>
+                <h3>Generated Functions for patricia Indexes </h3>
+                <p> The generated functions applicable only to <code>patricia</code> indexes are <code>_longest_match(), _exact_match(), _prefix_match()</code> and <code>_next_match()</code>.  These will have slightly different forms depending on the type of field being indexed. </p>
+                <p>A <code>patricia</code> index created over a scalar field will cause the following functions to be generated:</p>
+                <div class="code-block"><pre>&#160;
+    classname_indexname_next_match( mco_trans_h t, /*INOUT*/ mco_cursor_h c,
+                        type mask, int number_of_bits);
+&#160;
+    classname_indexname_prefix_match( mco_trans_h t, /*INOUT*/ mco_cursor_h c,
+                        type mask, int number_of_bits);
+&#160;
+    classname_indexname_longest_match( mco_trans_h t, /*INOUT*/ mco_cursor_h c,
+                        type mask, int number_of_bits);
+&#160;
+    classname_indexname_exact_match( mco_trans_h t, /*INOUT*/ mco_cursor_h c,
+                        type mask, int number_of_bits);
+                        &#160;</pre>
+                </div>
+                <p>The <code>type</code> argument is the scalar type (for example <code>uint4</code>) and <code>mask</code> is the key value to match.  If the indexed field is a fixed-length <i>array</i> or a <code>vector</code> of scalars these functions will be of the form:</p>
+                <div class="code-block"><pre>&#160;
+    classname_indexname_next_match( mco_trans_h t, /*INOUT*/ mco_cursor_h c,
+                        type * mask, int number_of_bits);
+&#160;
+    classname_indexname_prefix_match( mco_trans_h t, /*INOUT*/ mco_cursor_h c,
+                        type * mask, int number_of_bits);
+&#160;
+    classname_indexname_longest_match( mco_trans_h t, /*INOUT*/ mco_cursor_h c,
+                        type * mask, int number_of_bits);
+&#160;
+    classname_indexname_exact_match( mco_trans_h t, /*INOUT*/ mco_cursor_h c,
+                        type * mask, int number_of_bits);
+                        &#160;</pre>
+                </div>
+                <p>Here <code>type</code> is the type of each element of the array or <code>vector</code> (for example <code>uint4</code>) and <code>mask</code> is the key value to match.  If the indexed field is an <i>array of</i> <code>boolean</code> these functions will be of the form:</p>
+                <div class="code-block"><pre>&#160;
+    classname_indexname_next_match( mco_trans_h t, /*INOUT*/ mco_cursor_h c,
+                        char* mask, int number_of_bits);
+&#160;
+    classname_indexname_prefix_match( mco_trans_h t, /*INOUT*/ mco_cursor_h c,
+                        char* mask, int number_of_bits);
+&#160;
+    classname_indexname_longest_match( mco_trans_h t, /*INOUT*/ mco_cursor_h c,
+                        char* mask, int number_of_bits);
+&#160;
+    classname_indexname_exact_match( mco_trans_h t, /*INOUT*/ mco_cursor_h c,
+                        char* mask, int number_of_bits);
+                        &#160;</pre>
+                </div>
+                <p>Here <code>mask</code> is a key value that is a packed bit array (each byte contains 8 bits).</p>
+                <h3>Cursors and Searches</h3>
+                <p>The standard cursor positioning functions <code><a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/first.htm">mco_cursor_first()</a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/last.htm">mco_cursor_last()</a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/next.htm">mco_cursor_next()</a></code> and <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/prev.htm"><code>mco_cursor_prev()</code></a> are used to iterate through the result sets of <code>patricia</code> index searches. But instead of a <code>_search()</code> function, searches are performed using one of the generated <code>_match()</code> functions. Initially a cursor's position is not defined and needs to be set with a lookup or a call of <code><a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/first.htm">mco_cursor_first()</a></code> or <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/last.htm">mco_cursor_last()</a>.</p>
+                <p>Please refer to the <a href="Searches_C.htm">Searches</a> page for implementation details.</p>
+                <p>&#160;</p>
+                <h2><a name="RTree"></a>RTree Indexes</h2>
+                <p>As explained in the <a href="RTree.htm">R-Tree Index</a> page, an <code>rtree</code> index is commonly used to speed spatial searches. An <code>rtree</code> index is typically defined for an array field containing the number of coordinates required to describe a "rectangle". For example:</p>
+                <div class="code-block"><pre>&#160;
+    class rtree_class
+    {
+        int2 	square[4];
+        &#160;
+        rtree &lt;square&gt;  ridx;
+    };
+    &#160;</pre>
+                </div>
+                <p>The <code>rtree</code> index-related functions generated for this class will be as follows:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET  rtree_class_ridx_index_cursor( mco_trans_h t, /*OUT*/ mco_cursor_h c );
+&#160;
+    MCO_RET  rtree_class_ridx_search       ( mco_trans_h t_, /*IN*/ MCO_OPCODE op_,
+                        /*INOUT*/ mco_cursor_h c_,
+                        const int2* square );
+    &#160;</pre>
+                </div>
+                <h3>Cursors and Searches</h3>
+                <p>As explained in the <a href="RTree.htm">R-Tree Index</a> page, <code>rtree</code> searches are performed using  the generated <code>_search()</code> function with  one of the four search operation opcodes: <code>MCO_EQUAL, MCO_CONTAIN, MCO_OVERLAP</code> or <code>MCO_NEIGHBORHOOD</code>. Please refer to the <a href="Searches_C.htm">Searches</a> page for implementation details.</p>
+                <p>&#160;</p>
+                <h2><a name="KDTree"></a>KDTree Indexes</h2>
+                <p>As explained in the <a href="KDTree.htm">KD-Tree Index</a> page, <code>kdtree</code> indexes are ideal for multi-dimensional key value searches. The <code>kdtree</code> index is defined in the schema using the <code>kdtree</code> declaration. For example:</p>
+                <div class="code-block"><pre>&#160;
+    class Car
+    {
+        string vendor;
+        string model;
+        string color;
+        uint4 year;
+        uint4 mileage;
+        boolean automatic;
+        boolean ac;
+        uint4 price;
+        char&lt;3&gt; state;
+        string description;
+        &#160;
+        kdtree &lt;year, mileage, color, model, vendor, automatic, ac, price&gt; index;
+    };
+    &#160;</pre>
+                </div>
+                <p>The <code>kdtree</code> index-related functions generated for this class will be as follows:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET      Car_index_index_cursor            ( mco_trans_h t, /*OUT*/ mco_cursor_h c );
+&#160;
+    MCO_RET      Car_index_search                  ( mco_trans_h t, /*INOUT*/ mco_cursor_h c, 
+                    /*IN*/ Car * range_start, /*IN*/ Car * range_end );
+&#160;
+    MCO_RET      Car_index_locate                  ( mco_trans_h t, /*OUT*/ mco_cursor_h c, Car * handle);
+    &#160;</pre>
+                </div>
+                <h3>Cursors and Searches</h3>
+                <p>As explained in the <a href="KDTree.htm">KD-Tree Index</a> page, searches with <code>kdtree</code> indexes are performed using the <i>Query-By-Example</i> approach. Once a selection of database objects are found by the search operation, the standard cursor positioning functions <code><a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/first.htm">mco_cursor_first()</a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/last.htm">mco_cursor_last()</a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/next.htm">mco_cursor_next()</a></code> and <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/prev.htm"><code>mco_cursor_prev()</code></a> are used to iterate through the result sets. Please refer to the <a href="Searches_C.htm">Searches</a> page for implementation details.</p>
+                <p>&#160;</p>
+                <h2>Trigram Indexes</h2>
+                <p>As explained in the <a href="Trigram.htm">Trigram Index</a> page, <code>trigram</code> indexes are ideal for text searches when the exact spelling of the target object is not precisely known. The <code>trigram</code> index is defined in the schema using the <code>trigram</code> declaration. For example:</p>
+                <div class="code-block"><pre>    &#160;
+    class anObject
+    {
+        uint4 id;
+        string text;
+            &#160;
+        trigram&lt;text&gt; trigramIdx;
+    };
+    &#160;</pre>
+                </div>
+                <p>The <code>trigram</code> index-related functions generated for this class will be as follows:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET      anObject_trigramIdx_index_cursor           ( mco_trans_h t, /*OUT*/ mco_cursor_h c );
+    &#160;
+    MCO_RET      anObject_trigramIdx_search                 ( mco_trans_h t, /*INOUT*/ mco_cursor_h c, 
+                            MCO_OPCODE op_, 
+                            const char *text_key_, 
+                            uint2 sizeof_text_key_ );
+                            &#160;
+    MCO_RET      anObject_trigramIdx_locate                 ( mco_trans_h t, /*OUT*/ mco_cursor_h c, 
+                            anObject * handle);
+    &#160;</pre>
+                </div>
+                <h3>Cursors and Searches</h3>
+                <p>As explained in the <a href="Trigram.htm">Trigram Index</a> page, searches with <code>trigram</code> indexes are performed using the generated <code>_search()</code> function. Once a selection of database objects are found by the search operation, the standard cursor positioning  functions <code><a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/first.htm">mco_cursor_first()</a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/last.htm">mco_cursor_last()</a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/next.htm">mco_cursor_next()</a></code> and <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/prev.htm"><code>mco_cursor_prev()</code></a> are used to iterate through the result sets. Please refer to the <a href="Searches_C.htm">Searches</a> page for implementation details.</p>
+                <p>&#160;</p>
+                <h2><a name="Hash"></a>Hash Indexes</h2>
+                <p>As explained in the <a href="Hash_Autoid.htm">Hash and Autoid Indexes</a> page, <code>hash</code> indexes are ideal for quick lookup of individual database objects. <code>Hash</code> indexes require an extra parameter, <i>expected-number-of-entries</i>, following the index name. It is an integer number that the runtime uses to allocate the initial hash table for the index. It must be specified but is not required to be exact. For example:</p>
+                <div class="code-block"><pre>&#160;
+    class Record
+    {
+        uint4  iIdx;                  /* Index      */
+        uint4  iSeries;							  /* Series of measurement */
+&#160;
+        hash &lt;iIdx&gt;  I_Index[10000];
+        nonunique hash &lt;iSeries&gt; I_Series[10000];
+    };
+    &#160;</pre>
+                </div>
+                <p>Note that the <code>[10000]</code> specification for indexes <code>I_Index</code> and <code>I_Series</code> cause the runtime to allocate initial hash tables with space for <code>10000</code> key values. </p>
+                <p>The index-related functions generated for the (unique) <code>hash  I_Index</code> in this class will be as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    MCO_RET      Record_I_Index_index_cursor           ( mco_trans_h t, /*OUT*/ mco_cursor_h c );
+    &#160;
+    MCO_RET      Record_I_Index_compare                ( mco_trans_h t, mco_cursor_h c, uint4 iIdx_key_, 
+                        /*OUT*/ int *result_ );
+                        &#160;
+    MCO_RET      Record_I_Index_find                   ( mco_trans_h t, uint4 iIdx_key_, /*OUT*/ Record *handle_);
+    &#160;</pre>
+                </div>
+                <p>The index-related functions generated for the <code>nonunique hash  I_Series</code> in this class will be as follows:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET      Record_I_Series_index_cursor          ( mco_trans_h t, /*OUT*/ mco_cursor_h c );
+    &#160;
+    MCO_RET      Record_I_Series_compare               ( mco_trans_h t, mco_cursor_h c, uint4 iSeries_key_, 
+                        /*OUT*/ int *result_ );
+                        &#160;
+    MCO_RET      Record_I_Series_search                ( mco_trans_h t, /*INOUT*/ mco_cursor_h c, 
+                        uint4 iSeries_key_ );
+                        &#160;</pre>
+                </div>
+                <p>Note that for <code>unique hash</code> indexes the exact match <code>_find()</code> function is generated, but for <code>nonunique hash</code> indexes the <code>_search()</code> function is generated.</p>
+                <h3>Dynamic Hash Table Allocation</h3>
+                <p>An <i>e</i>X<i>treme</i>DB C API feature called <i>dynamic hash</i> can be enabled to automatically re-allocate the hash table as needed. This will avoid (a) long collision chains if the estimated number of objects is too small, or (b) wasting memory in the case of an overly cautious large estimate.</p>
+                <p>
+                    <img src="../../../Resources/Images/note.png" /> Note that when <i>dynamic hash</i> is enabled it applies to all <code>hash</code> indexes in the database as well as to the <code>hash</code> table maintained for <code>oid</code> and <code>autoid</code> indexes.</p>
+                <p>The <code>dynamic_hash</code> parameter (a boolean value) passed to <a href="../../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm">mco_db_open_dev()</a> in the <a href="../../../Programming/C/Structures/Database_Parameters.htm"><code>mco_db_params_t</code></a> structure determines if dynamic hash table extending is enabled or not (it is enabled by default). The initial hash table is allocated using two values: the estimated number of objects specified for this class in the database schema, and the <code>hash_load_factor</code> parameter (a percentage value, 100% by default), also part of the <a href="../../../Programming/C/Structures/Database_Parameters.htm"><code>mco_db_params_t</code></a> structure. The initial hash table is estimated <code>number of objects * 100 / hash_load_factor</code>. (the value of zero for <code>hash_load_factor</code> signifies the default value of 100%).</p>
+                <p>So if <code>hash_load_factor</code> is 100 (ie. 100%), then the initial size of the hash table is the specified estimated number of objects. If <code>hash_load_factor</code> is 50, then initial size of hash table is twice the estimated number of objects. And if <code>hash_load_factor</code> is 200, then the initial size of the hash table is half of the estimated number of objects.</p>
+                <p>When dynamic hash is enabled the <code>hash_load_factor</code> parameter is used to determine when to extend (reallocate) the hash table. For example, if the initial hash table size is 1000 and the <code>hash_load_factor</code> is 50, then the hash table will be extended when the 501st object is inserted; if the <code>hash_load_factor</code> is 150, then the hash table will be extended when the 1501st object is inserted.</p>
+                <p>
+                    <img src="../../../Resources/Images/note.png" /> If it is important to impose a definite limit on the size of the hash table, the application can disable dynamic hash by setting the dynamic_hash parameter to false. This will have the consequence that more hash conflicts can occur, so the application must be willing to pay that performance cost.</p>
+                <h3>Cursors and Searches</h3>
+                <p>As explained in the <a href="Hash_Autoid.htm">Hash and Autoid Indexes</a> page, "exact match" searches with <code>unique hash</code> indexes are performed using the <code>_find()</code> function. For  <code>nonunique hash</code> indexes the <code>_search()</code> function is used and once a selection of database objects are found by the search operation, the standard cursor positioning functions <code><a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/first.htm">mco_cursor_first()</a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/last.htm">mco_cursor_last()</a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/next.htm">mco_cursor_next()</a></code> and <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/prev.htm"><code>mco_cursor_prev()</code></a> are used to iterate through the result sets. Please refer to the <a href="Searches_C.htm">Searches</a> page for implementation details.</p>
+                <p>&#160;</p>
+                <h2><a name="OID"></a>OID Indexes </h2>
+                <p>Whether an <code>oid</code> is provided by an external source or retrieved with an object as a reference to another object in the database, in C applications, an <code>oid</code> can be used to quickly retrieve the object it identifies. Uniqueness is enforced during object creation by the <i>e</i>X<i>treme</i>DB runtime and an <code>oid</code> index can be used to establish relationships between classes in the database. </p>
+                <p>For example, to establish a relationship between an <i>Order</i> and <i>Execution</i> using <code>oids</code>, consider the following schema:</p>
+                <div class="code-block"><pre>&#160;
+    struct OrderId
+    {
+        uint4	Id;
+    };
+&#160;
+    declare oid OrderId[1000]; // 1000 is the number of expected values (database-wide)
+&#160;
+    class Order
+    {
+        . . .
+        vector &lt;ref&gt; Executions;
+        . . .
+    };
+&#160;
+    class Execution
+    {
+        float	quantity;
+        oid;
+        . . .
+    };
+    &#160;</pre>
+                </div>
+                <p>Note that the <code>declare</code> statement is used to identify a unique object identifier with the expected number of objects that will be stored with an <code>oid</code>. The <i>expected-number-of-entries</i> is used by the runtime to calculate the initial hash table size for the index. (See the <a href="#Hash">Hash Indexes</a> section for an explanation of how to specify static and dynamic hash tables and how they are managed by the <i>e</i>X<i>treme</i>DB runtime.)</p>
+                <p>Once the <code>oid</code> structure is declared, classes with this unique identifier can then be declared (as in the <i>Execution</i> class above). The runtime maintains an internal index referencing all objects of such classes. Objects can reference each other by <code>oid</code> using the <code>ref</code> data type (as in the <i>Order</i> class above). </p>
+                <p>The <code>oid</code> must be a user-defined structure, even if the <code>oid</code> has a single field. Each <code>oid</code> value must be unique for the entire database and only one <code>oid</code> declaration is allowed within a database schema. And only one <code>oid</code> statement is allowed <i>per class</i>. <code>Oids</code> must be assigned a value that is unique in the entire database (not just in the class, as is the case for hash and unique tree indexes).</p>
+                <p>In this example, the class <i>Order</i> contains a variable length array (a <code>vector</code>) <code>Executions</code> of references to <code>oids</code> of the class <i>Execution</i>. Each element of the <code>vector</code> is the <code>oid</code> of an instance of the class <i>Execution</i> and can be used to quickly reference (locate) the associated <i>Execution</i> object.</p>
+                <p>(For another example of creating <code>oid</code> references please refer to the <a href="../Class_Relationships/OID_Reference_Example_C.htm">Class Relationships</a> page.)</p>
+                <h3>OID Structures and Functions</h3>
+                <p>If an <code>oid</code> is declared for the database, the <code><a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a></code> schema compiler generates a C structure corresponding to the structure defining the <code>oid</code>. For instance, for a schema containing an <code>oid</code> declaration like the following:</p>
+                <div class="code-block"><pre>&#160;
+    declare database my_db;
+    &#160;
+    struct structname
+    {
+        uint4 num_in;
+    };
+    &#160;
+    declare oid structname[10000];
+    &#160;</pre>
+                </div>
+                <p>the following definitions and functions will be generated:</p>
+                <div class="code-block"><pre>&#160;
+    typedef struct my_db_oid__ 
+    {
+        uint4           num_in;
+    }
+    &#160;
+    my_db_oid;
+&#160;
+    static const uint2 my_db_oid_size = sizeof(my_db_oid);
+&#160;
+    MCO_RET  my_db_delete_object( /*IN*/ mco_trans_h t, /*IN*/ const my_db_oid * oid );
+    &#160;
+    MCO_RET my_db_get_class_code( /*IN*/ mco_trans_h t, /*IN*/ const my_db_oid * oid,
+                        /*OUT*/ uint2 *classcode );
+                        &#160;</pre>
+                </div>
+                <p>Note the prepended "my_db" in these definitions. This evidences the fact that only one <code>oid</code> can be defined for a given database and uniqueness for all values of that <code>oid</code> will be enforced by the <i>e</i>X<i>treme</i>DB runtime. The <code>_delete_object()</code> function deletes an object based on its <code>oid</code>. The <code>_get_class_code()</code> function returns an integer that identifies the class of the object referenced by a specified <code>oid</code> value.</p>
+                <p>For classes containing an <code>oid</code>, the following functions are generated to create an object, locate an object based on its <code>oid</code> and to extract the <code>oid</code> of an object:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET classname_new( /*IN*/ mco_trans_h t, /*IN*/ const my_db_oid *id,
+                        /*OUT*/ classname *handle );
+                        &#160;
+    MCO_RET classname_oid_find( /*IN*/ mco_trans_h t, /*IN*/ const my_db_oid *id,
+                        /*OUT*/ classname *handle );
+                        &#160;
+    MCO_RET  classname_oid_get( /*IN*/ classname *handle, /*OUT*/ my_db_oid *id );
+    &#160;</pre>
+                </div>
+                <h3>Cursors and Searches</h3>
+                <p>Only "exact match" searches are possible for <code>oid</code> which are performed using the <code>_oid_find()</code> function. Please refer to the <a href="Searches_C.htm">Searches</a> page for implementation details.</p>
+                <p>&#160;</p>
+                <h2><a name="Autoid"></a>Autoid Indexes</h2>
+                <p>The <code>autoid</code> is a guaranteed unique value generated by the <i>e</i>X<i>treme</i>DB runtime. For C applications, the <code>autoid</code> is declared within the <a href="../../../Programming/C/DDL.htm">DDL</a> class definition with a specified number of estimated objects of that class. An <code>autoid</code> index can be used to establish relationships between classes in the database. (For an example of creating <code>autoid</code> references please refer to the <a href="../Class_Relationships/Class_Relationships_C.htm">Class Relationships</a> page.)</p>
+                <p>When a class is declared to have an <code>autoid</code>, the schema compiler will generate the following two functions for the class:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET classname_autoid_find( /*IN*/ mco_trans_h t, /*IN*/ autoid_t id,
+                        /*OUT*/ classname *handle );
+                        &#160;
+    MCO_RET classname_autoid_get( /*IN*/ classname *handle, /*OUT*/ autoid_t *id );
+    &#160;</pre>
+                </div>
+                <p>When an object of a class with an <code>autoid</code> is created, the runtime generates and inserts a unique <code>autoid</code> value for the object into an internally maintained <code>hash</code> index. This value can be retrieved with the generated <code>_autoid_get()</code> function for the given class.  An <code>autoid</code> value, whether stored in a program variable or a field of another database object as a reference, can be used in the <code>_autoid_find()</code> function to locate the referenced object as demonstrated in the following code snippet:</p>
+                <div class="code-block"><pre>&#160;
+    Schema snippet:
+            
+    &#160;
+    class referenced 
+    {
+        ...
+        autoid[4000];
+        ...
+    };
+    &#160;
+    class referencing 
+    {
+        ...
+        autoid_t refd_object;
+        ...
+    };
+    &#160;
+&#160;
+    Application code snippets:
+            
+    &#160;
+    autoid_t	id;
+    &#160;
+    mco_trans_start( db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t );
+    &#160;
+    // create new object, autoid assigned by system
+    referenced_new( t, &amp;refd_obj );
+&#160;
+    // get the autoid value
+    referenced_autoid_get( &amp;refd_obj, &amp;id );
+    rc = referencing_new( t, &amp;refg_obj ); // create new object
+&#160;
+    // store ref’d autoid in it
+    referencing_refd_object_put( &amp;refg_obj, id );
+    rc = mco_trans_commit( t );
+&#160;
+    /* object retrieval */
+    rc = mco_trans_start( db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t );
+&#160;
+    /* first locate a ‘referencing’ object by some method (not shown) */
+    // get the autoid of the referenced obj
+    referencing_refd_object_get( &amp;refg_obj, &amp;id );
+    &#160;
+    // locate the referenced object
+    rc = referenced_autoid_find( t, id, &amp;refd_obj );
+    rc = mco_trans_commit( t );
+    &#160;</pre>
+                </div>
+                <p>This snippet shows the process of creating a new object of a class that has an <code>autoid</code> defined, retrieving the system-assigned <code>autoid</code> value, and storing that value in a field of an object of the class that references it. Later, the <code>autoid</code> value is extracted from the referencing object and used to locate the referenced object through its <code>_autoid_find()</code> function.</p>
+                <p>Note that the internal nature of the <code>autoid</code> value is <i>not defined</i>. The only defined property of an <code>autoid</code> is that it has size of 8 bytes and it is unique. An application should not rely on or expect numeric values of the <code>autoid</code> field.</p>
+                <h3>Cursors and Searches</h3>
+                <p>Only "exact match" searches are possible for <code>autoid</code> which are performed using the <a href="../../../Programming/C/Core_Functions/Generated/Class/autoid_find.htm"><code>_autoid_find()</code></a> function.  Please refer to the <a href="Searches_C.htm">Searches</a> page for implementation details.</p>
+                <p>&#160;</p>
+                <h2><a name="User-def"></a>User-defined Indexes</h2>
+                <p>For C applications, <code>tree</code> and <code>hash</code> indexes can be declared in the schema definition as <code>userdef</code>, in which case the application must provide custom compare functions that are used by the database runtime when building the index and during lookup. In addition, for <code>hash</code> indexes, the application must provide the custom hash functions. For example, consider the following sample schema:</p>
+                <div class="code-block"><pre>&#160;
+    declare database mydb;
+&#160;
+    class Obj 
+    {
+        unsigned&lt;4&gt; first_part1;
+        usigned&lt;2&gt;  first_part2;
+        unsigned&lt;4&gt; second_part1;
+        signed&lt;2&gt;   second_part2;
+        string      data;
+&#160;
+        userdef hash &lt;first_part1,  first_part2&gt;   first[1000];
+        userdef tree &lt;second_part1, second_part2&gt; second;
+    };
+    &#160;</pre>
+                </div>
+                <p>The following index-related functions are generated for <code>userdef hash</code> index <code>first</code>:</p>
+                <div class="code-block"><pre>&#160;
+    MCO_RET      Obj_first_index_cursor                ( mco_trans_h t, /*OUT*/ mco_cursor_h c );
+    &#160;
+    MCO_RET      Obj_first_compare                     ( mco_trans_h t, mco_cursor_h c, uint4 first_part1_key_, 
+                    uint2 first_part2_key_, /*OUT*/ int *result_ );
+    &#160;
+    MCO_RET      Obj_first_find                        ( mco_trans_h t, uint4 first_part1_key_, uint2 first_part2_key_, 
+                    /*OUT*/ Obj *handle_);
+                    &#160;</pre>
+                </div>
+                <p>And for <code>userdef tree</code> index <code>second</code>:</p>
+                <div class="code-block"><pre>    &#160;
+    MCO_RET      Obj_second_index_cursor               ( mco_trans_h t, /*OUT*/ mco_cursor_h c );
+    &#160;
+    MCO_RET      Obj_second_search                     ( mco_trans_h t, /*INOUT*/ mco_cursor_h c, 
+                    MCO_OPCODE op_, uint4 second_part1_key_, int2 second_part2_key_ );
+                    &#160;
+    MCO_RET      Obj_second_compare                    ( mco_trans_h t, mco_cursor_h c, uint4 second_part1_key_, 
+                        int2 second_part2_key_, /*OUT*/ int *result_ );
+&#160;
+    MCO_RET      Obj_second_locate                     ( mco_trans_h t, /*OUT*/ mco_cursor_h c, 
+                    Obj * handle);
+    &#160;</pre>
+                </div>
+                <p>For the <code>tree</code> index <code>second</code> it is necessary to implement two functions: the object-to-object and object-to-key compare functions.  These functions return a negative, zero or a positive value depending on whether the first parameter is less than, equal to, or greater than the second parameter.  For <code>hash</code> indexes, it is necessary to implement <code>&lt;classname_indexname&gt;_hash_obj()</code> and <code>&lt;classname_indexname&gt;_hash_ext()</code> functions in addition to the compare functions, which in this case return zero if the first and the second parameters are equal and non-zero otherwise.  The function prototypes are generated by the schema compiler and are placed into a file named <code>dbname_udf.c</code> (where <code>dbname</code> is the database name in the <code>declare database</code> statement).</p>
+                <p>For example, for the above sample schema the following <code>mydb_udf.c</code> file would be generated:</p>
+                <div class="code-block"><pre>&#160;
+    #include "mydb.h"
+    #include "mcowrap.h"
+&#160;
+    /*
+    * API for the user-defined index "first"
+    */
+    /* object-to-object user-defined compare function */
+    int2  Obj_first_compare_obj ( Obj * handle1, Obj * handle2 )
+    {
+        /* TODO: add your implementation here */
+        return 0;
+    }
+&#160;
+    /* object-to-key user-defined compare function */
+    int2  Obj_first_compare_ext ( Obj * handle, void ** key )
+    {
+        /* TODO: add your implementation here */
+        return 0;
+    }
+&#160;
+    /* user-defined object hash function */
+    uint4 Obj_first_hash_obj    ( Obj * handle )
+    {
+        /* TODO: add your implementation here */
+        return 0;
+    }
+    &#160;
+    /* user-defined key hash function */
+    uint4 Obj_first_hash_ext    ( void ** key)
+    {
+        /* TODO: add your implementation here */
+        return 0;
+    }
+&#160;
+    /*
+    * API for the user-defined index "second"
+    */
+    /* object-to-object user-defined compare function */
+    int2  Obj_second_compare_obj ( Obj * handle1, Obj * handle2 )
+    {
+        /* TODO: add your implementation here */
+        return 0;
+    }
+&#160;
+    /* object-to-key user-defined compare function */
+    int2  Obj_second_compare_ext ( Obj * handle, void ** key )
+    {
+        /* TODO: add your implementation here */
+        return 0;
+    }
+    &#160;</pre>
+                </div>
+                <p>If a file <code>dbname_udf.c</code> already exists (for example if the schema was previously compiled, then modified and compiled again), the <a href="../../../Programming/C/DDL.htm">DDL</a> compiler will generate a file <code>dbname_udf.c.new</code> and display a warning.  In this case, it is the responsibility of the programmer to decide which file should be included in the project. If the user-defined indexes have been changed, then the <code>.new</code> file should be renamed to the <code>.c</code> file.</p>
+                <p>The custom user-defined compare functions are always called within the context of a transaction.  So it is okay to access the object fields using the generated <code>_get()</code> functions. To access key fields within the index structure, supplementary macro definitions are generated in the <code>dbname.h</code> file. For the example schema above these would be as follows:</p>
+                <div class="code-block"><pre>&#160;
+    #define Obj_first_extkey_first_part1(k)
+    #define Obj_first_extkey_first_part2(k)
+    #define Obj_second_extkey_second_part1(ek)
+    #define Obj_second_extkey_second_part2(ek)
+    &#160;</pre>
+                </div>
+                <p>A sample implementation for the custom compare and hash functions could be as follows:</p>
+                <div class="code-block"><pre>&#160;
+    /* object-to-object user-defined compare function */
+    int2  Obj_first_compare_obj ( Obj * handle1, Obj * handle2 )
+    {
+        uint4 o1_first_part1, o2_first _part1;
+        uint2 o1_first _part2, o2_first _part2;
+&#160;
+        Obj_first_part1_get( handle1, &amp;o1_first_part1 );
+        Obj_first_part1_get( handle2, &amp;o2_first_part1 );
+        if (o1_first_part1 != o2_first_part1)
+            return 1;
+        &#160;
+        Obj_first_part2_get( handle1, &amp;o1_first_part2 );
+        Obj_first_part2_get( handle2, &amp;o2_first_part2 );
+        if (o1_first_part2 != o2_first_part2)
+            return 1;
+            &#160;
+        return 0;
+    }
+&#160;
+    /* object-to-key user-defined compare function */
+    int2  Obj_first_compare_ext ( Obj * handle, void ** key )
+    {
+        uint4 o_first_part1;
+        uint2 o_first_part2;
+&#160;
+        Obj_first_part1_get( handle, &amp;o_first_part1 );
+        if ( o_first_part1 != Obj_first_extkey_first_part1(key) )
+            return 1;
+&#160;
+        Obj_first_part2_get( handle, &amp;o_first_part2 );
+        if ( o_first_part2 != Obj_first_extkey_first_part2(key) )
+            return 1;
+            &#160;
+        return 0;
+    }
+    &#160;
+    /* user-defined object hash function */
+    uint4 Obj_first_hash_obj    ( Obj * handle )
+    {
+        uint4 o_first_part1;
+        uint2 o_first_part2;
+        uint4 hash;
+&#160;
+        Obj_first_part1_get( handle, &amp;o_first_part1 );
+        Obj_first_part2_get( handle, &amp;o_first_part2 );
+        hash = (o_first_part1*1000+o_first_part2) / 1000;
+        return hash;
+    }
+&#160;
+    /* user-defined key hash function */
+    uint4 Obj_first_hash_ext ( void ** key)
+    {
+        uint4 hash;
+&#160;
+        hash = ( Obj_first_extkey_first_part1(key)*1000 +
+            Obj_first_extkey_first_part2(key)) / 1000;
+        return hash;
+    }
+&#160;
+    /*
+    * API for the user-defined index "second"
+    */
+    /* object-to-object user-defined compare function */
+    int2  Obj_second_compare_obj ( Obj * handle1, Obj * handle2 )
+    {
+        uint4 o1_second_part1, o2_second _part1;
+        uint2 o1_second _part2, o2_second _part2;
+&#160;
+        Obj_second_part1_get( handle1, &amp;o1_second_part1 );
+        Obj_second_part1_get( handle2, &amp;o2_second_part1 );
+&#160;
+        Obj_second_part2_get( handle1, &amp;o1_second_part2 );
+        Obj_second_part2_get( handle2, &amp;o2_second_part2 );
+        &#160;
+        if ( o1_second_part1 &lt; o2_second_part1 )
+            return -1;
+&#160;
+        if ( o1_second_part1 &gt; o2_second_part1 )
+            return 1;
+&#160;
+        if ( o1_second_part2 &lt; o2_second_part2 )
+            return -1;
+        &#160;
+        if ( o1_second_part2 &gt; o2_second_part2 )
+            return 1;
+        &#160;
+        return 0;
+    }
+&#160;
+    /* object-to-key user-defined compare function */
+    int2  Obj_second_compare_ext ( Obj * handle, void ** key )
+    {
+        uint4 o_second_part1;
+        uint2 o_second_part2;
+&#160;
+        Obj_second_part1_get( handle, &amp;o_second_part1 );
+        Obj_second_part2_get( handle, &amp;o_second_part2 );
+&#160;
+        if ( o_second_part1 &lt; Obj_second_extkey_second_part1(key) )
+            return -1;
+&#160;
+        if ( o_second_part1 &gt; Obj_second_extkey_second_part1(key) )
+            return 1;
+&#160;
+        if ( o_second_part2 &lt; Obj_second_extkey_second_part2(key) )
+            return -1;
+&#160;
+        if ( o_second_part2 &gt; Obj_second_extkey_second_part2(key) )
+            return 1;
+&#160;
+        return 0;
+    }
+    &#160;</pre>
+                </div>
+                <h3>Cursors and Searches</h3>
+                <p> As seen above, for <code>userdef hash</code> indexes, only a <code>_find()</code> function is generated. But for <code>tree</code> indexes, both a <code>_find()</code> and a <code>_search()</code> function are generated.</p>
+                <p>The standard cursor positioning functions <code><a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/first.htm">mco_cursor_first()</a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/last.htm">mco_cursor_last()</a>, <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/next.htm">mco_cursor_next()</a></code> and <a href="../../../Programming/C/Core_Functions/Static/Cursor_Control/prev.htm"><code>mco_cursor_prev()</code></a> are used to iterate through the result sets. Please refer to the <a href="Searches_C.htm">Searches</a> page for implementation details.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

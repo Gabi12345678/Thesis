@@ -1,0 +1,13 @@
+MCO_PRJ_LIST += 07-transactions-transaction
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 07-transactions-transaction
+PRJ_07-transactions-transaction_TAGS:=sample core
+PRJ_07-transactions-transaction_DIR:=$(call mco_project_dir)
+PRJ_07-transactions-transaction_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_07-transactions-transaction_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_07-transactions-transaction_DATABASES:=simpledb
+PRJ_07-transactions-transaction_RUNTIME:=YES
+PRJ_07-transactions-transaction_MEMDEV:=PRIVATE
+PRJ_07-transactions-transaction_STORAGE:=TRANSIENT
+PRJ_07-transactions-transaction_SYNC:=AUTO
+PRJ_07-transactions-transaction_TRANSMGR:=MURSIW

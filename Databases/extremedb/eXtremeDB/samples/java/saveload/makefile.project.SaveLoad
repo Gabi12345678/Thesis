@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += SaveLoad
+PRJ_TARGET_CLASS += SaveLoad
+PRJ_SaveLoad_TAGS:=sample core java
+PRJ_SaveLoad_DIR :=$(call mco_project_dir)
+PRJ_SaveLoad_SRC :=$(call mco_project_file,SaveLoad.java)

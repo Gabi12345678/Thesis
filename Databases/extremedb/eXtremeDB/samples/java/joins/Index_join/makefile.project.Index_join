@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += Index_join
+PRJ_TARGET_CLASS += Index_join
+PRJ_Index_join_TAGS:=sample core java
+PRJ_Index_join_DIR :=$(call mco_project_dir)
+PRJ_Index_join_SRC :=$(call mco_project_file,Index_join.java)

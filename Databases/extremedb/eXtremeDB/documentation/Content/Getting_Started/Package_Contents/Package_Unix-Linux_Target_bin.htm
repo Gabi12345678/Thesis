@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Getting Started with eXtremeDB|eXtremeDB Package Contents|eXtremeDB Unix-Linux Package Contents">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeDB Unix-Linux Libraries - target/bin</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>DB Unix-Linux Libraries - target/bin</h1>
+            <blockquote>
+                <p>The <code>/target/bin</code> directory under your <i>e</i>X<i>treme</i>DB installation root directory contains Java archives <code>extremedb.jar</code> and <code>extremedb_jdbc.jar</code>, a <code>python</code> subdirectory and a number of binary libraries described below. The Java archive files are required only for <a href="../../Programming/Java_API.htm">Java applications</a> and <a href="../../Programming/JDBC_API.htm">JDBC applications</a>. The python subdirectory contains shared object libraries and <code>exdb.py</code> which are required for <a href="../../Programming/Python_API.htm">Python applications</a>. </p>
+                <h2>Python Subdirectory</h2>
+                <p>The <code>/target/bin/python</code> directory contains the <i>e</i>X<i>treme</i>DB Python implementation source file <code>exdb.py</code> and the following Python shared object libraries:</p>
+                <table class="TableStyle-FunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">eXtremeDB.so</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The release mode version of the  <i>e</i>X<i>treme</i>DB Python implementation</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">eXtremeDB_debug.so</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The debug mode version of the  <i>e</i>X<i>treme</i>DB Python implementation</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">eXtremeDB_load.so</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1"><a name="kanchor1001"></a>The loader functionality that dynamically loads requested runtime modules</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2>Native C Libraries</h2>
+                <p>The native C libraries (upon which the C++, Java and Python wrappers depend) are described in the sections below. Each library is provided in two forms:</p>
+                <ul>
+                    <li value="1"><b>Debug</b> - used during development to aid in finding application level errors; contains several levels of checks for possible erroneous argument values and other error conditions that should be caught and resolved before application deployment; <i>These are easily recognized with the</i> <code>_debug</code> <i>suffix in the filename</i></li>
+                    <li value="2"><b>Release</b> - used when the development cycle is completed or when performance comparisons are desired; because most of the checks built into the debug version are removed this version of the libraries performs significantly faster</li>
+                </ul>
+                <p> (Only release mode filenames are shown in the sections below.)</p>
+                <p>Java and Python applications load <a href="Package_Unix-Linux_Target_bin_so.htm">shared object versions</a> of the necessary libraries at runtime, but normally C and C++ applications will statically link the appropriate libraries. </p>
+                <h2>Required Libraries</h2>
+                <p>The following tables lists the essential libraries that implement the  <i>e</i>X<i>treme</i>DB  functionality. Platform-dependent functionality is implemented in the set of libraries called <b>System Access Layer (SAL)</b> . At least one of the libraries from each of the categories below must be linked to C and C++  applications together with the supporting SAL libraries. </p>
+                <p>The SAL libraries in the following table implement the indicated functionality  for all supported platforms:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcosalatomic.a </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Atomic operations</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcosallatches.a </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Latches implementations</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcosaltimer.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Lo-resolution  and hi-resolution timer implementations</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmconet.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">System network layer</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcosalmem.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">System memory management</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcosalsmp.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">System mutex, semaphores, threading and other multi-thread/process related code</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcosaldload.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">System dynamic loader</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcosalhollow.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Stub functions <i>for in-memory database single-threaded applications only</i></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Core Runtime</h3>
+                <p>Of the following libraries, <code>libmcolib.a</code> is required for basic <i>e</i>X<i>treme</i>DB functions and either <code>libmcovtmem.a</code> or <code>libmcovtdsk.a</code> is required depending on whether a persistent database is used:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcolib.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Main database functions</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcovtmem.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Virtual Table management for in-memory databases</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcovtdsk.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Virtual Table management for persistent and hybrid databases</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Memory Device Manager</h3>
+                <p>Depending on the type of <a href="../../Users_Guides/Core/Memory_Devices.htm">database memory device</a> being used, one of the following libraries is required:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcomconv.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Conventional memory device</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcomalloc.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Conventional memory device with internal memory allocation by the <i>e</i>X<i>treme</i>DB runtime</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcomipc.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Shared memory device using Unix-Linux IPC</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcompsx.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Shared memory device using Unix-Linux POSIX</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3><a name="kanchor1002"></a>Transaction Manager</h3>
+                <p>Depending on the choice of <a href="../../Users_Guides/Core/Transaction_Managers.htm">Transaction Manager</a>, one of the following libraries is required:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcotmursiw.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a name="kanchor1003"></a>MURSIW (<b>MU</b>lti-<b>R</b>ead-<b>S</b>ingle-<b>W</b>rite) transaction manager</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcotmvcc.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a name="kanchor1004"></a>MVCC (<b>M</b>ulti <b>V</b>ersion <b>C</b>oncurrency <b>C</b>ontrol) transaction manager</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcotexcl.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1"><b>EXCL</b>usive transaction manager</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Concurrency Management</h3>
+                <p>One of the following libraries is required to manage synchronization of database access from multiple threads or processes. </p>
+                <p>(Note that minimalistic single threaded in-memory database&#160;applications, a “hollow” synchronization stub  is provided in library <code>libmcosalhollow.a</code>.  It has no synchronization code so it is the fastest implementation - but it is valid <i>for single-threaded applications only</i>. If  the application links with <code>libmcosalhollow.a</code> then <i>no synchronization library is necessary</i>).</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcoslnxp.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">POSIX synchronization implementation – faster than SysV-based but applicable only for conventional memory applications (Note that this library is good for multi-process applications if pthread supports that and the operating system is not MacOS)</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcoslnxs5.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Pure SysV synchronization implementation – slowest but good for all applications</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcoslnx.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">SysV with <i>atomic</i> operations. - good for all applications in shared or conventional memory (Note that <i>atomic</i> operations avoid unnecessary kernel calls and can provide better performance.)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3><a name="Persist"></a> Persistent Database Support </h3>
+                <p>All C and C++ applications using the Persistent Storage APIs must link with <code>libmcovtdsk</code><i style="font-weight: bold;"> instead of </i><code>libmcovtmem</code> for "virtual table" control, and, in addition, one of the following libraries is required depending on the file system used:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcofuni.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Unix-Linux file system support</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcofu98.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Unix98 file system support</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcofu98zip.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">LZ Compression and database + mmap</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcofu98ziplog.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">LZ Compression and sequential log</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Utility Functions</h3>
+                <p>Miscellaneous functionality used in <i>e</i>X<i>treme</i>DB internals are provided in the following libraries. Depending on whether the standard C runtime libraries are used one of these is required:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcouwrt.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Utilities using the C runtime</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcounrt.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Utilities without the C runtime</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2>Optional   Libraries</h2>
+                <p>The following sections describe optional libraries that are required only for the <i>e</i>X<i>treme</i>DB features specified:</p>
+                <h3>Dynamic Module Loader [Optional]</h3>
+                <p>The following library provides the capability to dynamically load parts of the <i>e</i>X<i>treme</i>DB core on request:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcoloader.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Provides the <code><a href="../../Programming/C/Core_Functions/Static/Auxiliary/Miscellaneous/core_load.htm">mco_core_load()</a></code> API to dynamically load parts of the <i>e</i>X<i>treme</i>DB core on request</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Sequence Data Type Support [Optional]</h3>
+                <p>These libraries provide basic <code><a href="../../Users_Guides/Core/Sequences.htm"><code>sequence</code></a></code> data type operations such as reading and inserting <a href="../../Users_Guides/Core/Sequences.htm"><code>sequence</code></a> data. All  applications that use the <a href="../../Users_Guides/Core/Sequences.htm"><code>sequence</code></a> data type must link with one of the following libraries:</p>
+                <table style="margin-left: 0;margin-right: auto;mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');" class="TableStyle-FunctionReference" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcoseq.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="../../Users_Guides/Core/Sequences.htm"><code>Sequence</code></a> data type API support</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcoseqrle.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1"><a href="../../Users_Guides/Core/Sequences.htm"><code>Sequence</code></a> data type with RLE compression API support</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Analytics Function Library  [Optional]</h3>
+                <p>If, in addition to basic sequence operations, <a href="../../Users_Guides/Server/Analytics_Function_Library.htm">mathematics and statistical functions</a> that operate on sequences are required, applications must link with one of the following libraries:</p>
+                <table style="margin-left: 0;margin-right: auto;mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');" class="TableStyle-FunctionReference" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcoseqmath.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Mathematical and statistical functions operating on <a href="../../Users_Guides/Core/Sequences.htm"><code>sequences</code></a></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcoseqrlemath.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Mathematical and statistical functions operating on <a href="../../Users_Guides/Core/Sequences.htm"><code>sequences</code></a> with RLE compression</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Active Replication Fabric Support  [Optional]</h3>
+                <p><i>e</i>X<i>treme</i>DB<i> Active Replication Fabric</i> packages provide the following libraries. All applications that use <a href="../../Users_Guides/Active_Data_Replication.htm">ARF (IoT)</a> APIs must link with both:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcoiotcomm.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">IOT communication library</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcoiotrepl.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">
+                                <p>IOT replication</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Transaction Logging APIs [Optional]</h3>
+                <p>The <i>e</i>X<i>treme</i>DB<i> Transaction Logging</i> APIs are implemented in the following library. All applications that use the  <a href="../../Users_Guides/Transaction_Logging.htm">Transaction Logging API</a> must link with:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcolog.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Transaction Logging API</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>In addition, <i>all applications that use the  Transaction Logging APIs must link with a File System Wrapper library</i> (see the <a href="#Persist">Persistent Database Support</a> section above) </p>
+                <h3>Backup [Optional]</h3>
+                <p>The following library is provided for applications using the <i><a href="../../Users_Guides/Core/Database_Backup_Restore/Incremental_Backup.htm">incremental backup</a></i>  feature to backup and restore databases on persistent media:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcobackup.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Incremental backup and restore for <i>in-memory</i> and <i>persistent</i> databases</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Serialization [Optional]</h3>
+                <p>The following library is provided for applications using the <code>save</code> / <code>load</code> features to store and retrieve database or class snapshots on persistent media. (Note that this functionality does not require file system wrappers. The <code>save</code> / <code>load</code> features use an abstract stream (implemented by the application) to transfer data to the operating system.)</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcoseri.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Serialization (save and load) for <i>all-in-memory</i> databases</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3><a name="kanchor1005"></a>Uniform Data Access (UDA) [Optional]</h3>
+                <p>For applications that use the Uniform Data Access functions the following library is required:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcouda.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Required if UDA APIs are used</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Debug Error and Tracing Diagnostics [Optional]</h3>
+                <p>The <i>e</i>X<i>treme</i>DB<a href="../../Programming/C/Core_Functions/Static/Auxiliary/Tracing_Framework_C.htm"> tracing framework</a> allows applications to output trace and debugging information to a log file. If desired, the following library can be included: </p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcotrace.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Required if  <a href="../../Programming/C/Core_Functions/Static/Auxiliary/Tracing_Framework_C.htm">tracing framework</a> is used</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3><a name="kanchor1006"></a>Database Calculator [Optional]</h3>
+                <p>The following library is required for applications that  use the <a href="../../Programming/C/Core_Functions/Static/Auxiliary/Calculator.htm"><i>database calculator</i></a>:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcodbcalc.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Database Calculator implementation</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>HTTP Database Viewer [Optional]</h3>
+                <p>The HTTP&#160;Viewer requires the following libraries:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcoews.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">HTTP server implementation</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcohv.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">HTTP Database Viewer (without SQL capability)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Cryptography [Optional]</h3>
+                <p>The <i><a href="../../Users_Guides/Core/Database_Encryption.htm">Database Encryption</a></i> feature requires one of the following libraries:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">libmcocryptaes.a</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">AES encryption algorithm</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">libmcocryptstub.a</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Empty encryption APIs for custom implementation</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

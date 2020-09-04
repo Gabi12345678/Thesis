@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Control Structures used in the C API">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Database Parameters</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Database Parameters</h1>
+            <blockquote>
+                <p><a name="kanchor444"></a>The runtime settings for the database being opened by <code><a href="../Core_Functions/Static/Database_Control/open_dev.htm">mco_db_open_dev()</a></code> are defined in the <code>mco_db_params_t</code> parameter <span class="Param">params</span> which is a structure whose elements are defined in the following table. (Please use the following links for descriptions of common settings for <a href="../../../Users_Guides/Core/Database_Control/Open_C.htm">in-memory</a> or for <a href="../../../Users_Guides/Core/Persistent_Databases/Database_Control/Persistent_Open_C.htm">persistent</a> databases.)</p>
+                <p>The <code>mco_db_params_t</code> structure is defined in <code>mco.h</code> as follows:</p>
+                <div class="code-block"><pre><a name="kanchor445"></a>&#160;
+    typedef struct mco_db_params_t_ {
+        uint2            mark;                    /**/
+        uint2            mem_page_size;           /* memory page size */
+        uint4            disk_page_size;          /* disk page size, typical 4096 bytes, set to zero for in-memory only database */
+        uint4            db_max_connections;      /* max number of connections */
+        mco_offs_t       disk_max_database_size;  /* max size of persistent database */
+        mco_offs_t       file_extension_quantum;  /* quantum of increasing size of the database file 
+                                (can help to reduce file fragmentation) */
+        MCO_LOG_TYPE     db_log_type;             /* database logging method */
+        uint2            connection_context_size; /* recovery connection context */
+        uint2            hash_load_factor;        /* criteria of hash reallocation in percent of used items */
+        uint2            index_optimistic_lock_threshold; /* maximum number of active write transactions when optimistic locking of B-Tree 
+                              indexes can be performed */
+        mco_log_params_t log_params;              /* initial log settings */
+        int              mode_mask;               /* open mode mask */
+        int              min_conn_local_pages;    /* minimal number of pages in per-connection allocator */
+        int              max_conn_local_pages;    /* maximal number of pages in per-connection allocator */
+        int              allocation_bitmap_caching_priority; /* priority of allocator bitmap pages in LRU page pool */
+        int              index_caching_priority;  /* priority of indices pages in LRU page pool */
+        int              object_caching_priority; /* priority of objects (non-blob) pages in LRU page pool */
+        struct mco_ddl_dictionary_t_* ddl_dict;
+        mco_size_t       ddl_dict_size;
+        int              ddl_dict_flags;
+        char*            cipher_key;             /* database encryption key */
+        mco_bool         dynamic_hash;           /* dynamically extend hash table when number of items exceeds load factor */
+        char*            license_key;            /* eXtremeDB license key */
+        int              max_classes;            /* used to reserve space for classes in database header to allow dynamic table creation */
+        int              max_indexes;            /* used to reserve space for indexes in database header to allow dynamic table creation */
+        mco_size_t       autocompact_threshold;  /* size of object after reaching which mco_w_compact is called during transaction commit */
+        MCO_TRANS_SCHED_POLICY trans_sched_policy; /* scheduling policy for transactions with the same priority */
+        uint8            max_trans_time;         /* maximal transaction time, 0 to disable */
+        int              max_active_pages;       /* maximal number of pages accessed by connection */
+        int              page_hash_bundles;      /* number of bundles in encryption/protection/compression page hash */
+        int              compression_level;      /* compression level: 0..9, 0 - no compression, -1: default compression level */
+        int              compression_mask;       /* bitmap of page kinds which should be compressed */
+        int              expected_compression_ratio;   /* use to allocate page map: virtual database space can not be larger than physical */
+                            /* size compression ratio                                                           */
+        uint1            btree_cursor_read_ahead_size; /* number of keys taken from leaf B-Tree page at each access, can not be larger     */
+                            /* than MCO_CFG_CURSOR_BUF_SIZE                                                     */
+        int              mvcc_bitmap_size;       /* MVCC bitmap size should be power of two */
+        int              additional_heap_size;   /* heap memory used by various internal DB functionalities, mostly for buffering during   */
+                        /* XML export/import and database save/load operations                                    */
+        mco_size_t       cow_pagemap_size;       /* Size of copy-on-write MVCC pagemap (in bytes, one byte per disk page) */
+        mco_size_t       backup_map_size;        /* size of backup counters array, bytes, power of two, ignored if disk_max_database_size set */
+                        /* set to zero to disable backup feature */
+        unsigned int     backup_min_pages;       /* number of pages for last exclusive pass of backup procedure */
+                            /* set to zero to disable threshold */
+        unsigned int     backup_max_passes;      /* max number of passes before exclusive pass of backup procedure */
+        char             backup_map_filename[MCO_MAX_FILE_NAME]; /* name of a file will be used to store backup temporary data 
+                                    on mco_db_close() call eXtremeDB will use filesystem wrapper 
+                                    linked into the process to store the data   optional, 
+                                    set zero for default "&lt;persistent-storage&gt;.bmap" file 
+                                    locate at the same   location as persistent storage file  */
+    &#160;
+        uint8            iot_agent_id;
+        uint2            iot_level;
+        uint4            file_backup_delay;      /* delay in milliseconds between writing backup blocks to minimize backup impact on performance */
+&#160;
+    } mco_db_params_t;
+    &#160;</pre>
+                </div>
+                <p>The elements of this structure are explained as follows:</p>
+                <table style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" class="TableStyle-FunctionReference" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 188px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>mark</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Indicates that the structure has been initialized with default values through <code><a href="../Core_Functions/Static/Database_Control/params_init.htm">mco_db_params_init()</a></code> (Applications should not set or modify this field)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>mem_page_size</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The size of the memory page for a conventional or shared memory device (i.e. <code>dev.type=MCO_MEMORY_CONV</code> or  <code>dev.type=MCO_MEMORY_NAMED</code>). (For persistent and mixed mode databases, the value must be a power of two)  (See <a href="../../../Users_Guides/Core/Persistent_Databases/Database_Control/Persistent_Open_C.htm">Creating Databases</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>disk_page_size</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The size of the persistent storage page for this database; (should be set to zero for all-in-memory databases). Must be a power of two and at least eight times the <code>mem_page_size</code>  (See <a href="../../../Users_Guides/Core/Persistent_Databases/Database_Control/Persistent_Open_C.htm">Creating Databases</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>db_max_connections</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The maximum number of connections to this database  (See <a href="../../../Users_Guides/Core/Persistent_Databases/Database_Control/Persistent_Open_C.htm">Creating Databases</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>disk_max_database_size</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The max disk space required if a persistent database  (See <a href="../../../Users_Guides/Core/Persistent_Databases/Database_Control/Persistent_Open_C.htm">Creating Databases</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>file_extension_quantum</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The allocation block size for the database runtime to use when increasing the size of the database file (can help to reduce file fragmentation)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>db_log_type</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The database log file type desired if&#160; this is a persistent database. Must be one of the following values:  <code>REDO_LOG</code> ,  <code>UNDO_LOG</code> or  <code>NO_LOG</code>.</p>
+                            <p> (See <a href="../../../Users_Guides/Core/Persistent_Databases/Persistent_Database_IO.htm">Log File Types</a> and&#160; <a href="../../../Users_Guides/Core/Persistent_Databases/Persistent_Media_IO.htm">Persistent Media I/O</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>connection_context_size</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Indicates by how much the runtime increases the size of the connection structure to hold any application-specific data (referred to as the application’s context). The database runtime uses this memory to copy the data pointed to by the context parameter of <code>mco_db_connect_ctx()</code>. The application context can be anything. The context is required for the recovery process to verify that the task which has created the connection is alive. (See <a href="../../../Users_Guides/Core/Recovery/Recovery_C.htm">Recovery from Failed Processes</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>dynamic_hash</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>A boolean value determining if dynamic hash table extension is enabled (default) or not.  (See <a href="../../../Users_Guides/Core/Indexes_Cursors/Indexes_Cursors_C.htm">Hash  Indexes</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>hash_load_factor</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The factor used to determine when a hash index table is extended. Indicates the percent of used items in the hash table. (See <a href="../../../Users_Guides/Core/Indexes_Cursors/Indexes_Cursors_C.htm">Hash Indexes</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>index_optimistic_lock_threshold</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The maximum number of active write transactions when optimistic locking of B-Tree indexes is being performed. (See <a href="../../../Users_Guides/Core/Concurrency/Concurrency_C.htm">MVCC Locking Optimization</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>log_params</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Initial log settings specified in the <code><a href="Log_Parameters.htm">mco_log_params_t</a></code>.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>mode_mask</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The database open mode flags. These mode mask options are defined in file <code>mco.h</code>. (See <a href="Database_Open_Modes.htm">Database Open Modes</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>min_conn_local_pages</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The minimum number of pages held by the per-connection allocator in MVCC mode. (See <a href="../../../Users_Guides/Core/Persistent_Databases/Cache_Management/Cache_Management_C.htm">In-memory Page allocation</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>max_conn_local_pages</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The maximum number of pages held by the per-connection allocator in MVCC mode. (See <a href="../../../Users_Guides/Core/Persistent_Databases/Cache_Management/Cache_Management_C.htm">In-memory Page allocation</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>allocation_bitmap_caching_priority</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The cache priority for allocation bitmap pages; an integer value zero or greater. The higher the value the longer the allocation bitmap pages will remain in the cache.  (See <a href="../../../Users_Guides/Core/Persistent_Databases/Cache_Management/Prioritized_Cache.htm">Prioritized Cache</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>index_caching_priority</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The cache priority for index pages; an integer value zero or greater. The higher the value the longer the index pages will remain in the cache.  (See <a href="../../../Users_Guides/Core/Persistent_Databases/Cache_Management/Prioritized_Cache.htm">Prioritized Cache</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>object_caching_priority</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The cache priority for database objects (excluding BLOBs); an integer value zero or greater. The higher the value the longer the object pages will remain in the cache.  (See <a href="../../../Users_Guides/Core/Persistent_Databases/Cache_Management/Prioritized_Cache.htm">Prioritized Cache</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>ddl_dict</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Reserved for future use.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>ddl_dict_size</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Used to reserve space for the dictionary in the database header to allow dynamic schema modification. (This is commonly done via SQL <code>create table</code> or <code>alter table</code> operations. <b>So this parameter has no relevance for non-SQL applications</b>).</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>ddl_dict_build_flags</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Reserved for future use.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>cipher_key</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Enables database encryption. (See <a href="../../../Users_Guides/Core/Encryption/Encryption_C.htm">Database Encryption</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>license_key</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p><i>e</i>X<i>treme</i>DB license key.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>max_classes</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Used to reserve space for classes in the database header to allow dynamic schema modification. (This is commonly done via SQL <code>create table</code> or <code>alter table</code> operations. <b>So this parameter has no relevance for non-SQL applications</b>).</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>max_indexes</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Used to reserve space for indexes in the database header to allow dynamic schema modification (This is commonly done via SQL <code>create table</code> or <code>alter table</code> operations. <b>So this parameter has no relevance for non-SQL applications</b>).</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>autocompact_threshold</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Size of an object (in bytes) after reaching which <code>mco_autocompact()</code> is called during a transaction commit.  (See <a href="../../../Users_Guides/Core/Features/Autocompaction.htm">Automatic De-fragmentation of Dynamic Objects</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>trans_sched_policy</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Scheduling policy for transactions with the same priority. (See <a href="../../../Users_Guides/Core/Transaction_Priorities_Scheduling.htm" name="kanchor446">MURSIW transaction scheduling policies</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>max_trans_time</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Maximum transaction time for special system level debugging. Note that&#160; the <code>max_trans_time</code> setting <b>has no effect except in a special build of the </b><i>e</i>X<i>treme</i>DB<b> runtime.</b></p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>max_active_pages</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Maximum number of pages (default is 32) in the page hash used internally by the <i>e</i>X<i>treme</i>DB runtime when encryption protection or data compression is enabled. (See <a href="../../../Users_Guides/Core/Encryption/Encryption_C.htm">Database Encryption</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>page_hash_bundles</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Number of bundles in the page hash used internally by the <i>e</i>X<i>treme</i>DB runtime  when encryption protection or data compression is enabled. (See <a href="../../../Users_Guides/Core/Encryption/Encryption_C.htm">Database Encryption</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>compression_level</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Compression level: 0 = no compression, 1 = compression enabled (default) . (See <a href="../../../Users_Guides/Core/Encryption/Encryption_C.htm">Database Encryption</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>compression_mask</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>A bitmap indicating the kinds of pages that are to be compressed. (See <a href="../../../Users_Guides/Core/Compression/Compression_C.htm">Database Compression</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>expected_compression_ratio</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Used to allocate the page map (default = 10). It is not recommended to change this value. (See <a href="../../../Users_Guides/Core/Compression/Compression_C.htm">Database Compression</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>btree_cursor_read_ahead_size</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Number of keys taken from a leaf  of a B-Tree page on each access. (Cannot be larger than 10). (See <a href="../../../Users_Guides/Core/Persistent_Databases/Persistent_Indexes_Cursors_C.htm">B_Tree read-ahead buffering</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>mvcc_bitmap_size</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p><a name="kanchor447"></a>The size of a bitmap used internally to accelerate the performance of the MVCC transaction manager in some cases. The default value is 0 which disables this feature.  (See <a href="../../../Users_Guides/Core/Concurrency/Concurrency_C.htm">Accelerating MVCC performance</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>additional_heap_size</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Heap memory used by various internal DB functionalities.</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">cow_pagemap_size</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Size of copy-on-write MVCC page map (in bytes, one byte per disk page).</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>backup_map_size</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Size of backup counters array, bytes, power of two, ignored if <code>disk_max_database_size</code> is set (set to zero to disable backup feature). (See <a href="../../../Users_Guides/Core/Database_Backup_Restore/Library_Backup_Implementation.htm">Incremental Backup Implementation</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>backup_min_pages</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Number of pages for last exclusive pass of backup procedure (set to zero to disable threshold). (See <a href="../../../Users_Guides/Core/Database_Backup_Restore/Library_Backup_Implementation.htm">Incremental Backup Implementation</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>backup_max_passes</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>Max number of passes before exclusive pass of backup procedure. (See <a href="../../../Users_Guides/Core/Database_Backup_Restore/Library_Backup_Implementation.htm">Incremental Backup Implementation</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">backup_map_filename</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The name of a file will be used to store backup temporary data on <code>mco_db_close()</code> call <i>e</i>X<i>treme</i>DB will use the file system wrapper linked into the process to store the data. Can be set to zero to default to "&lt;persistent-storage&gt;.bmap" to locate the file at the same   location as the persistent storage file. (See <a href="../../../Users_Guides/Core/Database_Backup_Restore/Library_Backup_Implementation.htm">Incremental Backup Implementation</a>)</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">iot_agent_id</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p>The IoT agent Identifier</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">iot_level</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The IoT level that allows overriding the router's level defined in the MCO schema file</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">file_backup_delay</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The delay in milliseconds between writing backup blocks; to minimize backup impact on performance; default is 0 - no delay. (See <a href="../../../Users_Guides/Core/Database_Backup_Restore/File_Backup.htm">File Backup</a>)</td>
+                    </tr>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

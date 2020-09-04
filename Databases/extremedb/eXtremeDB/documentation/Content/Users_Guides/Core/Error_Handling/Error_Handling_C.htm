@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeDB Error Handling in C</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>DB Error Handling in C</h1>
+            <blockquote>
+                <p>As explained in the <a href="../Error_Handling.htm">Error Handling</a><a name="kanchor259"></a> page, the C API runtime functions return three categories of return codes: <i>Status, Error</i> and <i>Fatal Error</i>. The actual values of these return codes are enumerated in <code>mco.h</code>.  Status codes are return codes that are less than or equal to 50 and have <code>#define</code> names that are prefixed with <code>MCO_S_</code>.  Error codes are return codes that are greater than 50 and have <code>#define</code> names that are prefixed with <code>MCO_E_</code>. (Please refer to the <a href="../../../Programming/C/Return_Codes.htm">C API Return Codes</a> for a complete list.)</p>
+                <h2>Handling Status Codes</h2>
+                <p>Status codes don’t indicate an error but merely the status after an operation has been performed.  For example, most <i>e</i>X<i>treme</i>DB functions, if successful, return <code>MCO_S_OK,</code> or if a search function finds no objects corresponding to the specified key value, the status code <code>MCO_S_NOTFOUND</code> is returned. A status code returned by a function does not affect the state of the transaction context within which the function was executed.</p>
+                <h2>Handling Error Codes</h2>
+                <p>Error codes, in contrast, indicate the runtime’s failure to successfully complete an operation.  For example, if an invalid handle has been passed to a method, <code>MCO_E_INVALID_HANDLE</code> is returned.  A function returning an error code causes the enclosing transaction to enter an error state.</p>
+                <p>The error state of the transaction is remembered by the runtime and any subsequent call to a runtime function within that transaction will not execute but simply return the <code>MCO_E_TRANSACT</code> code. Being aware of this can greatly simplify your application code, while keeping the code size to a minimum. For example, it is not uncommon (and many vendors recommend) to check the return code after every call to a library function. This leads to source code that looks like one of:</p>
+                <div class="code-block"><pre>    &#160;
+    int foo() 
+    {
+        int rc, i;
+        for( i=0; i &lt; 10; i++ )
+        {
+            if((rc=func1()) != 0)
+                break;
+            if((rc=func2()) != 0)
+                break;
+            if((rc=func3()) != 0)
+                break;
+        }
+        return rc;
+    }
+    &#160;</pre>
+                </div>
+                <p>or</p>
+                <div class="code-block"><pre>&#160;
+    int foo() 
+    {
+        int rc, i;
+        for( i = 0; i &lt; 10; i++ ) 
+        {
+            if( (rc = func1()) == 0 )
+                if( (rc = func2()) == 0 )
+                    if( (rc = func3() == 0 )
+                        . . .
+                    else
+                        break;
+                else
+                    break;
+            else
+                break;
+        }
+        return rc;
+    }
+    &#160;</pre>
+                </div>
+                <p>In contrast, with <i>e</i>X<i>treme</i>DB the application may simply check the return code on each iteration of the loop:</p>
+                <div class="code-block"><pre>&#160;
+    uint foo() 
+    {
+        int rc, i;
+        for( i = rc = 0; i &lt; 10 &amp;&amp; MCO_S_OK == rc ; i++ )
+        {
+            rc = func1();
+            rc |= func2();
+            rc |= func3();
+        }
+        return rc;
+    }
+    &#160;</pre>
+                </div>
+                <p>The resulting implementation is clearly tighter code and easier to read.</p>
+                <h2>Handling Fatal Errors</h2>
+                <p>The third category of errors, fatal errors, are unrecoverable and cause the <i>e</i>X<i>treme</i>DB runtime to call the internal function <code>mco_stop()</code>. This function performs the role of an assertion internal to <i>e</i>X<i>treme</i>DB.  If an error handler has been registered (via <code><a href="../../../Programming/C/Core_Functions/Static/Error_Handling/set_handler.htm">mco_error_set_handler()</a></code>), <code>mco_stop()</code> will call this custom error handler. Otherwise <code>mco_stop()</code> will enter an infinite loop.  If your application appears to “hang” inexplicably, it is probably because you have not registered an error handler, something went wrong, and <code>mco_stop()</code> entered this infinite loop.</p>
+                <p>The <code>mco_stop()</code> function is only called when the runtime detects an unrecoverable error, such as corruption within its metadata.  In such a case, restarting the process is the only viable course of action.  As well, any runtime function call can be asserted and <code>mco_stop()</code> called if the assertion fails.  This usually means that the application did something illegal from the runtime’s point of view, such as passed an invalid transaction or object handle to a runtime function, or corrupted the runtime internals in some way.</p>
+                <p>Further, any runtime function might perform a number of validations that can result in a failed assertion. These validations vary depending on the <code>CHECK_LEVEL</code> set when the <i>e</i>X<i>treme</i>DB library is compiled. The <i>e</i>X<i>treme</i>DB object code packages include two sets of runtime libraries: the <i>debug</i> version, which has the highest <code>CHECK_LEVEL</code> and the <i>release</i> version, which has the lowest (minimal validations are performed).  Although the release version does some validations, these have no negative impact on the overall performance.  Developers are strongly advised to use the <i>debug</i> version during the development cycle.  Then, only when no fatal errors are reported by <i>e</i>X<i>treme</i>DB, switch to the <i>release</i> version. The only reason one would use the <i>release</i> version during the development phase is to measure application performance.</p>
+                <h2>Debugging during the Development Cycle</h2>
+                <p>The recommended method of debugging fatal errors for developers without a source code license is as follows:</p>
+                <ul>
+                    <li value="1">First, be sure to register a custom error handler (see function <code><a href="../../../Programming/C/Core_Functions/Static/Error_Handling/set_handler.htm">mco_set_error_handler()</a></code>).</li>
+                    <li value="2">Set a breakpoint inside the custom error handler, and run the application in the debugger to examine the application’s call stack at the point where the error occurs.</li>
+                    <li value="3">Note the last runtime function called and any other relevant information in the stack trace.</li>
+                    <li value="4">Consult the <a href="../../../Programming/C/Return_Codes.htm">error code</a><a name="kanchor260"></a> description in  to see why the runtime assertion failed; for example, an error in the transaction manager, heap corruption, a cursor is corrupted, etc.</li>
+                    <li value="5">Check the appropriate application entity right before the fatal runtime call was issued and make sure that the entity - transaction handle, object handle, heap memory, etc. - is in fact corrupted.</li>
+                    <li value="6">Go back through the stack and try to find the application code where the entity was corrupted.</li>
+                </ul>
+                <p>The following example demonstrates this procedure (note that this code is taken from the <code><a href="../../../Programming/C/SDK_Samples/Core_Samples/06-Errorhandling_Fatalerr.htm">06_errorhandling_fatalerr</a></code> sample):</p>
+                <div class="code-block"><pre>&#160;
+    static void errhandler( int n )
+    {
+        printf( "\n eXtremeDB runtime fatal error: %d", n );
+        getchar();
+        exit( -1 );
+    }
+&#160;
+    void main()
+    {
+        ...
+        mco_error_set_handler( &amp;errhandler );
+        ...
+        rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;t);
+        if ( MCO_S_OK == rc ) 
+        {
+            printf("\n\n\tThe following attempt to create a new record\n"
+                "\tshould cause the Error handler to be called with Fatal\n"
+                "\tError 340049 because it requires a READ_WRITE transaction.\n"
+                "\tThe type of transaction started was MCO_READ_ONLY...\n"
+                "\tNote: you will get error code instead of fatal error if\n"
+                "\tthe program was linked not against _check runtime\n");
+            /* anObject_new() should fail with error code 340049 = MCO_ERR_TRN+49 */
+            rc = anObject_new(t, &amp;rec);
+            if ( MCO_S_OK == rc ) 
+            {
+                rc = anObject_data_put(&amp;rec, data);
+                /* the following code will not be reached unless the transaction is
+                    changed to MCO_READ_WRITE */
+                if ( MCO_S_OK == rc ) 
+                {
+                    rc = mco_trans_commit(t);
+                }
+            } 
+            else if (rc == MCO_E_ACCESS) 
+            {
+                printf("\nThe sample was linked with no-check runtime\n");
+                rc = MCO_S_OK;
+            }
+            ...
+        }
+    }
+    &#160;</pre>
+                </div>
+                <p>When the above code is executed it causes the error handler to be called with the error code 340049 which generates the following output:</p>
+                <div class="code-block"><pre>&#160;
+    eXtremeDB runtime fatal error: 340049
+    &#160;</pre>
+                </div>
+                <p>Checking the error code, the value of <code>340000</code> corresponds to the constant <code>MCO_ERR_TRN</code>.  This indicates an error in the transaction being performed.  (The added value of <code>49</code> indicates the line within the runtime function where the assertion failed, causing <code>mco_stop()</code> to be called.  This is useful if it is necessary to contact <i>McObject Support</i> – or if the developer has a source code license.  For a more detailed explanation of error codes see <a href="../../../Programming/C/Return_Codes.htm">C API Return Codes</a>.)</p>
+                <p>Following is the call stack (as displayed by the Visual Studio 2008 debugger):</p>
+                <div class="code-block"><pre>&#160;
+    06-errorhandling-fatalerr.exe!mco_w_new_obj_noid(mco_trans_t_ * t=0x004e0378, 
+        unsigned int init_size=4, unsigned short class_code=1, mco_objhandle_t_ * ret=0x0012facc)  
+        Line 494 + 0x14 bytes
+&#160;
+    06-errorhandling-fatalerr.exe!anObject_new(mco_trans_t_ * t=0x004e0378, 
+        anObject_ * handle=0x0012facc) 
+         Line 120 + 0x2f bytes
+&#160;
+    06-errorhandling-fatalerr.exe!main(int argc=1, char * * argv=0x00343250)  
+        Line 60 + 0x13 bytes
+        &#160;
+    06-errorhandling-fatalerr.exe!__tmainCRTStartup()  
+        Line 582 + 0x19 bytes
+        &#160;
+    06-errorhandling-fatalerr.exe!mainCRTStartup()  
+        Line 399
+        &#160;</pre>
+                </div>
+                <p>It’s apparent that the function <code>mco_w_new_obj_noid()</code> called by <code>anObject_new()</code> caused the runtime assertion to fail.  Knowing that error code <code>MCO_ERR_TRN</code> indicates a problem with the transaction and that the <code>_new()</code> functions require a <code>READ_WRITE</code> transaction, the solution is obvious.</p>
+                <p>
+                    <img src="../../../Resources/Images/note.png" /> Note that the	<i>e</i>X<i>treme</i>DB generated functions like <code>anObject_new()</code> interface with the runtime through “wrapper” functions like <code>mco_w_new_obj_noid()</code>.  Though it is not necessary for developers to delve into the <i>e</i>X<i>treme</i>DB internals, it can be instructive to examine the <code>.c</code> interface file generated by the <code><a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a></code> schema compiler and notice how the compiler generates the calling parameters to these “wrapper” functions from the corresponding “dictionary” values.</p>
+                <p>If you have a source code license, the debugging technique is slightly different.  In this case it would be prudent to set a breakpoint in the <code>mco_stop()</code> function itself.  This results in the following call stack:</p>
+                <div class="code-block"><pre>&#160;
+    06-errorhandling-fatalerr.exe!mco_stop__(int n=340049, 
+        const char * file=0x004d437c, int line=494)  
+        Line 61
+        &#160;
+    06-errorhandling-fatalerr.exe!mco_w_new_obj_noid(mco_trans_t_ * t=0x004e0378, 
+        unsigned int init_size=4, unsigned short class_code=1, mco_objhandle_t_ * ret=0x0012facc)  
+        Line 494 + 0x14 bytes
+        &#160;
+    06-errorhandling-fatalerr.exe!anObject_new(mco_trans_t_ * t=0x004e0378, 
+        anObject_ * handle=0x0012facc)  
+        Line 120 + 0x2f bytes
+&#160;
+    06-errorhandling-fatalerr.exe!main(int argc=1, char * * argv=0x00343250) 
+         Line 60 + 0x13 bytes
+&#160;
+    06-errorhandling-fatalerr.exe!__tmainCRTStartup()  
+        Line 582 + 0x19 bytes
+    &#160;
+    06-errorhandling-fatalerr.exe!mainCRTStartup()  
+        Line 399
+        &#160;</pre>
+                </div>
+                <p>Here again the preceding line in the call stack indicates that function <code>mco_w_new_obj_noid()</code> failed and the same chain of logic makes it clear that the solution is to correct the transaction type.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

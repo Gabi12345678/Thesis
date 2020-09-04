@@ -1,0 +1,13 @@
+MCO_PRJ_LIST += 05-indexes-btree-pattern
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 05-indexes-btree-pattern
+PRJ_05-indexes-btree-pattern_TAGS:=sample core patternsearch
+PRJ_05-indexes-btree-pattern_DIR:=$(call mco_project_dir)
+PRJ_05-indexes-btree-pattern_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_05-indexes-btree-pattern_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_05-indexes-btree-pattern_DATABASES:=patterndb
+PRJ_05-indexes-btree-pattern_RUNTIME:=YES
+PRJ_05-indexes-btree-pattern_MEMDEV:=PRIVATE
+PRJ_05-indexes-btree-pattern_STORAGE:=TRANSIENT
+PRJ_05-indexes-btree-pattern_SYNC:=AUTO
+PRJ_05-indexes-btree-pattern_TRANSMGR:=MURSIW

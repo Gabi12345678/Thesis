@@ -1,0 +1,71 @@
+#
+# Makefile
+# OS   : Linux, QNX, SunOS, HPUX, CygWin
+# Tool : gcc or native complier
+#
+# Copyright (c) 2001-2009 McObject LLC.
+#
+#
+
+# root directory of eXtremeDB installation
+MCO_ROOT        ?= ../../../..
+
+# Application specifications
+# PRJ_TYPE       - type of the project, APP or LIB or NONE to prevent build
+# PRJ_SHOW_BUILD - Show build process, YES or NO or AUTO
+# PRJ_TITLE      - name of the sample, name of an executable file
+# PRJ_SIDE       - application side, TARGET or HOST
+# PRJ_SOURCES    - source files except generated
+# PRJ_SCHEMAS    - database schema files
+# PRJ_INTERFACES - rpc interface files
+# PRJ_DBNAMES    - names of the sample's databases
+# PRJ_STORAGE    - runtime confiuration, MEMORY for inmem or PERSISTENT or NONE for samples without a DB
+# PRJ_MEMDEV     - memory access device, CONV or SHARED or NONE
+# PRJ_STORAGEDEV - storage device, AUTO or NONE or platform-dependent name (see mcof* libraries)
+# PRJ_SYNC       - sync. primitives, AUTO or NONE or platform-dependent name (see mcos* libraries)
+# PRJ_TRANSMGR   - transaction manager, MURSIW or MVCC or NONE
+# PRJ_DIRECTPTR  - Direct Pointers feature, YES or NO or AUTO
+# PRJ_HA         - HA feature, TCP or UDP or PIPES or NONE
+# PRJ_RPC        - RPC feature and role, CLIENT or SERVER or NONE
+# PRJ_F_CPP      - generate C++ interface, YES or NO
+# PRJ_F_SQL      - SQL feature, LOCAL, REMOTE or NO
+# PRJ_F_LOG      - LOG feature, YES or NO
+# PRJ_F_DBCALC   - DBCALC feature, YES or NO
+# PRJ_F_UDA      - UDA feature, YES or NO
+# PRJ_F_XML      - XML feature, YES or NO
+# PRJ_F_SERI     - Serialization feature, YES or NO
+# PRJ_F_HV       - HttpViewer feature, YES or NO
+# PRJ_F_CLUSTER  - Cluster feature, TCP or NO
+# PRJ_RMFILES    - list of files to remove for distclean command except executable, database and generated files
+
+PRJ_TYPE         = APP
+PRJ_SHOW_BUILD   = AUTO
+PRJ_TITLE        = Async_Native
+PRJ_SIDE         = TARGET
+PRJ_SOURCES      = main.c
+PRJ_SCHEMAS      = AsyncEventDb.mco
+PRJ_INTERFACES   =
+PRJ_DBNAMES      = AsyncEventDb
+PRJ_STORAGE      = MEMORY
+PRJ_MEMDEV       = SHARED
+PRJ_STORAGEDEV   = NONE
+PRJ_SYNC         = AUTO
+PRJ_TRANSMGR     = MURSIW
+PRJ_DIRECTPTR    = AUTO
+PRJ_HA           = NONE
+PRJ_RPC          = NONE
+PRJ_F_CPP        = NO
+PRJ_F_SQL        = NO
+PRJ_F_LOG        = NO
+PRJ_F_DBCALC     = NO
+PRJ_F_UDA        = NO
+PRJ_F_XML        = NO
+PRJ_F_SERI       = NO
+PRJ_F_HV         = NO
+PRJ_F_CLUSTER    = NO
+PRJ_F_NATIVE     = YES
+PRJ_RMFILES      = 
+
+# Common definitions
+THIS_MAKEFILE := $(lastword $(MAKEFILE_LIST))
+include $(MCO_ROOT)/include/header.mak 

@@ -1,0 +1,13 @@
+MCO_PRJ_LIST += 03-connect-multi-process
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 03-connect-multi-process
+PRJ_03-connect-multi-process_TAGS:=sample core
+PRJ_03-connect-multi-process_DIR:=$(call mco_project_dir)
+PRJ_03-connect-multi-process_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_03-connect-multi-process_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_03-connect-multi-process_DATABASES:=simpledb
+PRJ_03-connect-multi-process_RUNTIME:=YES
+PRJ_03-connect-multi-process_MEMDEV:=SHARED
+PRJ_03-connect-multi-process_STORAGE:=TRANSIENT
+PRJ_03-connect-multi-process_SYNC:=AUTO
+PRJ_03-connect-multi-process_TRANSMGR:=MURSIW

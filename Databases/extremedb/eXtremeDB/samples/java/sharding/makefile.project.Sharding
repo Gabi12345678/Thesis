@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += Sharding
+PRJ_TARGET_CLASS += Sharding
+PRJ_Sharding_TAGS:=sample java sql net
+PRJ_Sharding_DIR :=$(call mco_project_dir)
+PRJ_Sharding_SRC :=$(call mco_project_file,Sharding.java)

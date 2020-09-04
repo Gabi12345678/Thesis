@@ -1,0 +1,19 @@
+/****************************************************************
+ *                                                              *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.    *
+ *                                                              *
+ ****************************************************************/
+// This sample demonstrates operations with trigram-indexes
+
+#define uint4   unsigned<4>
+
+declare database  trigramdb;
+
+class Obj 
+{
+     uint4 id;
+     char<64> carid;
+
+     trigram<carid> by_carid;
+};
+

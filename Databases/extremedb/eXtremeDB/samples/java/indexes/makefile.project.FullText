@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += FullText
+PRJ_TARGET_CLASS += FullText
+PRJ_FullText_TAGS:=sample core java
+PRJ_FullText_DIR :=$(call mco_project_dir)
+PRJ_FullText_SRC :=$(call mco_project_file,FullText.java)

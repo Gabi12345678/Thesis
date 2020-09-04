@@ -1,0 +1,22 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Rights Reserved.    *
+ *                                                               *
+ *****************************************************************/
+
+declare database transdb;
+
+class A {
+    unsigned<4> ui4;
+    string      tag;
+    
+    list;
+};
+
+class B {
+    unsigned<4> ui4;
+    string      tag;
+    
+    list;
+};
+

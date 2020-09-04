@@ -1,0 +1,15 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Rights Reserved.    *
+ *                                                               *
+ *****************************************************************/
+
+declare database vectorsdb;
+
+class AFile {
+    signed<4> id;
+    string name;
+    vector<signed<4>> lines;
+    
+    hash<name> idx1[10000];
+};

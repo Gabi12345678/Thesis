@@ -1,0 +1,7 @@
+declare database extenddb;
+
+class anObject {
+    unsigned<4> data;
+    list;
+};
+

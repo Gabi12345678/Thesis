@@ -1,0 +1,39 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.     *
+ *                                                               *
+ *****************************************************************/
+
+#define int1      signed<1>
+#define int2      signed<2>
+#define int4      signed<4>
+#define uint8   unsigned<8>
+#define uint4   unsigned<4>
+#define uint2   unsigned<2>
+#define uint1   unsigned<1>
+
+declare database inetdb;
+
+class Host {
+    uint4 id;
+    char<50> name;
+    hash<id> by_id[100];
+    hash<name> by_name[100];
+};
+
+class Browser {
+    uint4 id;
+    char<100> agent;
+    hash<id> by_id[100000];
+    hash<agent> by_agent[100000];
+};
+
+class Event {
+    sequence<uint4> day; 
+    sequence<char<16>> user; 
+    sequence<uint4> ip; 
+    sequence<uint4> host; 
+    sequence<uint4> url; 
+    sequence<uint4> agent; 
+    list;
+};

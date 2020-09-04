@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Hash Aggregate Grouping</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <h1>Hash Aggregate Grouping</h1>
+            <blockquote>
+                <h2>Hash Aggregate Grouping C Functions</h2>
+                <p>The <i>Hash Aggregate</i> C API functions group aggregates based on hash functions. So, unlike the <code>mco_seq_group_agg_TYPE()</code> APIs, these functions do not require that the grouping sequence be ordered. Also unlike all other sequence functions, this group of functions <i>allocates dynamic memory</i> for the hash table. If the <i>n_groups</i> parameter is 0, then the internal <a href="../../C/Structures/Database_Parameters.htm" name="kanchor756">database runtime parameter</a> <code>mco_seq_hash_init_size</code> is used to specify the size of the hash table and it is automatically extended when the threshold determined by <code><a href="../../C/Structures/Database_Parameters.htm">mco_seq_hash_load_factor</a></code> is reached. This dynamic hash table memory should be explicitly released by calling <code>mco_seq_free_hash()</code>.</p>
+                <p>The result of all <i>Hash Aggregate</i>  functions is returned in the <i>result_agg</i> or <i>result_count</i> sequence as the calculated aggregate or count for each group. The <i>input</i> sequence is split into groups based on the <i>group_by</i> sequence. The argument <i>result_group_by</i> returns the sequence of values used for grouping in order for the application to make the correspondence between the values in the result sequence and the groups.</p>
+                <p>For example, consider the following code snippet demonstrating how to use a <i>hash aggregate</i> function to calculate the average <i>Close</i> price for <i>Volume</i> values in ranges of 0..9, 10..19, 20..29, etc.:</p>
+                <div class="code-block"><pre>&#160;
+    {
+        mco_trans_h trans;
+        mco_cursor_t quote_cursor;
+        Quote quote;
+        mco_seq_iterator_t close_iterator, volume_iterator, volume_div_10_iterator; 
+        mco_seq_iterator_t group_iterator,  avg_iterator;
+        MCO_RET rc;
+        ...
+        &#160;
+        for (rc = mco_cursor_first(trans, &amp;quote_cursor); 
+            rc != MCO_S_CURSOR_END; 
+            rc = mco_cursor_next(trans, &amp;quote_cursor)) 
+        {
+            Quote_from_cursor(trans, &amp;quote_cursor, &amp;quote);
+            Quote_close_iterator(&amp;quote, &amp;close_iterator);
+            Quote_volume_iterator(&amp;quote, &amp;volume_iterator);
+            &#160;
+            rc = mco_seq_const_uint4(&amp;const_iterator, 10);
+            rc = mco_seq_div_uint4(&amp;volume_div_10_iterator, &amp;volume_iterator, &amp;const_iterator);
+            rc = mco_seq_hash_agg_avg_float(&amp;avg_iterator, &amp;group_iterator,
+            
+                    &amp;close_iterator, &amp;volume_div_10_iterator, 0);
+            
+            ...
+            mco_seq_free_hash(&amp;avg_iterator);
+        }
+        ...
+    }
+    &#160;</pre>
+                </div>
+                <p>Suppose that we have <i>Volume</i> and <i>Close</i> sequences with the following thirteen values: </p>
+                <div class="code-block"><pre>&#160;
+    Volume: {335, 808, 45, 402, 732, 48, 805, 450, 385, 420, 367, 69, 77}
+            
+    &#160;
+    Close: {62.830, 45.790, 74.730, 53.460, 67.870, 50.370, 80.320, 
+            29.940, 25.920, 37.280, 80.920, 57.730, 43.850}
+    &#160;</pre>
+                </div>
+                <p>To split the <i>Volume</i> sequence into groups associated with   ranges of 0..9, 10..19, 20..29, etc., we created the constant sequence iterator with values of 10 and use it as input to the <code>mco_seq_div_uint4()</code> API. This produces the following sequence values which are returned in the <i>result_group_by</i> sequence (<code>group_iterator</code> in this example) : </p>
+                <div class="code-block"><pre>&#160;
+    {80, 73, 7, 38, 4, 40, 6, 45, 33, 42, 36}
+            
+    &#160;</pre>
+                </div>
+                <p>Note that these values do not correspond to the positions of the input sequence. In fact the highlighted value 80 is the result of dividing the second and seventh elements of the <i>Volume</i> sequence. So the <i>Volume</i> values that fall into the 800-810 range (i.e. <code>808</code> and <code>805</code>) are the first group.</p>
+                <p>For this input, the resulting average <i>Close</i> sequence returned in the <i>result_agg</i> sequence (<code>avg_iterator</code> in this example) by function <code>mco_seq_hash_agg_avg_float()</code> will have the following values: </p>
+                <div class="code-block"><pre>&#160;
+    {63.055, 67.870, 43.850, 25.920, 62.550, 53.460, 57.730, 29.940, 62.830, 37.280, 80.920}
+    &#160;</pre>
+                </div>
+                <p>To associate the values in the resulting averages with the corresponding group of average <i>Close</i> values and verify the computation, note the following:</p>
+                <ul>
+                    <li value="1">the first element of the <i>result_group_by</i> sequence  (<code>80</code>) corresponds with <i>Volume</i>s in the range 800-810 (where <i>Volume</i> <code>/ 10 = 80</code>);</li>
+                    <li value="2">
+                        <p>the values for <i>Volume</i> in the range 800-810  are <code>808</code> in element in position 1 (zero-based index) and <code>805</code> in position 6;</p>
+                    </li>
+                    <li value="3">the <i>Close</i> values in the corresponding elements 1 and 6 are <code>45.790</code> and <code>80.320</code>;</li>
+                    <li value="4">the average is <code>(45.790 + 80.320) / 2 = 63.055</code> which is the value in position 1 of the result sequence.</li>
+                </ul>
+                <h2>Hash Aggregate Grouping SQL Functions</h2>
+                <p>The SQL API provides function <code>seq_hash_group_by()</code> to produce the grouping values iterator used as input to the <code>seq_hash_agg_*()</code> functions.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

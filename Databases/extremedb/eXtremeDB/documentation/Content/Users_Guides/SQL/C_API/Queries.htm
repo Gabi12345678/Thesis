@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Executing eXtremeSQL Queries in C</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Executing <i>e</i>X<i>treme</i>SQL Queries in C</h1>
+            <blockquote>
+                <p>Once the SQL database engine structure is initialized with one of the two methods explained in the <span class="Param"><a href="Engine_Initialization.htm">SQL Engine Initialization</a></span> page, this structure is used, for all calls to the <code>mcosql_*</code> functions. The principal function for  performing SQL queries is <code>mcosql_execute_query()</code> which returns a result set in the form of structure <code>data_source_t</code>.  Then the result set data is extracted from the data source using a <code>cursor</code> as demonstrated in the following code snippet:</p>
+                <div class="code-block"><pre><a name="kanchor749"></a>    &#160;
+    /* Return the autoid for the Person record with the specified name */
+    MCO_RET get_person_id( database_t db, char const* name, int64_t* id )
+    {
+        status_t status = SQL_OK;
+        data_source_t data_source;
+        cursor_t cursor;
+        record_t record;
+        status = mcosql_execute_query(db, NULL, &amp;data_source, "select autoid from Person where name=%s",
+                            name);
+            if ( SQL_OK == status ) 
+            {
+                status = mcosql_get_cursor(data_source, &amp;cursor);
+            
+                if ( SQL_OK == status ) 
+                {
+                    status = mcosql_cursor_move_next(cursor, &amp;record);
+                    if ( SQL_OK == status ) 
+                    {
+                        // process record
+                        ...
+                    }
+                    else if ( NO_MORE_ELEMENTS != status )
+                    {
+                        mcosql_error_handler(status);
+                    }
+                }
+                mcosql_release_query_result(data_source);
+            
+            }
+        return status;
+    }
+    &#160;</pre>
+                </div>
+                <p>Note the following in this example code:</p>
+                <ul>
+                    <li value="1">	the function <code>get_person_id()</code> is an application-level function intended to return the <code>autoid</code> for a <i>Person</i> object with the name specified. The schema definition for the <i>Person</i> record is as follows:</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    class Person
+    {
+        string name;
+        string address;
+        string position;
+        uint4  salary;
+        float  rating;
+        autoid_t&lt;Person&gt; manager;
+        autoid[1000];
+        &#160;
+        tree&lt;name&gt; pk;
+    };
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <ul>
+                    <li value="1">	the function <code>mcosql_execute_query()</code> executes a SQL query and returns a status code  (as defined in header file “<code>include/sql/sqlc.h</code>”); it takes a variable length argument list consisting of :<ul style="list-style-type: circle;"><li value="1"><![CDATA[	]]><code>db</code> – the database engine</li><li value="2"><code>trans</code> -  a transaction handle or <code>NULL</code> if the query is to be executed in its own separate transaction (<span>see section “<i><a href="Transactions.htm">Managing Transactions</a></i>” )</span>.</li><li value="3"><![CDATA[	]]><code>data_source</code> – the address of the data source to receive the result set</li><li value="4"><![CDATA[	]]><code>statement</code> – the SQL select statement to be executed</li><li value="5"><code>	…</code> - a list of 0 or more arguments to be inserted into the select statement. (The rules for substitution of values into the SQL statement are elaborated in the <i><a href="Argument_Substitution.htm" style="font-style: normal;text-decoration: none;">SQL Statement Argument Substitution</a></i> page.)</li></ul></li>
+                    <li value="2">	the function <code>mcosql_get_cursor()</code>, creates a cursor over the result set and <code>mcosql_cursor_move_next()</code> is used to scroll through the result rows.</li>
+                    <li value="3">	the status code  <code>NO_MORE_ELEMENTS</code> is returned when the end of the result set is reached</li>
+                    <li value="4">	the function <code>mcosql_release_query_result()</code> must be called when finished with the query to release the memory and other resources allocated for the result set.</li>
+                </ul>
+                <h2>Processing Query Results</h2>
+                <p>Processing the query result set rows will often require extracting values of different types by iterating over the columns of each row. Then each column value must be handled differently depending on its type. Internally, all integer values are stored as 64-bit values. To extract a column value the function <code>mcosql_get_column_value_as()</code>is called to convert the internal value to that used by the application. For example the following call extracts the value from the first column of a result set and converts it to a 4-byte integer value:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    rc = (MCO_RET)mcosql_get_column_value_as(record, 0, CT_UINT4,
+                            &amp;value, sizeof(value), NULL);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>Prior to <i>e</i>X<i>treme</i>SQL version 6.5, the function <code>mcosql_get_column_value()</code> was used to extract column values. This function expects the receiving buffer to be 64-bits even for smaller types. However in version 6.5 and later, the <code>mcosql_get_column_value()</code> argument list has been changed and in most cases it should not be used because it returns the “<code>raw</code>” value of the internal type (i.e. suppose we have a column of 32-bit integers. Those values are returned as 64-bit integers which may be not what the user desires - especially if a 32-bit buffer is supplied for the data).</p>
+                <p>Prior to version 6.5, code like the following snippet was used to process the columns of a result set:</p>
+                <div class="code-block"><pre>    &#160;
+    /* For each row of the result set, iterate through the columns and display values. */
+    status = mcosql_get_cursor( data_source, &amp;cursor );
+    if ( SQL_OK == status ) 
+    {
+        for ( n = 0; SQL_OK == ( status = mcosql_cursor_move_next( cursor, &amp;record ) ); n++ )
+        {
+            for (j = 0; j &lt; i; j++)
+            {
+                status = mcosql_get_column_value(record, j, &amp;type, &amp;value );
+                if ( SQL_OK == status ) 
+                {
+                    if ( 0 == j )
+                        printf( "\t" );
+                    else
+                        printf( ", " );
+                    print_value(db, type, value);
+            
+                }
+            }
+            printf("\n");
+        }
+        if ( NO_MORE_ELEMENTS != status )
+        {
+            mcosql_error_handler(status);
+        }
+    }
+    &#160;</pre>
+                </div>
+                <p>Note also that the argument list for <code>mcosql_get_column_value()</code> in version 6.5 and later contains six arguments as opposed to the previous implementation which had 4 arguments.</p>
+                <p>Now the function signature is as follows</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    status_t mcosql_get_column_value(record_t record, size_t columnNo, type_t* type, void* buf,
+                        size_t buf_size, size_t* value_size);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>where <code>buf</code> receives the value stored in the specified column and the data type is returned in argument type. Also note that the function <code>mcosql_get_record_id()</code> formerly used to retrieve the <code><a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a></code> generated record identifier has been eliminated from version 6.5 and later, and the previous function <code>mcosql_release_memory()</code> is no longer available as all memory is managed by the static block allocator.</p>
+                <p>The application level function <code>print_value()</code> (highlighted in the snippet above) is copied below to demonstrate how different value types might be displayed to an output device:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    /* print the value contained in this database field depending on its type */
+    void print_value(database_t db, int type, void* value)
+    {
+        char buf[MAX_NAME_LENGTH];
+        switch (type)
+        {
+            case CT_NULL:
+                printf("null");
+                break;
+            case CT_BOOL:
+                printf(*(char*)value ? "true" : "false");
+                break;
+            case CT_UINT1:
+                printf("%u", *(uint1*)value);
+                break;
+            case CT_UINT2:
+                printf("%u", *(uint2*)value);
+                break;
+            case CT_UINT4:
+                printf("%u", *(uint4*)value);
+                break;
+            case CT_UINT8:
+                printf("%" INT8_FORMAT "d", *(int64_t*)value);
+                break;
+            case CT_INT1:
+                printf("%d", *(int1*)value);
+                break;
+            case CT_INT2:
+                printf("%d", *(int2*)value);
+                break;
+            case CT_INT4:
+                printf("%d", *(int4*)value);
+                break;
+            case CT_INT8:
+                printf("%" INT8_FORMAT "d", *(int64_t*)value);
+                break;
+            case CT_REAL4:
+                printf("%.1f", *(float*)value);
+                break;
+            case CT_REAL8:
+                printf("%.1f", *(double*)value);
+                break;
+            case CT_STRING:
+                printf("%s", (char*)value);
+                break;
+            case CT_REFERENCE:
+                {
+                    /* lookup the referenced record and extract its name field */
+                    int64_t id;
+                    mcosql_get_record_id(value, &amp;id);
+                    get_person_name(db, buf, sizeof(buf), &amp;id);
+                    printf("%s", buf);
+                    break;
+                }
+            default:
+                printf("???");
+        }
+    }
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>Note the following in this example code:</p>
+                <ul>
+                    <li value="1">	The column type constants <code>CT_*</code> are defined in the header file “<code>include/sql/sqlc.h</code>”.</li>
+                    <li value="2">	The constant <code>INT8_FORMAT</code> inserted into the <code>printf()</code> format string for types <code>CT_INT8</code> and  <code>CT_UINT8</code>  is defined in the header file “<code>include/sql/stdtp.h</code>” as the string constant “<code>l</code>”, “<code>ll</code>” or “<code>I64</code>” depending on the development system platform.</li>
+                    <li value="3">	In this example the type <code>CT_REFERENCE</code> is treated as a reference to a different <i>Person</i> object with the <code>autoid</code> contained in the function’s value argument. So an additional database lookup is performed to navigate to the specified <i>Perso</i>n record and extract then display its name field. Clearly this is application logic specific to this particular database schema and data model.</li>
+                </ul>
+                <h3>Extracting Data from Result Set Rows</h3>
+                <p>The example above extracts a single column value from each result set row. But often a result set row consists of an entire database object, as for example in the query “<code>select * from Person</code>”. In this case a function like the following might be written to process the result set:</p>
+                <div class="code-block"><pre>    &#160;
+    /* Demonstrate use of the function mcosql_extract_struct() */
+    MCO_RET get_persons( database_t db, char const* name_like )
+    {
+        data_source_t data_source;
+        cursor_t cursor;
+        status_t status;
+        record_t record;
+        int64_t id;
+        type_t type;
+        void* value;
+        int n;
+        &#160;
+        /* Define a structure with exactly the same components as the Person database class */
+        struct 
+        { 
+            char * name; 
+            char * address; 
+            char * position; 
+            uint4 salary;
+            float rating; 
+            autoid_t manager; 
+        } rec;
+        &#160;
+        /* Define a character array to hold possible null indicators if any fields are null */
+        char null_indicators[10];
+        printf("\n\tGet Person records with name like '%s':\n", name_like );
+        status = mcosql_execute_query(db, NULL, &amp;data_source,
+                            "select * from Person where name like %s", name_like );
+        if ( SQL_OK == status ) 
+        {
+            status = mcosql_get_cursor( data_source, &amp;cursor );
+            if ( SQL_OK == status ) 
+            {
+                for (n = 0; SQL_OK == ( status = mcosql_cursor_move_next( cursor, &amp;record ) ); n++)
+                {
+                    /* Extract the structure "rec" from the result set record */
+                    status = mcosql_extract_struct(data_source, record, &amp;rec, sizeof(rec), null_indicators);
+                    printf("\t\t%d. %s: salary=%d, rating = %f\n", n + 1, rec.name, rec.salary, rec.rating);
+                }
+                if ( NO_MORE_ELEMENTS != status )
+                {
+                    mcosql_error_handler(status);
+                }
+            } 
+            else
+             {
+                fprintf(stderr, "No person found with name like '%s'\n", name_like);
+            }
+            mcosql_release_query_result( data_source );
+        }
+        return rc;
+    }
+    &#160;</pre>
+                </div>
+                <p>Note the following in this example code:</p>
+                <ul>
+                    <li value="1">	the structure <code>record_t</code> <code>record</code> is used to receive the result set row retrieved by the call to function  <code>mcosql_cursor_move_next()</code>.</li>
+                    <li value="2">	the structure <code>rec</code> is defined to correspond exactly to the database object <i>Person</i> as defined in the <code>schema</code> file. The rules for defining this C <code>struct</code> are as follows:</li>
+                </ul>
+                <blockquote>
+                    <blockquote>
+                        <p>o	The <code>struct</code> must have the same number of components in the same order as the database class.</p>
+                        <p>o	<i>e</i>X<i>treme</i>SQL assumes the default alignment of all structure elements; i.e. the alignment used by the compiler without special align <code>pragmas</code>.</p>
+                        <p>o	<code>Array</code> type components are represented by a pointer to <code>Array</code> value.</p>
+                        <p>o	<code>String</code> components are represented as null-terminated ANSI strings.</p>
+                        <p>o	Nested structures should be represented by the same C <code>struct</code>.</p>
+                        <p>o	If the column does not belong to a database class but is rather the result of some select statement expression or calculation, then its type is determined by the following:</p>
+                    </blockquote>
+                </blockquote>
+                <blockquote>
+                    <blockquote>
+                        <ul style="list-style-type: square;">
+                            <li value="1">	Integer types (<code>char</code>, <code>short</code>, <code>unsigned short</code>, <code>int</code>, …) are represented by type <code>int64_t</code></li>
+                            <li value="2">	floating point types (<code>float</code>, <code>double</code>) are represented by type <code>double</code></li>
+                            <li value="3">	other types are represented as they are (not converted to any other type)</li>
+                        </ul>
+                    </blockquote>
+                </blockquote>
+                <ul>
+                    <li value="1">	for each row in the result set, the row contents  (in <code>record_t</code> record) are extracted into structure rec by calling function <code>mcosql_extract_struct()</code>.</li>
+                    <li value="2">	the <code>null_indicators[]</code> array indicates if any of the columns are null</li>
+                </ul>
+                <p>In addition to the functions demonstrated above, the following functions are provided for processing result set rows:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    /* Get the current transaction within which the specified data source was produced */
+    mcosql_get_current_transaction(data_source_t data_source, transaction_t* trans);
+    &#160;
+    /* Get the number of columns in the specified data source */
+    mcosql_get_number_of_columns(data_source_t data_source, int* n_columns);
+    &#160;
+    /* Get an iterator to iterate over the data source columns */
+    mcosql_get_column_iterator(data_source_t data_source, column_iterator_t* iterator);
+    &#160;
+    /* Get column information. Move the column iterator to the next position and return name
+    and type information for the current column */
+    mcosql_get_column_info(column_iterator_t iterator, type_t* type, char** name);
+    &#160;
+    /* Get column value converted to the specified type. In case of string types,
+    only a pointer to the zero terminated string will be placed in the buffer
+    and it remains valid only until mcosql_release_query_result is executed. */
+    mcosql_get_column_value_as(record_t record, int columnNo, type_t type, void* buffer);
+    &#160;
+    /* Get the value of a structure or array field of the current record for update of
+    its components. This value remains valid only until mcosql_release_query_result
+    is executed. This value can be used only as a SQL statement parameter (used
+    with the '%v' format placeholder). */
+    mcosql_get_column_value_for_update(record_t record, int columnNo, type_t* type, void* value);
+    &#160;
+    /* Set the value of a specified column */
+    mcosql_set_column_value(record_t record, int columnNo, type_t type, void* value);
+    &#160;</pre>
+                    </div>
+                    <p>It is important to note that the internal SQL engine representation of the supported C data types can lead to some questions such as: Why for a field declared as “<code>int4</code>“ (<code>signed&lt;4&gt;</code>) does <code>mcosql_get_column()</code> return an <code>int8</code> value? The answer is that inside the sql engine all integer types are represented by <code>int8</code>, and all floating point values by <code>double</code>. So even if nothing is done with the field (for example <code>select * from foo</code>), the value is still converted to <code>int8</code>. Because this could be inconvenient, the function <code>mcosql_get_column_as()</code> is provided, which converts the column value to the specified type.</p>
+                </blockquote>
+                <h3>Extracting Arrays, Vectors, Structs, Blobs and References</h3>
+                <p>Result set values of type <code>array</code> (or <code>vector</code>), <code>ref</code>, <code>struct</code> and <code>blob</code> require more complicated processing. The following functions are provided for these types of fields.</p>
+                <p>For result set columns corresponding to database fields of type <code>array</code> (or <code>vector</code>):</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    /* Get array length */
+    mcosql_get_array_length(void* array, int* length);
+    &#160;
+    /* Get array element value */
+    mcosql_get_array_element_value(void* array, int index, type_t* type, void* value);
+    &#160;
+    /* Get array element value for update of its components */
+    mcosql_get_array_element_value_for_update(void* array, int index, type_t* type, void* value);
+    &#160;
+    /* Get array body: copy the specified number of elements from the specified offset
+    to the buffer. This method can be used only for arrays of scalar types. */
+    mcosql_get_array_body(void* array, void* dst, int offs, int len);
+    &#160;
+    /* Set array length */
+    mcosql_set_array_length(void* array, int length);
+    &#160;
+    /* Set array element value */
+    mcosql_set_array_element_value(void* array, int index, type_t type, void* value);
+    &#160;
+    /* Set array body: copy the specified number of elements from buffer to the array
+    using the specified offset. This method can be used only for arrays of scalar types. */
+    mcosql_set_array_body(void* array, void* src, int offs, int len);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>The following snippet is an example of code that uses these functions to process an array (or <code>vector</code>)field:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    void process_array(void * value)
+    {
+        unsigned int i, len = 0;
+        mcosql_get_array_length(value, &amp;len);
+        for (i = 0; i &lt; len; i++)
+        {
+            type_t inner_type;
+            void* inner_value;
+            mcosql_get_array_element_value(value, i, &amp;inner_type, &amp;inner_value);
+            /* Do what is needed with the array element */
+        }
+    }
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>For result set columns corresponding to database fields of type <code>ref</code> (reference to another database object):</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    /* Get referenced record (by actual memory address ‘ref’) */
+    mcosql_get_referenced_record(void* ref, record_t* record);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>For result set columns corresponding to database fields of type <code>struct</code>:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    /* Get number of components in the structure */
+    mcosql_get_struct_size(void* s, int* size);
+    /* Get structure component value */
+    mcosql_get_struct_component_value(void* s, int index, type_t* type, void* value);
+    /* Get structure or array component of a structure for updates to its components or elements. */
+    mcosql_get_struct_component_value_for_update(void* s, int index, type_t* type, void* value);
+    /* Set structure component value */
+    mcosql_set_struct_component_value(void* s, int index, type_t* type, void* value);
+    &#160;</pre>
+                    </div>
+                    <p>The following snippet is an example of code that uses these functions to process a <code>struct</code> field:</p>
+                    <blockquote>
+                        <div class="code-block"><pre>    &#160;
+    void process_struct(void * value)
+    {
+        unsigned int i, len = 0;
+        mcosql_get_struct_size(value, &amp;len);
+        for (i = 0; i &lt; len; i++)
+        {
+            type_t inner_type;
+            void* inner_value;
+            mcosql_get_struct_component_value(value, i, &amp;inner_type, &amp;inner_value);
+            /* Do what is needed with the struct field */
+        }
+    }
+    &#160;</pre>
+                        </div>
+                    </blockquote>
+                </blockquote>
+                <p>For result set columns corresponding to database fields of type <code>blob</code> (Binary Large Object):</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    /* Return the number of bytes available to be extracted.
+    NB: This is not the total size of the BLOB, it can be smaller than BLOB size.
+    For example, if the BLOB consists of several segments, it can be the segment size. */
+    mcosql_blob_available_size(void* blob, int* size);
+    &#160;
+    /* Copy BLOB data to the specified buffer. This method copies up to buffer_size bytes
+    from the current position in the BLOB to the specified buffer. Then, the current
+    position is advanced by the number of bytes fetched. */
+    mcosql_blob_get_data(void* blob, void* buffer, int buffer_size, int* n_bytes);
+    &#160;
+    /* Append new data to the BLOB. NB: Append is always performed at the end of the
+    BLOB and doesn't change the current position for the GET method. */
+    mcosql_blob_append_data(void const* blob, void* buffer, int size);
+    &#160;
+    /* Reset the current position to the beginning of the BLOB */
+    mcosql_blob_reset(void* blob);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

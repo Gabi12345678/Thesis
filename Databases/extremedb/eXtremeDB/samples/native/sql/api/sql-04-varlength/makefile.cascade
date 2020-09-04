@@ -1,0 +1,4 @@
+-include $(call mco_makefile_file, \
+blobs/makefile.project.blobs \
+vectors/makefile.project.vectors \
+)

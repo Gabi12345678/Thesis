@@ -1,0 +1,13 @@
+MCO_PRJ_LIST += 08-benchmarks-perf-struct
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 08-benchmarks-perf-struct
+PRJ_08-benchmarks-perf-struct_TAGS:=sample core
+PRJ_08-benchmarks-perf-struct_DIR:=$(call mco_project_dir)
+PRJ_08-benchmarks-perf-struct_SRC:=$(call mco_project_file,main.c create_objects.c hash_search.c search_delete.c sequential.c tree_search.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_08-benchmarks-perf-struct_SCHEMAS:=$(call mco_project_file,structdb.mco)
+PRJ_08-benchmarks-perf-struct_DATABASES:=structdb
+PRJ_08-benchmarks-perf-struct_RUNTIME:=YES
+PRJ_08-benchmarks-perf-struct_MEMDEV:=PRIVATE
+PRJ_08-benchmarks-perf-struct_STORAGE:=TRANSIENT
+PRJ_08-benchmarks-perf-struct_SYNC:=AUTO
+PRJ_08-benchmarks-perf-struct_TRANSMGR:=MURSIW

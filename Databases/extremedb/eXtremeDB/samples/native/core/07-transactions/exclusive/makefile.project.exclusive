@@ -1,0 +1,13 @@
+MCO_PRJ_LIST += 07-transactions-exclusive
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 07-transactions-exclusive
+PRJ_07-transactions-exclusive_TAGS:=sample core
+PRJ_07-transactions-exclusive_DIR:=$(call mco_project_dir)
+PRJ_07-transactions-exclusive_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_07-transactions-exclusive_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_07-transactions-exclusive_DATABASES:=transdb
+PRJ_07-transactions-exclusive_RUNTIME:=YES
+PRJ_07-transactions-exclusive_MEMDEV:=PRIVATE
+PRJ_07-transactions-exclusive_STORAGE:=TRANSIENT
+PRJ_07-transactions-exclusive_SYNC:=AUTO
+PRJ_07-transactions-exclusive_TRANSMGR:=EXCLUSIVE

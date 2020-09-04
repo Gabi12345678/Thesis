@@ -1,0 +1,14 @@
+declare database mixeddb;
+
+transient class A {
+    unsigned<4> ui4;
+    
+    list;
+};
+
+
+persistent class B {
+    unsigned<4> ui4;
+    
+    list;
+};

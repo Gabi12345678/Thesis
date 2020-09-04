@@ -1,0 +1,12 @@
+ts=2020-04-14T14:08:44.748+02:00 lvl=info msg="kapacitor starting" service=run version=1.5.4 branch=HEAD commit=1f648f85772efe222a3853fe1a0d9ef88854a8c1
+ts=2020-04-14T14:08:44.748+02:00 lvl=info msg="go version" service=run version=go1.13.6
+ts=2020-04-14T14:08:44.749+02:00 lvl=info msg="listing Kapacitor hostname" source=srv hostname=localhost
+ts=2020-04-14T14:08:44.749+02:00 lvl=info msg="listing ClusterID and ServerID" source=srv cluster_id=c0da8e42-9a93-48fe-9fd1-e3e9b40fa775 server_id=6a5567c6-07b3-446d-9542-b330e1384468
+ts=2020-04-14T14:08:44.749+02:00 lvl=info msg="opened task master" service=kapacitor task_master=main
+ts=2020-04-14T14:08:44.749+02:00 lvl=debug msg="opening service" source=srv service=*storage.Service
+ts=2020-04-14T14:08:57.606+02:00 lvl=info msg="kapacitor starting" service=run version=1.5.4 branch=HEAD commit=1f648f85772efe222a3853fe1a0d9ef88854a8c1
+ts=2020-04-14T14:08:57.606+02:00 lvl=info msg="go version" service=run version=go1.13.6
+ts=2020-04-14T14:08:57.606+02:00 lvl=info msg="listing Kapacitor hostname" source=srv hostname=localhost
+ts=2020-04-14T14:08:57.606+02:00 lvl=info msg="listing ClusterID and ServerID" source=srv cluster_id=c0da8e42-9a93-48fe-9fd1-e3e9b40fa775 server_id=6a5567c6-07b3-446d-9542-b330e1384468
+ts=2020-04-14T14:08:57.606+02:00 lvl=info msg="opened task master" service=kapacitor task_master=main
+ts=2020-04-14T14:08:57.607+02:00 lvl=debug msg="opening service" source=srv service=*storage.Service

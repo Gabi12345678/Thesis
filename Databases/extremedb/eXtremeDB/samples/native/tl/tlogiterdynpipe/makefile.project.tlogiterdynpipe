@@ -1,0 +1,16 @@
+MCO_PRJ_LIST += tlogiterdynpipe
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += tlogiterdynpipe
+PRJ_tlogiterdynpipe_TAGS:=sample tlog
+PRJ_tlogiterdynpipe_DIR:=$(call mco_project_dir)
+PRJ_tlogiterdynpipe_SRC:=$(call mco_project_file, main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_tlogiterdynpipe_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_tlogiterdynpipe_DATABASES:=tlogiterdynpipedb
+PRJ_tlogiterdynpipe_RUNTIME:=YES
+PRJ_tlogiterdynpipe_MEMDEV:=PRIVATE
+PRJ_tlogiterdynpipe_STORAGE:=TRANSIENT
+PRJ_tlogiterdynpipe_STORAGEDEV:=AUTO
+PRJ_tlogiterdynpipe_SYNC:=AUTO
+PRJ_tlogiterdynpipe_TRANSMGR:=MURSIW
+PRJ_tlogiterdynpipe_F_LOG:=YES
+PRJ_tlogiterdynpipe_F_SERI:=YES

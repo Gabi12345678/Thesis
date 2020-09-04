@@ -1,0 +1,14 @@
+MCO_PRJ_LIST += iot_notify_dev
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += iot_notify_dev
+PRJ_iot_notify_dev_TAGS:=sample iot net
+PRJ_iot_notify_dev_DIR:=$(call mco_project_dir)
+PRJ_iot_notify_dev_SRC:=$(call mco_project_file, main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_iot_notify_dev_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_iot_notify_dev_DATABASES:=iotdevice
+PRJ_iot_notify_dev_RUNTIME:=YES
+PRJ_iot_notify_dev_MEMDEV:=PRIVATE
+PRJ_iot_notify_dev_STORAGE:=TRANSIENT
+PRJ_iot_notify_dev_SYNC:=AUTO
+PRJ_iot_notify_dev_TRANSMGR:=MURSIW
+PRJ_iot_notify_dev_F_IOT:=YES

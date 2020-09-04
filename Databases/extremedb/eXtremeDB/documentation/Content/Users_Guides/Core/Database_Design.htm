@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Database Design Considerations</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Database Design Considerations</h1>
+            <blockquote>
+                <p>This section explains some database design considerations with respect to <i>e</i>X<i>treme</i>DB.  It is not an exhaustive treatment of the topic of database design.  That is a very large subject and well beyond the scope of this document.  Rather, the objective here is to shed light on the workings of <i>e</i>X<i>treme</i>DB in order that developers can make informed database design decisions choosing from the many available options.</p>
+                <h2>Types of Database Design Considerations</h2>
+                <h3>Logical vs. Physical</h3>
+                <p>Logical design considerations involve how you will conceptually organize the data: what objects you will define, how they are interrelated, what means you will employ to affect the relationships, what access methods are required, and the performance requirements of your application.  In this process, you will decide things like: what indexes are needed and of which kind, whether an <i>Object Identifier</i> (<code>oid</code>) will be needed and what its structure should be, which classes will have <code>oids</code>, whether to implement interclass relationships via <code>oid</code> and <code>ref</code>, <code><a name="kanchor93"></a>autoid</code> and <code>autoid_t</code>, via indexes, or to de-normalize and use a <code>vector</code> instead.</p>
+                <p>The physical design considerations are things like: page size, initial database size, incremental extensions, whether certain fields can be <code>optional</code>, and whether classes can be <code>compact</code>.</p>
+                <p><i>e</i>X<i>treme</i>DB imposes very few limitations. However, it is important to be aware of the following:</p>
+                <ul>
+                    <li value="1">There is a limit of 64K (65,536) classes per database.</li>
+                    <li value="2">Each class can have up to 64K fields, subject to a limit of 2^32 (4,294,967,296) bytes per object.</li>
+                    <li value="3">An index can include 64K fields.</li>
+                    <li value="4">A database can have at most 64K indexes.</li>
+                    <li value="5">A database can store 2^32 (or 2^64 on 64 bit platforms) objects per class.</li>
+                    <li value="6">Vectors are limited to 64K elements (vector elements are indexed by an unsigned 2-byte integer).</li>
+                    <li value="7">Page size can be as low as 40 bytes and as much as 64K, but as explained below, this is not a limitation in any practical sense.</li>
+                    <li value="8">Strings are limited to 64K in size. If storing larger strings is a possibility, this will require a <code>blob</code> field.</li>
+                </ul>
+                <h2>Page Size</h2>
+                <p>The <i>e</i>X<i>treme</i>DB<a name="kanchor94"></a> runtime provides its own optimized memory management.  It includes a low-level page manager and a heap manager.  When a database instance is created, memory space is allocated on the heap or claimed (declared) in static memory.  This memory is formatted by the runtime and used the entire time the database exists.  A small portion of this memory is dedicated for database runtime control structures.  The page manager controls the remainder along with any extensions.  The memory is partitioned into pages, each page having the same size (<code>page_size</code>).  The page manager is a very fast and efficient mechanism.  It allows any page released by any consumer (for example, by a <code>tree</code> index) to be used immediately by any other consumer (for example, by the object layout manager).  The <code>page_size</code> parameter is passed to the runtime at the time the database instance is created and affects all the derived memory managers.</p>
+                <p>As a rule of thumb, <code>page_size</code> should be between 60 and 512 bytes; a 100 byte page works fine in most situations.  The <code>page_size</code> should be a multiple of 4, and if it is not the runtime will adjust it internally.  Almost all memory used by the database instance is used to store objects or index data.  The overhead imposed by the index memory managers is not really affected by the <code>page_size</code> when it is larger than 60 bytes.  This is because the fixed part of the index control data is typically between 4 and 12 bytes per page. Therefore, the page size mostly affects the overhead imposed by object layout managers.</p>
+                <p>Objects that have dynamic data fields, such as <code>strings</code> or <code>vectors</code>, always occupy whole pages.  Multiple fixed size objects can share a page. This means, for example, that if the page size is 100 bytes and some object with dynamic fields took 440 bytes including all control data, then 60 bytes (= 5*100 – 440) would be wasted.  It is not really possible to determine in advance the exact optimal page size.  It depends on the object size distribution at runtime: the actual sizes of the dynamic data, the dynamic sequence of operations, and what type of objects will be stored most frequently, etc.  To determine runtime memory requirements, the <i><a href="../../Programming/C/Core_Functions/Static/Auxiliary/Calculator.htm">calculator</a></i> tool is provided to do memory calculations using the actual application database dictionary and specified numbers of objects.  The statistics generated by the <i>calculator</i> make it easy to adjust the page size parameter in order to optimize memory use.</p>
+                <h2>Initial Database Size</h2>
+                <p><i>e</i>X<i>treme</i>DB allows the application to define multiple memory devices at runtime. If the maximum amount of memory that can be used for storage is known, it can be specified in the database open parameters to claim that memory in advance.  The runtime creates a page manager that uses contiguous address space for object storage. Once claimed, the physical memory cannot be returned back to the operating environment without destroying the database.  So, if the maximum database size is not known in advance, the application can claim a reasonably sized block of memory first and then extend that amount at runtime as necessary.</p>
+                <h3>Extending Database Size</h3>
+                <p>Practically, there are no performance penalties associated with extending database memory and the application doesn’t need to be aware of how the page manager works.  The only issue to be concerned about with memory extension is that none of the “database” memory can be returned back to the operating system without destroying the database content.  (For a detailed discussion of memory management see the <a href="Database_Control.htm">Database Control</a> pages).</p>
+                <h2>Using OIDs</h2>
+                <h3>Estimating the Number of oid Entries</h3>
+                <p>A custom <code>oid</code> can be defined for C, C++ and Python applications in the database schema. (<code>oids</code> are not supported in the Java and C# APIs.) The DDL specification requires an estimate of the total number of <code>oids</code> that will be created. This number is used by the runtime to build the <code>oid</code> hash table.  (See the section <a href="Indexes_Cursors/Hash_Autoid.htm">Hash and Autoid Indexes</a> page for an explanation of how to specify static and dynamic hash tables and how they are managed by the <i>e</i>X<i>treme</i>DB runtime.)</p>
+                <h3>oid Design Considerations</h3>
+                <p>Classes should use an <code>oid</code> if the application data model <i>has one</i>.  In other words, if objects described in the schema have some native identifying information and that information is common between objects of different types, then an <code>oid</code> is a natural way to represent this model.  If the application’s objects are identified differently depending on their type, then an <code>oid</code> should not be used.  The <code>oid</code> can have several fields, but they must be of fixed size.</p>
+                <h2>Use of Structures</h2>
+                <p>The <i>e</i>X<i>treme</i>DB structure meaning and usage is almost the same as in C.  A <code>struct</code> declaration names a type and specifies a list of elements of the structure that can have different types.  Structures and simple types are building blocks to construct object definitions.  Structures can be used as fields of other structures.  In contrast to C/C++ though, <i>e</i>X<i>treme</i>DB structures cannot be instantiated without a class, nor do they take any memory by themselves; they can only exist as a field of an object.  <i>e</i>X<i>treme</i>DB structures merely present a compact way to program with data that is used across multiple classes.  Also, it is very common for applications to use structures as <code>vector</code> fields.  There are a couple of unconventional (not C-like) ways that <i>e</i>X<i>treme</i>DB uses structures: the declaration of an <code>oid</code> requires a structure (even if the <code>oid</code> is a single field), and use of <code>optional</code> fields; only structure fields can be declared as <code>optional</code>.</p>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that 	<i>e</i>X<i>treme</i>DB allows indexing by structure field(s) even when the structure is used as a <code>vector</code> field.</p>
+                <h2>Compact Modifier for Class Declarations</h2>
+                <p>The <code>compact</code> class qualifier limits the size of the class’ elements to 64K.  This is because 2-byte offsets are used instead of 4-byte offsets to address within each object’s layout.  Obviously, there is an overhead imposed by <i>e</i>X<i>treme</i>DB to support certain data layouts.  A large portion of this overhead is due to the fact that dynamic data types are supported, such as <code>vectors</code>, <code>strings</code> and <code>optional</code> fields.  For instance, each <code>string</code> field is implemented as an offset to the actual data.  For a <code>compact</code> class this offset is 2 bytes, otherwise it is 4 bytes.  Another example is an <code>optional</code> field.  It is common in applications for some data to not be known at the time of creation for a particular object.  Instead of reserving space for such data within each object, it can be declared as <code>optional</code>.  <i>e</i>X<i>treme</i>DB will place an offset to the actual data within the data layout.  Then if data is not present (or has been erased) this offset is null.  The space for the structure is only allocated when necessary to store the data.  All these offsets are 2-bytes in the <code>compact</code> model.</p>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that the total 64K limit of a <code>compact</code> object size does not include <code>blobs</code> defined for the class. It is still possible to have a large <code>blob</code> (&gt; 64K in size) for <code>compact</code> classes. Addressing within a <code>blob</code> is not affected by the <code>compact</code> declaration.</p>
+                <p>The <code>–c</code> or <code>–compact</code> options for the <code><a href="../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a></code> schema compiler can be used to make all classes of a database <code>compact</code>.</p>
+                <p>For example, consider a class that contains two <code>string</code> fields and one <code>optional</code> structure.  For 1000 objects of this class, the <code>compact</code> declaration would save (at least) 3*2*1000 = 6000 bytes of overhead (3 fields, 2 bytes less overhead each, times 1000 objects equals 6,000 bytes).</p>
+                <p>The only limitation with <code>compact</code> classes is the total size of an object, 64K.  If it is known that objects of a class will always require less than 64K it is beneficial to use the compact qualifier.</p>
+                <h2>Char&lt;n&gt; vs. String</h2>
+                <p>The <code>char&lt;n&gt;</code> declaration defines a fixed length byte array of <code>n</code> bytes (where n &lt;= 64K).  The <code>string</code> declaration defines a variable length byte array &lt;= 64K.  In the case of <code>char&lt;n&gt;</code>, <code>n</code> bytes will be consumed for this field by every object (instance of the class).  It is best to use <code>char&lt;n&gt;</code> when exactly <code>n</code> bytes are used in every instance, as for example in a social security number field that is a required entry.  In the case of a string element, <i>e</i>X<i>treme</i>DB imposes 2 or 4-bytes overhead (depending on the <code>compact</code> qualifier, see above) for each instance.</p>
+                <h2>Blob</h2>
+                <p>An object having K allocated <code>blobs</code> has (4 + 8*K) bytes allocated within the object layout.  A 32-byte header is written for each <code>blob</code> when it is stored, within the first <code>blob</code> page, plus 8 bytes for the 2nd through N-th pages.</p>
+                <h2>Vector</h2>
+                <p>Like <code>string</code> and <code>blob</code>, a minimum of 2-bytes or 4-bytes of overhead is imposed for each <code>vector</code> of each object.  If the <code>vector</code> is of structures or strings, then the overhead is 2 * (N+1) (compact) or 4 * (N+1) (normal) where N is the number of elements in the <code>vector</code>.  If the <code>vector</code> is a simple type, the overhead is only 2 (<code>compact</code>) or 4 (normal) bytes.</p>
+                <p><code>Vectors</code>, unlike <code>blobs</code>, have structure. The elements of a <code>vector</code> can be efficiently located by offset within the <code>vector</code>.  In contrast, <code>blob</code> access methods are like sequential file access - the <code>blob</code> is a series of bytes, exactly as a file is. Because of this, it is always better to use a <code>vector</code> when the data is regular in nature and needs to be accessed by the element number.</p>
+                <h2>Variable vs. Fixed Length Elements</h2>
+                <p>This discussion applies to <code>char</code> / <code>string</code> (and Unicode variants) and fixed-size <code>arrays</code> versus <code>vectors</code>.</p>
+                <p><i>e</i>X<i>treme</i>DB stores all fixed-size elements of a class on a single page and variable length elements on separate pages (to allow them to grow).  The page with the fixed-size elements contains a 2- or 4-byte offset for each variable length field.</p>
+                <p>As a consequence, using variable length fields may actually use database space less efficiently than defining a fixed length element even knowing that a portion of the fixed length element may go unused.</p>
+                <p>For example, suppose we have a page size of 100 bytes and a character field that might hold between 8 and 50 characters, with the average length being 18. A field definition of <code>char&lt;50&gt;</code> will leave 32 bytes, on average, unused.  But a <code>string</code> field will use 2 (or 4) extra bytes and leave at least 50 bytes unused on the page that <i>e</i>X<i>treme</i>DB uses for the <code>string</code> field.  In this circumstance, a fixed length character field would be better. Conversely, a character field that must allow for up to 256 bytes would be better defined as a <code>string</code> field.</p>
+                <p>The same basic principle applies to the choice of fixed length <code>arrays</code> or variable length <code>vectors</code>.</p>
+                <h2>Optional Structure Fields</h2>
+                <p>Only structures can be declared <code>optional</code>, so to make a single field <code>optional</code>, it must be included in a structure with just that one field as an element. If a structure is declared <code>optional</code>, 4 bytes (normal) or 2 bytes (compact) are used by <i>e</i>X<i>treme</i>DB for the offset. This is the overhead of an <code>optional</code> structure compared to an ordinary structure.  Obviously, if a structure is always present, there is no advantage to declaring it <code>optional</code>.</p>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that <code>optional</code> structure elements cannot be used in an index.</p>
+                <h2>Voluntary Indexes</h2>
+                <p>The advantages of indexes on a class are fast searches and runtime-maintained order (for all but <code>hash</code> indexes).  It naturally requires additional time to create or modify the index on inserts, updates and deletes and extra memory space to keep index control structures.  Normally, indexes are created at the time of database instance initialization and are maintained during the life of the database.  However, some indexes are useful for a particular purpose or task only, and after the completion of that task the index is no longer needed.  Another common scenario is the need for fast processing at a certain point of execution, i.e. an application could be required to acquire boot stage data faster or have some other period at a high transaction rate, but without performing any complex searches at that time, while normally the transaction rate is lower but search operations must be complex and fast.  Here a <code>voluntary</code> index can be used (unless a <code>hash</code> index  is required – <code>hash</code> indexes cannot be <code>voluntary</code>) and index creation deferred until after the critical performance period.</p>
+                <p><code>Voluntary</code> indexes can be created, used for a series of transactions and then destroyed.  Because index creation is a relatively “heavy” operation, it does not make sense to always create an index if all that is needed is to perform a few searches at some particular time during execution.  In this case the indexes can be declared <code>voluntary</code> and built as needed prior to the search operation.</p>
+                <p><code>Voluntary</code> indexes use the same algorithms and consume the same space as regular indexes; they differ only by their ability to be created and destroyed dynamically, and by the fact that <code>voluntary</code> indexes are not created automatically when the database instance is created.</p>
+                <h2>Hash and Tree Indexes</h2>
+                <p><i>e</i>X<i>treme</i>DB provides <code>hash</code> index algorithms and <code>tree</code> index algorithms of a rich variety of types, modified for efficient operations in memory when the associated class is <code>transient</code>.  The b-tree index algorithm is the most general; it can be used for all kinds of searches and for ordered fetches.  A b-tree index can be unique or not unique and is searchable by ranges and partial key values.  In addition to the b-tree, <i>e</i>X<i>treme</i>DB provides specialized tree-type indexes including “Patricia Trie”, “R-Tree” and “Kd-Tree” that are described in detail in the <a href="Indexes_Cursors.htm">Indexes and Cursors</a> pages.  A <code>hash</code> index is only suitable for search by equality, or for an unordered sequential scan, and can also be <code>unique</code> or <code>nonunique</code>. <code>Hash</code> indexes can exhibit better average performance, for both insert and lookup operations, compared to a <code>tree</code> index, but this also depends on the initial <code>hash</code> table size and on key distribution.</p>
+                <p>In the ideal case, the hash table will be sized to contain one entry (sometimes called a “bucket”) for each database object being indexed which means that a single hash table lookup (a simple hash function calculation) will suffice to access each database object. But in reality, regardless of the table size, the hash function does not guarantee a unique value and consequently multiple index values can map to the same bucket (called a “conflict”) and a linked list of object pointers (called a “collision chain”) will result.</p>
+                <p>So if the number of database objects is known beforehand, this number can be specified in the schema declaration for the index and will result in optimal performance. But if the number of database objects cannot be known with a reasonable degree of confidence, an <i>e</i>X<i>treme</i>DB feature called <i>dynamic hash</i> will automatically re-allocate the hash table as needed. This will avoid (a) long collision chains if the estimated number of objects is too small, or (b) wasting memory in the case of an overly cautious large estimate. (Please refer to the <a href="Indexes_Cursors/Indexes_Cursors_C.htm">C API Indexes and Cursors</a> page for further details on dynamic hash.)</p>
+                <p>Memory consumption is comparable for <code>tree</code> and <code>hash</code> indexes of transient classes. The <a href="Indexes_Cursors/Hash_Autoid.htm">Hash and Autoid index</a> page gives a method for estimating index memory consumption. </p>
+                <h2>List Indexes</h2>
+                <p>Each <code>list</code> declaration will create an additional dynamic structure, which will consume resources similar to those taken by a tree index.  The <code>list</code> declaration is useful when:</p>
+                <ul>
+                    <li value="1">objects of a class have to be accessed sequentially</li>
+                    <li value="2">the application does not require any particular order in which objects are accessed</li>
+                    <li value="3">there is no suitable index for the class</li>
+                </ul>
+                <p>
+                    <img src="../../Resources/Images/note.png" /> Note that the <code>list</code> declaration is a deprecated feature, supported for backward compatibility.  <i>e</i>X<i>treme</i>DB version 4.0 introduced the possibility to instantiate a cursor over the entries of a <code>hash</code> index, eliminating the need for <code>list</code> cursors.</p>
+                <h2>Vector of Structs vs. Objects of a Class</h2>
+                <p>An object is characterized, in part, by the fact that when it is deleted all of its dependent parts are deleted (i.e. all its scalar fields, <code>structs</code>, <code>arrays</code>, <code>vectors</code>, <code>strings</code> and <code>blobs</code>).  To accomplish this, these dependent parts of an object are stored using an object layout manager.  In order to express one-to-many relationships between parts of the object it may be very efficient to use a <code>vector</code>. For example, a <code>vector</code> of <code>strings</code> will take only 2 or 4 bytes for the <code>vector</code> itself plus 2 or 4 bytes overhead per <code>string</code>, whereas making a separate object from each <code>string</code> will require at least one page for each <code>string</code>, so the overhead may be more significant.  <code>Vectors</code> are useful when the object model in an application already contains dynamically structured items.  Say, for example, an application needs to collect radar measurements for various “Targets”, and that each measurement is a set of structures.  Its database could be defined as follows:</p>
+                <div class="code-block"><pre>&#160;
+    struct Target
+    {
+        uint2 x;
+        uint2 y;
+        uint2 dx;
+        uint2 dy;
+        uint2 type;
+    };
+&#160;
+    class Measurement
+    {
+        uint4 timestamp;
+        uint4 radar_number;
+        vector&lt; Target &gt; targets;
+    }
+    &#160;</pre>
+                </div>
+                <p>Alternatively, in “normalized” form, it could be defined:</p>
+                <div class="code-block"><pre>&#160;
+    class Target2
+    {
+        uint4  m_unique_id; // ref to measurement
+        uint2 x;
+        uint2 y;
+        uint2 dx;
+        uint2 dy;
+        uint2 type;
+    }
+&#160;
+    class Measurement2
+    {
+        uint4 m_unique_id;
+        uint4 timestamp;
+        uint4 radar_number;
+    }
+    &#160;</pre>
+                </div>
+                <p>As an exercise, build an application that stores an intensive stream of <i>Measurements</i> and makes some simple lookups of the data.  For instance, one that deletes all <i>Measurements</i> that are older then 30 minutes and periodically requests radar beacons (indicated by the field <code>radar_number</code>) that have detected targets of a given type.  It will demonstrate that the first (<i>e</i>X<i>treme</i>DB) approach will perform far faster and will take far less space because fewer objects have to be maintained and fewer operations have to be performed.</p>
+                <p>&#160;</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

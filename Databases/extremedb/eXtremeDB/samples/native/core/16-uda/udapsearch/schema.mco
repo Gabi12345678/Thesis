@@ -1,0 +1,20 @@
+/******************************************************************
+ *                                                                *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.      *
+ *                                                                *
+ ******************************************************************/
+
+#define int4      signed<4>
+
+declare database  udapsearch;
+
+class TestClass 
+{
+	string 		key;
+	char<20> 	k2;
+	int4 		k3;
+	int4 		v1;
+
+	list;
+	tree <key,k2,k3> i1;
+};

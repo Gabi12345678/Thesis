@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += BTree
+PRJ_TARGET_CLASS += BTree
+PRJ_BTree_TAGS:=sample core java
+PRJ_BTree_DIR :=$(call mco_project_dir)
+PRJ_BTree_SRC :=$(call mco_project_file,BTree.java)

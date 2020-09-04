@@ -1,0 +1,102 @@
+/************************************************************
+ *                                                          *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.*
+ *                                                          *
+ ************************************************************/
+
+#define int1      signed<1>
+#define int2      signed<2>
+#define int4      signed<4>
+#define int8      signed<8>
+#define uint8     unsigned<8>
+#define uint4     unsigned<4>
+#define uint2     unsigned<2>
+#define uint1     unsigned<1>
+
+declare database  uda4;
+declare oid       Passport[100];
+
+struct Country
+{
+	char<3> c_code;
+	string  name;
+};
+
+struct Date
+{
+	uint1   day;
+	char<3> month;
+	uint2   year;
+};
+
+struct Passport
+{
+	char<8> series;
+	uint8    number;
+};
+
+struct PostalAddress
+{
+	Country  country;
+	string   city;
+	string   street;
+};
+
+struct Phone
+{
+	int2    country;
+	char<5> area;
+	char<7> number;
+};
+
+struct Residence
+{
+	PostalAddress where;
+	Date since;
+	optional Phone   phone;
+};
+
+struct Office
+{
+	PostalAddress         where;
+	string          organization;
+	string          position;
+	vector<Phone>   phone;
+};
+
+class Person
+{
+	string    name;
+	Residence residence[3];
+	optional Office    office;
+	optional Phone     mobile;
+	blob      description;
+
+	oid;
+	autoid[100];
+	list;
+};
+
+compact class Children
+{
+	ref    father;
+	ref    mother;
+	string name;
+	float  height;
+	double weight;
+	date   age;
+
+	autoid[200];
+
+	list;
+};
+
+class Dog
+{
+	string name;
+	ref    owner;
+
+	autoid[1000];
+
+	list;
+};

@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 parser = argparse.ArgumentParser(description = 'Script to run Recov in Kairos')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synth_1K.txt')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/real.txt')
 parser.add_argument('--lines', nargs='*', type=int, default = [100],
         help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 10 --columns 4" will try (10, 4)')
 parser.add_argument('--columns', nargs='*', type=int, default = [100],
@@ -21,7 +21,6 @@ parser.add_argument('--start_time', nargs='?', type=int,
 args = parser.parse_args()
 args.db_dir = os.path.abspath("../kairosdb/build/h2db/")
 args.kairos_path = os.path.abspath("../kairosdb/bin/kairosdb.sh")
-
 
 def get_size(start_path = args.db_dir):
 	total_size = 0

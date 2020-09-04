@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|Java API|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Create/Open Databases in Java</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Create/Open Databases in Java</h1>
+            <blockquote>
+                <p>As demonstrated in the <a href="../../../Getting_Started/Quick_Start/QS_Java/QS_Java2.htm">Java Quick Start</a>,  databases are created by the <i>Database</i> method <code>open()</code>. There are two versions of the <code>open()</code> method:</p>
+                <div class="code-block"><pre>&#160;
+    open( String dbName, Parameters params, long size)
+&#160;
+    open( String dbName, Parameters params, Devices[] devices)
+&#160;</pre>
+                </div>
+                <p>The first version is appropriate for In-Memory databases as it allows simply specifying the database <code>size</code> as the third argument. The second version is necessary if a shared memory device or additional <a href="Devices_Java.htm">memory devices</a> are required, which is typically necessary only for persistent databases. However for an In-Memory database an additional one or more <a href="Devices_Java.htm">memory devices</a> could be necessary if database memory might need to be extended.</p>
+                <p class="BodyParagraph">For an in-memory database the relevant parameters are described below. For persistent databases there are additional considerations. Please use the following link to view detailed instructions for creating or opening <a href="../Persistent_Databases/Database_Control/Persistent_Open_Java.htm">persistent databases</a>.</p>
+                <h2>Database Parameters</h2>
+                <p>The <i>Database.Parameters</i> class is used to specify the classes that will be stored in the <i>e</i>X<i>treme</i>DB<a name="kanchor993"></a> database and other properties that determine runtime behavior. The <i>Database.Parameters</i> constructor initializes the database parameters with default values. For In-Memory databases, apart from the default values, typically the only parameters to specify are <code>memPageSize</code>, <code>classes</code> and <code>maxConnections</code>. For example:</p>
+                <div class="code-block"><pre>    &#160;
+    public static void main(String[] args)
+    {
+        ...
+        Database.Parameters params = new Database.Parameters();
+        ...
+        params.memPageSize = 128; // Memory page size
+        params.classes = new Class[] { OpenObj.class }; // List of classes that will be stored in eXremeDB database.
+        params.maxConnections = 10;
+        &#160;</pre>
+                </div>
+                <p>The key properties of the <i>Database.Parameters</i> class for in-memory databases are:</p>
+                <table class="TableStyle-FunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">memPageSize</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The size in bytes of the database object and index pages</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">diskPageSize</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><i>Set to zero</i> to indicate an in-memory database (and disable disk operations)</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">classes</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The list of Java classes that will be stored in <i>e</i>X<i>treme</i>DB database (The classes must use @Persistent annotation)</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">maxConnections</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">The total number of connections allowed to the database</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2>Memory page size</h2>
+                <p>The <code>memPageSize</code> property defines the size of memory pages for conventional memory.  The <code>memPageSize</code> can be calculated to optimize performance and will vary depending on the application dynamics, but as a rule of thumb, page size should be between 80 and 512 bytes; a 128 byte page size is good in most situations. </p>
+                <p>(Note that for all-in-memory databases <code>diskPageSize</code> will be set to zero by the <i>Database.Parameters</i> constructor.)</p>
+                <p>(Also note that <code>rtree</code> indexes require larger page sizes. If error codes <code>MCO_ERR_RTREE</code> or <code>MCO_E_DISK_PAGE_POOL_EXHAUSTED</code> are encountered during database transactions, increase the page size in increments until these error codes are remedied.) </p>
+                <h2>Max  database connections</h2>
+                <p>The <code>maxConnections</code> property specifies the maximum number of connections that will be managed for this database. </p>
+                <h2>Example</h2>
+                <p class="BodyParagraph">Typical application code to create  an in-memory database could look like the following:</p>
+                <div class="code-block"><pre>    &#160;
+    static final int DATABASE_SIZE = 16*1024*1024;
+    &#160;
+    public static void main(String[] args)
+    {
+        Database db = new Database();
+        Database.Parameters params = new Database.Parameters();
+        ...
+        params.memPageSize = 128; // Memory page size
+        params.classes = new Class[] { Record.class }; // List of classes that will be stored in eXremeDB database.
+        &#160;
+        db.open("operations-db", params, DATABASE_SIZE);
+        &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

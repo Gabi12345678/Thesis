@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Manipulator Java SequenceIterator Methods</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <h1>Manipulator Java <i>SequenceIterator</i> Methods</h1>
+            <blockquote>
+                <p>The <i>manipulator</i> Java <i>SequenceIterator</i> methods take a variety of  sequence arguments and produce <i>result</i> sequences  as described in the table below:</p>
+                <table class="TableStyle-FunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../../Resources/TableStyles/FunctionReference.css');" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 445px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 511px;" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><span style="font-family: Arial;">SequenceIterator </span><b style="font-family: Arial;">parse</b><span style="font-family: Arial;">(String val, Sequence.Type type)</span></code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Construct a sequence from the string literal <code>val</code> or the <code>type</code> specified; i.e. "{1.0, -1.1, 0}"</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><span style="font-family: Arial;">SequenceIterator </span><b style="font-family: Arial;">map</b><span style="font-family: Arial;">(SequenceIterator positions)</span></code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Extract from the underlying sequence the elements with positions specified in the provided sequence.
+     The <code>positions</code> should be provided in ascending order (they are intended to be obtained using methods <code>filterPos()</code>or <code>topPos()</code>)</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><span style="font-family: Arial;">SequenceIterator[] </span><b style="font-family: Arial;">tee</b><span style="font-family: Arial;">()</span></code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Fork the sequence iterator; i.e. create two instances of iterators for the same sequence. These iterators should be traversed together (used in the same expression).
+  Return an array with the pair of forked iterators
+</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><span style="font-family: Arial;">SequenceIterator </span><b style="font-family: Arial;">constant</b><span style="font-family: Arial;">(double val, Sequence.Type type)</span></code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Construct a sequence of the <code>type</code> specified with the double constant value <code>val</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><span style="font-family: Arial;">SequenceIterator </span><b style="font-family: Arial;">constant</b><span style="font-family: Arial;">(long val, Sequence.Type type)</span></code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Construct a sequence of the <code>type</code> specified with the long constant value <code>val</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><span style="font-family: Arial;">SequenceIterator </span><b style="font-family: Arial;">constant</b><span style="font-family: Arial;">(byte[] val, Sequence.Type type)</span></code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Construct a sequence of the <code>type</code> specified with the byte array constant value <code>val</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><span style="font-family: Arial;">SequenceIterator </span><b style="font-family: Arial;">concat</b><span style="font-family: Arial;">(SequenceIterator tail)</span></code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Concatenate the two sequences: eg. for sequence <code>{1,2,3}</code>, <code>concat({4,5})</code> would produce result sequence <code>{1,2,3,4,5}</code>.
+    Return result sequence iterator
+</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><span style="font-family: Arial;">SequenceIterator </span><b style="font-family: Arial;">cat</b><span style="font-family: Arial;">(SequenceIterator other)</span></code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Concatenate the two sequences: eg. for sequence <code>{('a','b','c'}</code>, </p>
+                                <p><code>cat({'x','y','z'})</code> would produce result sequence <code>{'ax', 'by', 'cz'}</code>.
+    Return result sequence iterator
+</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">SequenceIterator <b>unique</b>()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Copy to the <i>result</i> sequence only the unique elements in ordered sequence <i>input</i> by "collapsing duplicates"</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">SequenceIterator <b>normalize</b>()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return the normalized <i>input</i> sequence; i.e. divide each sequence element by the square root of the sum of squares of all elements</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"> SequenceIterator <b>thin</b>(long origin, long step)</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Copy  the <i>input</i> sequence to <i>result</i> selecting elements with the specified <i>origin</i> and <i>step</i></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">SequenceIterator <b>limit</b>(long from, long till)</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Copy to the <i>result</i> sequence the sub-sequence from the <i>input</i> using sequence positions <i>from</i> and <i>till</i>. </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">SequenceIterator <b>reverse</b>()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return in <i>result</i> the sequence in reverse order</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">SequenceIterator <b>diff</b>()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return in <i>result</i> the differences between pairs of sequence elements in <i>input</i>.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">SequenceIterator <b>trend</b>()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return in result the value 1, -1 or 0 determined by comparing pairs of element values to determine if the values are trending up or down (See page <a href="../../../SQL/Analytics_Functions/Manipulator/SQL_Trend.htm">SQL Sequence Trend Function</a> for a detailed description)</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">SequenceIterator <b>repeat</b>(int count)</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return in <i>result</i> each element of the <i>input</i> sequence repeated <i>n_times</i> times.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p>SequenceIterator <b>stretch</b>(SequenceIterator ts1, SequenceIterator ts2, long filler)</p>
+                                <p>also</p>
+                                <p>SequenceIterator <b>stretch</b>(SequenceIterator ts1, SequenceIterator ts2, double filler)</p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Return in <i>result</i> the elements of the <i>values</i> sequence stretched to the length of the <i>ts1</i> sequence by repeating the elements of <i>values</i> while the corresponding timestamp in sequence <i>ts2</i> is larger than timestamp from <i>ts1</i>. Use the <i>filler</i> values for elements where the corresponding timestamp in sequence <i>ts2</i> is less than timestamp from <i>ts1</i>. </p>
+                                <p>For example, assume <i>ts1</i> = <code>{1,2,3,4,5}</code>, <i>ts2</i> = <code>{2,4}</code>, <i>values</i> = <code>{1.1,2.2}</code> and <i>filler</i> =<code>1.0</code>. With these input sequences the <i>result</i> will be <code>{1.1,2.2,2.2,1.0,1.0}</code>. </p>
+                                <p>(This method can be used to calculate <i>split adjusted price</i> where it is necessary to revert time series of splits, calculate the cumulative product and multiply on price.)</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                                <p>SequenceIterator <b>stretch0</b>(SequenceIterator ts1, SequenceIterator ts2, long filler)</p>
+                                <p>also</p>
+                                <p>SequenceIterator <b>stretch0</b>(SequenceIterator ts1, SequenceIterator ts2, double filler)</p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return in <i>result</i> the elements of the <i>values</i> and <i>filler</i> sequences by injecting the elements of <i>values</i> where the corresponding timestamps in sequence <i>ts2</i> match the timestamp from <i>ts1</i>. Use the <i>filler</i> values for elements where the  timestamp in sequence <i>ts2</i> has no matching timestamp in <i>ts1</i>. For example, assume <i>ts1 </i>= <code>{1,2,3,5}</code>, <i>ts2</i> = <code>{2,3,4}</code>, <i>values</i> = <code>{1.1,1.2,1.3}</code> and <i>filler</i> = <code>0.0</code>. With these input sequences the <i>result</i> will be <code>{0.0,1.1,1.2,1.3,0.0}</code>.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">SequenceIterator <b>asofJoin</b>(SequenceIterator ts1, SequenceIterator ts2)</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return in <i>result</i> the elements of the <i>values</i> sequence corresponding to the timestamp of <i>ts2</i> closest to the timestamp of <i>ts1</i>. For example, assume <i>ts1</i> = <code>{4,9}</code>, <i>ts2</i> = <code>{1,3,6,10}</code>, and <i>values</i> = <code>{0.1,0.3,0.6,1.0}</code>. With these input sequences the <i>result</i> will be  <code>{0.3,1.0}</code>.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">SequenceIterator <b>cast</b>(Sequence.Type type)</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return in <i>result</i> the sequence converted to the specified <code>type</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">SequenceIterator <b>cross</b>(int firstCrossDirection)   </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return in <i>result</i> the positions in the <i>input</i> sequence where it crosses zero. If the integer argument <i>first_cross_direction</i> is positive then the <i>result</i> sequence starts with the first cross above zero; if negative it starts with cross below zero; if <i>first_cross_direction</i> is zero then it doesn't matter, i.e. the first cross can be above or below zero.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">SequenceIterator <b>extrema</b>(int firstExtremum)</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Return in <i>result</i> the positions  of extrema (local minimum and maximums) in the <i>input</i> sequence. If the integer argument <i>first_extremum</i> is positive then the <i>result</i> sequence starts with first local maximum; if negative it starts with with local minimum; if <i>first_extremum</i> is zero then it doesn't matter.</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">
+                                <p>SequenceIterator <b>hash</b>()</p>
+                                <p>also</p>
+                                <p>SequenceIterator <b>hash</b>(SequenceIterator other)</p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">&#160;</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2>Example</h2>
+                <p>Following is an example code snippet demonstrating <i>sequence manipulator</i> methods:</p>
+                <div class="code-block"><pre>        &#160;
+    public static void windowAggregate(Connection con)
+    {
+        con.startTransaction(Database.TransactionType.ReadOnly);
+        Cursor&lt;Quote&gt; cursor = new Cursor&lt;Quote&gt;(con, Quote.class, "symbol");
+        for (Quote quote : cursor) 
+        {
+            SequenceIterator cross = quote.day.map(quote.close.iterator().
+                            windowAggAvg(20).sub(quote.close.iterator().
+                            windowAggAvg(5)).cross(1));
+            ...
+        }
+        con.commitTransaction();
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

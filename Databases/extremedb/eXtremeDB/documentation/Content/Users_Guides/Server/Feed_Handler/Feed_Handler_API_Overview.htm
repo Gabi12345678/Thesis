@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The eXtremeDB Feed Handler C API Overview</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>The <i>e</i>X<i>treme</i>DB Feed Handler API Overview</h1>
+            <blockquote>
+                <p>The Feed Handler Application Programming Interface allows the users to create their own extension modules that handle market data feeds not currently supported by the <i>e</i>X<i>treme</i>DB Feed Handler.</p>
+                <p>The modules are implemented as shared libraries on Linux and macOS, and as DLLs on Windows. They should be linked with the Feed Handler library, <code>libfh</code>, as well as any third-party libraries and frameworks required to handle specific feeds.</p>
+                <p>The <code>libfh</code> library exposes a number of C functions that facilitate module configuration, database schema definition, data storage, etc. These functions are referred to as the “Feed Handler API” (or simply <i>API</i> for brevity).</p>
+                <p>Furthermore, each module is expected to export a certain predefined set of C functions. The Feed Handler application will call these functions to manage the module. These functions are referred to as the “Feed Handler Module API” (or <i>ModAPI</i>).</p>
+                <p>The modules can be implemented in C or C++, or in any other language of choice, as long as it allows for usage of C APIs, and provides means to create shared libraries or DLLs.</p>
+                <p>(See page <a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Feed_Handler.htm">Feed Handler C API</a> for detailed description of the individual functions.)</p>
+                <h2>Feed Handler Module API Usage</h2>
+                <h3>Module Lifetime Overview</h3>
+                <p>Upon launch, the Feed Handler application loads and parses its configuration file. The configuration file lists handler modules that do the actual job of receiving and handling data, and their configurations. For each module, the Feed Handler application loads its shared library. It uses the name of the module (as specified in the “<code>name</code>” field) as the base name of the module library. For example, if the name is “testfeed”, the Feed Handler will look for the <code>libtestfeed[_debug].so</code> library on Linux/macOS and <code>testfeed[_debug].dll</code> on Windows. The debug versions of the libraries are loaded by the debug version of the Feed Handler executable. Standard shared library search paths are used for each platform.</p>
+                <p>After loading the module library, the Feed Handler application searches it for the <i>ModAPI</i> functions and checks the module’s version (see the <code>mco_fh_mod_api_version()</code> function description). If the check passes, it calls the module’s <code>mco_fh_mod_create()</code> method.</p>
+                <p>Next, the application initializes the module. The configuration file defines the following entities:</p>
+                <ul>
+                    <li value="1"><b>Data sources</b>: service endpoints providing market data of interest; the exact semantics of this field depend on the module and are described in its documentation.</li>
+                    <li value="2"><b>Subscriptions</b>: market data symbol names and the names of the data sources that provide them.</li>
+                </ul>
+                <p>The application uses the <code>mco_fh_mod_add_data_source()</code> and <code>mco_fh_mod_add_subscription()</code> <i>ModAPI</i> functions to pass these entities to the module.</p>
+                <p>Then the application calls the <code>mco_fh_mod_init()</code> <i>ModAPI</i> function. The module is expected to connect to the data sources, load dictionaries, metadata, etc. that will be needed for the next steps.</p>
+                <p>The Feed Handler application does not have any knowledge about the modules’ data schema. Thus, each module is required to supply the metadata that describes the types of its records and their fields. There are two ways to implement this:</p>
+                <blockquote>
+                    <p>1. The application calls <code>mco_fh_mod_fill_metadata()</code> function. If the module knows all names and types of its data fields, it can pass them to the Feed Handler using the <code>mco_fh_metadata_add()</code> function.</p>
+                    <p>2. Alternatively, if the module cannot supply all possible fields for all supported tables at once (e.g. there are too many fields and it is not known beforehand which fields will appear in which tables), the <code>mco_fh_mod_fill_metadata()</code> function should return <code>MCO_FH_E_NOT_IMPLEMENTED</code>. In this case, the Feed Handler application will call the module’s <code>mco_fh_mod_get_field_info()</code> function to retrieve the types of fields configured by the user. The module responds with the field type specification (<code>type</code>, <code>size</code> and <code>precision</code>).</p>
+                </blockquote>
+                <p>When the metadata is specified, the Feed Handler application creates the tables in the database using the table mappings provided by the user and the modules’ metadata. Then, it tells the module which tables and fields to write via the <code>mco_fh_mod_add_table()</code> function. The module should store the table name and its fields (and the fields’ ordering). The table name will be used to instantiate database writers, and the field information will be used to fill out database records.</p>
+                <p>When all the tables are passed to the module, the module execution is started. The application calls its <code>mco_fh_mod_start()</code> function, and the module is expected to begin execution in a separate thread and return control to the application immediately.</p>
+                <p>To write data to the database, the module creates a “writer” object and a “record” object using the <code>mco_fh_writer_create()</code> and <code>mco_fh_record_create()</code> API functions. The module should not create these objects anew for each incoming data record; instead, it is expected to retain them. It is only allowed to create one writer object per table. <i>These objects should only be accessed by the thread that created them.</i></p>
+                <p>The module fills out each record with the retrieved market data prior to writing it to the database. It uses the <code>mco_fh_record_set_field_*()</code> family of functions to set a record’s field values. These functions accept the record object’s <code>handle</code>, the <code>index</code> of the field, and the <code>value</code> of the field.</p>
+                <p>The module continues to retrieve and store market data until the application calls its <code>mco_fh_mod_stop()</code> <i>ModAPI</i> function. When this function is called, the module is expected to stop all feeds, disconnect from the servers, join threads, and return control to the application.</p>
+                <h2>API Usage Samples and Discussion</h2>
+                <p>Some of the <i>API</i> usage scenarios are given below. Please note that the samples are intentionally simplified for clarity and may omit error handling, or have suboptimal performance.</p>
+                <h3>Module Initialization</h3>
+                <p>When the module’s <code>mco_fh_mod_create()</code> <i>ModAPI</i> function is called, it is passed two parameters: <code>custom module configuration</code> (from the “config” section of the module configuration), and a pointer to the module’s <code>handle</code>. The module sets this <code>handle</code>’s value. The Feed Handler application does not interpret it in any way: it is passed unmodified to the <i>ModAPI</i> functions. The module is free to use it to store custom context data.</p>
+                <p>The module uses the <code>mco_fh_config_*()</code> family of functions to read configuration data. For example:</p>
+                <div class="code-block"><pre>&#160;
+    mco_fh_ret mco_fh_mod_create(mco_fh_config_node_h cfg, mco_fh_module_h *h)
+    {
+        Module *module = new Module();
+        // get the "debug" flag value
+        mco_fh_config_node debug_node = mco_fh_config_node_get_child(cfg, "debug");
+        if (mco_fh_config_node_get_bool(debug_node, MCO_NO) == MCO_YES) 
+        {
+            module-&gt;enableDebugMode();
+        }
+&#160;
+        *h = module;
+        return MCO_FH_OK;
+    }
+    &#160;</pre>
+                </div>
+                <p>Next, after setting data sources and subscriptions, the Feed Handler application calls the module’s <code>mco_fh_mod_init()</code> <i>ModAPI</i> function and passes it the module handle and the database handle. For example:</p>
+                <div class="code-block"><pre>&#160;
+    mco_fh_ret mco_fh_mod_init(mco_fh_module_h h, mco_fh_db_h db)
+    {
+        Module *module = (Module *)h;
+        module-&gt;setDatabase(db);
+        module-&gt;connectToService();
+        return MCO_FH_OK;
+    }
+    &#160;</pre>
+                </div>
+                <h3>Metadata Definition</h3>
+                <p>As was noted above, the Feed Handler application doesn’t have any knowledge of the module’s data structures. The feed handled by the module may provide <i>Quotes</i>, <i>Trades</i>, Level 2 data, all of the above, or something entirely different. All of these data structures’ contents (number of fields, their types and names) may differ from feed to feed. For example, a <i>Quote</i> record usually contains <code>symbol name</code>, <code>bid</code> and <code>ask</code> values, but may also include auxiliary data, like <code>timestamps</code>, <code>exchange IDs</code>, etc.</p>
+                <p>In the discussion below we will suppose that the feed provides only quotes, which are described by the following C structure:</p>
+                <div class="code-block"><pre>&#160;
+    struct FeedQuote
+    {
+        char symbol[4];
+        int exchangeCode;
+        float bid;
+        float ask;
+        bool isNBBO;
+    };
+    &#160;</pre>
+                </div>
+                <p>It was mentioned that the module can choose one of two approaches to metadata registration. With the first one, the module registers all records and their fields at once, when its <code>mco_fh_mod_fill_metadata()</code> <i>ModAPI</i> function is called. With the second one, the Feed Handler application reads table mappings from the configuration file and requests the module to provide information for each record and field it encounters.</p>
+                <p>Below are examples of both approaches.</p>
+                <h4>Providing Metadata with mco_fh_mod_fill_metadata()</h4>
+                <blockquote>
+                    <p>If the module knows all of the possible fields of all its records, it can opt to specify them at once inside the <code>mco_fh_mod_fill_metadata()</code> <i>ModAPI</i> function:</p>
+                    <div class="code-block"><pre>&#160;
+    mco_fh_ret mco_fh_mod_fill_metadata(mco_fh_module_h h)
+    {
+        mco_fh_metadata_add(db, “Quote”, “symbol”, McoSql::tpString, 4, 0);
+        mco_fh_metadata_add(db, “Quote”, “exchangeCode”, McoSql::tpInt4, 0, 0);
+        mco_fh_metadata_add(db, “Quote”, “bid”, McoSql::tpReal4, 0, 0);
+        mco_fh_metadata_add(db, “Quote”, “ask”, McoSql::tpReal4, 0, 0);
+        mco_fh_metadata_add(db, “Quote”, “isNBBO”, McoSql::tpBool, 0, 0);
+        return MCO_FH_OK;
+    }
+    &#160;</pre>
+                    </div>
+                    <p>Note that the <code>mco_fh_metadata_add()</code> <i>API</i> function should only be called from <code>mco_fh_mod_fill_metadata()</code>.</p>
+                </blockquote>
+                <h4>Providing Metadata with mco_fh_mod_get_field_info()</h4>
+                <blockquote>
+                    <p>If the module opts not to specify its metadata in <code>mco_fh_mod_fill_metadata()</code> function, it should return <code>MCO_FH_E_NOT_IMPLEMENTED</code>. In this case, the Feed Handler will call its <code>mco_fh_mod_get_field_info()</code> function instead. This method will be called for each record type and field that the application encounters while parsing the configuration file. The module is required to return type information for the requested fields:</p>
+                    <div class="code-block"><pre>&#160;
+    mco_fh_ret mco_fh_mod_get_field_info(mco_fh_module_h h, const char *rec_type, 
+                            const char *field_name, mco_int4 *type, 
+                            mco_size_t *size, mco_size_t *precision)
+    {
+        // only "Quote" type is supported
+        if (std::string(rec_type) != "Quote") 
+        {
+            return MCO_FH_E_INVALID_RECORD_TYPE;
+        }
+        &#160;
+        if (std::string(field_name) == "symbol") 
+        {
+            *type = McoSql::tpString;
+            *size = 4;
+            *precision = 0;
+        } else if (std::string(field_name) == "exchangeCode") 
+        {
+            *type = McoSql::tpInt4;
+            *size = 0;
+            *precision = 0;
+        } else if (std::string(field_name) == "bid") 
+        {
+            *type = McoSql::tpReal4;
+            *size = 0;
+            *precision = 0;
+        } else if (std::string(field_name) == "ask") 
+        {
+            *type = McoSql::tpReal4;
+            *size = 0;
+            *precision = 0;
+        } else if (std::string(field_name) == "isNBBO") 
+        {
+            *type = McoSql::tpBool;
+            *size = 0;
+            *precision = 0;
+        } else 
+        {
+            return MCO_FH_E_INVALID_FIELD_NAME;
+        }
+        &#160;
+        return MCO_FH_OK;
+    }
+    &#160;</pre>
+                    </div>
+                    <p>For example, the user might specify the following table mapping (note that the <code>isNBBO</code> field is omitted):</p>
+                    <div class="code-block"><pre>&#160;
+    {
+        "type": "Quote",
+        "name": "MyQuotes",
+        "fields":
+        [
+            { "source": "symbol", "target": "sym" },
+            { "source": "bid", "target": "bid" },
+            { "source": "ask", "target": "ask" },
+            { "source": "exchangeCode", "target": "exchCode" }
+        ],
+    }
+    &#160;</pre>
+                    </div>
+                    <p>In this case, the Feed Handler application will issue a sequence of calls to the module’s <code>mco_fh_mod_get_field_info()</code> function like this:</p>
+                    <div class="code-block"><pre>&#160;
+    mco_int4 type;
+    mco_size_t size, precision;
+    // ...
+    mco_fh_mod_get_field_info(modHandle, "Quote", "symbol", &amp;type, &amp;size, &amp;precision);
+    // ...
+    mco_fh_mod_get_field_info(modHandle, "Quote", "bid", &amp;type, &amp;size, &amp;precision);
+    // ...
+    mco_fh_mod_get_field_info(modHandle, "Quote", "ask", &amp;type, &amp;size, &amp;precision);
+    // ...
+    mco_fh_mod_get_field_info(modHandle, "Quote", "exchangeCode", &amp;type, &amp;size, &amp;precision);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <h3>mco_fh_mod_fill_metadata() vs mco_fh_mod_get_field_info()</h3>
+                <p>Both approaches yield the same result. However, the first approach has an added benefit of allowing the user to specify empty table mappings. For example:</p>
+                <div class="code-block"><pre>&#160;
+    {
+        "type": "Quote",
+        "name": "MyQuotes",
+        "fields": [],
+    }
+    &#160;</pre>
+                </div>
+                <p>In this case, the “MyQuotes” table will contain “symbol”, “exchangeCode”, “bid”, “ask” and “isNBBO” fields. The fields will appear in the same order as they were specified by the <code>mco_fh_mod_fill_metadata()</code> function.</p>
+                <h3>Error Handling and mco_fh_log()</h3>
+                <p>Currently, the Feed Handler application does not try to interpret the <i>ModAPI</i> return codes, because if the module fails to initialize or start (and most of these errors are returned at the initialization phase), then there is no point in trying to continue execution. The application writes a log message and shuts down. The module is expected to write descriptive log messages, too, using the <code><a href="../../../Programming/C/Core_Functions/Static/Feed_Handler/log.htm">mco_fh_log()</a></code> API. The API <a href="../../../Programming/C/Structures/Feed_Handler.htm#Feed">reference guide pages</a> specify error codes that the <i>ModAPI</i> implementations should return in certain circumstances; however, they are not limited to these codes and may use others if needed.</p>
+                <h2>Handling Database Table Descriptions</h2>
+                <p>After the metadata is successfully registered, the Feed Handler application tells the module which database tables and fields to write; the user may omit some fields in the configuration, so only the requested ones should be written. Furthermore, the field order is configurable as well. The module should store the table names and field positions. The module may assign integer codes to fields, or use any other suitable approach, as required by its logic. However, for the sake of brevity, the example below stores field names as strings, which might not be the optimal approach from the performance standpoint:</p>
+                <div class="code-block"><pre>&#160;
+    struct TableInfo
+    {
+        std::string name;
+        std::vector&lt;std::string&gt; fields;
+        // these two fields will be used in further examples:
+        mco_fh_writer_h writer;
+        mco_fh_record_h record;
+    };
+    std::vector&lt;TableInfo&gt; tables;
+    // ...
+    mco_fh_ret mco_fh_mod_add_table(mco_fh_module_h h, const char *rec_type, 
+                        const char *name, const char **fields, 
+                        mco_size_t nfields)
+    {
+        if (std::string(rec_type) != "Quote") 
+        {
+            return MCO_FH_E_INVALID_RECORD_TYPE;
+        }
+        &#160;
+        TableInfo table;
+        table.name = std::string(name);
+        for (mco_size_t i = 0; i &lt; nfields; i++) 
+        {
+            table.fields.push_back(fields[i]);
+        }
+        tables.push_back(table);
+        return MCO_FH_OK;
+    }
+    &#160;</pre>
+                </div>
+                <h2>Writing Data to the Database</h2>
+                <p>When all tables are passed to the module, the Feed Handler application calls the module’s <code>mco_fh_mod_start()</code> <i>ModAPI</i> function. The module should launch its worker threads and return control immediately.</p>
+                <p>For each database table that the module needs to write, it should create a <i>writer</i> object and one or more <i>record</i> objects. Only one <i>writer</i> per table is allowed. The number of <i>record</i> objects is not limited; however, the module is expected to reuse the records instead of allocating them anew for each incoming feed data entity. Generally, it does not make sense to allocate more than one <i>record</i> object per table. <i>Writer</i> and <i>record</i> objects should only be used from the thread where they were created.</p>
+                <p>The module knows which tables to write from the previous step. It may now create the <i>writer</i> and <i>record</i> objects:</p>
+                <div class="code-block"><pre>&#160;
+    std::vector&lt;TableInfo&gt;::iterator it;
+    for (it = tables.begin(); it != tables.end(); ++it) 
+    {
+        it-&gt;writer = mco_fh_writer_create(db, it-&gt;name.c_str());
+        it-&gt;record = mco_fh_record_create(writer);
+    }
+    &#160;</pre>
+                </div>
+                <p>To store a record in the database, the module first fills its fields with actual data retrieved from the feed. It uses the previously stored field information to decide which fields to write:</p>
+                <div class="code-block"><pre>&#160;
+    // retrieve next quote from the feed
+    FeedQuote *quote = feed-&gt;nextQuote();
+    std::vector&lt;TableInfo&gt;::iterator it;
+    for (it = tables.begin(); it != tables.end(); ++it) 
+    {
+        // get handles of the previously created writer and record
+        mco_fh_writer_t writer = it-&gt;writer;
+        mco_fh_record_t record = it-&gt;record;
+        // optionally, reset the record's contents
+        mco_fh_record_zero_out(record);
+        // fill only the required fields of the record
+        for (size_t fieldIndex = 0; fieldIndex &lt; it-&gt;fields.size(); fieldIndex++) 
+        {
+            if (it-&gt;fields[fieldIndex] == "symbol") 
+            {
+                mco_fh_record_set_field_string(record, fieldIndex, quote-&gt;symbol);
+            } else if (it-&gt;fields[fieldIndex] == "exchangeCode") {
+                mco_fh_record_set_field_int4(record, fieldIndex, quote-&gt;exchangeCode);
+            } else if (it-&gt;fields[fieldIndex] == "bid") {
+                mco_fh_record_set_field_float(record, fieldIndex, quote-&gt;bid);
+            } else if (it-&gt;fields[fieldIndex] == "ask") {
+                mco_fh_record_set_field_float(record, fieldIndex, quote-&gt;ask);
+            } else if (it-&gt;fields[fieldIndex] == "isNBBO") {
+                mco_fh_record_set_field_bool(record, fieldIndex, quote-&gt;isNBBO);
+            }
+        }
+        // write the record to the database
+        mco_fh_writer_store_record(writer, record);
+    }
+    &#160;</pre>
+                </div>
+                <h2>Module Shutdown</h2>
+                <p>The module may request application shutdown in abnormal circumstances (e.g. in case of an unrecoverable error) using the <code>mco_fh_app_stop()</code><i>API</i>. Note, however, that this function should only be called after the module’s execution has been started (with <code>mco_fh_mod_start()</code>) and before it was required to stop (with <code>mco_fh_mod_stop()</code>).</p>
+                <p>When the Feed Handler application needs to shut down (either due to the user’s request, or the <code>mco_fh_app_stop()</code> call), it calls the module’s <code>mco_fh_mod_stop()</code> <i>ModAPI</i> function. The module should stop all its threads and wait for them to be joined. Please note that the writer and record objects should only be destroyed from the threads that created them:</p>
+                <div class="code-block"><pre>&#160;
+    mco_fh_record_destroy(record);
+    mco_fh_writer_destroy(writer);
+    &#160;</pre>
+                </div>
+                <p>Finally, the Feed Handler application calls the module’s <code>mco_fh_mod_destroy()</code> <i>ModAPI</i> function. The module should release all allocated resources:</p>
+                <div class="code-block"><pre>&#160;
+    void mco_fh_mod_destroy(mco_fh_module_h h)
+    {
+        Module *module = (Module *)h;
+        delete module;
+    }
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2>Feed Handler API Reference</h2>
+                <p>See page <a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Feed_Handler.htm">Feed Handler C API</a> for detailed description of the individual functions.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

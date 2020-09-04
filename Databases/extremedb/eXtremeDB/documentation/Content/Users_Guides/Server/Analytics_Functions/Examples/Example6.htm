@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Analytics Functions Example 6: Correlation</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Analytics Functions Example 6: Correlation</h1>
+            <blockquote>
+                <h2>Correlation</h2>
+                <p>Perform a correlation calculation for two sequences - calculate the correlation between <code>low</code> and <code>high</code> values:</p>
+                <div class="code-block"><pre>&#160;
+    SELECT symbol, high, low, seq_corr(low, high) as “correlation”
+    FROM Quote WHERE symbol='IBM';
+    &#160;
+    symbol
+    high{}
+    low{}
+    correlation
+    ------------------------------------------------------------------------------
+    IBM
+    {196.350006, 196.289993, 194.460007, 193.779999, 193.300003, 193.490005,
+    192.960007, 195.000000, 193.279999, 192.729996, 193.179993, 194.460007,
+    195.000000, 196.080002, 208.580002, 205.059998, 205.179993, 206.220001,
+    205.729996, 204.880005, 204.470001, 205.350006, 205.020004, 204.750000,
+    201.289993, 200.910004, 202.089996, 201.949997, 200.740005, 200.949997,
+    200.320007, 201.250000, 201.889999, 201.720001, 199.070007, 201.089996,
+    202.490005, 199.899994, 202.750000, 203.119995, 202.940002, 205.190002,
+    207.699997, 208.490005, 209.600006, 210.740005, 210.199997, 210.729996,
+    212.360001, 215.860001, 215.899994, 214.500000, 215.119995, 215.820007,
+    213.000000, 213.169998, 212.809998, 212.500000, 212.160004, 213.440002}
+    {193.800003, 194.440002, 192.779999, 192.339996, 191.610001, 191.649994,
+    191.279999, 192.899994, 191.750000, 190.389999, 191.350006, 193.240005,
+    193.800003, 194.009995, 203.360001, 203.080002, 204.130005, 204.289993,
+    203.639999, 203.190002, 202.960007, 203.839996, 203.570007, 202.509995,
+    199.559998, 198.679993, 199.679993, 199.750000, 199.020004, 199.570007,
+    199.259995, 199.820007, 200.220001, 198.860001, 198.110001, 198.839996,
+    197.509995, 197.839996, 198.600006, 200.789993, 199.360001, 202.550003,
+    205.690002, 206.660004, 208.240005, 209.429993, 209.039993, 209.089996,
+    209.770004, 212.149994, 213.410004, 212.639999, 211.830002, 214.300003,
+    210.110001, 211.619995, 210.050003, 211.500000, 210.100006, 209.740005}
+    0.991867
+            
+    &#160;</pre>
+                </div>
+                <p>Note that the calculated correlation value of <code>0.991867</code> indicates a high correlation between the <code>high</code> and <code>low</code> values; i.e. when the <code>high</code> value increases, very often the <code>low</code> value increases, and likewise when the <code>high</code> value decreases, very often the <code>low</code> value decreases.</p>
+                <h2>To run this example</h2>
+                <p>A sample script to demonstrate this <code>select</code> statement using <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> can be run from the <code>samples/xsql/scripts/financial</code> directory with the following command:</p>
+                <div class="code-block"><pre>    &#160;
+    x 6
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

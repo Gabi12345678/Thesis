@@ -40,7 +40,7 @@ for lines in args.lines:
 	for columns in args.columns:
 		initial_size = 0
 		print("Starting Kairosdb")
-		kairos = subprocess.Popen([args.kairos_path, "run"], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+		kairos = subprocess.Popen([args.kairos_path, "run"], stderr = subprocess.DEVNULL)
 		time.sleep(4)
 		while True:
 			try:
@@ -81,7 +81,7 @@ for lines in args.lines:
 					"name": "master.data", 
 					"aggregators": [
 						{ 
-							"name": "kmeans", 
+							"name": "kmeansjava", 
 							"lines": lines, 
 							"columns": columns
 						}, { 

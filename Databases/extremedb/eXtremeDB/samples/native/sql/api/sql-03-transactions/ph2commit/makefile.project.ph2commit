@@ -1,0 +1,15 @@
+MCO_PRJ_LIST += api-sql-03-transactions-ph2commit
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += api-sql-03-transactions-ph2commit
+PRJ_api-sql-03-transactions-ph2commit_TAGS:=sample sql
+PRJ_api-sql-03-transactions-ph2commit_DIR:=$(call mco_project_dir)
+PRJ_api-sql-03-transactions-ph2commit_SRC:=$(call mco_project_file,main.cpp) $(MCO_SAMPLES_COMMON_DIR)/common.c $(MCO_SAMPLES_COMMON_DIR)/commonSQL.c
+PRJ_api-sql-03-transactions-ph2commit_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_api-sql-03-transactions-ph2commit_DATABASES:=ph2commitdb
+PRJ_api-sql-03-transactions-ph2commit_RUNTIME:=YES
+PRJ_api-sql-03-transactions-ph2commit_MEMDEV:=PRIVATE
+PRJ_api-sql-03-transactions-ph2commit_STORAGE:=TRANSIENT
+PRJ_api-sql-03-transactions-ph2commit_SYNC:=AUTO
+PRJ_api-sql-03-transactions-ph2commit_TRANSMGR:=MURSIW
+PRJ_api-sql-03-transactions-ph2commit_F_SQL:=LOCAL
+PRJ_api-sql-03-transactions-ph2commit_F_CPP:=YES

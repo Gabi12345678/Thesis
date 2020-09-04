@@ -1,0 +1,15 @@
+MCO_PRJ_LIST += tpcodbc
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += tpcodbc
+PRJ_tpcodbc_TAGS:=target odbc samples
+PRJ_tpcodbc_DIR:=$(call mco_project_dir)
+PRJ_tpcodbc_SRC:=$(call mco_project_file,tpcodbc.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_tpcodbc_SCHEMAS:=
+PRJ_tpcodbc_DATABASES:=
+PRJ_tpcodbc_RUNTIME:=YES
+PRJ_tpcodbc_MEMDEV:=SHARED
+PRJ_tpcodbc_STORAGE:=TRANSIENT
+PRJ_tpcodbc_SYNC:=AUTO
+PRJ_tpcodbc_TRANSMGR:=MURSIW
+PRJ_tpcodbc_F_SQL:=REMOTE
+PRJ_tpcodbc_F_ODBC:=YES

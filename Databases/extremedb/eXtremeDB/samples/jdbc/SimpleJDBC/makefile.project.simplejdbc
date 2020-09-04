@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += SimpleJDBC
+PRJ_TARGET_CLASS += SimpleJDBC
+PRJ_SimpleJDBC_TAGS:=sample java jdbc
+PRJ_SimpleJDBC_DIR :=$(call mco_project_dir)
+PRJ_SimpleJDBC_SRC :=$(call mco_project_file,SimpleJDBC.java)

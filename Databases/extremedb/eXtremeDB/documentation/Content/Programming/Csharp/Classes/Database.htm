@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The C# Database Class</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <h1>The C# <i>Database</i> Class</h1>
+            <p><i>Database</i> provides the wrapper for interfacing with <i>e</i>X<i>treme</i>DB databases.</p>
+            <h3>For an overview see page <a href="../Csharp_Classes.htm">C# Classes</a></h3>
+            <h3>Class Definition</h3>
+            <div class="code-block"><pre>&#160;
+    public class Database implements java.io.Closeable 
+    {
+        /* Public enums */
+        public enum TransactionType {…};
+        public enum TransactionPriority {…};
+        public enum IsolationLevel {…};
+        public enum LogType {…};
+        public enum IndexType {…};
+        public enum EventType {…};
+        public enum CommitPolicy {…};
+        public enum TransSchedPolicy {…};
+        public enum BackupType {…};
+        &#160;
+        /* Public embedded classes */
+        public static class RuntimeInfo{…};
+        public static class HAChannelInfo {…};
+        public static class ClusterNodeParams {…};
+        public static class ClusterNodeInfo {…};
+        public static class ClusterWindow	{…};
+        public abstract static class ClusterNWParams { };
+        public static class ClusterTCPParams extends ClusterNWParams {…};
+        public static class ClusterMPIParams extends ClusterNWParams {…};
+        public static class ClusterParams {…};
+        public static class ClusterInfo {…};
+        public static class BackupInfo {…};
+        public static class Parameters {…};
+        public static class SSLParameters {…};
+        public abstract static class Device {…};
+        public static class PrivateMemoryDevice extends Device {…};
+        public static class SharedMemoryDevice extends Device {…};
+        public static class FileDevice extends Device {…};
+        public static class MultiFileDevice extends FileDevice {…};
+        public static class RaidDevice extends FileDevice {…};
+&#160;
+        /* Constructors */
+        public Database() {…}
+        public Database(int config) {…};
+        public Database(Database db) {…};
+        &#160;
+        /* System Time */
+        public interface GetCurrentTimeCallback {…};
+        public static void setCurrentTimeCallback(GetCurrentTimeCallback callback ) {…};
+        &#160;
+        /* Runtime Options */
+        public static void setRuntimeOption(int option, int value) {…};
+        public static int  getRuntimeOption(int option) {…};
+        &#160;
+        /* Database methods */
+        public void open(String name, Parameters params, Device[] devices) {…};
+        public void open(String name, Parameters params, long size) {…};
+        &#160;
+        public Connection connect() {…};
+        public Connection connect(byte [] context) {…};
+        public Connection connect(String name) {…};
+        public Connection connect(String name, byte[] context) {…};
+        &#160;
+        public SqlLocalConnection connectSql() {…};
+        &#160;
+        public void extend(Device device) {…};
+        public void extend(Device device, byte [] context) {…};
+        &#160;
+        public boolean detach(Device device) {…};
+        public boolean detach(Device device, byte [] context) {…};
+        &#160;
+        public void close() {…};
+        &#160;
+        public RuntimeInfo getRunTimeInfo() {…};
+        &#160;
+        public void generateMcoFile(String path) throws IOException {…};
+        &#160;
+        /* Cluster */
+        public interface ClusterQuorumCallback {…};
+        public interface ClusterNotifying {…};
+    }
+    &#160;</pre>
+            </div>
+            <h2>  Public Interface</h2>
+            <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                <col class="TableStyle-FunctionReference-Column-Column2" style="width: 368px;" />
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Constants/Database_Enums.htm">enums</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Enumerated <i>Database</i> constants</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Constants/Database_Constants.htm">constants</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><i>Database</i> constant values</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Embedded_Classes/Embedded_Database_Classes.htm">embedded classes</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Public embedded <i>Database</i> classes</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2" style="font-size: 11pt;"><b>Constructors</b>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public <b>Database</b>()</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Default constructor</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public <b>Database</b>(int config)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Constructor accepting a bitmap argument consisting of Runtime Configuration options (<code><a href="Constants/Database_Constants.htm"><code>MCO_CFG_*</code></a></code> ) flags</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public <b>Database</b>(Database db)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Copy constructor</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2"><span style="font-size: 11pt; font-weight: bold;">System Time Methods</span>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public interface <b>GetCurrentTimeCallback</b>()</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The prototype for a system time callback function</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public static void <b>setCurrentTimeCallback</b>(GetCurrentTimeCallback callback )</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Calls the specified system time callback function to set the current time</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2"><span style="font-size: 11pt; font-weight: bold;">Runtime Options Methods</span>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public static void <b>setRuntimeOption</b>(int option, int value)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Set the specified runtime option</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public static int  <b>getRuntimeOption</b>(int option)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Retrieve the specified runtime option</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2"><span style="font-size: 11pt; font-weight: bold;">Database Methods</span>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public void <b>open</b>(String name, Parameters params, long size)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Open an <i>e</i>X<i>treme</i>DB database with the specified name, <a href="Embedded_Classes/Database_Parameters.htm">parameters</a> and size</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public void <b>open</b>(String name, Parameters params, Device[] devices)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Open an <i>e</i>X<i>treme</i>DB database with the specified <a href="Embedded_Classes/Database_Parameters.htm">parameters</a> and <a href="Embedded_Classes/Database_Device.htm">device(s)</a></td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public Connection <b>connect</b>()</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Connect to an <i>e</i>X<i>treme</i>DB database</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public Connection <b>connect</b>(byte [] context)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Connect to an <i>e</i>X<i>treme</i>DB database with a specified context</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public Connection <b>connect</b>(String name)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Connect to an <i>e</i>X<i>treme</i>DB database by name</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public Connection <b>connect</b>(String name, byte[] context)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Connect to an <i>e</i>X<i>treme</i>DB database by name with a specified context</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public SqlLocalConnection <b>connectSql</b>()</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Create a local SQL connection</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public void <b>extend</b>(Device device)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Extend database memory</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public void <b>extend</b>(Device device, byte [] context)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Extend database memory with a specified context</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public boolean <b>detach</b>(Device device)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Detach a memory device</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public boolean <b>detach</b>(Device device, byte [] context)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Detach a memory device with the specified context</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public void <b>close</b>()</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Close the database</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public RuntimeInfo <b>getRunTimeInfo</b>()</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Retrieve <i>e</i>X<i>treme</i>DB <a href="Embedded_Classes/Runtime_Info.htm">runtime settings</a></td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public void <b>generateMcoFile</b>(String path)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Generate a schema definition file</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1" colspan="2"><span style="font-size: 11pt; font-weight: bold;">Cluster Methods</span>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>public interface <b>ClusterQuorumCallback</b></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Callback prototype for <a href="Embedded_Classes/Database_Cluster_Parameter_Classes.htm">Quorum notification</a></td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><code>public interface <b>ClusterNotifying</b></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Callback prototype for <a href="Embedded_Classes/Database_Cluster_Parameter_Classes.htm">event notification</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

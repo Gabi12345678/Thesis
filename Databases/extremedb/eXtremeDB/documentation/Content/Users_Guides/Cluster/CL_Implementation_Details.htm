@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|High Availability User's Guide|Cluster User's Guide">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeDB Cluster Implementation Details</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>DB Cluster Implementation Details</h1>
+            <blockquote>
+                <h2>Cluster Binary Schema Evolution</h2>
+                <p><a name="kanchor721"></a>The Cluster runtime supports the Binary Schema Evolution (BSE) feature of <i>e</i>X<i>treme</i>DB, thus nodes in the single cluster are able to have different database schemas. To enable binary evolution mode the application must set the <code>BINARY_EVOLUTION</code> flag in the <code>mode_mask</code> field on all nodes.</p>
+                <p>Using the <b>C/C++ API</b>, this is done as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    mco_cluster_params_t cl_params;
+    ...
+    mco_cluster_params_init(&amp;cl_params);
+    ...
+    cl_params.mode_mask |= MCO_CLUSTER_MODE_BINARY_EVOLUTION; /* use BSE */
+    &#160;</pre>
+                </div>
+                <p>In the <b>Java API</b>:</p>
+                <div class="code-block"><pre>&#160;
+    Database.Parameters params = new Database.Parameters();
+    ...
+    params.clusterParams = new Database.ClusterParams(...);
+    ...
+    params.clusterParams.mode |= Database.CLUSTER_MODE_BINARY_EVOLUTION;
+    &#160;</pre>
+                </div>
+                <p>In the <b>C# API</b>:</p>
+                <div class="code-block"><pre>    &#160;
+    Database.Parameters parameters = new Database.Parameters();
+    ...
+    parameters.ClusterParameters = new Database.ClusterParams(...);
+    ...
+    parameters.ClusterParameters.Mode |= Database.CLUSTER_MODE_BINARY_EVOLUTION;
+    &#160;</pre>
+                </div>
+                <p>Note that if nodes <code>A</code> and <code>B</code> set the <code>CLUSTER_MODE_BINARY_EVOLUTION</code> flag but have exactly the same schema, the objects between these nodes are sent without any conversion. In this case the only overhead for using the binary evolution flag is the additional space allocated in the database header (at database creation time). This space is used to store the dictionaries from other nodes.</p>
+                <h2>Saving and Loading a snapshot of a cluster database</h2>
+                <p>A snapshot of a cluster database can be saved by calling function <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/save.htm">mco_db_save()</a></code>. The ability to load a cluster database from a snapshot (image file) is enabled through the following two fields in the <a href="../../Programming/C/Structures/Cluster_Parameters.htm"><code>mco_cluster_params_t</code></a> structure passed to <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/open.htm">mco_cluster_db_open()</a></code>:</p>
+                <div class="code-block"><pre>    &#160;
+    void *   	      stream_handle;
+    mco_stream_read   input_stream_reader;
+    &#160;</pre>
+                </div>
+                <p>These fields correspond to two the first two parameters of the <a href="../../Programming/C/Core_Functions/Static/Database_Control/load.htm"><code>mco_db_load()</code></a> API, where <code>stream_handle</code> is a handle to the <code>input stream</code> and <code>input_stream_reader</code> is the handler function called by the runtime to read the input.</p>
+                <p>If the values for these two parameters are <code>NULL</code>, then <code><a href="../../Programming/C/Cluster_Functions/db_open.htm">mco_cluster_db_open()</a></code> calls <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm">mco_db_open_dev()</a></code>, otherwise <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/load.htm">mco_db_load()</a></code> is called. By default (set in <code><a href="../../Programming/C/Cluster_Functions/params_init.htm">mco_cluster_params_init()</a></code>) these values are set to <code>NULL</code>.</p>
+                <p>For example, with code like the following, a cluster-based in-memory database can be opened (created) or loaded from a saved database snapshot (image file):</p>
+                <div class="code-block"><pre>    &#160;
+    mco_size_sig_t file_reader(void* stream_handle /* FILE*  */,
+    void* to, mco_size_t max_nbytes)
+    {
+        return (mco_size_t) fread(to, 1, max_nbytes, (FILE*)stream_handle);
+    }
+    mco_size_sig_t file_writer(void* stream_handle /* FILE*  */,
+    &#160;
+    const void* from, mco_size_t max_nbytes)
+    {
+        return (mco_size_t) fwrite(from, 1, max_nbytes, (FILE*)stream_handle);
+    }
+    &#160;
+    main()
+    {
+        mco_db_h db;
+        mco_cluster_params_t cl_params;
+        mco_cluster_params_init(&amp;cl_params);
+        &lt;fill cl_params&gt;
+        FILE *rfile = fopen("&lt;image_file&gt;", "r");
+        if (rfile) /* if image exists, load database */
+        { 
+            cl_params.stream_handle       = rfile;
+            cl_params.input_stream_reader = &amp;file_reader;
+        }
+    &#160;
+        mco_cluster_db_open("&lt;db_name&gt;",...., &amp;cl_params);
+        &lt;start mco_cluster_listen() thread&gt;
+        mco_db_connect("&lt;db_name&gt;", &amp;db);
+    &#160;
+        &lt;... Do some work ...&gt;
+        mco_cluster_stop(db);
+    &#160;
+        /* save database */
+        FILE *wfile = fopen("&lt;image_file&gt;", "w");
+        mco_db_save(wfile, &amp;file_writer, db);
+        &lt;close database&gt;
+    }
+    &#160;</pre>
+                </div>
+                <h2>Cluster Transaction Window</h2>
+                <p>The transaction window in the <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> allows an application to merge transaction data from several commit threads into a single <code>send()</code> operation reducing the number of system calls. For small transactions this can significantly improve the overall performance in the cluster database. The C APIs <code><a href="../../Programming/C/Cluster_Functions/get_window_params.htm">mco_cluster_get_window_params()</a></code> and <code><a href="../../Programming/C/Cluster_Functions/set_window_params.htm">mco_cluster_set_window_params()</a></code> are used to retrieve the current window parameters and to set new values.</p>
+                <p>The transaction window has three threshold values specified in structure <code><a href="../../Programming/C/Structures/Cluster_Parameters.htm">mco_cluster_window_t</a></code> : <code>bsize</code>, <code>length</code> and <code>timeout</code>. The first one (<code>bsize</code>) defines the maximum size of the "buffered" transaction data in bytes, <code>length</code> is the maximum number of buffered transactions and <code>timeout</code> is the maximum delay ( in milliseconds) before sending the buffered data to other nodes. The buffered data will be sent as soon as any of these thresholds is reached. So the number of buffered transactions is never more than <code>mco_cluster_window_t::length</code> and the delay is never more than <code>mco_cluster_window_t::timeout</code>.</p>
+                <p>The initial parameters of the window are set via the <code><a href="../../Programming/C/Structures/Cluster_Parameters.htm">mco_cluster_params_t::window</a></code> passed to the C API <code><a href="../../Programming/C/Cluster_Functions/db_open.htm">mco_cluster_db_open()</a></code>. The default values are <code>length=0</code>, <code>bsize=0</code> and <code>timeout=1</code>, which means that the window is <i>not used</i> because the maximum number of buffered transactions (<code>length</code>) is zero. If one of the cluster nodes sets the window <code>length</code> to a value greater than 0, all other nodes also must use the <code>length</code> greater than 0, but the values may be different on the different nodes. (Note that a window <code>length = 1</code> is roughly the same as <code>lenght = 0</code>). The value of the window <code>bsize</code> can be 0, which means "unlimited data size".</p>
+                <p>Note that normally the window <code>length</code> should not exceed the number of active write threads - otherwise the data will always be sent by the <code>timeout</code> threshold. For example, the window is absolutely useless if the application has only one write thread. Usually the best results are reached if the window <code>length</code> is in the range of 50%-75% times the number of writers. The value of the window <code>bsize</code> can be used to limit the size of buffered transaction data in the case of "large" transactions.</p>
+                <h2>Cluster and Transaction Logging</h2>
+                <p>In some cases it may seem desirable to optimize <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> performance for persistent databases by instead using the <a href="../../Programming/C/Transaction_Logging.htm"><i>e</i>X<i>treme</i>DB<i> Transaction Logging</i></a> feature which provides a possible alternative to using persistent database classes.  In order to enable <i>e</i>X<i>treme</i>DB<i> Transaction Logging</i> (TL), the cluster mode flag <code>MCO_CLUSTER_MODE_START_DETACHED</code> must be used to create a cluster database that is not immediately connected to other nodes. This makes it possible to add processing between the moment the database is created and the moment the node is connected to the cluster. Specifically, when TL is enabled, the transaction log can be applied to the cluster database by calling <code><a href="../../Programming/C/TL_Functions/apply.htm">mco_translog_apply()</a></code>.</p>
+                <p>For example, the following code opens a cluster database in <code>detached</code> mode, applies the transaction log, and then connects to other cluster nodes:</p>
+                <div class="code-block"><pre>    &#160;
+    main()
+    {
+        mco_db_h db;
+        mco_cluster_params_t cl_params;
+        mco_cluster_params_init(&amp;cl_params);
+    &#160;
+        &lt;fill cl_params&gt;
+        FILE *rfile = fopen(image_path, "r");
+        if (rfile) /* load image if exists */
+        { 
+            cl_params.stream_handle       = rfile;
+            cl_params.input_stream_reader = &amp;file_reader;
+        }
+    &#160;
+        /* start in detached mode */
+        cl_params.mode_mask |= MCO_CLUSTER_MODE_START_DETACHED;
+        mco_cluster_db_open(db_name,...., &amp;cl_params);
+        mco_db_connect(db_name, &amp;db);
+        &#160;
+        /* Apply transaction log */
+        mco_translog_apply(db, log_path, MCO_TRANSLOG_ALL_LABELS);
+        &#160;
+        /* Connect to other cluster nodes */
+        mco_cluster_attach(db, &amp;cl_params);
+        &lt;start mco_cluster_listen() thread&gt;
+        &#160;
+        /* Start transaction logging */
+        mco_translog_start(db, log_path, tl_start_data);
+        &#160;
+        /* Save snapshot to ensure all remote transactions are saved */
+        FILE *wfile = fopen(image_path, "w");
+        mco_translog_db_save(wfile, &amp;file_writer, db));
+        &#160;
+        &lt;... Do usual work ...&gt;
+        mco_cluster_stop(db);
+        mco_translog_stop(db);
+        &lt;close database&gt;
+    }
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2>Distributed Databases - Sharding</h2>
+                <p><i>Sharding</i> and <i>clustering</i> are two different concepts that exist for different purposes and are architecturally different. Sharding implements database partitioning, while a Cluster, in its default configuration, does not partition the database but rather replicates everything.</p>
+                <p>Cluster can be used to implement redundancy in a sharding database. In brief, each shard can be not a single node, but a cluster. The implementation is similar to <i>HA Replication</i> as described in the <a href="../High_Availability_Users_Guide.htm"><i>e</i>X<i>treme</i>DB<i> High Availability</i> User's Guide</a>, with the difference that any node can act as a <code>master</code>; i.e. receive SQL statements and replicate the changes to other nodes in the shard.</p>
+                <p>When an <i>e</i>X<i>treme</i>DB database is distributed using <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> the following conditions apply:</p>
+                <ul>
+                    <li value="1">	All nodes in a cluster are equal, each node can perform <code>READ_WRITE</code> and <code>READ_ONLY</code> operations</li>
+                    <li value="2"><![CDATA[	]]><code>Read-only</code> transactions are always local (no network access)</li>
+                    <li value="3"><![CDATA[	]]><code>Write</code> transactions are distributed by the Cluster runtime to all (or some) nodes on the cluster</li>
+                </ul>
+                <p>&#160;</p>
+                <h2>Cluster Runtime Open Flags</h2>
+                <p>Following are explanations for 3 flags that can be specified in the <code>mco_cluster_params.mode_mask</code> to affect specific Cluster runtime behavior:</p>
+                <blockquote>
+                    <p>1)	<code>MCO_CLUSTER_MODE_EARLY_DATA_SEND</code></p>
+                    <p>Normally, the cluster runtime sends transaction data to other nodes after the first phase of a commit on the initiator has completed successfully. This</p>
+                    <p>allows the runtime to reduce network traffic for transactions that failed locally (for example, due to a uniqueness violation). On the other hand, sending data earlier, before the local phase_1, can reduce the total time to perform distributed transaction. Flag <code>MCO_CLUSTER_MODE_EARLY_DATA_SEND</code> forces the cluster runtime to send data before phase_1.</p>
+                    <p>&#160;</p>
+                    <p>2. <code>MCO_CLUSTER_MODE_BINARY_EVOLUTION</code> - this flag allows nodes to join with different schemas into a single cluster. Also note that this flag prohibits any DDL</p>
+                    <p>statements in the cluster.</p>
+                    <p>&#160;</p>
+                    <p>3. <code>MCO_CLUSTER_MODE_START_DETACHED</code></p>
+                    <p>Normally, <code><a href="../../Programming/C/Cluster_Functions/db_open.htm">mco_cluster_db_open()</a></code> creates a database, connects to other cluster's nodes and synchronizes the database content. The <code>MCO_CLUSTER_MODE_START_DETACHED</code> flag tells <code><a href="../../Programming/C/Cluster_Functions/db_open.htm">mco_cluster_db_open()</a></code> to just create the database and skip any network operations. To add this node to the cluster, the application must call <code><a href="../../Programming/C/Cluster_Functions/attach.htm">mco_cluster_attach()</a></code> later.</p>
+                </blockquote>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

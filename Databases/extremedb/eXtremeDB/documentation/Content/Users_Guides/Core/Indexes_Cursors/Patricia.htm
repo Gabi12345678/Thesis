@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Patricia trie Indexes</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Patricia trie Indexes</h1>
+            <blockquote>
+                <p>As explained in the <a href="../../../Fundamental_Concepts/Indexes.htm">Indexes</a> page, the <i>e</i>X<i>treme</i>DB Patricia Trie indexes can be used for optimal access of IP addresses and similar alphanumeric strings.</p>
+                <p>Searches on <code>patricia</code> indexes are performed using the <code>patricia</code>-specific search methods <b>LongestMatch</b>, <b>ExactMatch</b>, <b>PrefixMatch</b> and <b>NextMatch</b>. </p>
+                <h3>LongestMatch</h3>
+                <p>The <b>LongestMatch</b> search locates the record whose index value has the longest match, i.e. has the greatest number of characters or bits starting from the right that match the key value. For example, consider a class <i>Operators</i> with string fields <code>prefix</code> and <code>operator</code> and a <code>patricia</code> index on the field <code>prefix</code>, and the following values:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <thead>
+                        <tr class="TableStyle-FunctionReference-Head-Header1">
+                            <th class="TableStyle-FunctionReference-HeadE-Column2-Header1">prefix</th>
+                            <th class="TableStyle-FunctionReference-HeadD-Column2-Header1">operator</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">01        </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">ATT</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">020</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">     BCC</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">025</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">TNT</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">03</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">ANC</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">0355</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">NCC</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">0355</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">UDC</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">045 </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">WTC</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>The <b>LongestMatch</b> search with a key value of <code>02456</code> would position the cursor at the object with <code>prefix=025</code> and <code>operator=TNT</code>; with a key value of <code>035567787</code> at the object with <code>prefix=0355</code> and <code>operator=UDC</code>); and with a key value of <code>03</code> at the object with <code>prefix=0355</code> and <code>operator=UDC</code> as well.  Notice that the cursor is positioned at the last record matching the key value.  In order to walk through the result set to visit all records matching the key value,  applications will use the <code>nextMatch</code> function or method.</p>
+                <h3>ExactMatch</h3>
+                <p>The <b>ExactMatch</b> search locates the first record whose index value exactly matches the key value supplied.  If no exact matches are found <code>MCO_S_NOTFOUND</code> is returned.  For example, using the above table: the <b>ExactMatch</b> search with the key value of <code>02</code> would find the object with <code>prefix=020</code> and <code>operator=BCC</code>, but the key value of <code>024</code> would cause <code>MCO_S_NOTFOUND</code> to be returned.</p>
+                <h3>PrefixMatch</h3>
+                <p>The <b>PrefixMatch</b> search is similar to <b>LongestMatch</b> except that it finds the first object whose index matches the key, whereas <b>LongestMatch</b> returns the object with the longest (deepest) match.  So using the above table: the <b>PrefixMatch</b> search with the key value of <code>02456</code> finds the object with <code>prefix=025</code> and <code>operator=TNT</code>; the key value of <code>035567787</code> finds the object with <code>prefix=0355</code> and <code>operator=NCC</code>; and the key of value <code>03</code> finds the object with <code>prefix=03</code> and <code>operator=ANC</code>.</p>
+                <h3>NextMatch</h3>
+                <p>The <b>NextMatch</b> search is used after the <code>cursor</code> is positioned within the result set, to walk through the result set to visit all records matching the key value.  To traverse the database objects in order, applications can use the standard <code>cursor</code> <b>next</b> or <b>prev</b> operations,  but these functions are not constrained by the key value used to perform the initial search; so iteration could continue beyond the range specified in the key.</p>
+                <h3>Example search</h3>
+                <p>Unlike other  index compare functions that return &lt;0, 0  or &gt;0, the <code>patricia</code>-based compare function returns the number of the first different bit between the key and the object pointed to by the <code>cursor</code>. This allows interrupting the <code>cursor</code> traversal in a manner similar to the “standard” compare API.  In addition, the application is able to refine the cursor traversal.  For example consider a <i>routing table</i> containing the following values:</p>
+                <div class="code-block"><pre>    &#160;
+    128.1.1.0
+    128.1.1.10
+    128.1.1.20
+    128.1.2.0
+    128.1.2.10
+    128.1.3.0
+    &#160;</pre>
+                </div>
+                <p>stored in a database class  <i>Nodes</i> with a <code>patricia</code> index on an integer of bit array field <code>ipaddr</code>. Suppose the application is looking for the entire subnet <code>128.1.1</code>.  </p>
+                <p>The search key value would be passed in as</p>
+                <div class="code-block"><pre>&#160;
+    10000000|00000001|00000001 binary or 8388865
+    &#160;</pre>
+                </div>
+                <p>The <b>PrefixMatch</b> search called with this key value and length 24 (i.e. 24 bits), positions the cursor at the object with <code>ipaddr</code> equivalent to <code>128.1.1.0</code>.   Now the <b>NextMatch</b> function is called to advance to record <code>128.1.1.10</code> and the <code>patricia</code> compare function returns the value <code>28</code> which means that <code>28</code> bits of the records <code>ipaddr</code> match the key value.</p>
+                <p>Continuing: the <code>cursor</code> <b>next</b> operation advances to record <code>128.1.1.20</code> and the <code>patricia</code> compare function returns <code>27</code>; then <code>cursor</code> <b>next</b> advances to record <code>128.1.2.0</code> and the <code>patricia</code> compare  function returns <code>22</code>.</p>
+                <p>At this point the application would conclude that it has left the region of interest since the key size is <code>24</code> bits and the mismatch was detected in the 22nd bit.  In other words the key is no longer a prefix for the value in the object now pointed at by the <code>cursor</code>.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

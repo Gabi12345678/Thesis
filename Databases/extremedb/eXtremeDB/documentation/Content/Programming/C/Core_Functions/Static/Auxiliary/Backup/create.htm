@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Static API|Auxiliary Interfaces|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>mco_backup_create</title>
+        <link href="../../../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>mco_backup_create</h1>
+            <p>Create a backup record of the database.</p>
+            <h3>For an overview see page <a href="../Backup.htm">Incremental Online Backup in C</a></h3>
+            <h3>Prototype</h3>
+            <div class="code-block"><pre>&#160;
+    void	mco_backup_create(	/*IN*/ mco_db_h con, 
+                    /*IN*/ char const* file_name, 
+                    /*IN*/ char const* label, 
+                    /*IN*/ mco_backup_type type,
+                    /*IN*/ int compression_level, 
+                    /*IN*/ char const* cipher, 
+                    /*IN*/ char* err_buf, 
+                    /*IN-OUT*/ unsigned int * err_buf_sz)
+&#160;</pre>
+            </div>
+            <h3>Arguments</h3>
+            <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../../../../Resources/TableStyles/IndentedFunctionReference.css');" cellspacing="0">
+                <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">con</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A database connection used to create the backup record</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">file_name</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The name of the backup file where the backup record will be created</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">label</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The backup's label</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"> type </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                            <p>The type of backup record; one of the following:</p>
+                            <div class="code-block"><pre>    &#160;
+    typedef enum {
+        MCO_BACKUP_TYPE_SNAPSHOT,
+        MCO_BACKUP_TYPE_INCREMENTAL,
+        MCO_BACKUP_TYPE_AUTO
+    } mco_backup_type;
+    &#160;</pre>
+                            </div>
+                            <p>where <code>type</code> has the following effect:</p>
+                            <table class="TableStyle-IndentedFunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../../../../Resources/TableStyles/IndentedFunctionReference.css');" cellspacing="0">
+                                <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 247px;" />
+                                <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                <tbody>
+                                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_BACKUP_TYPE_SNAPSHOT</td>
+                                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">An image of the entire  database; must be done at least once</td>
+                                    </tr>
+                                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_BACKUP_TYPE_INCREMENTAL</td>
+                                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A partial image of the database. Contains only differences in the database content between two consecutive backup records.</td>
+                                    </tr>
+                                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                        <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">MCO_BACKUP_TYPE_AUTO</td>
+                                        <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">Automatic selection of a <i>snapshot</i> or <i>incremental</i> record depending on the content of the backup file. If there is no <i>snapshot</i> in the file yet the backup process will create one; otherwise a partial backup record is created</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">compression_level </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">An optional backup compression level 1 to 9; (1 indicates the fastest, but the lowest compression level)</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">cipher </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">An optional cipher to encrypt the backup</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">err_buf </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A buffer for error description</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">err_buf_sz</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">On input this specifies the size of <code>err_buf</code>. On return it contains the number of characters written into the buffer. If <code>err_buf_sz</code> is null the routine returns <code>MCO_E_ILLEGAL_PARAM</code></td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Description</h3>
+            <p>This function creates a backup record of the database. The record can be <i>full</i> (a snapshot) or <i>partial</i> (an incremental record) depending on the <code>type</code> specified. Note that <i>it is necessary to have at least one snapshot in a backup file</i>. The backup process does not block database processing so the application is allowed to run transactions normally while the backup is in progress. The backup process blocks the database for only a short period of time when the normal data processing is paused or after a set number of transactions as specified by the backup parameters <code><a href="../../../../Structures/Database_Parameters.htm"><code>backup_min_pages</code></a></code> and <code><a href="../../../../Structures/Database_Parameters.htm">backup_max_passes</a></code> passed to <code><a href="../../Database_Control/open_dev.htm">mco_db_open_dev()</a></code> on database creation. (See the <a href="../../../../../../Users_Guides/Core/Database_Backup_Restore/Incremental_Backup.htm">Incremental Backup and Restore</a> page for further details.)</p>
+            <h3>Return Codes</h3>
+            <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../../../../Resources/TableStyles/IndentedFunctionReference.css');" cellspacing="0">
+                <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 182px;" />
+                <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_S_OK</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The backup was successful</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_E_ILLEGAL_PARAM</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The label argument exceeds the maximum length allowed (<code>MCO_MAX_BACKUP_LABEL_SIZE</code>)</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_E_DISK_OPEN</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Could not open the backup file</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">MCO_E_DISK_SEEK</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The file system <code>fseek()</code> failed, probably due to backup file integrity failure</td>
+                    </tr>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">MCO_E_DISK_VERSION_MISMATCH</td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">Incremental backup cannot be performed because the backup file doesn't contain a previous backup image</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Example</h3>
+            <div class="code-block"><pre>    &#160;
+    {
+        mco_db_h con;
+        MCO_RET rc;
+        char * filename = “backup.bak”;
+        char label[MAX_LABEL_SIZE;
+        int duration_msec = 1000;
+        int msec;
+&#160;
+        do
+        {
+            rc = mco_db_connect( db_name, &amp;con );
+            if ( MCO_S_OK&#160;== rc )
+            {
+                msec = (int)MCO_SYSTEM_GET_CURRENT_TIME_MSEC();
+                sprintf(label, "Backup at %d msec", msec);
+&#160;
+                /* backup the database */
+                rc = mco_backup_create( con, filename, label,
+                        MCO_BACKUP_TYPE_AUTO, 1, 0, 0);
+                sleep_msec(duration_msec);
+                mco_db_disconnect(con);
+            }
+        } while (rc == MCO_S_OK&#160;&amp;&amp; !stop);
+    }
+    &#160;</pre>
+            </div>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

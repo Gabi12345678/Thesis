@@ -1,0 +1,13 @@
+MCO_PRJ_LIST += 02-open-nvram
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 02-open-nvram
+PRJ_02-open-nvram_TAGS:=sample core
+PRJ_02-open-nvram_DIR:=$(call mco_project_dir)
+PRJ_02-open-nvram_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_02-open-nvram_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_02-open-nvram_DATABASES:=nvramdb
+PRJ_02-open-nvram_RUNTIME:=YES
+PRJ_02-open-nvram_MEMDEV:=PRIVATE
+PRJ_02-open-nvram_STORAGE:=TRANSIENT
+PRJ_02-open-nvram_SYNC:=AUTO
+PRJ_02-open-nvram_TRANSMGR:=MURSIW

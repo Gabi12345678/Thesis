@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Getting Started with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Step 1: Startup</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Step 1: Startup</h1>
+            <blockquote>
+                <h1>Starting <i>xSQL</i> as a database server and client</h1>
+                <p><span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> is an interactive tool for processing SQL statements.  It can be run as a server to provide access to <i>e</i>X<i>treme</i>DB databases from local or remote clients. For example. from directory <code>target/bin</code> type:</p>
+                <div class="code-block"><pre>&#160;
+    xsql -size 100m -p 5000
+    press Enter to stop SQL server
+    &#160;</pre>
+                </div>
+                <p>This opens an in-memory database session, with database size of <code>100 Mb</code>, on port <code>5000</code> of the host computer. A client can be another instance of <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> that connects to the port specified by the server, or it can be any application using the <i>e</i>X<i>treme</i>SQL API. To start <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> as a client process on the same host computer, connecting to the server instance above, use the following command:</p>
+                <div class="code-block"><pre>&#160;
+    xsql @127.0.0.1:5000
+    &#160;</pre>
+                </div>
+                <p>The following display shows that the <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> client is ready to accept interactive commands:</p>
+                <div class="code-block"><pre><a name="kanchor541"></a>    &#160;
+    xsql started
+    Runtime configuration
+     Remote node(s)        : 127.0.0.1:5000
+     Runtime                          : Release
+    XSQL&gt;
+    &#160;</pre>
+                </div>
+                <p>To end the client/server session, first close the client by typing the command <code>exit</code>. </p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;exit
+    &#160;</pre>
+                </div>
+                <p>Then close the server by pressing &lt;Enter&gt;. </p>
+                <p> <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> can be opened in a single interactive server process, so that a separate client process is not necessary, by simply typing <code>xsql</code> from directory <code>target/bin</code>:</p>
+                <div class="code-block"><pre><a name="kanchor542"></a><a name="kanchor543"></a>&#160;
+    xsql
+    &#160;
+    Simple interactive configuration is started
+    To run as a server, type, for example: 'xsql -size 100m -p 5000'
+    Then to connect as a client, use 'xsql @127.0.0.1:5000'
+    Type 'xsql -h' for more details
+    &#160;
+    xsql started
+    Runtime configuration
+      Transaction manager  : MURSIW
+     Storage (transient)  : Conventional memory, 100M
+     Storage (persistent) : Not supported
+     Runtime                     : Release
+    XSQL&gt;
+    &#160;</pre>
+                </div>
+                <p>Note that, if no command line arguments are specified the default options are equivalent to running with the command line <code>xsql –i –size 100m</code>. As the display indicates, <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> is running in interactive mode with the following characteristics:</p>
+                <ul>
+                    <li value="1">	100 Megabytes for database storage - the space to be allocated for the database.</li>
+                    <li value="2"><code>MURSIW </code>is the transaction manager</li>
+                    <li value="3"><code>transient</code> database objects will be created in conventional memory (RAM)</li>
+                    <li value="4"><code>persistent</code> (disk-based) database objects are not supported</li>
+                    <li value="5">the <i>e</i>X<i>treme</i>DB release mode libraries are loaded</li>
+                </ul>
+                <p>(Note that <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> can be started with a variety of command-line configuration options, including the <code>-c</code> option to read configuration specifications from a <code>config.file</code>, in addition to the “server” and “client” examples above. All command-line options and configuration file specifications can be viewed <a href="../../../Users_Guides/xSQL/xSQL_Startup_Options.htm">here</a>.)</p>
+                <h2>Sample scripts directories</h2>
+                <p>A number of sample SQL scripts, command files (shell scripts) and sample data are provided to facilitate running these examples in the SDK directories:</p>
+                <div class="code-block"><pre>   
+    eXtremeDB/samples/xsql/configs  
+    eXtremeDB/samples/xsql/scripts 
+    eXtremeDB/samples/xsql/scripts/sequences  
+    eXtremeDB/samples/xsql/scripts/financial  
+    &#160;</pre>
+                </div>
+                <p>These sample scripts will be demonstrated in the following steps of this tutorial. Because <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> automatically loads dynamic libraries located in <code>eXtremeDB/arget/bin.so</code> it is recommended to start <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> in the <code>eXtremeDB/target/bin</code> directory. (Alternatively the <code>LD_LIBRARY_PATH</code> environment variable can be exported (set) to indicate the directory from which to load dynamic libraries.)</p>
+                <p>To simplify launching <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> from <i>target/bin</i> while remaining in the working directory that contains the script files, the Windows command file <code>xsql.bat</code>, or <code>xsql.sh</code> in Unix-Linux packages, is provided to eliminate the need to type a long relative directory path like</p>
+                <div class="code-block"><pre>&#160;
+    ..\..\..\..\target\bin\xsql.exe
+    &#160;</pre>
+                </div>
+                <p>For example, using this command file, the following is a minimal command to run <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> interactively  in a Windows console window from directory <code>eXtremeDB/samples/xsql/scripts/financial</code>:</p>
+                <div class="code-block"><pre>&#160;
+    xsql
+    &#160;</pre>
+                </div>
+                <p>or from a Unix-Linux console window:</p>
+                <div class="code-block"><pre>&#160;
+    ./xsql.sh
+    &#160;</pre>
+                </div>
+                <p>(For simplicity, throughout the rest of this tutorial Operating System commands will be presented only in the Windows format; Unix-Linux users will know what to do.)</p>
+                <p>Now we can execute SQL commands interactively. Use this link to go on to <a href="Server_QS_xSQL2.htm">Step 2</a>.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += Main
+PRJ_TARGET_CLASS += Main
+PRJ_Main_TAGS:=sample java sequences
+PRJ_Main_DIR :=$(call mco_project_dir)
+PRJ_Main_SRC :=$(call mco_project_file,Create.java IntDate.java Main.java Query.java Quote.java)

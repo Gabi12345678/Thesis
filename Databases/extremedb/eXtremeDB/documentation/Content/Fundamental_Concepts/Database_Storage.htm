@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="eXtremeDB Fundamental Concepts">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Database Storage</title>
+        <link href="../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Database Storage</h1>
+            <blockquote>
+                <p><i>e</i>X<i>treme</i>DB supports the notion of <i>logical database devices</i>. Logical database devices are abstractions of physical storage locations that can be <i>conventional memory</i> (static or heap allocated memory in the application address space), <i>shared memory</i> (“named” memory shared by multiple processes), or persistent <i>file system</i> memory such as a simple file, a multi-file or RAID file, or even a <i>raw disk partition</i>. All access to <i>e</i>X<i>treme</i>DB databases from applications using any of the <i>e</i>X<i>treme</i>DB programming language APIs as well as through <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> is managed via these logical memory devices. (Please see the <i><a href="https://www.mcobject.com/advanced-memory-management/">Memory Management</a></i> web page for more information on <i>e</i>X<i>treme</i>DB memory management strategies for embedded systems.)</p>
+                <p>The application determines the size and location of the memory device, the type of memory and how the <i>e</i>X<i>treme</i>DB<a name="kanchor1022"></a> runtime will use the device. This is referred to as <b>device assignment</b> which consists of:</p>
+                <ul>
+                    <li value="1">A memory region for meta- and user-data, indexes and other database structures</li>
+                    <li value="2"><a name="kanchor1023"></a>A memory region for the disk manager cache (page pool)</li>
+                    <li value="3">A persistent storage device (can be file, multi-file or RAID)</li>
+                    <li value="4">A device that contains a database log file</li>
+                </ul>
+                <p>A database is created “on top” of one or more devices. That means that a database logical structure (a database layout) is created by the <i>e</i>X<i>treme</i>DB runtime and is independent of the physical layout (storage devices). An in-memory database will use a single <code>conventional</code> or <code>shared</code> memory device for all database data, indexes and metadata. A database with <code>persistent</code> classes (whose data is stored on persistent storage media) requires an array of four or more database devices. Regardless of its nature, any database must have at least one in-memory device. And databases can be “extended” by adding a storage device to the layout. Once the device has been added into the layout (i.e. the memory / storage is extended) that memory cannot be given back for other use by the application - it is managed exclusively by the <i>e</i>X<i>treme</i>DB runtime.</p>
+                <p>Each device definition reflects the physical properties of the underlying storage:</p>
+                <ul>
+                    <li value="1">Conventional memory device</li>
+                    <li value="2">Shared (named) memory region</li>
+                    <li value="3">A file device</li>
+                    <li value="4">A multi-file device</li>
+                    <li value="5">RAID-0 (striping)</li>
+                    <li value="6">RAID-1 (mirroring)</li>
+                    <li value="7">Other types (pipe, high availability asynchronous buffer…)</li>
+                </ul>
+                <p>The following diagram illustrates how in-memory and persistent devices might be configured to manage a <i>hybrid</i> database :</p>
+                <p>
+                    <img src="../Resources/Images/Storage_Devices.PNG" />
+                </p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

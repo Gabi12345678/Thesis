@@ -95,7 +95,7 @@ for line in args.lines:
 		l = []
 		for x in tqdm(range(line)):
 			s = f.readline()[:-1].split(" ")
-			t = int((datetime.strptime(s[0], "%Y-%m-%dT%H:%M") - datetime(1970, 1, 1)).total_seconds())
+			t = int((datetime.strptime(s[0], "%Y-%m-%dT%H:%M:%S") - datetime(1970, 1, 1)).total_seconds())
 			v = {}
 			for y in range(column):
 				v["dim" + str(y)] = float(s[y + 1])

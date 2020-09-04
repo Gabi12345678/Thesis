@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|Python API|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Iterator Python SequenceIterator Methods</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Iterator Python <i>SequenceIterator</i> Methods</h1>
+            <blockquote>
+                <p>The <i>iterator</i> methods are used to insert values into, iterate over and extract elements from sequences. Some, like <code>first()</code>, <code>last()</code> and <code>search()</code> are used to extract the first, last or found elements from a <i><a href="../../Common/Analytics/Materialized.htm">materialized</a></i> sequence. </p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 150px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 608px;" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">next()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Extract the next sequence value</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">reset()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Reset the iterator position to the first element in the sequence</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">first()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Extract the first element in a <i><a href="../../Common/Analytics/Materialized.htm">materialized</a></i> sequence</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">last()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Extract the last element in a <i><a href="../../Common/Analytics/Materialized.htm">materialized</a></i> sequence</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">subseq( from, till )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return the sub-sequence [<i>from</i>,<i>till</i>] of the object's  <a href="../../Common/Analytics/Materialized.htm" style="font-style: italic;">materialized</a> sequence</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">append( values )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Append the <i>values</i> sequence to the object's <i><a href="../../Common/Analytics/Materialized.htm">materialized</a></i> sequence. The argument <i>values</i> may be a tuple, a list, or a single value</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">insert( values )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Insert the <i>values</i> sequence into the object's <i><a href="../../Common/Analytics/Materialized.htm">materialized</a></i> sequence. The argument <i>values</i> may be a tuple, a list, or a single value</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">delete( from, till )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Delete elements in the specified range from the object's sequence </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">search( from, boundary_from, to, boundary_to )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return the sequence with elements in the specified range from the object's <i><a href="../../Common/Analytics/Materialized.htm">materialized</a></i> sequence. The arguments <i>from</i> and <i>to</i> specify values in the object's sequence; <i>boundary_from</i> and <i>boundary_to</i> are boundary types typically specified as <code>exdb.SeqIteratorBoundary.MCO_SEQ_BOUNDARY_INCLUSIVE or exdb.SeqIteratorBoundary.MCO_SEQ_BOUNDARY_EXCLUSIVE</code></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">count()</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Return the count of elements in the object's <i><a href="../../Common/Analytics/Materialized.htm">materialized</a></i> sequence.</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">map( input )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Extract from the <i>input</i> sequence elements with positions specified in the object's sequence. (The positions should be provided in ascending order (these are typically obtained using methods <code>filter_pos()</code> or <code>top_pos()</code>)</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">project( field1, ... )</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>Project the object's sequence to other fields in the <a href="../../Common/Analytics/Materialized.htm">materialized</a> object. For example:</p>
+                                <div class="code-block"><pre>    &#160;
+    dayit = quote.day.search(DMY(1,MONTH(last),YEAR(last)),
+        exdb.SeqIteratorBoundary.MCO_SEQ_BOUNDARY_INCLUSIVE,
+        last, exdb.SeqIteratorBoundary.MCO_SEQ_BOUNDARY_INCLUSIVE)
+    openit,closeit = dayit.project('open', 'close')
+                            
+    &#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">store( other )</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">
+                                <p>Store the elements of the object's sequence to another sequence iterator. For example:</p>
+                                <div class="code-block"><pre>    &#160;
+    SequencIterator avg;
+    avg.store(quote.low)
+                            
+    avg.wavg(quote.high)
+    &#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>&#160;</p>
+                <h2>Example</h2>
+                <p>Following is an example code snippet demonstrating the use of iteration method <code>next()</code>:</p>
+                <div class="code-block"><pre>        &#160;
+    cursor = con.cursor("Quote", "by_sym")
+    for quote in cursor:
+        ...
+        print "%s: %f" % (quote.symbol, quote.close.next())
+        ...
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

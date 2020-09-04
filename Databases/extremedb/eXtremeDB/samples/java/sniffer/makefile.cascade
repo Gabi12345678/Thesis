@@ -1,0 +1,4 @@
+MCO_FILE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
+-include $(MCO_FILE_DIR)makefile.project.ConnectCtx
+-include $(MCO_FILE_DIR)makefile.project.CreateDBSniffer
+-include $(MCO_FILE_DIR)makefile.project.createdb_sniffer

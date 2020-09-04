@@ -27,7 +27,7 @@ def kmeans(datapoints, clusters_count, iterations):
 		
 		for i in range(clusters_count):
 			if count_clusters[i] == 0:
-				clusters[i] = random.sample(datapoints, 1)[0]
+				clusters[i] = random.sample(list(datapoints), 1)[0]
 			else:
 				clusters[i] = sum_clusters[i] / count_clusters[i]
 

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Transaction Isolation Levels</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Transaction Isolation Levels</h1>
+            <blockquote>
+                <p>Transaction isolation defines how and when the changes made by one transaction become visible to other concurrent transactions.  DBMSs usually offer a number of transaction isolation levels that define the degree to which one transaction must be isolated from data modifications made by other transactions.  In fact, the ANSI / ISO SQL standard defines four levels of transaction isolation: <b>Read Uncommitted</b>, <b>Read Committed</b>, <b>Repeatable Read</b> and <b>Serializable</b>.  The <a href="Transaction_Managers.htm"><i>e</i>X<i>treme</i>DB transaction managers</a> support three of these levels as described below.</p>
+                <h2>Read Committed </h2>
+                <p>When this level is used a transaction always reads committed data.  The transaction will never read data that another transaction has changed and not yet committed, but it does not ensure that the data will not be changed before the end of the transaction. With <code><a name="kanchor250"></a>MVCC</code> (but not <code><a name="kanchor251"></a>MURSIW</code>) it is possible that a value can change if it is re-read during the transaction, because another transaction committed a change to that same object.</p>
+                <h2>Repeatable Read (snapshot) </h2>
+                <p>This is the default isolation level in <i>e</i>X<i>treme</i>DB. When a <code>MVCC</code> transaction runs at the <b>Repeatable Read</b> level, it creates a snapshot of the object(s) read when they are read. Re-reading the object will re-read the snapshot, not the committed object in the database (that might have been changed), hence the name “repeatable read”. For <code>MURSIW</code>, transactions are both <b>Read Committed</b> and <b>Repeatable Read</b> because no write transaction can execute in parallel with any other transaction.</p>
+                <h2>Serializable </h2>
+                <p>This level applies an exclusive lock to all write transactions—no other write transactions can run at the same time, however, with <code>MVCC</code>, “readers” can still run in parallel with the “writer” and with each other. Note that this “sequential” transaction processing of <code>MVCC</code> write transactions applies only to transactions with <code>MCO_SERIALIZABLE</code> isolation level; transactions with other isolation levels can be active simultaneously. With <code>MURSIW</code>, write transactions are always serialized.</p>
+                <h2>Example</h2>
+                <p>To illustrate how choosing an isolation level with <code>MVCC</code> could be important, consider the example of two transactions <code>t1</code> and <code>t2</code> that concurrently read and update data sets as follows:</p>
+                <div class="code-block"><pre>&#160;
+    a=1 b=2
+    t1: e=b ; a=a+1; c=a+b
+    t2: f=a ; b=b+2; d=a+b
+    &#160;</pre>
+                </div>
+                <h3>Serializable case #1</h3>
+                <div class="code-block"><pre>&#160;
+    t1: e=b			e=2
+    t1: a=a+1	a=1+1	a=2
+    t1: c=a+b	c=2+2	c=4
+&#160;
+    t2: f=a			f=2
+    t2: b=b+2	b=2+2	b=4
+    t2: d=a+b	d=2+4	d=6
+    &#160;
+    -------------------------
+    Result: a=2, b=4, c=4, d=6, e=2, f=2
+    &#160;</pre>
+                </div>
+                <h3>Serializable case #2</h3>
+                <div class="code-block"><pre>&#160;
+    t2: f=a			f=1
+    t2: b=b+2	b=2+2	b=4
+    t2: d=a+b	d=1+4	d=5
+&#160;
+    t1: e=b			e=4
+    t1: a=a+1	a=1+1	a=2
+    t1: c=a+b	c=2+4	c=6
+    &#160;
+    -------------------------
+    Result: a=2, b=4, c=6, d=5, e=4, f=1
+    &#160;</pre>
+                </div>
+                <h3>Repeatable read</h3>
+                <div class="code-block"><pre>&#160;
+    t1: read a		a(t1)=1
+    t1: read b		b(t1)=2
+    t2: read a		a(t2)=1
+    t2: read b		b(t2)=2
+    t1: e=b(t1)		e=2
+    t2: f=a(t2)		f=1
+    t2: b(t2)=b(t2)+2	b=2+2 b(t2)=4
+    t2: d=a(t2)+b(t2)	d=1+4 d=5
+    t2: commit
+&#160;
+    t1: re-read a		a(t1)=1
+    t1: re-read b		b(t1)=2
+    t1: a(t1)=a(t1)+1	a=1+1 a(t1)=2
+    t1: c=a(1)+b(t1)	c=2+2 c(t1)=4
+    t1: commit
+&#160;
+    -----------------------------
+    Result: a=2, b=4, c=4, d=5, e=2, f=1
+    &#160;</pre>
+                </div>
+                <h3>Read committed</h3>
+                <div class="code-block"><pre>&#160;
+    t1: read a		a(t1)=1
+    t1: read b		b(t1)=2
+    t2: read a		a(t2)=1
+    t2: read b		b(t2)=2
+    t1: e=b(t1)		e=2
+    t2: f=a(t2)		f=1
+    t2: b(t2)=b(t2)+2	b=2+2 b(t2)=4
+    t2: d=a(t2)+b(t2)	d=1+4 d=5
+    t2: commit
+    &#160;
+    t1: re-read a		a(t1)=1
+    t1: re-read b		b(t1)=4
+    t1: a(t1)=a(t1)+1	a=1+1 a(t1)=2
+    t1: c=a(1)+b(t1)	c=2+4 c(t1)=6
+    t1: commit
+&#160;
+    -----------------------------
+    Result: a=2, b=4, c=6, d=5, e=2, f=1
+    &#160;</pre>
+                </div>
+                <p>In summary, the quite different results of each of these cases are:</p>
+                <div class="code-block"><pre>&#160;
+    Serializable #1:	a=2, b=4, c=4, d=6, e=2, f=2
+&#160;
+    Serializable #2:	a=2, b=4, c=6, d=5, e=4, f=1
+&#160;
+    Repeatable Read:	a=2, b=4, c=4, d=5, e=2, f=1
+&#160;
+    Read Committed:	a=2, b=4, c=6, d=5, e=2, f=1
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

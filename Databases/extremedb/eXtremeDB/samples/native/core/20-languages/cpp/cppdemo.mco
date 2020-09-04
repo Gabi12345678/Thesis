@@ -1,0 +1,22 @@
+// simple schema to demonstrate C++ interface
+
+declare database cppdemo;
+
+struct Dimensions
+{
+  float width, length, height;
+};
+
+class Part
+{
+  string      type;
+  string      name;
+  float       price;
+  unsigned<4> code;
+  Dimensions  dim;
+
+  hash< code >        ByCode [ 10000 ];
+  tree< type, name >  ByType; // ordered by type, name
+};
+
+

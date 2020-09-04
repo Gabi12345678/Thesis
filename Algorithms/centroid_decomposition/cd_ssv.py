@@ -74,7 +74,7 @@ def CD(x, n, m):
     R = np.zeros((m, m))
     for i in range(0, m):
         if (n < 5000):
-            z[:, [i]] = SSV(x, n, m)
+            z[:, [i]] = SSV_init(x, n, m)
         else:
             z[:, [i]] = SSV_init(x, n, m)
         norm  = LA.norm(np.dot(np.transpose(x), z[:, [i]]))

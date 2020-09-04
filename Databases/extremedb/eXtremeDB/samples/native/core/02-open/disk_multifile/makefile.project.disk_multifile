@@ -1,0 +1,14 @@
+MCO_PRJ_LIST += 02-open-disk_multifile
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 02-open-disk_multifile
+PRJ_02-open-disk_multifile_TAGS:=persistent sample core
+PRJ_02-open-disk_multifile_DIR:=$(call mco_project_dir)
+PRJ_02-open-disk_multifile_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_02-open-disk_multifile_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_02-open-disk_multifile_DATABASES:=genericdb
+PRJ_02-open-disk_multifile_RUNTIME:=YES
+PRJ_02-open-disk_multifile_MEMDEV:=PRIVATE
+PRJ_02-open-disk_multifile_STORAGE:=PERSISTENT
+PRJ_02-open-disk_multifile_STORAGEDEV:=AUTO
+PRJ_02-open-disk_multifile_SYNC:=AUTO
+PRJ_02-open-disk_multifile_TRANSMGR:=MURSIW

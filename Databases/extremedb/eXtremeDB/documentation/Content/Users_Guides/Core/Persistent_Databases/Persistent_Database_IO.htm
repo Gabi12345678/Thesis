@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Persistent Database I/O</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Persistent Database I/O</h1>
+            <blockquote>
+                <h2><a name="Setting"></a>
+                </h2>
+                <p>To understand how persistent database read and write operations are performed it is important to first understand how caching works. Typically, persistent database applications are not performing I/O to the persistent media (hard disk, solid state disk, etc.) directly. The operations of reading and writing to the database do not access the persistent media but rather use memory caches to optimize overall performance.</p>
+                <p><i>e</i>X<i>treme</i>DB uses a database cache, or page pool, that can be optimized via a number of configuration options. The page pool holds a certain amount of data for fast access. And when necessary writes the data to or reads from the persistent media via the operating system’s file system. This file system manages its own cache to buffer the contents before actually accessing the persistent media.</p>
+                <p>These two types of cache and how they interact are explained in the following sections.</p>
+                <h3>A note on bypassing the File System Cache</h3>
+                <p>Why do we need file system caching? Using the <code>O_DIRECT</code> flag it is possible to bypass the file system cache and thus avoid the well known problem called "double buffering", i.e. when the same pages are cached by the database cache management and by the operating system's file system cache management. This leads to extra copies and waste of memory. Some people think that the DBMS should have full control over caching and exclude the operating system from this process.</p>
+                <p>But the fact is that <i>only the operating system knows the amount of free resources it has at a given moment</i>. Many empirical tests have shown that attempts to eliminate the operating system's cache <i>actually lead to worse performance</i>.</p>
+                <h3>Huge Page support on Linux systems</h3>
+                <p>Most modern Linux systems allow configuring some part of their virtual memory space to use by huge pages. The huge pages feature enables the Linux kernel to manage large pages of memory in addition to the standard 4KB (on x86 and x86_64) or 16KB (on IA64) page size. When the system needs to access a virtual memory location, it uses the page tables to translate the virtual address to a physical address. Using huge pages means that the system needs to load fewer such mappings into the Translation Lookaside Buffer (TLB), which is the cache of page tables on a CPU that speeds up the translation of virtual addresses to physical addresses. Enabling the huge pages feature allows the kernel to use hugetlb entries in the TLB that point to huge pages. The hugetlb entries mean that the TLB entries can cover a larger address space, requiring many fewer entries to map the memory.
+
+On systems with more than 16GB of memory running <i>e</i>X<i>treme</i>DB databases, enabling the huge pages feature can improve database performance.
+
+ Specifying the MAP_HUGETLB flag, or SHM_HUGETLB for <i>e</i>X<i>treme</i>DB shared memory databases, in the <a href="../../../Programming/C/Structures/Memory_Devices.htm">memory device flags</a> makes it possible to use the huge page feature. </p>
+                <h2>The File System Cache</h2>
+                <p>The operating system (Linux, MacOS, Windows, VxWorks, etc.) allocates a portion of system memory for file system management. The file system works hard to prevent applications from suffering disk I/O latency, for example by using DRAM to buffer writes, and to cache and pre-fetch reads. What matters to the database application is this latency of its requests to the file system.</p>
+                <p>Reads and writes often are served from the file system main memory cache instead of the disk as illustrated in the following diagram:</p>
+                <p>&#160;</p>
+                <p>
+                    <img src="../../../Resources/Images/Persistent_IO_10_526x534.png" style="width: 526;height: 534;" />
+                </p>
+                <p>As the wider arrows indicate, the I/O throughput is orders of magnitude faster for "cache hits" that have RAM access speeds as opposed to the "cache misses" which require the operating system to access the persistent media.</p>
+                <p>Please see the <a href="Persistent_Media_IO.htm">Persistent Media I/O</a> page for further details on how <i>e</i>X<i>treme</i>DB interacts with the Operating System's file management system.</p>
+                <h2>The <i>e</i>X<i>treme</i>DB Database Cache</h2>
+                <p>Why do we need a separate database cache? As explained above, the performance of database applications can be significantly impacted by latency of read write requests from the file system. When read or write requests result in file system "cache misses" the persistent media access can seriously degrade application performance. The file system cannot resolve the performance requirements of database applications for a number of reasons:</p>
+                <ul>
+                    <li value="1">Processes other than the database application(s) can get in the way of efficient caching. Consider an <i>e</i>X<i>treme</i>DB application running alongside other applications. Heavy disk I/O could be caused by some other application. Suppose the <i>e</i>X<i>treme</i>DB application was actually caching very well in DRAM and hardly using the disks, but then a nightly backup process walks the entire file system, rattling the disks. The <i>e</i>X<i>treme</i>DB might then experience very slow database queries caused by an entirely unrelated process.</li>
+                    <li value="2">File systems are unaware of any database-specific objects that need to be accessed together, such as indexes or support structures, etc. Consequently only part of the required data is cached.</li>
+                    <li value="3">Database logic can potentially affect the cache contents, for example objects from a given class may need to be cached.</li>
+                    <li value="4">The database must ensure the safety of writes so that the database is always in a consistent state. The file system <code>_commit()</code> (or <code>_sync()</code> ) API writes buffered data to disk, but in the event of system failure the file system buffer may be lost resulting in database corruption.</li>
+                </ul>
+                <p>For these reasons, <i>e</i>X<i>treme</i>DB implements a database cache to  minimize the effects of persistent media I/O as illustrated in the following diagram:</p>
+                <p>
+                    <img src="../../../Resources/Images/Persistent_IO_11_526x600.png" style="width: 526;height: 600;" />
+                </p>
+                <p>The database cache is defined as a <i>memory device</i> which can be conventional RAM or shared memory. Database transactions affect one or more "pages" which are managed by the database cache (or "page pool") manager as illustrated in the following diagram:</p>
+                <p>
+                    <img src="../../../Resources/Images/Persistent_IO_13_528x604.png" style="width: 528;height: 604;" />
+                </p>
+                <h2>Cache Size and Tuning</h2>
+                <p>The memory address and size for the cache are specified  in the memory devices  passed to the database <b>open</b> API. The memory can be either shared memory or local memory. (It must be shared memory if two or more processes are to share the database.) Generally a larger cache will improve application performance, but the frequency of updates to persistent media (flushing of cache pages) is more important for performance. How database updates are written to persistent media is determined by the <a href="#Transact" name="kanchor345">Transaction Commit Policy</a>.</p>
+                <p>In general, a cache is too small to hold all the data an application might possibly need, so at some point something must be removed from the cache in order to make room for new data. The goal is to retain those items that are more likely to be retrieved again soon. This requires a sensible algorithm for selecting what to remove from the cache. The topic of <i>cache replacement policies</i> or <i>page replacement algorithms</i> is well covered in this <a href="https://en.wikipedia.org/wiki/Cache_replacement_policies">wikipedia article</a> which is worth reading for detailed descriptions of various approaches to this problem. By default <i>e</i>X<i>treme</i>DB uses a variant of the <a href="https://en.wikipedia.org/wiki/Page_replacement_algorithm#Clock">CLOCK</a> algorithm  called <i>Prioritized Cache.</i> Please view the <a href="Cache_Management/Prioritized_Cache.htm">Prioritized Cache</a> page for further implementation details. </p>
+                <p>Normally, when re-opening a <code>persistent</code> database, <i>e</i>X<i>treme</i>DB populates the cache by running the normal application operations. So it takes some time to gain the best performance. To address this the <i>e</i>X<i>treme</i>DB<a name="kanchor346"></a> runtime provides APIs to <a href="../../../Programming/C/Core_Functions/Static/Disk_Manager/save_cache.htm">save</a> and <a href="../../../Programming/C/Core_Functions/Static/Disk_Manager/load_cache.htm">load</a> the cache contents at runtime so that the process of re-opening a <code>persistent</code> database, and preparing it for maximum operational performance, can be significantly enhanced. </p>
+                <h1>Database Log Policy</h1>
+                <p>Log policy controls when transactions are committed to the persistent storage. <i>e</i>X<i>treme</i>DB supports three database logging policies. </p>
+                <blockquote>
+                    <p>
+                        <img src="../../../Resources/Images/note.png" />Note that it is important not to confuse the use of <i>e</i>X<i>treme</i>DB<i> Transaction Logging</i>, an entirely independent group of APIs, with the normal <i>e</i>X<i>treme</i>DB runtime logging for persistent databases. Please see the <a href="../../Transaction_Logging.htm">Transaction Logging</a> page for further details.</p>
+                </blockquote>
+                <p>The policies are described  below, but the basic strategy, benefits and disadvantages of these policies can be summarized as follows:</p>
+                <blockquote>
+                    <h3>Write Ahead Logging (REDO_LOG policy)</h3>
+                    <p>WAL's central concept is that changes to the data must be written only after  those changes have been logged.</p>
+                    <blockquote>
+                        <p><span style="color: #008000; font-weight: bold;">Benefits:</span>
+                        </p>
+                        <p>Significantly reduced number of disk writes (only at commit);</p>
+                        <p>The log file is written sequentially, and so the cost of syncing the log is much less than the cost of flushing the data pages.</p>
+                        <p><span style="color: #dc143c; font-weight: bold;">Disadvantages:</span>
+                        </p>
+                        <p>Cache size limit - can run out of memory when there are many uncommitted updates;</p>
+                        <p>The transaction size is limited to the size of the page pool (cache).</p>
+                    </blockquote>
+                    <h3>Immediate Modifications Logging (UNDO_LOG policy)</h3>
+                    <p>The log file contains entries that allow the current transaction’s updates to be undone.</p>
+                    <blockquote>
+                        <p><span style="color: #008000; font-weight: bold;">Benefits:</span>
+                        </p>
+                        <p>The algorithm never runs out of memory and provides easy and efficient recovery.</p>
+                        <p><span style="color: #dc143c; font-weight: bold;">Disadvantages:</span>
+                        </p>
+                        <p>All updates must be flushed to the database file when committed to persistent media.</p>
+                        <p> All “writes” are to the database file and are random and thus are slower than writes to the log file, which are sequential.</p>
+                        <p>A "flush" is performed not only when the database commits; almost always when dirty pages are discarded from the page pool a "flush" is performed.</p>
+                    </blockquote>
+                    <h3>No logging policy (NO_LOG policy)</h3>
+                    <p>If this option is selected, transaction logging is turned off and a log file is not created.</p>
+                    <blockquote>
+                        <p><span style="color: #008000; font-weight: bold;">Benefits:</span>
+                        </p>
+                        <p>Updates can be significantly faster.</p>
+                        <p><span style="color: #dc143c; font-weight: bold;">Disadvantages:</span>
+                        </p>
+                        <p>Application will not be able to recover the database in the event of a crash.</p>
+                        <p><a name="kanchor347"></a><a name="kanchor348"></a>Transaction rollback is not available (when MURSIW transaction manager is used).</p>
+                    </blockquote>
+                    <p>&#160;</p>
+                </blockquote>
+                <h2>Write Ahead Logging (REDO_LOG policy)</h2>
+                <p>Write Ahead Logging (WAL) is a standard approach to transaction logging. (Please refer to this <a href="https://en.wikipedia.org/wiki/Write-ahead_logging">web page</a> for a general description.)​</p>
+                <p>Briefly, WAL's central concept is that changes to the data must be written only after those changes have been logged - that is, when log records have been flushed to permanent storage. When a page (data or index) is updated, it is "pinned" in the page pool (cache) and guaranteed to never get swapped out during the transaction ("no steal" policy). Upon transaction commit, all updated pages are first written into the log and then committed (flushed) to the permanent storage. Only then are updated pages written to the database (but don't get flushed). If during the commit the log size becomes larger than the specified threshold, a checkpoint is created: all updated pages are written to disk, updates are flushed to the permanent storage and the log is truncated.</p>
+                <p>The obvious benefit of the <code>REDO_LOG</code> policy is a significantly reduced number of disk writes, since only the log file needs to be flushed to disk at the time of transaction commit. Furthermore, the log file is written sequentially, and so the cost of syncing the log is much less than the cost of flushing the data pages. The disadvantage of using WAL is that the algorithm can run out of memory when there are many uncommitted updates. The transaction size is limited to the size of the page pool (cache). Every time a page is made "dirty" (anything is changed on the page), it must remain in cache. </p>
+                <p>The following diagram illustrates the WAL approach:</p>
+                <p>
+                    <img src="../../../Resources/Images/Persistent_IO_14_528x528.png" style="width: 528;height: 528;" />
+                </p>
+                <h2>Immediate Modifications Logging (UNDO_LOG policy)</h2>
+                <p>When the <code>UNDO_LOG</code> strategy is used, the log file contains entries that allow the current transaction’s updates to be un-done. Briefly, the <i>e</i>X<i>treme</i>DB implementation of this approach is as follows: During the update, the runtime marks the containing page as "dirty" and flags it in the bitmap of modified pages, and the original page is written to the log file. Regardless of the number of times the individual page is changed during the transaction, the original image of the page is written to the log file only once.  When the transaction is committed, all modified pages are written and flushed to the database file and then the log file is truncated. The recovery and the rollback procedures read all saved pages from the log file, restoring the original images of the pages from the log file and clearing the "dirty" bit for the page.</p>
+                <p>The advantages of using Undo Logging are that the algorithm never runs out of memory and provides easy and efficient recovery. The disadvantages are that all updates must be flushed to the database file when committed to persistent media. Writes to the database file are usually random and thus are slower than writes to the log file, which are sequential. Further, when we updating the page, we need to be sure that the updated version is not stored to the persistent media before we have saved the original version in the log. So a "flush" is performed not only when the database commits, but almost always when dirty pages are discarded from the page pool.</p>
+                <p>The following diagram illustrates the Undo Logging approach:</p>
+                <p>
+                    <img src="../../../Resources/Images/Persistent_IO_15_528x528.png" style="width: 528;height: 528;" />
+                </p>
+                <h2>The Non-transactional Mode (NO_LOG Option)</h2>
+                <p>If this option is selected, log file updating is turned off, and a log file is not created. This will significantly increase update performance, but the application will not be able to recover the database in the event of a crash, and transaction rollback is also not available. This mode can be useful when the application needs to quickly populate the database file. But it is not recommended to use this option under any other circumstances.</p>
+                <p>&#160;</p>
+                <h2>Choosing the Log file type</h2>
+                <p>The choice of logging policy is determined by the log file type: <code>UNDO_LOG</code>, <code>REDO_LOG</code> or <code>NO_LOG</code>. Following are some guidelines for choosing the proper logging strategy depending on application characteristics:</p>
+                <p>Choose <code>UNDO_LOG</code> when the application:</p>
+                <ul>
+                    <li value="1">has long-running transactions</li>
+                    <li value="2">is performance insensitive at commit</li>
+                    <li value="3">runs in a space-constrained transactional environment</li>
+                    <li value="4">recovery time is essential</li>
+                </ul>
+                <p>Choose <code>REDO_LOG</code> when the application:</p>
+                <ul>
+                    <li value="1">normally has short transactions</li>
+                    <li value="2">has throughput and latency sensitive procedures that require fast commit</li>
+                </ul>
+                <p>Choose <code>NO_LOG</code> <i>if data safety is of no concern</i>:</p>
+                <ul>
+                    <li value="1">Never use in production unless data safety is irrelevant</li>
+                </ul>
+                <p><a name="Setting"></a>For further details please see the <a href="Setting_Log_File_Type.htm">Setting the Log File Type</a> page.</p>
+                <h1>Database Transactions</h1>
+                <p>The ACID (Atomicity, Consistency, Isolation, Durability) model is one of the oldest and most important concepts of database theory. It sets forward four goals that every database management system must strive to achieve: atomicity, consistency, isolation and durability. No database that fails to meet any of these four goals can be considered reliable:</p>
+                <p><b>Atomicity</b> states that database modifications must follow an “all or nothing” rule. Each transaction is said to be “atomic.” If one part of the transaction fails, the entire transaction fails. It is critical that the database management system maintain the atomic nature of transactions in spite of any DBMS, operating system or hardware failure.</p>
+                <p><b>Consistency</b> states that only valid data will be written to the database. If, for some reason, a transaction is executed that violates the database’s consistency rules, the entire transaction will be rolled back and the database will be restored to a state consistent with those rules. On the other hand, if a transaction successfully executes, it will take the database from one state that is consistent with the rules to another state that is also consistent with the rules.</p>
+                <p><b>Isolation</b> requires that multiple transactions occurring at the same time not impact each other’s execution. For example, if Joe issues a transaction against a database at the same time that Mary issues a different transaction, both transactions should operate on the database in an isolated manner. The database should either perform Joe’s entire transaction before executing Mary’s or vice-versa. This prevents Joe’s transaction from reading intermediate data produced as a side effect of part of Mary’s transaction that will not eventually be committed to the database. Note that the isolation property does not ensure which transaction will execute first, merely that they will not interfere with each other.</p>
+                <p><b>Durability</b> ensures that any transaction committed to the database will not be lost. Durability is ensured through the use of database backups and transaction logs that facilitate the restoration of committed transactions in spite of any subsequent software or hardware failures.</p>
+                <h2><a name="Transact"></a>Transaction Commit Policies</h2>
+                <p>A transaction is said to be durable if, upon return of control to the application after a transaction commit, the transaction data can be recovered in the event of a failure of the application or the system (assuming that the media on which the database and/or transaction log itself is not compromised / corrupted).</p>
+                <p>In order to guarantee the durability of transactions, database systems must force the updates to be written through the database cache, and the file system cache, onto the physical media (be it solid state or spinning media).  This flushing of the file system buffers is an expensive operation (in terms of performance), but is the only way to guarantee the durability property.</p>
+                <p>Why might an application relax the durable property of transactions? Durable transactions are “expensive” . Some applications do not require durable transactions, for example: commodity / equity trading systems whose data can be re-loaded from other sources; and applications that implement bulk load operations that can be repeated if necessary.</p>
+                <p><i>e</i>X<i>treme</i>DB offers four transaction commit policies. The commit policy is initially set when opening the database but can later be modified during program execution. </p>
+                <p> (Note that the transaction commit policy affects <i>persistent databases only</i>).</p>
+                <p>The transaction commit policies are described  below, but the basic strategy, benefits and disadvantages of these policies can be summarized as follows:</p>
+                <blockquote>
+                    <h3>Buffered Synchronization (MCO_COMMIT_BUFFERED policy)</h3>
+                    <p>Indicates that the database cache is not flushed to disk upon transaction commit.</p>
+                    <blockquote>
+                        <p><span style="color: #008000; font-weight: bold;">Benefits:</span>
+                        </p>
+                        <p>Significantly reduces the number of I/O operations.</p>
+                        <p>Application failure will not cause database corruption.</p>
+                        <p>The application can explicitly force the cache to be flushed to the media (i.e. Periodically, at the application’s discretion, it can persist all the data to disk and truncate the log file).</p>
+                        <p><span style="color: #dc143c; font-weight: bold;">Disadvantages:</span>
+                        </p>
+                        <p>In case of application failure, the database cache is destroyed and buffered transactions (changes made by all transactions committed after the policy was set) will be lost.</p>
+                    </blockquote>
+                    <h3>No Synchronization (MCO_COMMIT_NO_SYNC policy)</h3>
+                    <p>Indicates that the database runtime does not explicitly synchronize the file system buffers with the file system media.   It is up to the file system to determine when the data is actually written to the media.</p>
+                    <blockquote>
+                        <p><span style="color: #008000; font-weight: bold;">Benefits:</span>
+                        </p>
+                        <p>This mode provides some performance advantages over the full synchronization mode.</p>
+                        <p><span style="color: #dc143c; font-weight: bold;">Disadvantages:</span>
+                        </p>
+                        <p>Risks losing transaction data in the event of a system crash (while committed transactions are still in the file system cache). The database and log files could be left in an inconsistent state causing the database content to be corrupted.</p>
+                    </blockquote>
+                    <h3>Delayed Synchronization (MCO_COMMIT_DELAYED policy)</h3>
+                    <p>Indicates that modified pages are kept in the page pool, similar to the <code>MCO_COMMIT_BUFFERED</code> policy. When the total size of all kept pages reaches the threshold or the number of delayed commits exceeds a value, all delayed transactions are committed to the persistent storage at once. </p>
+                    <blockquote>
+                        <p><span style="color: #008000; font-weight: bold;">Benefits:</span>
+                        </p>
+                        <p>This mode has performance advantages over the full synchronization (<code>MCO_COMMIT_SYNC_FLUSH</code>) mode. </p>
+                        <p>No risk of corrupting the database.</p>
+                        <p><span style="color: #dc143c; font-weight: bold;">Disadvantages:</span>
+                        </p>
+                        <p>In case of system failure multiple transactions (that are still in the  cache) are lost.</p>
+                    </blockquote>
+                    <h3>Full Synchronization (MCO_COMMIT_SYNC_FLUSH policy)</h3>
+                    <p>Indicates that a database commit flushes the cache, synchronizes the file system buffers for both database and log files.(Note that this is the default transaction policy.)</p>
+                    <blockquote>
+                        <p><span style="color: #008000; font-weight: bold;">Benefits:</span>
+                        </p>
+                        <p>This policy provides durable transactions.</p>
+                        <p><span style="color: #dc143c; font-weight: bold;">Disadvantages:</span>
+                        </p>
+                        <p>None really, except that it can be slow.</p>
+                    </blockquote>
+                    <p>&#160;</p>
+                </blockquote>
+                <h2>Buffered Synchronization (MCO_COMMIT_BUFFERED policy)</h2>
+                <p>This policy indicates that the database cache does not get flushed to disk upon transaction commit but when the application calls the cache flush API. Pages that were made dirty by the current transaction are left in the database cache. That applies to both the database and the log file pages. This policy significantly reduces the number of I/O operations: the runtime only writes dirty pages to disk during normal swapping. In the case of an application failure, the database cache is destroyed and all changes made by buffered transactions (committed after the policy was set) will be lost. The database <i>can be</i> corrupted in the case of an abnormal application termination when using the <code>NO_LOG</code> logging policy.</p>
+                <p>Note that an  application failure <i>will not cause database corruption</i>, provided that the hardware and the operating system are working properly, as the log file is written to persistent storage during the cache flush operation thereby guaranteeing consistency of database files. But, because not every commit will cause a write to persistent media, the buffered commits will be lost. The database is restored to a consistent state from the log file when the application is restarted. </p>
+                <p>The following diagram illustrates the Buffered Synchronization approach:</p>
+                <p>
+                    <img src="../../../Resources/Images/Persistent_IO_16_529x537.png" style="width: 529;height: 537;" />
+                </p>
+                <p>Note that the dashed arrows indicate that data in the cache (buffered transactions) are not automatically flushed to the persistent media. Persistent updates occur when  the application calls the cache flush API.</p>
+                <h2>No Synchronization (MCO_COMMIT_NO_SYNC policy)</h2>
+                <p>This policy indicates that the database runtime does not explicitly synchronize the file system buffers with the file system media. Upon transaction commit, all changes made by the transaction are transferred from the application space to the operating system space and the log file is truncated (when using the <code>UNDO_LOG</code> logging policy only). It is up to the file system to determine when the data is actually written to the media. This mode provides some performance advantages over the full synchronization mode but also risks losing transaction data in the event of a system crash (while committed transactions are still in the file system cache).</p>
+                <p>Note that in the case of a failure the database and log files could be left in an inconsistent state causing the database content to be corrupted.</p>
+                <p>With MCO_COMMIT_NO_SYNC mode, the application can explicitly force the cache to be flushed to the media. When combined with the <code>MCO_COMMIT_NO_SYNC</code> transaction policy, the cache flush API allows periodically (at the application’s discretion) persisting all the data to disk and truncating the log file.</p>
+                <p>The following diagram illustrates the No Synchronization approach:</p>
+                <p>
+                    <img src="../../../Resources/Images/Persistent_IO_17_528x536.png" style="width: 528;height: 536;" />
+                </p>
+                <p>Note that the solid arrows indicate that data in the database cache is flushed to file system on commit and the dashed arrows indicate that data in the file system cache (buffered transactions) are flushed to the persistent media under file system control.</p>
+                <h2>Delayed Synchronization (MCO_COMMIT_DELAYED policy)</h2>
+                <p>This commit policy is only available if the logging policy is set to <code>REDO_LOG</code>.  Similar to the <code>MCO_COMMIT_BUFFERED</code>  mode, in this mode the transaction is not committed to persistent media immediately upon the database commit.  Instead, the database cache manager keeps the transaction in memory until a specified threshold is reached. There are two threshold criteria: 1) the amount of <i>used space</i> (1/3 is the default) and 2) the <i>number of transactions</i> (turned off by default). So when the total size of all kept pages reaches the <i>used space</i> threshold or the number of delayed commits exceeds the <i>number of transactions</i> value, all delayed transactions are committed to the persistent storage at once. </p>
+                <p>In the case of an application failure, some of the last transactions can be lost because it cannot be known when the commit to persistent media actually happened and which transactions were actually written.</p>
+                <p>The following diagram illustrates the Delayed Synchronization approach:</p>
+                <p>
+                    <img src="../../../Resources/Images/Persistent_IO_18_525x533.png" style="width: 525;height: 533;" />
+                </p>
+                <p>Note that the dashed arrows indicate that data in the cache (buffered transactions) are not automatically flushed to the persistent media. Persistent updates occur when  the specified threshold is reached.</p>
+                <h2>Full Synchronization (MCO_COMMIT_SYNC_FLUSH policy)</h2>
+                <p>This policy indicates that a database commit flushes the cache, synchronizes the file system buffers for both database and log files and truncates the log file (when using the <code>UNDO_LOG</code> logging policy only).  This policy provides durable transactions. The database can be corrupted only if the physical media where the database and log files are located is damaged.</p>
+                <p>The following diagram illustrates the Full Synchronization approach:</p>
+                <p>
+                    <img src="../../../Resources/Images/Persistent_IO_19_527x535.png" style="width: 527;height: 535;" />
+                </p>
+                <p>Note that the solid arrows indicate that data in the database cache is flushed to file system cache and to the persistent media automatically when transactions are committed.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

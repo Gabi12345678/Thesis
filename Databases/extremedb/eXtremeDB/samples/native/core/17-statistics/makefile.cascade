@@ -1,0 +1,8 @@
+-include $(call mco_makefile_file, \
+dbcalcapi-conv/makefile.project.dbcalcapi-conv \
+dbcalcapi-disk/makefile.project.dbcalcapi-disk \
+dbcalc-conv/makefile.project.dbcalc-conv \
+dbcalc-disk/makefile.project.dbcalc-disk \
+dbstat-conv/makefile.project.dbstat-conv \
+dbstat-disk/makefile.project.dbstat-disk \
+)

@@ -1,0 +1,62 @@
+/************************************************************
+ *                                                          *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.*
+ *                                                          *
+ ************************************************************/
+
+#define int1      signed<1>
+#define int2      signed<2>
+#define int4      signed<4>
+#define int8      signed<8>
+#define uint8     unsigned<8>
+#define uint4     unsigned<4>
+#define uint2     unsigned<2>
+#define uint1     unsigned<1>
+
+declare database uda5;
+
+class branches {
+      int4      Bid;
+      int4      Bbalance;
+      char<88>  filler;
+
+      list;
+      hash<Bid> Bpk[1];
+};
+
+
+class tellers {
+      int4      Tid;
+      int4      Bid;
+      int4      Tbalance;
+      char<84>  filler;
+
+      list;
+      event <new> newEv;    
+      hash<Tid> Tpk[10];
+};
+
+class accounts {
+      int4      Aid;
+      int4      Bid;
+      int4      Abalance;
+      char<84>  filler;
+
+      list;
+      event <filler update> upEv1;
+      event <Bid update> upEv2;
+      event <delete> delEv;
+      hash<Aid> Apk[20000];
+};
+
+class account_history {
+      int4      Tid;
+      int4      Bid;
+      int4      Aid;
+      int4      delta;
+      time      htime;
+      char<22>  filler;
+
+      event <checkpoint> chkEv;
+      list;
+};

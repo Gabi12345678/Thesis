@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += AsyncEvent
+PRJ_TARGET_CLASS += AsyncEvent
+PRJ_AsyncEvent_TAGS:=sample java core events
+PRJ_AsyncEvent_DIR :=$(call mco_project_dir)
+PRJ_AsyncEvent_SRC :=$(call mco_project_file,AsyncEvent.java MyClass.java)

@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Lua API Reference</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Lua API Reference</h1>
+            <blockquote>
+                <p>The <i>e</i>X<i>treme</i>DB <i>Lua</i> API consists of the <a href="#Function">functions</a> and <a href="#Classes">classes</a> described in the following sections. (Please see the <i><a href="../../../Appendix/lua-5.3.4/doc/manual.html"><i>Lua</i> 5.3 Reference Manual</a></i> for detailed information on the <i>Lua</i> language.)</p>
+                <h1><a name="Function"></a>Functions</h1>
+                <p>The <i>Lua</i> functions are described in the following sections.</p>
+                <h2>initRuntime()</h2>
+                <blockquote>
+                    <p>This function loads and initializes eXtremeDB runtime.</p>
+                    <div class="code-block"><pre>&#160;
+  function initRuntime(t)
+&#160;</pre>
+                    </div>
+                    <h3>Parameters</h3>
+                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 68px;" />
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" style="width: 398px;" />
+                        <tbody>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">t</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">A hash table with the possible keys defined below</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h3>Possible keys</h3>
+                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 57px;" />
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                        <tbody>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">disk</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Boolean, defines if persistent runtime should be loaded. (Default is <code>false</code>, which means load IM runtime.)</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tmgr</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1"><a name="kanchor352"></a>String, which transaction manager should be used. Possible values are '<code>mvcc</code>', '<code>mursiw</code>'. (Default value is '<code>mursiw</code>')</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">shm</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Boolean, specifies if shared memory support should be enabled. (Default value is <code>false</code>.)</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">debug</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Boolean, specifies if debug libraries should be loaded. (Default value is <code>false</code>.)</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">cluster</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Boolean, specifies if cluster support should be loaded. (Default value is <code>false</code>.)</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">ha</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Boolean, specifies if HA support should be loaded. (Default value is <code>false</code>.)</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">disk_compression</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Boolean, specifies if disk compression library should be loaded. (Default value is <code>true</code>.)</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">posix</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">Boolean, specifies if posix synchronization primitives should be loaded. (Default value is <code>true</code>.)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>&#160;</p>
+                </blockquote>
+                <h2>create()</h2>
+                <blockquote>
+                    <p>This function loads and initializes the <i>e</i>X<i>treme</i>DB runtime.</p>
+                    <div class="code-block"><pre>  &#160;
+  function create(dbname, devs, params, schema, persistent, debug, 
+           nosort, largeDatabase, compact, transient)
+           &#160;</pre>
+                    </div>
+                    <h3>Parameters:</h3>
+                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                        <tbody>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">dbname</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A string, name of the database.</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">devs</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>A list of tables, defines database devices. Each database device is described with table, as follows:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">type </td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                                    <p>The type of the device. Possible values are: <code>conv</code>, <code>named</code>, <code>file</code>, <code>multifile</code>, <code>raid</code>.</p>
+                                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 73px;" />
+                                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                                        <tbody>
+                                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">conv</td>
+                                                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Conventional memory device. Creates a device in conventional memory. In this case expected keys and values are: <code>size, flags</code></td>
+                                                            </tr>
+                                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">named</td>
+                                                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Shared memory device: Creates a device in shared memory. Expected values are: <code>size, name, flags, hint</code></td>
+                                                            </tr>
+                                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">file</td>
+                                                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">This key has the same meaning as in the <a href="../../../Programming/C/Structures/Memory_Devices.htm">mco_device_t</a> structure.</td>
+                                                            </tr>
+                                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">multifile</td>
+                                                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">This key has the same meaning as in the <a href="../../../Programming/C/Structures/Memory_Devices.htm">mco_device_t</a> structure.</td>
+                                                            </tr>
+                                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">raid</td>
+                                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">This key has the same meaning as in the <a href="../../../Programming/C/Structures/Memory_Devices.htm">mco_device_t</a> structure.</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">size</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The size of the memory region.  (The memory region will be created.)</td>
+                                            </tr>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">name</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1"><b>For </b><code style="font-weight: bold;">type=named</code><b>:</b> the name of the shared memory region.</td>
+                                            </tr>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">flags</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A bit mask of flags for device. These are the same flags as for C API <a href="../../../Programming/C/Structures/Memory_Devices.htm">mco_device_t</a> structure.</td>
+                                            </tr>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">hint </td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1"><b>For </b><code style="font-weight: bold;">type=named</code><b>:</b> the same parameter as for the <a href="../../../Programming/C/Structures/Memory_Devices.htm">mco_device_t</a> structure. It can be a desired address to map shared memory region or <code>nil</code> to map region to any possible address.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">params</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A table having the same keys with the same meaning as the corresponding fields in the <code><a href="../../../Programming/C/Structures/Database_Parameters.htm">db_params</a></code> C API structure</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">schema</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A string containing the database schema to pass to the <code><a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a></code> compiler. Can be <code>nil</code> if a schema is not used, e.g. for using a dynamic schema with SQL or to load a schema from a persistent database.</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">persistent</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A Boolean parameter defining if the schema is to be compiled for a persistent database.  (Please refer to the <a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a> page for more details.)</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">debug</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A Boolean parameter defining if the schema is to be compiled with the debug flag.  (Please refer to the <a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a> page for more details.)</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">nosort</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A Boolean parameter specifying if the table (class) fields should be sorted.  (Please refer to the <a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a> page for more details.)</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">largeDatabase</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A Boolean parameter specifying that large database support is enabled. . (Please refer to the <a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a> page for more details.)</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">compact</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A Boolean parameter specifying that compact object layout is used. (Please refer to the <a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a> page for more details.)</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">transient</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">A Boolean parameter defining if the schema is to be compiled for a transient (in-memory) database.  (Please refer to the <a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a> page for more details.)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </blockquote>
+                <p>&#160;</p>
+                <h2>connect()</h2>
+                <blockquote>
+                    <p>This function connects database engine. It returns an instance of the <i>SqlEngine</i> class which represents a connection; it behaves like a connection and should be treated as a connection. The parameters determine whether the <i>SqlEngine</i> is connected to a <a href="#Local">Local Database</a>, as a <a href="#Remote">Remote Client</a> or <a href="#Distribu">Distributed Client</a>.</p>
+                    <div class="code-block"><pre>&#160;
+  function connect( params )
+&#160;</pre>
+                    </div>
+                    <h3>Parameters</h3>
+                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 68px;" />
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" style="width: 711px;" />
+                        <tbody>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">params</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">A table; for different scenarios a different set of keys must be set according to the usage scenarios described below	</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h2>Usage Scenarios</h2>
+                    <p>The <i>SqlEngine</i> can connect to a local or remote database depending on the parameters specified. </p>
+                    <h3><a name="Local"></a>Local Database</h3>
+                    <p>Create local in-process database and connect the local engine by specifying the following keys:</p>
+                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 57px;" />
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                        <tbody>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">dbname</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A string, name of the database.</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">dbsize</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">String, which transaction manager should be used. Possible values are '<code>mvcc</code>', '<code>mursiw</code>'. (Default value is '<code>mursiw</code>')</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">pagesize</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">Boolean, specifies if shared memory support should be enabled. (Default value is <code>false</code>.)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Example:</p>
+                    <div class="code-block"><pre>&#160;
+    c = connect({dbname='testdb', pagesize=1024, dbsize=1024*1024*1024})
+    print ('Connection is:', c)
+    &#160;</pre>
+                    </div>
+                    <h3><a name="Remote"></a>Remote RSQL Client</h3>
+                    <p>Connect to a remote <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> server using RSQL protocol by specifying the following keys:</p>
+                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 57px;" />
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                        <tbody>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">host</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A  mandatory string specifying the host IP address.</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">port </td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The port number to connect to</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">sql_login</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">An optional string: the login username</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">sql_password</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">An optional string: the login password</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">ssl_params</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">An optional <i>FFI</i>-defined structure: the keys correspond to the C API structure <a href="../../../Programming/C/Structures/SSL_Parameters.htm">mco_ssl_params_t</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Example:</p>
+                    <div class="code-block"><pre>    &#160;
+    sslparams = ffi.new('mco_ssl_params_t')
+    ssl_params_init(sslparams)
+    sslparams.verify_mode = bit.bor(SSLVerifyMode.VerifyPeer, SSLVerifyMode.VerifyFailIfNoPeerCert)
+    sslparams.certificate_file = "../../thlib/certs/client.crt"
+    sslparams.certificate_file_type = 1 -- SSL_FILETYPE_PEM / X509_FILETYPE_PEM
+    sslparams.private_key_file = "../../thlib/certs/client.key"
+    sslparams.private_key_file_type = 1 -- SSL_FILETYPE_PEM / X509_FILETYPE_PEM
+    &#160;
+    conn = connect{host='localhost', port=5010, sql_login=’john’, sql_password=’run_like_hell’, ssl_params=sslparams}
+                
+    &#160;</pre>
+                    </div>
+                    <h3><a name="Distribu"></a>Distributed RSQL Client</h3>
+                    <p>Open several remote servers (shards) and create a distributed client by specifying  the following keys:</p>
+                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 115px;" />
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                        <tbody>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">nodes</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">A  mandatory string specifying the array of nodes to create: each node specification consists of an IP address and port in the form "&lt;address&gt;:port". For example "localhost:5001".</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">sql_login</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">An optional string: the login username</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">sql_password</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">An optional string: the login password</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">ssl_params</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">An optional <i>FFI</i>-defined structure: the keys correspond to the C API structure <a href="../../../Programming/C/Structures/SSL_Parameters.htm">mco_ssl_params_t</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Example:</p>
+                    <div class="code-block"><pre>&#160;
+    sslparams = ffi.new('mco_ssl_params_t')
+    ssl_params_init(sslparams)
+    sslparams.verify_mode = bit.bor(SSLVerifyMode.VerifyPeer, SSLVerifyMode.VerifyFailIfNoPeerCert)
+    sslparams.certificate_file = "../../thlib/certs/client.crt"
+    sslparams.certificate_file_type = 1 -- SSL_FILETYPE_PEM / X509_FILETYPE_PEM
+    sslparams.private_key_file = "../../thlib/certs/client.key"
+    sslparams.private_key_file_type = 1 -- SSL_FILETYPE_PEM / X509_FILETYPE_PEM
+    &#160;
+    conn = connect{ nodes={"localhost:5010", "localhost:5011"},
+                
+             sql_login='user2',
+             sql_password='hYfjdKK2',
+             ssl_params=sslparams}
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <blockquote>
+                    <h3>RSQL Client with Compression enabled</h3>
+                    <p>Open a remote SQL client with the maximum compression level</p>
+                    <div class="code-block"><pre>&#160;
+    c = connect({host='localhost', port=5010, sql_login=’john’, compressionLevel=9})
+    &#160;</pre>
+                    </div>
+                    <p>&#160;</p>
+                </blockquote>
+                <h2>iseq()</h2>
+                <blockquote>
+                    <p>This function takes a sequence handle  argument and creates an iterator. </p>
+                    <div class="code-block"><pre>&#160;
+  function iseq(it)
+&#160;</pre>
+                    </div>
+                    <h3>Parameters</h3>
+                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 68px;" />
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" style="width: 711px;" />
+                        <tbody>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">it</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">A sequence iterator</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Example:</p>
+                    <div class="code-block"><pre>&#160;
+    for el in iseq(seqit) do
+        print (el)
+    end
+    &#160;</pre>
+                    </div>
+                    <p>&#160;</p>
+                </blockquote>
+                <h2>isenq()</h2>
+                <blockquote>
+                    <p>This function takes a number of sequence handles and creates an iterator which will return values for all of the sequences. The sequences will be iterated simultaneously, so each <code>next()</code> call will take one element from all the sequences. Sequences must have equal number of arguments. End of iteration is determined by the first element. </p>
+                    <div class="code-block"><pre>&#160;
+    funtion iseqn(it1, … itN)
+    &#160;</pre>
+                    </div>
+                    <p>Example:</p>
+                    <div class="code-block"><pre>&#160;
+    for price,vol in iseqn(priceit, volit) do
+        print (price, vol)
+    end
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>&#160;</p>
+                <h2>ResetLuaUDFs()</h2>
+                <blockquote>
+                    <p>Sometimes it may be necessary to change the source code of a UDF. The Lua UDF is compiled at the time of its first run and then this compiled object is kept in the Lua interpreter. So any changes to the UDF source code will not actually be active; the SQL engine will continue to execute the old version.</p>
+                    <p>This function will reset Lua's table of loaded compiled functions so that on the next call the new version of the UDF will be compiled, allowing reloading without having to restart the SQL engine, or in the case of <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>, restart the <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> server. This will incur a performance penalty, but reloads Lua UDFs without the inconvenience of restarting the server.</p>
+                    <p>The following code snippet shows how <code>ResetLuaUDFs()</code> can be called after changing the source code to UDF <code>get_data3()</code>. Note that it returns a different value after being reloaded:</p>
+                    <div class="code-block"><pre xml:space="preserve">&#160;
+    XSQL&gt;select get_data3();</pre><pre xml:space="preserve">    #1</pre><pre xml:space="preserve">    ------------------------------------------------------------------------------</pre><pre xml:space="preserve">    <span style="background-color: #ffff00;">50</span>
+    Selected records: 1
+    XSQL&gt;select ResetLuaUDFs();</pre><pre xml:space="preserve">    #1</pre><pre xml:space="preserve">    ------------------------------------------------------------------------------</pre><pre xml:space="preserve">    null</pre><pre xml:space="preserve">    Selected records: 1
+</pre><pre xml:space="preserve">    XSQL&gt;select get_data3();</pre><pre xml:space="preserve">    #1</pre><pre xml:space="preserve">    ------------------------------------------------------------------------------</pre><pre xml:space="preserve">    <span style="background-color: #ffff00;">51</span></pre><pre xml:space="preserve">
+    Selected records: 1</pre><pre xml:space="preserve">&#160;</pre>
+                    </div>
+                </blockquote>
+                <p>&#160;</p>
+                <h1><a name="Classes"></a>Classes</h1>
+                <p>The <i>Lua</i> classes are  described in the following sections.</p>
+                <h2><a name="SqlEngin"></a>SqlEngine</h2>
+                <blockquote>
+                    <p>The <i>SqlEngine</i> class is used to execute SQL statements and queries as well as to call <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> functions providing the following methods:</p>
+                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 80px;" />
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" style="width: 626px;" />
+                        <tbody>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">query()</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>Execute a SQL query and return a <i>Cursor.</i></p>
+                                    <div class="code-block"><pre>&#160;
+  query(sql, ...)
+&#160;</pre>
+                                    </div>
+                                    <p>Parameters:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 33px;" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">sql</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">An SQL query string with %b (bool), %s (string), %L (integer), %f (real) placeholders for parameters</td>
+                                            </tr>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">...</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">A varying list of string parameters to be substituted</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p>Example:</p>
+                                    <div class="code-block"><pre>&#160;
+  engine:query("select * from Customer where id=%s", cust_id)
+    &#160;</pre>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">statement()</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>Execute an insert, update, delete SQL statement and return the number of affected rows.</p>
+                                    <div class="code-block"><pre>&#160;
+  statement(sql, ...)
+&#160;</pre>
+                                    </div>
+                                    <p>Parameters:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 33px;" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">sql</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">An SQL statement with %[b (bool), %s (string), %L (integer), %f (real) placeholders for parameters</td>
+                                            </tr>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">...</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">A varying list of string parameters to be substituted</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p>Example:</p>
+                                    <div class="code-block"><pre>&#160;
+  engine:statement("insert into Customer values (%s,%s,%s)", 
+            "ABC123", "Honjuan Inc.", "Shengen, po.1234")
+    &#160;</pre>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">call</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>Call an <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> function with specified arguments and return the result of the function.</p>
+                                    <div class="code-block"><pre>&#160;
+  call(func,...)
+&#160;</pre>
+                                    </div>
+                                    <p>Parameters:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 33px;" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">func</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">An SQL statement with %[b (bool), %s (string), %L (integer), %f (real) placeholders for parameters</td>
+                                            </tr>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">...</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">A varying list of string parameters to be substituted</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p>Example:</p>
+                                    <div class="code-block"><pre>&#160;
+  engine:call("seq_avg",price)
+  &#160;</pre>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">close</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">
+                                    <p>Close the current session.</p>
+                                    <div class="code-block"><pre>&#160;
+  close()
+&#160;</pre>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </blockquote>
+                <p>&#160;</p>
+                <h2>Cursor</h2>
+                <blockquote>
+                    <p>The <i>Cursor</i> class represents a database cursor. It is created and returned as the result of the <i>SqlEngine</i>:method <code>query()</code>.  <i>Cursor</i> provides the following methods:</p>
+                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 168px;" />
+                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                        <tbody>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">moveNext()</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Move the cursor to next record. This function can be used instead of <code>next()</code>  if record fields are accessed using <code>Cursor:get*()</code> methods. It returns <code>true</code> if there is next record, <code>false</code> otherwise.</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">next()</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Get the next record. It returns the next record or <code>nil</code> if end of the result set is reached.</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">getColumnName( column )</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>Get the result column name. </p>
+                                    <p>Parameters:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 68px;" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">column</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">The zero-based column index of the column</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">getColumnType( column )</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Get the result column type: It returns the column type as: <code>'void', 'int', 'real', 'string', 'bool', 'array', 'struct', 'binary', 'raw', 'sequence'</code></td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">extract( dst, size )</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>Extract the record in a C structure (created using <i>FFI</i>).</p>
+                                    <p>Parameters:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 68px;" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">dst</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The address of the structure (created using <code>ffi.new</code>)</td>
+                                            </tr>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">size</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1"> The size of the structure (<code>ffi.sizeof</code>)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">getInt( column )</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>Get an integer column value.</p>
+                                    <p>Parameters:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 68px;" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">column</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">The zero-based column index of the column</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p>Example:</p>
+                                    <div class="code-block"><pre>    &#160;
+  local i0 = cursor:getInt(0)
+    &#160;</pre>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">getReal( column )</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>Get a floating point column value.</p>
+                                    <p>Parameters:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 68px;" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">column</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">The zero-based column index of the column</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p>Example:</p>
+                                    <div class="code-block"><pre>&#160;
+  local r0 = cursor:getReal(0)
+    &#160;</pre>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">getString( column )</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>Get a string column value.</p>
+                                    <p>Parameters:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 68px;" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">column</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">The zero-based column index of the column</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">getBinary( column )</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>Get a binary column value.</p>
+                                    <p>Parameters:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 68px;" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">column</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">The zero-based column index of the column</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">get( column )</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>Get a column value.</p>
+                                    <p>Parameters:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 68px;" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">column</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">The zero-based column index of the column</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">getSequence( column )</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>Get a sequence column value. It returns a raw sequence that can be passed to <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> sequence functions or converted to a sequence iterator using the <code>Sequence.iterator</code> function.</p>
+                                    <p>Parameters:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 68px;" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">column</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">The zero-based column index of the column</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">getBool( column )</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                    <p>Get a Boolean column value.</p>
+                                    <p>Parameters:</p>
+                                    <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 68px;" />
+                                        <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                                        <tbody>
+                                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">column</td>
+                                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">The zero-based column index of the column</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p>Example:</p>
+                                    <div class="code-block"><pre>&#160;
+  local b0 = cursor:getBool(0)
+    &#160;</pre>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">numberOfColumns()</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Get the number of columns in the result set.</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">getRow()</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Get the current record as a <i>Lua</i> table.</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">close()</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Close the cursor.</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">reset()</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Reset the cursor.</td>
+                            </tr>
+                            <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                                <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">lazy()</td>
+                                <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">
+                                    <p>Setup a cursor to lazily extract columns. When lazy columns extraction is active, the cursor will extract only columns which are requested by the program  (UDF or script). Columns that are not specified, will not be extracted. Lazy extraction will speed up execution.</p>
+                                    <p>Example:</p>
+                                    <div class="code-block"><pre>&#160;
+  for t in con:query("select * from eqtrade"):lazy():tuples() do
+    if t.price &gt;= 10 then
+      acc.sum_size = (acc.sum_size or 0) + t.size
+      acc.sum_price = (acc.sum_price or 0) + t.price
+      count = count + 1
+    end
+  end
+  &#160;</pre>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </blockquote>
+                <p>&#160;</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,15 @@
+MCO_PRJ_LIST += 18-backup-bse-conv
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 18-backup-bse-conv
+PRJ_18-backup-bse-conv_TAGS:=persistent sample core
+PRJ_18-backup-bse-conv_DIR:=$(call mco_project_dir)
+PRJ_18-backup-bse-conv_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_18-backup-bse-conv_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_18-backup-bse-conv_DATABASES:=backupdb
+PRJ_18-backup-bse-conv_RUNTIME:=YES
+PRJ_18-backup-bse-conv_MEMDEV:=PRIVATE
+PRJ_18-backup-bse-conv_STORAGE:=TRANSIENT
+PRJ_18-backup-bse-conv_STORAGEDEV:=
+PRJ_18-backup-bse-conv_SYNC:=AUTO
+PRJ_18-backup-bse-conv_TRANSMGR:=MURSIW
+PRJ_18-backup-bse-conv_F_SERI:=YES

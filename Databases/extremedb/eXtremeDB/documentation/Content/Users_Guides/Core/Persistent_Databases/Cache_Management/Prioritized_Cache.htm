@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeDB Prioritized Cache</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>DB Prioritized Cache</h1>
+            <blockquote>
+                <p>As explained in the <a href="../Persistent_Database_IO.htm">Persistent Database I/O</a> page, for persistent databases I/O operations (reading from and writing to the persistent media) are the most “expensive” operations in performance terms. To minimize the effect of I/O, <i>e</i>X<i>treme</i>DB<a name="kanchor811"></a> implements a Disk Manager (DM) Cache that interacts with the Operating System’s file system cache.  By default <i>e</i>X<i>treme</i>DB uses a variant of the CLOCK caching  algorithm called <i>Prioritized Cache</i>. It is also possible to choose a Least Recently Used (LRU) algorithm by rebuilding the <i>e</i>X<i>treme</i>DB<a name="kanchor812"></a> runtime setting an internal conditional compilation (#ifdef)&#160;switch. (Please contact <i>McObject Support</i> for further details if the LRU algorithm is desired.)</p>
+                <p>The following sections explain some implementation details to help developers optimize the <i>e</i>X<i>treme</i>DB Disk Manager performance for a specific application’s needs. </p>
+                <h2>Implementation</h2>
+                <h3>Least Recently Used (LRU) Algorithm</h3>
+                <p>The LRU policy is based on the principle of locality which states that program and data references within a process tend to cluster. The LRU replacement policy selects that page for replacement which has not been referenced for the longest time. For years, LRU was considered to be the optimal online policy. The problem with this approach for small in-memory entities is the difficulty in implementation. One approach would be to tag each page with the time of its last reference; this would have to be done at each memory reference, both instruction and data. LRU policy does nearly as well as an optimal policy, but it imposes significant overhead.</p>
+                <p> Typical implementations of the LRU algorithm require keeping "age bits" for cached pages and tracking the "Least Recently Used" cache page based on these age-bits. <i>e</i>X<i>treme</i>DB  improves on basic LRU cache policies by implementing a technique that allows applications to influence how long certain pages remain in the disk manager cache. The crux of the improvement is in adding a cache priority property to each page. When the LRU algorithm locates a "victim",&#160;instead of immediately releasing the page (removing the page from the tail of the L2 link list), the algorithm inspects its <code>caching_priority</code> field. If the value is not zero, the <code>caching_priority</code> is decremented and the page is re-linked to the beginning of the L2-list. A caching priority of zero means the default behavior. A caching priority of 1 indicates that the page will be moved from the head to the tail of the LRU list twice. A caching priority of 2 means three loops through the LRU list, and so on. The higher the priority, the longer the page remains linked to the LRU list (stays in cache).</p>
+                <p>However, the main drawback of this implementation is relatively large memory overhead (2 pointers per entity) and problems with concurrent access (manipulations with the L2 list requires a global lock). In the case of using LRU for database pages on persistent storage, the main LRU problem is flushing of the useful data from cache by a sequential scan. This is solved by using a more complicated version of the LRU algorithm (for example, by splitting cache in two parts: for frequently and rarely accessed objects) or changing the sequence scan algorithm to use some kind of cyclic buffer. For this reason, the default <i>e</i>X<i>treme</i>DB caching algorithm is the CLOCK algorithm described below.</p>
+                <h3>CLOCK Algorithm</h3>
+                <p>In CLOCK, all page frames are visualized to be arranged in form of a circular list that resembles a clock. The hand of the clock is used to point to the oldest page in the buffer. Each page has an associated reference counter that is set whenever the particular page is referenced. The page replacement policy is invoked in case of a page miss, in which case the page pointed to by the hand, i.e. the oldest page is inspected. If the reference bit of the page is set, then the bit is reset to zero and the hand is advanced to point to the next oldest page. This process continues until a page with reference bit zero is found. The page thus found is removed from the buffer and a new page is brought in its place with reference bit set to zero. </p>
+                <p> Every page access ("pin") bumps up the counter by one until the counter has reached its limit (which is currently set to 5). Every full rotation of the hand decreases the counter by one. When the page is released ("unpin") the counter is set to the <code>max(current_value, caching_priority+1)</code>. Hence it would take no less than <code>caching_priority+1</code> hand rotations to remove the page from the cache. So the higher the <code>caching_priority</code> the more rounds of the CLOCK algorithm it has to perform before removing it from the cache. The <code>caching_priority</code> parameters are set when opening the database.</p>
+                <p>In effect, the CLOCK algorithm is better in three respects:</p>
+                <ul>
+                    <li value="1">It has less memory overhead</li>
+                    <li value="2">It doesn't require a global lock</li>
+                    <li value="3">The sequential scan does not immediately flush the cache</li>
+                </ul>
+                <p>It has been observed that this CLOCK algorithm approximates LRU very efficiently with minimum overhead.</p>
+                <h3>Cache Priority</h3>
+                <p>In fact, applications can assign the cache priority for specific database objects. At the time the database is created,&#160;the application can assign priorities to <i>indexes</i>, memory allocator <i>bitmap</i> pages and <i>object</i> pages (excluding BLOBs). By default all pages have the same priority (zero), but it is also possible to&#160;change the caching priority for a class (<i>object</i>) at runtime.&#160;Using the <i>object</i> priority, the relative priorities of specific classes can be adjusted. For example, large and rarely accessed objects can be assigned lower priority, while small frequently accessed classes can be assigned a higher priority. The caching priority assigned at runtime&#160;is stored in the database and is used until it is explicitly overwritten.</p>
+                <p>Other memory initialization factors that can affect overall performance are the sizes specified for the cache and maximum disk space for the database. These are explained in the following sections.</p>
+                <h2>Cache Size</h2>
+                <p>The memory address and size for the cache are specified  in the memory devices  passed to the database <b>open</b><a name="kanchor813"></a> API. The memory can be either shared memory or local memory. (It must be shared memory if two or more processes are to share the database.) Generally a larger cache will improve application performance, but the frequency of updates to persistent media (flushing of cache pages) is more important for performance. How database updates are written to persistent media is determined by the Transaction Commit Policy.</p>
+                <h2>Maximum Database Size</h2>
+                <p>The <i>e</i>X<i>treme</i>DB runtime uses the value of the database parameter <code>MaxDiskDatabaseSize</code> to allocate the “dirty pages bitmap”. The bitmap is allocated in cache at the time the cache is created. The bitmap size can be roughly calculated as:</p>
+                <div class="code-block"><pre>&#160;
+    MaxDiskDatabaseSize / MemPageSize / 8.
+&#160;</pre>
+                </div>
+                <h2>Reserve Page Pool</h2>
+                <p>The <i>e</i>X<i>treme</i>DB runtime deals with a cache overflow condition by adding a reserved pool of pages into the cache. In “debug" mode (using the debug disk manager library), the cache overflow condition triggers an <code>ASSERT</code> (a fatal error). But in release mode (using the release disk manager library), the disk manager logic assumes that the operation of adding a page into the page pool is always successful (the return code from the <code>MCO_PIN()</code> operation is never verified). The reserve pool ensures that this assumption is always true: if it is impossible to allocate a page from the normal, unreserved space in the page pool, the disk manager allocates the page (or a number of pages) from the reserve pool. When that happens, the disk manager sets the current transaction into the error state. The error state of the transaction is then detected and the transaction is rolled back and the “out-of-memory” condition is returned to the application.</p>
+                <p>The  page pool reservation mechanism facilitates out-of-memory error handling for the cache and ensures that if / when the database runtime runs out of page pool, active transactions can still be committed or rolled back. To accomplish this the database runtime utilizes two threshold values: the low threshold, called a <i>yellow zone</i> and the high threshold called the <i>red zone</i>. The yellow zone value is calculated as 2/3 of the pool size, but no greater than the red zone value, while the red zone is calculated based on the number of <code>max_active_pages</code> (32 by default) and the maximum number of connections.</p>
+                <p>Once the yellow threshold is crossed the runtime attempts to offload (commit to the media) some pages modified or created by the transaction. Once the red threshold is crossed the transaction is marked erroneous.</p>
+                <h2><a name="kanchor814"></a>Connection cache</h2>
+                <p>In addition to the disk manager cache (also often referred to as a <i>page pool</i>), <i>e</i>X<i>treme</i>DB provides a per-connection cache. The database runtime “pins” a predefined number of pages from the page pool for each connection. This is referred to as a <i>connection cache</i>. When a transaction loads pages into the page pool, and the total number of pages loaded from the media is less than the size of the connection cache, the database runtime makes sure that these pages stay in the cache until the transaction is committed, or the database connection is broken.</p>
+                <p>By default the size of the connection cache is set to four pages. Usually the  runtime accesses a page only a few times during a transaction and the number of pages accessed at each moment of time is normally quite small so that the default value of 4 pages works fine. The implementation of the per-connection cache in this case uses a sequential search. However, changing the connection cache size can have a very significant impact on performance in some cases. It is possible to specify a much larger size with the hope that an entire working set of pages will fit into the cache. In such cases a hash table is used to lookup cached pages. But note that it is <i>not possible</i> to modify the connection cache size without recompiling the <i>e</i>X<i>treme</i>DB libraries. If this is required please contact McObject Technical Support.</p>
+                <p>The connection cache is enabled by default, but can be disabled and reset (committing the connection cache to the database) at runtime. These APIs are provided to manage  a scenario with many connections and long-lasting transactions.  In this scenario, the connection cache could cause the page pool to run out of free pages (a new transaction allocates its own connection cache, but long transactions prevent those pages from being released back to the shared page pool). To address this, the connection cache could be turned off or reset often. However, under normal circumstances, the application does not need to control the connection cache.</p>
+                <h2>In-memory Page allocation</h2>
+                <p>Whereas the connection cache manages memory pages for the disk manager cache, the <i>e</i>X<i>treme</i>DB runtime uses a per-connection cache allocator to reduce synchronization overhead while allocating and deallocating pages. Each connection has a private set of pages which it can manage without the need for  synchronization.</p>
+                <p>The minimum and maximum number of pages held by the per-connection allocator in <code><a href="../../MVCC_Transaction_Manager.htm" name="kanchor815">MVCC</a></code> mode are determined by database parameters that can be modified by some APIs. The <code><a href="../../MVCC_Transaction_Manager.htm">MVCC</a></code><a name="kanchor816"></a> transaction manager optimizes access to the shared memory pool by pre-allocating a number of pages at once and assigning these pages to the connection. The default minimum  value  is 256 pages and maximum  is 512. The minimum / maximum value assignments represents a tradeoff between accessing a shared resource more frequently and allocating extra memory. Changing these default values can be effective if there are well defined object allocation and deallocation patterns in the application.</p>
+                <h2><a name="Native"></a>Native Language APIs</h2>
+                <p> Currently only the C API provides functions to manage caching parameters. Please refer to the <a href="Cache_Management_C.htm">C API Cache Management</a> page for implementation details. </p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

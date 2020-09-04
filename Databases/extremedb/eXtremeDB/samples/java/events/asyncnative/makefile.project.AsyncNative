@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += AsyncNative
+PRJ_TARGET_CLASS += AsyncNative
+PRJ_AsyncNative_TAGS:=sample java core events
+PRJ_AsyncNative_DIR :=$(call mco_project_dir)
+PRJ_AsyncNative_SRC :=$(call mco_project_file,AsyncNative.java MyClass.java)

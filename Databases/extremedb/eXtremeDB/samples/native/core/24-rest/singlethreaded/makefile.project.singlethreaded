@@ -1,0 +1,15 @@
+MCO_PRJ_LIST += 24-rest-st
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 24-rest-st
+PRJ_24-rest-st_TAGS:=sample rest net
+PRJ_24-rest-st_DIR:=$(call mco_project_dir)
+PRJ_24-rest-st_SRC:=$(call mco_project_file,main.c loaddata.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_24-rest-st_SCHEMAS:=$(call mco_project_file,restst.mco)
+PRJ_24-rest-st_DATABASES:=reststdb
+PRJ_24-rest-st_RUNTIME:=YES
+PRJ_24-rest-st_MEMDEV:=PRIVATE
+PRJ_24-rest-st_STORAGE:=TRANSIENT
+PRJ_24-rest-st_SYNC:=AUTO
+PRJ_24-rest-st_TRANSMGR:=MURSIW
+PRJ_24-rest-st_F_REST:=YES
+PRJ_24-rest-st_F_BACKUP:=YES

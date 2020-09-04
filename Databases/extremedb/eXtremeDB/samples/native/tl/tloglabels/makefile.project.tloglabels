@@ -1,0 +1,15 @@
+MCO_PRJ_LIST += tloglabels
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += tloglabels
+PRJ_tloglabels_TAGS:=sample tlog
+PRJ_tloglabels_DIR:=$(call mco_project_dir)
+PRJ_tloglabels_SRC:=$(call mco_project_file, main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_tloglabels_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_tloglabels_DATABASES:=tloglabelsdb
+PRJ_tloglabels_RUNTIME:=YES
+PRJ_tloglabels_MEMDEV:=PRIVATE
+PRJ_tloglabels_STORAGE:=TRANSIENT
+PRJ_tloglabels_STORAGEDEV:=AUTO
+PRJ_tloglabels_SYNC:=AUTO
+PRJ_tloglabels_TRANSMGR:=MURSIW
+PRJ_tloglabels_F_LOG:=YES

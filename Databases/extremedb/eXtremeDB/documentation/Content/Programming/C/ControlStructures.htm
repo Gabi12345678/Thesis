@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Control Structures used in the C API</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Control Structures used in the C API</h1>
+            <p>The <i>e</i>X<i>treme</i>DB<a name="kanchor956"></a> runtime accesses the database through the binary form of the database schema called the Database Dictionary. This defines the data layout through which the C API functions then interact with the data storage. Some of the C API functions require the use of control structures and in some cases callback functions. Please use the  following links for descriptions of these control structures and callback prototypes:</p>
+            <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                <col class="TableStyle-FunctionReference-Column-Column2" style="width: 177px;" />
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Memory_Devices.htm">Memory Devices</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Logical Memory Devices</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Database_Parameters.htm">Database Parameters</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Database open and runtime options</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Log_Parameters.htm">Log Parameters</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Transaction Log file control</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Runtime_Info.htm">Runtime Info</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Characteristics of the runtime currently active</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Runtime_Options.htm">Runtime Options</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Options to control certain characteristics of the <i>e</i>X<i>treme</i>DB runtime</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Backup.htm">Backup</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Incremental Backup information</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Disk_Manager.htm" name="kanchor957">Disk Manager</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Disk Manager and Cache control</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Database_Statistics.htm">Database Statistics</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Memory usage statistics </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Transaction.htm">Transaction</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Database transaction control</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Cursor.htm">Cursor</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Cursor (for index searches)</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Event_Types.htm">Event Types</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Database Event Types</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/SequenceIterator.htm">Sequence_Iterator</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"> The <code>mco_seq_iterator_t</code> structure used by the  <a href="Analytics_Functions.htm">Analytics Functions</a> that operate on database fields of type <a href="../../Users_Guides/Core/Sequences.htm">sequence</a> <![CDATA[ ]]></td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/UDA.htm" name="kanchor958">UDA</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Uniform Data Access</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/XML_Policy.htm">XML Policy</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">XML Policy structure</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Callback_Functions.htm">Callback Functions</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">User-defined functions that are called by the <i>e</i>X<i>treme</i>DB runtime</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/TL_Parameters.htm">Transaction Logging</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><i>e</i>X<i>treme</i>DB<i> Transaction Logging</i> parameters</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/HA_Parameters.htm">High Availability</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><i>e</i>X<i>treme</i>DB<i> High Availability</i> parameters</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Cluster_Parameters.htm">Cluster</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> parameters</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/SSL_Parameters.htm">SSL Parameters</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Secure Socket Layer parameters for network security</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Socket_Parameters.htm">Socket Parameters</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Socket parameters used for <i>e</i>X<i>treme</i>DB network communications</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Feed_Handler.htm">Feed Handler</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Feed Handler structures</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Perfmon_Db.htm">Perfmon Database</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"> The performance monitor database classes</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Perfmon_Options.htm">Perfmon Options</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The structure defining performance monitor database options</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/Tracing_Enums.htm">Tracing Framework</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Tracing Framework Modules and Severity</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Structures/EWS_Web_Server.htm">EWS Web Server</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The MCO EWS HTTP request structure</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><a href="Structures/Web_Services.htm">Web Services</a>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">The  JSON structures used by the <a href="Core_Functions/Static/Auxiliary/Web_Services_C.htm">Web Services API</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

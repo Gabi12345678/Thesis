@@ -1,0 +1,14 @@
+MCO_PRJ_LIST += 20-languages-cpp
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 20-languages-cpp
+PRJ_20-languages-cpp_TAGS:=sample core
+PRJ_20-languages-cpp_DIR:=$(call mco_project_dir)
+PRJ_20-languages-cpp_SRC:=$(call mco_project_file,cppdemo_main.cpp) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_20-languages-cpp_SCHEMAS:=$(call mco_project_file,cppdemo.mco)
+PRJ_20-languages-cpp_DATABASES:=cppdemo
+PRJ_20-languages-cpp_RUNTIME:=YES
+PRJ_20-languages-cpp_MEMDEV:=PRIVATE
+PRJ_20-languages-cpp_STORAGE:=TRANSIENT
+PRJ_20-languages-cpp_SYNC:=AUTO
+PRJ_20-languages-cpp_TRANSMGR:=MURSIW
+PRJ_20-languages-cpp_F_CPP:=YES

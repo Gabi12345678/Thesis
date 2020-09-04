@@ -1,0 +1,29 @@
+/****************************************************************
+ *                                                              *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.    *
+ *                                                              *
+ ****************************************************************/
+
+#define uint2     unsigned<2>
+
+declare database  index_join_db;
+
+class Department 
+{
+    string name;
+    string code;
+    uint2  dept_no;
+
+    unique tree<name> Iname;
+    unique tree<code> Icode;
+    unique hash<dept_no> Idept_no[1000];
+};
+
+class Employee 
+{
+    string name;
+    uint2  dept_no;
+
+    unique tree<name> Iname;
+    unique tree<dept_no,name> Idept_name;
+};

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Getting Started with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Step 6: Exporting and Importing Data</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Step 6: Exporting and Importing Data</h1>
+            <blockquote>
+                <p>It can be important, especially when using in-memory databases, to save data to or load data from persistent storage; i.e. disk based files. There are a number of commands to do this. Also when using persistent databases, it may be desirable to use the backup command to save a snapshot of its current state.</p>
+                <h2>Save and Load Class Data</h2>
+                <p>To save and/or load the data for an entire class (table) to/from an external file, use the <code>saveclass</code> and <code>loadclass</code> commands which have the following syntax:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;saveclass &lt;file-path&gt; &lt;table-name&gt;
+    XSQL&gt;loadclass &lt;file-path&gt; &lt;table-name&gt;
+    &#160;</pre>
+                </div>
+                <p>To demonstrate this, from the <code>samples/xsql/scripts/financial</code> directory, start <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> with the following command to create and display the <i>Account</i> table:</p>
+                <div class="code-block"><pre>    &#160;
+    xsql -size 100m -i -f account.sql
+    select * from Account;
+    userid  name    lastlog
+    ------------------------------------------------------------------------------
+    101     Dennis Hamer    01/23/2015 14:15:03
+    102     Edith Jackson   02/12/2015 19:30:16
+    103     Eric Harmon     02/14/2015 09:34:47
+    &#160;
+    Selected records: 3
+    &#160;</pre>
+                </div>
+                <p>Now perform the following commands to save and load the <i>Account</i> table's data:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;saveclass account.txt Account
+    XSQL&gt;delete from Account;
+    XSQL&gt;select * from Account;
+    userid  name    lastlog
+    ------------------------------------------------------------------------------
+    &#160;
+    Selected records: 0
+    &#160;
+    XSQL&gt;loadclass account.txt Account
+    XSQL&gt;select * from Account;
+    userid  name    lastlog
+    ------------------------------------------------------------------------------
+    101     Dennis Hamer    01/23/2015 14:15:03
+    102     Edith Jackson   02/12/2015 19:30:16
+    103     Eric Harmon     02/14/2015 09:34:47
+    &#160;
+    Selected records: 3
+    &#160;</pre>
+                </div>
+                <p>Note that after deleting the data we verified that the table is empty; then after loading from <code>account.txt</code>, the data is restored.</p>
+                <h2>Saving and loading a database image</h2>
+                <p>To save an image of an in-memory database (transient objects) to a specified file use the <code>save</code> command, which has syntax:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;save &lt;file-path&gt;
+    &#160;</pre>
+                </div>
+                <p>For example:</p>
+                <div class="code-block"><pre>    &#160;
+    XSQL&gt;save account_db.img
+    &#160;</pre>
+                </div>
+                <p>To open (load) a database that has been saved as an image file, it is necessary to also have saved the <code>metadata</code> that precisely describes the database:</p>
+                <div class="code-block"><pre>    &#160;
+    XSQL&gt;savemeta account_db.cfg
+    &#160;</pre>
+                </div>
+                <p>Now we can use the <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> option <code>-image &lt;filename&gt;</code> to load the database from a specified file. For example:</p>
+                <div class="code-block"><pre>    &#160;
+        xsql -size 100m -i -c account_db.cfg -image account_db.img
+        &#160;</pre>
+                </div>
+                <p>(Note that the <code>metadata</code> specifications for <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> must be identical to those used to save the image, whether the image file was created by <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> or any of the <i>e</i>X<i>treme</i>SQL APIs). </p>
+                <h2>Saving Metadata and Dictionary information</h2>
+                <p>It may be necessary to open a persistent database created through an application with <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>, or another <i>e</i>X<i>treme</i>SQL application. In order to be able to do so, <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> must use the exact same <code>metadata</code><a name="kanchor36"></a> (runtime options, page sizes, devices, database parameters and dictionary) as for the original database. (Note that applications can use the <code>mco_db_save_metadata()</code> function in the C API or equivalent methods in the C++, Java, C# or Python APIs to save the database <code>metadata</code>.) The <code>metadata</code> is saved in an <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> configuration file in <code>JSON</code> format. Consequently the <code>metadata</code> can then be loaded via the configuration file at startup as shown above.</p>
+                <p>To save the database schema from <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> into a specified file:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;savedict &lt;file-path&gt;
+    &#160;</pre>
+                </div>
+                <h2>Backup of an entire database</h2>
+                <p>The following commands are provided to <code>backup</code> and <code>restore</code> in-memory or persistent databases:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;backup [TO] file_name [FULL|INCREMENTAL|AUTO] [[AS] label] [WITH CIPHER=key [',' COMPRESSION=level ]];
+    &#160;</pre>
+                </div>
+                <p>Note that the <code>file_name</code> argument is required; the other parameters are optional.</p>
+                <p>The <code>restore</code> command is used to apply a backup to the current database from a given backup file.</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;restore [FROM] file_name [[TO] label] [WITH CIPHER=key];
+    &#160;</pre>
+                </div>
+                <p>  If it is necessary to restore a database from several consecutive backups, it has to be done by calling the <code>restore</code>several times in the chronological order.</p>
+                <p>To list the content of a backup file use the SQL function “backup &lt;backup-file&gt;” to print out the backup labels and some generic backup information to the console:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;select * from backup &lt;backup-file&gt;;
+    &#160;</pre>
+                </div>
+                <h3>Notes on database backup</h3>
+                <ul>
+                    <li value="1">The size of the backup file could be equal to or exceed the actual size of the database. This is because backup frames contain overhead -- the increments can be larger than actual size of modified data.</li>
+                    <li value="2">While the database is being backed up, it is available for both read and write operations with the exception of the short period of time at the end of the backup process. At the end of each backup, the database is locked and becomes unavailable for updates. This is transparent to applications; a write transaction would wait for the database to become available. Note that it is quite possible to perform a continuous backup in a loop. For example, using bash:</li>
+                </ul>
+                <div class="code-block"><pre>&#160;
+    !/bin/bash
+    While true; do
+        xsql ... "BACKUP ..."
+    done
+    &#160;</pre>
+                </div>
+                <ul>
+                    <li value="1">The <code>restore</code> from a backup file requires exclusive access to the database.</li>
+                    <li value="2">The backup protocol maintains database integrity and does not allow restoring the database from an out-of-order backup.</li>
+                </ul>
+                <h2>Importing from CSV files</h2>
+                <p>Often it is useful to import data from external CSV files. This can be done via the import command, which has syntax:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;import TABLE CSV-FILE [(use|skip) header] [commit N]
+    &#160;</pre>
+                </div>
+                <p>Note that the <code>header</code> line indicates the column names to be imported if use is specified, otherwise if <code>skip</code> is specified all of the table columns are expected in each line of the import data; <code>commit N</code>, if present, specifies the transaction blocking factor, the number of lines of input for each database commit.</p>
+                <p>The possible delimiter characters are defined by the string “<code>; , | \t </code>“. The first one of these characters encountered in the input stream will be used as the delimiter for the following data. Following are some example input strings explaining how they will be interpreted:</p>
+                <div class="code-block"><pre>&#160;
+    A;B,C;D|E - the ';' will be used as delimiter, there are three fields: 'A', 'B,C' and 'D|E'
+    &#160;
+    A,B,C;D|E - the ';' will be used as delimiter, there are three fields: 'A', 'B' and 'C;D|E'
+    &#160;
+    A|B,C;D|E - the '|' will be used as delimiter, there are three fields: 'A', 'B,C;D'  and 'E'
+    &#160;</pre>
+                </div>
+                <p>For example, the sample file <code>account.csv</code> could be imported as follows:</p>
+                <div class="code-block"><pre>&#160;
+    XSQL&gt;import Account account.csv skip header
+    Import of 4 records completed in 0 milliseconds
+    XSQL&gt;select * from Account;
+    userid  name    lastlog
+    -----------------------------------------------
+    101     Dennis Hamer    01/23/15 14:15:03
+    102     Edith Jackson   02/12/15 19:30:16
+    103     Eric Harmon     02/14/15 09:34:47
+    104     James Taylor    03/30/15 19:24:27
+    105     Jackson Brown   04/02/15 09:17:11
+    106     Eric Clapton    04/14/15 23:59:07
+    107     Van Morrison    04/20/15 20:22:18
+    &#160;
+    Selected records: 7
+    &#160;</pre>
+                </div>
+                <p>Some more elaborate examples of importing data from CSV files with various formats (including NYSE quotes and CME Trades) are presented in  the <a href="../../../Users_Guides/xSQL_Users_Guide.htm"><span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> User's Guide</a> sections. (Also please refer to this User's Guide for several more advanced features of <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>.)</p>
+                <p>And note that there are also SQL functions to perform the data import and backup functions described above. For example, to backup a persistent database:</p>
+                <div class="code-block"><pre>&#160;
+    select backup('copy.dbs', 'copy.log', 1);
+    &#160;</pre>
+                </div>
+                <p>or to save a snapshot of an in-memory database:</p>
+                <div class="code-block"><pre>&#160;
+    select save_snapshot('saved.img');
+&#160;</pre>
+                </div>
+                <p>Please refer to the   <a href="../../../Users_Guides/SQL_Users_Guide.htm"><i>e</i>X<i>treme</i>SQL User's Guide</a> sections for further explanation and examples of <i>e</i>X<i>treme</i>SQL functions.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

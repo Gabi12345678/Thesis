@@ -1,0 +1,6 @@
+-include $(call mco_makefile_file, \
+data_loaders/CME/modcme/makefile.project.modcme \
+)
+
+# there is no apidef.h file required for the module
+# data_loaders/NYSE/modnyse/makefile.project.modnyse \

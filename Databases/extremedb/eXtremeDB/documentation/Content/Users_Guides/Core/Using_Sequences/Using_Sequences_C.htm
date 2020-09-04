@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Using Sequences in C</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Using Sequences in C</h1>
+            <p>As explained in the <a href="../Using_Sequences.htm">User's Guide</a> page, a sequence is an unbounded array of <i>e</i>X<i>treme</i>DB-supported scalar data elements. The  generated C API <a href="../../../Programming/C/Core_Functions/Generated/Field/Sequence.htm"><code style="font-style: italic;"><a href="../../../Programming/C/Core_Functions/Generated/Field/Sequence.htm">classname_fieldname_*()</a></code></a> functions are used by C applications to manage database fields of type <a href="../Sequences.htm">sequence</a>. As <a href="../Sequences.htm">sequences</a> are effectively vectors of values, they are accessed through <i>iterators</i>. The C type <code><a href="../../../Programming/C/Structures/SequenceIterator.htm">mco_seq_iterator_h</a></code> is used in <code style="font-style: italic;"><a href="../../../Programming/C/Core_Functions/Generated/Field/Sequence.htm">classname_fieldname_*()</a></code> for basic sequence operations. A powerful set of <a href="../../../Programming/C/Analytics_Functions.htm">Analytics Methods</a> are also provided for performing mathematical and statistical operations on <a href="../Sequences.htm">sequences</a>.</p>
+            <h2>Inserting and Updating Sequences in C </h2>
+            <blockquote>
+                <p>Normally sequence data is inserted using the <a href="../../../Programming/C/Generated.htm">generated</a> C API &lt;classname&gt;_&lt;fieldname&gt;_append(). For example consider the following schema definition:</p>
+                <div class="code-block"><pre>&#160;
+    #define uint4 unsigned&lt;4&gt;
+    &#160;
+    class Quote {
+        char&lt;16&gt;            symbol;
+        sequence&lt;uint4 asc&gt; day;
+        sequence&lt;float&gt;     price;
+        &#160;
+        tree&lt;symbol&gt; by_symbol;
+    };
+    &#160;</pre>
+                </div>
+                <p>With this class definition, the <i>Quote</i> sequence fields <code>day</code> and <code>price</code> can be populated with code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    #define  N_ITEMS                4
+    uint4 days[N_ITEMS] = { 1, 2, 4, 5 };
+    float prices[N_ITEMS] = { 10, 20, 40 ,50 };
+    ...
+    Quote q;
+    Quote_new(t, &amp;q);
+    Quote_symbol_put(&amp;q, "IBM", (uint2)(strlen("IBM")));
+    Quote_day_append(&amp;q, days, N_ITEMS);
+    Quote_price_append(&amp;q, prices, N_ITEMS);
+    &#160;</pre>
+                </div>
+                <p>It may sometimes be necessary to insert values into an ordered time series. Values can be  inserted into an existing sequence using the <a href="../../../Programming/C/Generated.htm">generated</a> C API &lt;classname&gt;_&lt;fieldname&gt;_insert(). For example, the following code snippet searches for the <i>Quote</i> object with symbol "<code>IBM</code>", then inserts <code>day</code> and <code>price</code> values:</p>
+                <div class="code-block"><pre>&#160;
+    #define  DAY_THREE              3
+    #define  DAY_THREE_PRICE        30
+    uint4 day_to_insert[1] = { DAY_THREE };
+    float price_to_insert[1] = { DAY_THREE_PRICE };
+    ...
+    mco_trans_h     t;
+    mco_cursor_t    cur;
+    ...
+    mco_trans_start(db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t);
+    rc = Quote_by_symbol_index_cursor(t, &amp;cur);
+    if (MCO_S_OK == rc)
+    {
+        rc = Quote_by_symbol_search(t, &amp;cur, MCO_GE, "IBM", 
+                        (uint2)(sizeof("IBM")));
+        if (MCO_S_OK == rc)
+        {
+            //insert here
+            Quote q;
+            Quote_new(t, &amp;q);
+&#160;
+            rc = Quote_from_cursor(t, &amp;cur, &amp;q);
+            rc = Quote_day_iterator(&amp;q, &amp;it);
+            if (MCO_S_OK == rc)
+            {
+                rc = Quote_day_search(&amp;q, &amp;it, 
+                            DAY_THREE, MCO_SEQ_BOUNDARY_EXCLUSIVE, 
+                            0, MCO_SEQ_BOUNDARY_OPEN);
+                mco_seq_no_t pos = it.first_seq_no;
+                rc = Quote_day_insert(&amp;q, pos, day_to_insert, 1);
+                rc = Quote_price_insert(&amp;q, pos, price_to_insert, 1);
+                rc = mco_trans_commit(t);
+            }
+        }
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

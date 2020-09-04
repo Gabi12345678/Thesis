@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Base Data Types</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Base Data Types</h1>
+            <blockquote>
+                <p>The following table describes the data types recognized by the DDL compiler <code><a href="../../../Getting_Started/Package_Contents/mcocomp.htm">mcocomp</a></code>:</p>
+                <table style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');" class="TableStyle-FunctionReference" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 100px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 299px;" />
+                    <thead>
+                        <tr class="TableStyle-FunctionReference-Head-Header1">
+                            <th class="TableStyle-FunctionReference-HeadE-Column2-Header1">Data type</th>
+                            <th class="TableStyle-FunctionReference-HeadE-Column2-Header1">Meaning</th>
+                            <th class="TableStyle-FunctionReference-HeadD-Column2-Header1">Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>signed&lt;n&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Signed n-byte integer, n = 1, 2, 4, or 8.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    signed&lt;2&gt; a_short; 
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>unsigned&lt;n&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Unsigned n-byte integer, n = 1, 2, 4, or 8.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    unsigned&lt;4&gt; hall;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>float</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">4-byte real number.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    float rate;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>double</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">8-byte real number.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    double rate;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>char&lt;n&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Fixed length single-byte character array less than 64K in size. <code>char</code> fields could store C-type strings or binary data. Trailing null characters for C strings are not required to be stored, since <i>e</i>X<i>treme</i>DB adds them when the string is read out of the database, provided that the size of the supplied buffer is large enough to hold it.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    char&lt;8&gt; name;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>nchar&lt;n&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Fixed length double-byte character array less than 64K in size. <code>nchar</code> fields store 2-byte characters that are sorted by their numerical value. This is suitable for many Asian languages.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>In the schema:</p>
+                                <div class="code-block"><pre>&#160;
+{
+    nchar&lt;20&gt; uname;
+};
+&#160;</pre>
+                                </div>
+                                <p>In the C/C++ program: </p>
+                                <div class="code-block"><pre>&#160;
+    nchar_t uname[21];
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>wchar&lt;n&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Fixed length double-byte character array of less than 64K in size. <code>wchar</code> fields store Unicode characters that are sorted according to the machine’s locale setting.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>In the schema:</p>
+                                <div class="code-block"><pre>&#160;
+{
+    wchar&lt;20&gt; uname;
+};
+&#160;</pre>
+                                </div>
+                                <p>In the C/C++ program: </p>
+                                <div class="code-block"><pre>&#160;
+    wchar_t uname[21];
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>binary&lt;n&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Fixed length byte array less than 64K in size. Like <code>char&lt;n&gt;</code> except in how comparison is performed while building an index or searching. For these purposes an array of characters has the natural delimiter '\0' that marks the end of the compared part; <code>binary</code> data are used entirely as defined by the array size. Can be a field of a class, structure and even of a direct structure. Arrays and <code>vectors</code> of <code>binary&lt;n&gt;</code> are allowed. </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    binary&lt;100&gt;                  b;
+    binary&lt;100&gt;                  b_array[10];
+    vector&lt;binary&lt;100&gt;&gt;                  b_vector;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>string</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Variable-length single-byte character array of less than 64K bytes in size. Bytes are returned to the application exactly as stored (up to the length of the supplied buffer). C-strings of unknown length should be stored in a <code>string</code> field to save space. Ending null characters can be omitted, for the same reasons as for <code>char&lt;n&gt;</code> type. On creation, fields of type <code>string</code> contain only a 2 or 4 byte null pointer. No storage is allocated until a value is inserted and the pointer value is set to the address of the variable length storage (which consists of the 2 byte length followed by the body).</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    string description;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>nstring</code><![CDATA[
+
+]]></td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Variable length double-byte character array less than 64K in size. See <code>nchar</code>. On creation, fields of type <code>nstring</code> contain only a 2 or 4 byte null pointer. No storage is allocated until a value is inserted and the pointer value is set to the address of the variable length storage  (which consists of the 2 byte length followed by the body).</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>In the schema:</p>
+                                <div class="code-block"><pre>&#160;
+{
+    nstring uname;
+};
+&#160;</pre>
+                                </div>
+                                <p>In the C/C++ program: </p>
+                                <div class="code-block"><pre>&#160;
+    nchar_t *uname;
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>wstring</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Variable length double-byte character array less than 64K in size. See <code>wchar</code>.
+On creation, fields of type <code>wstring</code> contain only a 2 or 4 byte null pointer. No storage is allocated until a value is inserted and the pointer value is set to the address of the variable length storage  (which consists of the 2 byte length followed by the body).<![CDATA[
+]]></td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <p>In the schema:</p>
+                                <div class="code-block"><pre>&#160;
+{
+    wstring uname;
+};
+&#160;</pre>
+                                </div>
+                                <p>In the C/C++ program: </p>
+                                <div class="code-block"><pre>&#160;
+    wchar_t *uname;
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>varbinary</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Variable length byte array (like type <code>string</code> is a variable length character array except for comparison where all bytes of the <code>string</code> are used). Can be a member of a class or structure (making it variable length). But it <i>cannot be a field of direct structure</i>; can be nullable; arrays and <code>vectors</code> of <code>varbinary</code> are allowed. On creation, fields of type <code>varbinary</code> contain only a 2 or 4 byte null pointer. No storage is allocated until a value is inserted and the pointer value is set to the address of the variable length storage (which consists of the 2 byte length followed by the body).</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    varbinary                   vb;
+    varbinary                   vb_array[10];
+    vector&lt;varbinary&gt;           vb_vector;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>enum</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">User-defined type consisting of a set of named constants called enumerators. The name of each enumerator is treated as a constant and must be unique within the scope of the DDL schema where the <code>enum</code> is defined. An enumerator can be promoted to a <code>unit1, uint2,</code> or <code>uint4</code> value.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+enum FLOWCONTROL {
+       XON, CTS 
+};
+&#160;
+class using_enum {
+    FLOWCONTROL fc;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>numeric | decimal</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>numeric&lt;W,P&gt; =</code><![CDATA[
+]]><code>decimal&lt;W,P&gt;</code>;
+W = width
+P = Precision
+where P &lt;= W &lt; 20
+
+The actual storage space occupied is determined by the specified width:
+<table style="margin-left: 0;margin-right: auto;"><col style="width: 1in;" /><col style="width: 1in;" /><thead><tr><th>Width</th><th>Storage Type</th></tr></thead><tbody><tr><td>1 - 2</td><td>signed&lt;1&gt;</td></tr><tr><td>3 - 4</td><td>signed&lt;2&gt;</td></tr><tr><td>5 - 9</td><td>signed&lt;4&gt;</td></tr><tr><td>10 - 19</td><td>signed&lt;8&gt;</td></tr></tbody></table><![CDATA[
+]]></td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    numeric&lt;10,2&gt; num;
+    decimal&lt;8&gt; dec;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">sequence</td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">A sequence is an unbounded array of <i>e</i>X<i>treme</i>DB-supported scalar data elements, e.g. [u]int[1|2|3|4|8], float and double.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+class quote 
+{
+    sequence&lt;float&gt; open; 
+    sequence&lt;float&gt; close;
+    sequence&lt;float&gt; high;
+    sequence&lt;float&gt; low;
+    sequence&lt;int4&gt; volume;
+    sequence&lt; time asc&gt; timestamp; 
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">blob</td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Binary data object; a byte array of any size, can be greater than 64K in size.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    blob jpeg
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>vector</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Variable length array of any data type, such as <code>signed, unsigned,</code> or <code>struct</code> (in C terminology).</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+struct A {
+    unsigned&lt;2&gt; a1;
+    char a2
+};
+&#160;
+class A_class {
+&#160;
+    vector &lt;A&gt; struct_array;
+    vector&lt;unsigned&lt;2&gt;&gt; numbers;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>ref</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Explicitly declared reference to an object by object’s <code>oid</code>.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+struct Id {
+    unsigned&lt;2&gt; a1;
+    char a2
+};
+&#160;
+declare oid 	Id[20000];
+&#160;
+class A {
+    ...
+    oid;
+};
+&#160;
+class B {
+    ...
+    ref a; // reference to an
+               // object of class A
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a name="kanchor499"></a>autoid_t</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Explicitly declared reference to an object by object’s <code>autoid</code>.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+class A {
+    ...
+    autoid[20000];
+};
+&#160;
+class B {
+    ...
+    autoid_t&lt;A&gt; a;
+    vector &lt;autoid_t&gt; va;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>date</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">A 32 bit unsigned integer. Though it can be used to store date values in any user-defined format, typically it is used to store the value used in most C/C++ time functions which treat the integer value as the number of seconds since 1 Jan 1970 (Epoch).</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    date start_dt;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>time</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">A 32 bit unsigned integer. Though it can be used to store time values in any user-defined format, typically it is used to store the value used in most C/C++ time functions which treat the integer value as the number of seconds since 1 Jan 1970 (Epoch).</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    time start_tm;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>datetime</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">A 64 bit unsigned integer. It can store the date/time in higher resolution, up to nanoseconds. To be compatible with Java, C# and <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>, C/C++ applications must store date/time with database's resolution (defined with <a href="../Core_Functions/Static/Runtime_Control/runtime_setoption.htm"><code>MCO_RT_OPTION_DATETIME_PRECISION</code></a>). Please refer to page <a href="../../../Users_Guides/Core/Datetime_Fields/Datetime_C.htm">Managing Date/Time Fields in C</a> for further details.)</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    datetime start_dt;
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>boolean</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">A fixed size array of bits.</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    boolean bits[8];
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><code>rect | rectangle</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">A rectangle with 2,4,8 byte integers, float or double coordinates.</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">
+                                <div class="code-block"><pre>&#160;
+{
+    rectangle &lt;uint2&gt;	u2[3];
+    rectangle&lt;float&gt;	f[2];
+};
+&#160;</pre>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <blockquote>
+                <p>In addition, data types can be fixed size arrays, for example:</p>
+                <div class="code-block"><pre>&#160;
+    time start_tm[3];
+&#160;</pre>
+                </div>
+                <p>defines an array of three <code>time</code> values. Any element except vectors, blobs and optional structs can be a fixed size array. Fixed size arrays cannot be used in indexes; for this, use a <code>vector</code>.</p>
+                <h2>Variable Length Field References</h2>
+                <p>For each <code>string, vector, sequence, blob</code> or <code>optional struct</code> field a reference pointer (2 or 4 bytes) is stored in the data layout for the objects of this class. The actual object data is stored separately and retrieved via this reference address when the object is accessed. This can lead to <a href="../../../Users_Guides/Core/Using_Binary_Data.htm">performance considerations</a> especially for persistent databases.</p>
+                <h2>String, Blob and Binary Fields</h2>
+                <p>It is recommended to use <code>blob</code> fields only for large data fields (greater than 1 Kb). When a field is not intended to be used in indexes and its data size is less than 64 Kb it is recommended to use <code>string</code> fields (without any encoding). <code>String</code> fields in <i>e</i>X<i>treme</i>DB can contain arbitrary data, not only ASCII characters; i.e. arbitrary binary data can be stored in a <code>string</code> without encoding. The only limitation is that <code>string</code> fields cannot be used in internal comparisons (needed for indexes) and cannot be passed as parameters in <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>. If a field of binary data is intended to be indexed, the <code>binary</code> or <code>varbinary</code> data type should be used. Unlike <code>blob</code> fields, <code>binary</code> and <code>varbinary</code> fields can be added to both simple and compound indexes. </p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

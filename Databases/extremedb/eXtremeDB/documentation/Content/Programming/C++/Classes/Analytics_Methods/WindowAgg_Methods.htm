@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|C++ API|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Window Aggregate C++ Sequence Methods</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Window Aggregate C++ <i>Sequence</i> Methods</h1>
+            <blockquote>
+                <p>Like <i>Grid Aggregate</i> methods, all C++ Sequence <i>Window Aggregate</i> methods take an integer <i>interval</i> argument and produce a result sequence containing the calculated aggregate for each interval.  The difference in how <i>Window Aggregate</i> methods determine their <i>sliding window</i> interval is described in the <a href="../../../Common/Analytics/Window_v_Grid_Agg_Functions.htm">Window versus Grid Aggregate</a> page. The result of all <i>Window Aggregate</i> methods is returned in the result sequence as the calculated aggregate for each interval. As with <i>Grid Aggregate</i> methods, the object's sequence is split into intervals based on the value of the <i>interval</i> argument (of type <code>uint8</code>) which determines the maximum number of elements in the group, though there may be fewer. So the input sequence will be divided into blocks of interval elements on which the operation is performed.</p>
+                <table class="TableStyle-FunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../../Resources/TableStyles/FunctionReference.css');" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 401px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 533px;" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">    Sequence&lt;T&gt; <b>windowAggMax</b>(mco_size_t interval) const</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Returns the  sequence with the <b>maximum</b> value for each window of elements</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">    Sequence&lt;T&gt; <b>windowAggMin</b>(mco_size_t interval) const</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Returns the  sequence  with the <b>minimum</b> value for each window of elements </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">  Sequence&lt;R&gt; <b>windowAggSum</b>(mco_size_t interval) const</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Returns the  sequence  with the <b>sum</b> of each window of elements</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">   Sequence&lt;double&gt; <b>windowAggAvg</b>(mco_size_t interval) const </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Returns the  sequence with the <b>average</b> of each window of elements</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Sequence&lt;double&gt; <b>windowAggVar</b>(mco_size_t interval) const</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Returns the  sequence with the <b>variance</b> of each window of elements</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Sequence&lt;double&gt; <b>windowAggVarSamp</b>(mco_size_t interval) const</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Returns the  sequence with the <b>sample variance</b> of each window of elements</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">Sequence&lt;double&gt; <b>windowAggDev</b>(mco_size_t interval) const</td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Returns the  sequence with the <b>standard deviation</b> of each window of elements</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">Sequence&lt;double&gt; <b>windowAggDevSamp</b>(mco_size_t interval) const</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Returns the  sequence with the <b>sample standard deviation</b> of each window of elements</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2>Example</h2>
+                <p>Following is an example code snippet demonstrating a <i>window aggregate</i> method:</p>
+                <div class="code-block"><pre>        &#160;
+    {
+        mco_trans_h trans;
+        mco_cursor_t quote_cursor;
+        Quote quote;
+        MCO_RET rc;
+        ...
+        rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;trans);
+        if ( MCO_S_OK == rc )
+        {
+        &#160;
+            for (rc = mco_cursor_first(trans, &amp;quote_cursor); 
+                rc != MCO_S_CURSOR_END; 
+                rc = mco_cursor_next(trans, &amp;quote_cursor)) 
+            {
+                quote.from.cursor(trans, &amp;quote_cursor);
+                &#160;
+                // Calculate window (moving) aggregates. Find the dates when the 20-day moving 
+                // average crosses over the 5-days moving average
+                print_sequence(quote, quote.day_map((quote.close_iterator().windowAggAvg(20) - 
+                        quote.close_iterator().windowAggAvg(5)).cross(1)));
+            }
+            mco_trans_rollback(trans);
+        }
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

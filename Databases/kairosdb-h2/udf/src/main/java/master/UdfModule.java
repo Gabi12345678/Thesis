@@ -11,5 +11,13 @@ public class UdfModule extends AbstractModule
 		bind(KMeansAggregator.class);
 		bind(CDAggregator.class);
 		bind(RecovAggregator.class);
+		bind(HotSaxAggregator.class);
+		bind(ZScoreAggregator.class);
+		bind(ScreenAggregator.class);
+		bind(ZScoreJava.class);
+		bind(KMeansJavaAggregator.class);
+		bind(CDJavaAggregator.class);
+		bind(RecovJavaAggregator.class);
+		bind(HotSaxJavaAggregator.class);
 	}
 }

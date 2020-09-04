@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Executing eXtremeSQL Prepared Statements in C++</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Executing <i>e</i>X<i>treme</i>SQL Prepared Statements in C++</h1>
+            <blockquote>
+                <p>As explained in the <a href="SQL_Cpp_App_Development.htm">Embedded SQL Application Development in C++</a> page, it is sometimes useful to create a SQL statement that will be executed multiple times. In <i>e</i>X<i>treme</i>SQL, this is done by calling one of the <code>prepare()</code> or <code>vprepare()</code> methods in class <i><a href="../../../Programming/C++/Classes/McoSqlEngine.htm">McoSqlEngine</a></i> to compile the SQL statement into a <i>PreparedStatement</i> instance. This has the advantages of eliminating the statement compilation step each time the statement is executed and binding the statement argument pointers only once. However, note that, as a consequence of using only pointer arguments,  the application must keep the argument variables passed to <code>prepare()</code>by pointer (i.e. as references)  in scope during the entire life-time of that prepared statement, and assure that the arguments have actual values at the moment of execution of that prepared statement.  (Please see <i><a href="../C_API/Argument_Substitution.htm"><i>e</i>X<i>treme</i>SQL Statement Argument Substitution</a></i> page for the detailed list of argument substitution format specification.)</p>
+                <p>
+                    <img src="../../../Resources/Images/note.png" /> Note that the Python, JNI and .NET wrapper API's have no prepared statements support. This is because of the absence of pointers in the Python, Java and C# languages. As result it is impossible to store and then use a variable indirectly. </p>
+                <h2>Prepare</h2>
+                <p>The <code>prepare()</code> method is defined as follows:</p>
+                <div class="code-block"><pre>&#160;
+    virtual void prepare(PreparedStatement &amp;stmt, char const* sql, ...);
+    &#160;</pre>
+                </div>
+                <p>Then the <code>executePreparedStatement()</code>method is called to execute the pre-compiled statement or <code>executePreparedQuery()</code> is called to execute queries and return a result set.</p>
+                <p>For example, the following code snippet defines and compiles 5 <i>PreparedStatements</i>:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    #include &lt;mcosql.h&gt;
+    #include &lt;commonSQL.h&gt;
+    #include "sqldb.h"
+    &#160;
+    McoSqlEngine engine;
+    &#160;
+    void Prepare()
+    {
+        int2 delta;
+        unt1 aid;
+        unt4 tid;
+        int8 bid;
+        char historyFiller[10] = “----------“;
+        PreparedStatement stmt[5];
+        &#160;
+        engine.open( db_name, sqldb_get_dictionary(), DATABASE_SIZE, MEMORY_PAGE_SIZE);
+        ...
+    &#160;
+        engine.prepare(stmt[0], "UPDATE accounts SET Abalance=Abalance+%*i2 WHERE Aid=%*u1",
+                    &amp;delta, &amp;aid);
+        engine.prepare(stmt[1], "SELECT Abalance FROM  accounts WHERE Aid=%*u1", &amp;aid);
+        engine.prepare(stmt[2], "UPDATE tellers SET Tbalance=Tbalance+%*i2 WHERE Tid=%*u4",
+                    &amp;delta, &amp;tid);
+        engine.prepare(stmt[3], "UPDATE branches SET Bbalance=Bbalance+%*i2 WHERE Bid=%*i8",
+                    &amp;delta, &amp;bid);
+        engine.prepare(stmt[4],
+            "INSERT INTO account_history(Tid, Bid, Aid, delta, htime, filler) VALUES”
+            “ (%*u4,%*i8,%*u1,%*i2,now,%s)", &amp;tid, &amp;bid, &amp;aid, &amp;delta, historyFiller);
+        ...
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>(Note the use of “<code>%*iN</code>” and “<code>%*uN</code>” placeholders for the signed and unsigned integer variables where “<code>N</code>” indicates the integer width. See also page <a href="../../../Programming/Common/Format_Specifiers/Format_Specifiers_C_Cpp.htm">Parameter Substitution Format Specifiers</a> for further details on parameter substitution.)</p>
+                <p>Then the statements can be executed as follows:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    McoSqlEngine engine;
+    &#160;
+    void ExecuteStatements()
+    {
+        engine.executePreparedStatement(stmt[0]);
+        engine.executePreparedStatement(stmt[2]);
+        engine.executePreparedStatement(stmt[3]);
+        engine.executePreparedStatement(stmt[4]);
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>And queries are executed instantiating a <i><a href="../../../Programming/C++/Classes/QueryResult.htm">QueryResult</a></i> for the query result set as follows:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    McoSqlEngine engine;
+    &#160;
+    void PerformQuery()
+    {
+        QueryResult *result = engine.executePreparedQuery(stmt[1]);
+        Cursor * cursor = result-&gt;records();
+        &#160;
+        while (cursor-&gt;hasNext())
+        { 
+            Record * rec = cursor-&gt;next();
+            &#160;
+            // Process the result row
+            ...
+        }
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>
+                    <img src="../../../Resources/Images/note.png" /> Note that it is also possible to prepare a statement in one thread and execute the statement in a different thread. However, be aware that when executing a prepared query, the object of class <i>PreparedStatement</i> must exist until the release of the resulting <code><a href="../../../Programming/C++/Classes/DataSource.htm">DataSource</a></code> object. Otherwise the internal structures of the result set could be corrupted.</p>
+                <p>&#160;</p>
+                <h2>The vprepare() methods</h2>
+                <p>The <code>prepare()</code> method uses a variable arguments list (please see the following page for details of the <a href="./​https://en.wikipedia.org/wiki/Stdarg.h">stdarg interface</a>). The <i><a href="../../../Programming/C++/Classes/SqlEngine.htm">SqlEngine</a></i> base class of <i><a href="../../../Programming/C++/Classes/McoSqlEngine.htm">McoSqlEngine</a></i> provides two additional "lower level" <code>vprepare()</code> methods:</p>
+                <div class="code-block"><pre>    &#160;
+    virtual void vprepare(PreparedStatement &amp;stmt, char const* sql, va_list* list);
+    &#160;
+    virtual void vprepare(PreparedStatement &amp;stmt, char const* sql, ParamDesc* params);
+    &#160;</pre>
+                </div>
+                <p>The first of these two methods, which uses the <code>va_list</code> argument, is actually used in the implementation of <code>prepare()</code> as follows:</p>
+                <div class="code-block"><pre>&#160;
+    void SqlEngine::prepare(PreparedStatement &amp;stmt, char const* sql, ...)
+    {
+        va_list list;
+        va_start(list, sql);
+        vprepare(stmt, sql, &amp;list);
+        va_end(list);
+    }
+    &#160;</pre>
+                </div>
+                <p>The second requires creating an array of <i>ParamDesc</i> instances which specify the <code>type</code> and address of each parameter. For example:</p>
+                <div class="code-block"><pre>&#160;
+    #include &lt;mcosql.h&gt;
+    #include &lt;commonSQL.h&gt;
+    #include "sqldb.h"
+    &#160;
+    McoSqlEngine engine;
+    &#160;
+    int main( int argc, char ** argv )
+    {
+        PreparedStatement stmt;
+        ParamDesc params[2];
+&#160;
+        int4 id = 0;
+        char str[10];
+&#160;
+        params[0].type = tpInt4;
+        params[0].ptr = &amp;id;
+        params[0].lenptr = NULL;
+        params[1].type = tpString;
+        params[1].ptr = &amp;str;
+        params[1].lenptr = NULL;
+        ...
+        engine.open( db_name, sqldb_get_dictionary(), DATABASE_SIZE, MEMORY_PAGE_SIZE);
+        &#160;
+        engine.vprepare(stmt, "insert into AnObject values (?,?)", params);
+        id = 1; strcpy(str, "one");
+        engine.executePreparedStatement(stmt);
+&#160;
+        id = 2; strcpy(str, "two");
+        engine.executePreparedStatement(stmt);
+        &#160;
+        id = 3; strcpy(str, "three");
+        engine.executePreparedStatement(stmt);
+        ...
+    }
+    &#160;</pre>
+                </div>
+                <p>The <i>ParamDesc</i> structure is defined in <code>include/sql/sqlcpp.h</code> as follows:</p>
+                <div class="code-block"><pre>&#160;
+    struct ParamDesc
+    {
+        Type type;
+        void* ptr;
+        int* lenptr;
+        bool indirectStr;
+    };
+    &#160;</pre>
+                </div>
+                <p>The <code>type</code>, <code>ptr</code> and <code>lenptr</code> elements specify the variable <code>type</code>, its address and the address of an integer that specifies the length of the variable if of type <code>tpString</code> , <code>tpUnicode</code> or <code>tpBinary</code>; for all other data types it should be set to <code>NULL</code>. (For fields of type <code>tpBinary</code> it is mandatory to specify <code>lenptr</code>, for data types <code>tpString</code> and <code>tpUnicode</code> it is optional; if <code>lenptr</code> is set to <code>NULL</code> for a variable of type <code>tpString</code> or <code>tpUnicode</code> the size will be automatically calculated from the actual size of string specified by field <code>ptr</code>.)</p>
+                <p>The <code>indirectStr</code> element must be set <code>false</code> for variables of type <code>char*</code> or <code>wchar_t</code>* and set <code>true</code> for variables of type <code>char**</code> or <code>wchar_t**</code>; the size of the string variable can optionally be specified in the <code>lenptr</code> element.</p>
+                <blockquote>
+                    <p>
+                        <img src="../../../Resources/Images/note.png" /> Note that usually a <code>string</code> passed as argument is a pointer to the first character of string. For example the following string definition:</p>
+                    <div class="code-block"><pre>&#160;
+    const char *mystring = "The Stranglers";
+    &#160;</pre>
+                    </div>
+                    <p>could be passed as an argument to an <code>executeStatement()</code> method with the substitution placeholder <code>%*S</code>. This could be called a "direct string pointer". By contrast, a prepared statement works with <i>indirect</i> (by pointer) access to the arguments. So the substitution placeholder <code>%*s</code> means a pointer to a <code>string</code> which in its turn is a pointer to <code>char</code>. For example the following definitions could be used for "indirect string" arguments:</p>
+                    <div class="code-block"><pre>&#160;
+    const char *mystring = "Ramones"; 
+    const char **ptr_to_string = &amp;mystring;
+    &#160;</pre>
+                    </div>
+                    <p>The following code snippet demonstrates how string arguments can be used with <code>prepare()</code> and the <code>ParmDesc</code> variant of the <code>vprepare()</code> method :</p>
+                    <div class="code-block"><pre>&#160;
+    const char *mystring = "The Stranglers";
+    const char **ptr_to_string = &amp;mystring;
+    PreparedStatement stmt;
+&#160;
+    // Indirect string 'prepare'
+    engine.prepare(stmt, "select * from Bands where name=%*s", ptr_to_string);
+    &#160;
+    // Indirect string 'vprepare'
+    ParamDesc desc;
+    desc.type = tpString;
+    desc.ptr = ptr_to_string;
+    desc.lenptr = NULL;
+    desc. indirectStr = true;
+    engine.vprepare("select * from Bands where name=?", &amp;desc);
+    &#160;
+    // Direct string 'prepare'
+    engine.prepare(stmt, "select * from Bands where name=%*S", mystring);
+&#160;
+    // Direct string 'vprepare'
+    desc.type = tpString;
+    desc.ptr = mystring;
+    desc.lenptr = NULL;
+    desc. indirectStr = false;
+    engine.vprepare("select * from Bands where name=?", &amp;desc);
+    &#160;</pre>
+                    </div>
+                    <p>The same applies to wide character strings. The substitution placeholder <code>%*w</code> assumes an argument of type <code>wchar_t* *</code>  ("pointer to a pointer to a wide character"), while the placeholder <code>%*W</code> assumes an argument of type <code>wchar_t*</code>.</p>
+                </blockquote>
+                <h3>ParmDesc Types</h3>
+                <p>Valid values for the <code>type</code> element (as enumerated in <code>include/sql/value.h</code>) and the corresponding C/C++ variable types are defined in the following:</p>
+                <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column2" style="width: 186px;" />
+                    <thead>
+                        <tr class="TableStyle-IndentedFunctionReference-Head-Header1">
+                            <th class="TableStyle-IndentedFunctionReference-HeadE-Column1-Header1">
+                                <p>type specification</p>
+                            </th>
+                            <th class="TableStyle-IndentedFunctionReference-HeadD-Column2-Header1">C/C++ variable type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpNull</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">NULL</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpBool, tpInt1, tpUInt1</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">char</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpInt2</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">short</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpUInt2</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">unsigned short</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpInt4</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">int</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpUInt4</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">unsigned int</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpInt8</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                <p>long int</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpUInt8</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">uint64_t</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpReal4</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">float</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpReal8</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">double</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpDateTime</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">mco_datetime (unsigned int)</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpNumeric</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">double</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpUnicode</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">wstring (wchar_t*)</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpString</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">string (char *)</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpBinary</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">byte[]</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">tpInt = tpInt8</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">int64_t</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"> tpReal = tpReal8</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">double</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">tpReference</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1"><a name="kanchor701"></a>autoid_t</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

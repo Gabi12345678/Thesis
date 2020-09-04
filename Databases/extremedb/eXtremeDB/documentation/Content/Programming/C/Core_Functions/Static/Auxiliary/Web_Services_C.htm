@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Static API|Auxiliary Interfaces">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title> Web Services C API</title>
+        <link href="../../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>DB Web Services C API</h1>
+            <blockquote>
+                <p>The <code>mcorest</code> library exposes a REST-like interface. Please see page <a href="../../../../../Users_Guides/Core/Web_Services/McoREST_Resources_Responses.htm"><i>e</i>X<i>treme</i>DB Web Service Resources</a> for a list of the resources that are currently supported, as well as samples of the JSON responses. </p>
+                <h3>For an overview see page <a href="../../../../../Users_Guides/Core/Web_Services.htm"><i>e</i>X<i>treme</i>DB Web Services</a></h3>
+                <p>The core library <code>mcorest</code> implements the basic functionality (parsing and dispatching HTTP requests, formatting JSON, etc.) used by the web service libraries. Each web service library registers itself with the core library and makes its services available through one or more URL paths.</p>
+                <p>Applications that wish to expose certain web services will link with the core library, as well as web service libraries and their dependencies. The web service libraries are not interdependent (unless explicitly stated), and thus the applications can select only the ones they need. Note that the services must be initialized explicitly by the application through their respective <code><a href="Web_Services/svc_db_init.htm"><code>mcocore_svc_*_init()</code></a></code> functions.</p>
+                <p>Three web service libraries are implemented currently:</p>
+                <ul>
+                    <li value="1"><code>mcorestdb</code>: implements basic database-related functionality: listing databases and retrieving basic class statistics. Requires <code>mcouda</code>.</li>
+                    <li value="2"><code>mcorestsql</code>: implements SQL-related functionality; currently only displays engine statistics and RSQL client information. Requires <code>mcosql</code>.</li>
+                    <li value="3"><code>mcorestperf</code>: provides perfmon statistics. Requires <code>mcoperf</code>.</li>
+                </ul>
+                <h2>Creating new Web Services for mcorest</h2>
+                <p>It is possible to create new web services using the mcorest API defined in the <code>mcorestapi.h</code> header file. A web service will:</p>
+                <ul>
+                    <li value="1">Choose a URL path to serve (e.g. <code>/api/myservice</code>).</li>
+                    <li value="2">Implement the service as a C function ("handler routine"), whose signature has to match the <code><a href="Web_Services/mcorest_api_handler_fn.htm">mcorest_api_handler_fn</a></code> type.</li>
+                    <li value="3">Register the URL path and the handler routine with the <code>mcorest</code> core library using the <code><a href="Web_Services/mcorest_api_register_service.htm">mcorest_api_register_service()</a></code> function.</li>
+                </ul>
+                <p>The handler routine in a web service library will be called when the core library gets an HTTP request for the web service's registered path. Then, the handler will:</p>
+                <ul>
+                    <li value="1">Optionally parse the URL path's child elements and query parameters that are passed through the handler's <code>path_suffix</code> argument.</li>
+                    <li value="2">Send status code using one of the <code><a href="Web_Services/mcorest_api_status_.htm">mcorest_api_status_*()</a></code> calls.</li>
+                    <li value="3">If the status code is 200/OK, the handler will optionally send a JSON response using <code>mcorest_api_json_write()</code> methods. </li>
+                    <li value="4">Return <code>MCO_S_OK</code> code.</li>
+                    <li value="5">If the handler fails at some point, it should return one of the <code><a href="../../../Return Codes/MCOREST_Codes.htm">MCO_E_REST_*</a></code> error codes. However, note that in this case the HTTP connection will be dropped without sending an HTTP response.</li>
+                </ul>
+                <h2>Necessary and Optional Libraries</h2>
+                <p>C and C++ applications that wish to use the web services must link with the following libraries:</p>
+                <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcorest</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The embedded Web Services REST API</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcoews</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">HTTP server implementation</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcosaltimer</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Low-resolution  and high-resolution timer implementations</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">mcosalsmp </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">Required for multithreading support</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>Applications that wish to expose an existing web service will link with its library, as well as its dependencies:</p>
+                <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcorestdb</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The <code>database</code> Web Service; requires <code>mcouda</code><a name="kanchor1036"></a> for UDA APIs</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcorestsql</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The <code>SQL</code> Web Service;  requires <code>mcosql</code></td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">mcorestperf</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">The <code>perfmon</code> Web Service;  requires <code>mcoperf</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2>API Reference</h2>
+                <p>The table below lists the Web Services C API functions: </p>
+                <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../../../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 222px;" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column2" style="width: 594px;" />
+                    <tbody>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/initialize.htm">mcorest_initialize()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Initializes the <code>MCO REST</code><a name="kanchor1037"></a> server runtime</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/svc_db_init.htm">mcorest_svc_db_init() </a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1"> Initializes the <code>database</code> web service library</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/svc_perf_init.htm">mcorest_svc_perf_init()</a><![CDATA[
+]]></td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1"> Initializes the <code>perfmon</code> web service library</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/svc_sql_init.htm">mcorest_svc_sql_init()</a> <![CDATA[ ]]></td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1"> Initializes the SQL web service library</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/create.htm">mcorest_create()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Creates the <code>MCO REST</code> server instance and stores its handle in the <code>rest</code> parameter</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/add_interface.htm">mcorest_add_interface()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Adds a network interface to the <code>MCO REST</code> server instance</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/set_basic_auth.htm">mcorest_set_basic_auth()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Set Basic HTTP authentication parameters for the server instance</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/reset_basic_auth.htm">mcorest_reset_basic_auth()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Reset Basic HTTP authentication parameters and disables the authentication</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/start.htm">mcorest_start()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Start the <code>MCO REST</code> server</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/stop.htm">mcorest_stop()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Stops the <code>MCO REST</code> server in threaded mode after it was started
+ with <code><a href="Web_Services/start.htm">mcorest_start()</a></code></td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/interface_check.htm">mcorest_interface_check()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                <p>Checks the interface for incoming network connections</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/conn_execute.htm">mcorest_conn_execute()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Executes one or more HTTP requests</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/conn_cancel.htm">mcorest_conn_cancel()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Close an active connection</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/interface_close.htm">mcorest_interface_close()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Shuts down the interface</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/destroy.htm">mcorest_destroy()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                <p>  Destroys the <code>MCO REST</code> server instance</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/shutdown.htm">mcorest_shutdown()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Shut down the <code>MCO REST server</code> runtime</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/mcorest_api_handler_fn.htm">mcorest_api_handler_fn()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Web service request handler routine</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/mcorest_api_failure.htm">mcorest_api_failure()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Record details of a handler failure</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/mcorest_api_failure_clear.htm">mcorest_api_failure_clear()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Reset the previously set failure details associated with the HTTP request object</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/mcorest_api_handler_fn.htm">mcorest_api_stream_with_request()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Initialize a stream from an <a href="../../../Structures/EWS_Web_Server.htm">MCO EWS HTTP request</a></td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/mcorest_api_request_from_stream.htm">mcorest_api_request_from_stream()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Return the <a href="../../../Structures/EWS_Web_Server.htm">MCO EWS HTTP request</a> request associated with the stream</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/mcorest_api_register_service.htm">mcorest_api_register_service()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Register the URL path and the handler routine with the <code>mcorest</code> core library</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/mcorest_api_status_.htm">mcorest_api_status_*()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Send API status code to the web service caller</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><a href="Web_Services/mcorest_api_json_read_.htm">mcorest_api_json_read_*()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Functions that read JSON data</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1"><a href="Web_Services/mcorest_api_json_write_.htm">mcorest_api_json_write_*()</a>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">Functions that write JSON data</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

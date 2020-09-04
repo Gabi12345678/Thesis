@@ -1,0 +1,15 @@
+MCO_PRJ_LIST += api-sql-01-c-api-prepared
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += api-sql-01-c-api-prepared
+PRJ_api-sql-01-c-api-prepared_TAGS:=sample sql
+PRJ_api-sql-01-c-api-prepared_DIR:=$(call mco_project_dir)
+PRJ_api-sql-01-c-api-prepared_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c $(MCO_SAMPLES_COMMON_DIR)/commonSQL.c
+PRJ_api-sql-01-c-api-prepared_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_api-sql-01-c-api-prepared_DATABASES:=prepareddb
+PRJ_api-sql-01-c-api-prepared_RUNTIME:=YES
+PRJ_api-sql-01-c-api-prepared_MEMDEV:=PRIVATE
+PRJ_api-sql-01-c-api-prepared_STORAGE:=TRANSIENT
+PRJ_api-sql-01-c-api-prepared_SYNC:=AUTO
+PRJ_api-sql-01-c-api-prepared_TRANSMGR:=MURSIW
+PRJ_api-sql-01-c-api-prepared_F_SQL:=REMOTE
+PRJ_api-sql-01-c-api-prepared_F_CPP:=YES

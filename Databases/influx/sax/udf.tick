@@ -1,0 +1,16 @@
+dbrp "master"."autogen"
+
+batch
+	|query('SELECT * FROM "master"."autogen"."puncte"')
+		.every(200d)
+		.period(200d)
+	@hotsax()
+
+//output the result from Hot Sax into influxdb
+
+	|influxDBOut()
+		.database('master')
+		.retentionPolicy('autogen')
+		.measurement('output')
+	
+	

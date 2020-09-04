@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The eXtremeSQL C++ Class McoDistributedSqlEngine</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>The <i>e</i>X<i>treme</i>SQL C++ Class <i>McoDistributedSqlEngine</i></h1>
+            <blockquote>
+                <p>The <i>e</i>X<i>treme</i>SQL <i>Distributed</i> SQL <i>Engine</i> provides limited support for the database sharding architecture for <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i> installations.  Why is it limited? Most full-blown distributed database engines (such as the one found in Oracle for example) normally create an execution plan based on the query tree and data distribution statistics (or other knowledge of how the data is distributed between shards), that contains “map-reduce” style operations. The <i>e</i>X<i>treme</i>SQL distributed engine merely executes the query on every node over that node's shard, and consolidates the result sets received from multiple nodes when possible (the consolidation of the results is referred to as merge). Sometimes merging the result sets is simply impossible, as it is for example for calculating an average. More often, the engine does not have enough information to make sure that the combined result set is correct. The Distributed SQL Engine is taking the most optimistic approach -- it always assumes that the application distributed data between shards and created the <span class="Param">SQL</span> query to avoid merging problems. Yet with the understanding of the engine's limitations, many application's will benefit from using the distributed engine and improve their overall database access performance dramatically.</p>
+                <p>The Distributed SQL Engine sends a query to one of the network nodes, or broadcasts queries to all nodes. A node is specified through the query prefix. In order to control the distribution of data, the application must either load data to each shard locally, or specify the node ID (number) in the insert statements. For example:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    10:insert into T values (…)
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>Also the application can explicitly use the current node ID in the select condition when selecting out records that are inserted on the specific node (<code>%#</code> indicates the current node ID, and <code>%@</code> the number of shards). For example:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    insert into hist_cpvehicleid_jj
+    select * from foreign table (path='/home/usr/shea2.csv', skip=1)
+    as hist_cpvehicleid_jj
+    where mod(hashcode(fstr_vechileid), %#)=%@;
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>If none of those methods are used, the <i>DistributedSQL</i> broadcasts the insert on all nodes. The following query types are supported:</p>
+                <blockquote>
+                    <p><code>select * from T;</code>
+                    </p>
+                    <p><code>*:select * from T;</code>   -- similar to the above, run the statement on all nodes</p>
+                    <p><code>N:select * from T;</code>   -- execute the statement on the node <code>N</code> (nodes are enumerated from 1)</p>
+                    <p><code>?:select * from T;</code>   -- execute the statement on any node. Currently <span class="Param">SQL</span> picks up the node in the round-robin fashion, thus implementing a simple load-balancing scheme</p>
+                </blockquote>
+                <p>Once the query has been executed and the result set is created on each node, the Distributed <span class="Param">SQL</span> Engine collects the resulting data sets from all nodes. If the query contained an aggregation or a sort clause, or sequence functions (statistical functions operating on fields of type sequence; See the “Vector-based Statistical Functions for <span class="Param">SQL</span>” section in Chapter 3 for details), then the result sets are merged. The Distributed <span class="Param">SQL</span> Engine currently supports the following aggregates:</p>
+                <ul>
+                    <li value="1">	COUNT</li>
+                    <li value="2">	MIN</li>
+                    <li value="3">	MAX</li>
+                    <li value="4">	SUM (aggregate operand is a column) with or without a '<code>group by</code>' clause</li>
+                </ul>
+                <p>The engine does not currently support:</p>
+                <ul>
+                    <li value="1">	Merging aggregates with the DISTINCT qualifier;</li>
+                    <li value="2">	Aggregates over complex expressions (such as <code>X+Y</code>), except if the sort by or group by columns are included into the result set or the select statement;</li>
+                </ul>
+                <blockquote>
+                    <p>For instance (using <code>Metatable</code> as an example):</p>
+                </blockquote>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    select Metatable.*,FieldNo+FieldSize as ns from Metatable order by ns;
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <blockquote>
+                    <p>or</p>
+                </blockquote>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    select T.*,x+y as xy from T order by xy;
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <ul>
+                    <li value="1">	Aggregates over hash (<code>seq_hash_aggregate_*</code>), except for two scenarios:<ol><li value="1"><p>when the data that the hash table is built over belongs to a single shard (exchange in the example below):</p></li></ol></li>
+                </ul>
+                <blockquote>
+                    <blockquote>
+                        <div class="code-block"><pre>&#160;
+    select seq_hash_agg_sum(price,exchange) from Quote;
+    &#160;</pre>
+                        </div>
+                    </blockquote>
+                </blockquote>
+                <blockquote>
+                    <ol start="2">
+                        <li value="2">	if the sequence is converted into a horizontal representation -- flattened, the query can run regardless of the data distribution:</li>
+                    </ol>
+                </blockquote>
+                <blockquote>
+                    <blockquote>
+                        <div class="code-block"><pre>    &#160;
+    select flattened  seq_hash_agg_sum(price,exchange) from Quote;
+    &#160;</pre>
+                        </div>
+                    </blockquote>
+                </blockquote>
+                <ul>
+                    <li value="1">	The <code>AVG</code> aggregate. Unless the groups from different nodes do not overlap. For example the following layout is supported:</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>&#160;
+    Node1:
+    Symbol Price
+    AAA      10.0
+    AAA      12.0
+    AAA       9.0
+    BBB      11.0
+    BBB      10.0
+    BBB      10.0
+    &#160;
+    Node2:
+    Symbol Price
+    CCC       8.0
+    CCC       7.0
+    CCC      10.0
+    DDD     15.0
+    DDD     14.0
+    DDD     13.0
+    select avg(Price) from Quote group by Symbol;
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>Other examples of valid and invalid statements are:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    select * from T;
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <blockquote>
+                    <p><span style="color: #3cb371;">Supported; the results are concatenated.</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select * from T order by y;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; sort results from all nodes</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select * from T order by x+y;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #dc143c;">Complex expressions are not currently supported</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select sum(x) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; the aggregated results are merged</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select avg(x) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #dc143c;">Merge of AVG aggregate is not currently supported</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select y,sum(x) from T group by y;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; groups and aggregates are merged</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select sum(x) from T group by y;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; note that the 'group by' columns must be included in the "from" list</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select sum(x*2) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #dc143c;">Complex expressions are not currently supported</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select ifnull(sum(x), 0) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; aggregate results are merged</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select seq_sum(x) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; results are merged</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select seq_hash_agg_sum(x,y) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #dc143c;">Merge of the hash aggregates are not currently supported</span>
+                    </p>
+                    <div class="code-block"><pre>    &#160;
+    select flattened seq_hash_agg_sum(x,y) from T;
+    &#160;</pre>
+                    </div>
+                    <p><span style="color: #3cb371;">Supported; sorted, split in groups and aggregated</span>
+                    </p>
+                </blockquote>
+                <p>The <i>Distributed</i> <i>SQL</i> <i>Engine</i> supports definition for a sharding condition when data is imported from a <code>CSV</code> file or through application code. Sharding of CSV imported data is specified through the following SQL statement:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    select from foreign table (path='csv-file', skip=n) as PatternTable where distribution-condition
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>As mentioned above, the <i>Distributed</i> <i>SQL</i> <i>Engine</i> also supports special <code>%@ and %#</code> pseudo-parameters. The first corresponds to the node number (zero based); the second is used to specify the total number of nodes. For example:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    echo "insert into table_name
+    select * from foreign table (path='table_name_file.csv', skip=1) as table_name
+    where mod(instrument_sid/$chunk_size,%#)=%@;"
+    &gt; loadrisk.sql
+    ./xsql.sh loadrisk.sql
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>The <code>xsql.sh</code> script invokes the <i>Distributed</i> <i>SQL</i> <i>Engine</i> as follows:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    xsql @node1 @node2 ... @nodeN $@
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>When the application reads the input data from a stream (a socket in the example below) or any other source, it is inserted into the database through a code fragment similar to the following:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    table_name tb;
+    socket_read(s, &amp;tb);
+    engine.execute("insert into table_name(starttime, endtime, book1, book2, instrument_sid)
+    values (%l,%l,%s,%s,%l)", tb.starttime, tb.endtime, tb.book1, tb.book2,
+    tb.instrument_sid);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>The following fragments would add a sharding condition to the application's code:</p>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    char sql[MAX_SQL_STMT_LEN];
+    table_name tb;
+    socket_read(s, &amp;tb);
+    sprintf(sql, "%d:insert into table_name (starttime,endtime,book1,book2,instrument_sid)
+    values (%%l,%%l,%%s,%%s,%%l)", tb.instrument_sid%n_nodes);
+    engine.execute(sql, tb.starttime, tb.endtime, tb.book1, tb.book2, tb.instrument_sid);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Database Browser</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Database Browser</h1>
+            <blockquote>
+                <p>The <i>e</i>X<i>treme</i>DB SDK includes an HTML-based database browser / editor (HTTP Viewer) that can be used to examine any <i>e</i>X<i>treme</i>DB<a name="kanchor450"></a> database. The browser is implemented via C API libraries which comprise a layer between the UDA API and the generic C APIs of the <i>e</i>X<i>treme</i>DB database. The browser interface can also be implemented with <i>e</i>X<i>treme</i>SQL.</p>
+                <h2>Connecting to a Database</h2>
+                <p>To connect to the database, type the address in the browser in the form</p>
+                <div class="code-block"><pre>&#160;
+    http://ip_address:port
+    &#160;</pre>
+                </div>
+                <p>By default, <code>mcohv</code> uses <code>port 8082</code>. For example, if the database is local, the connection string is</p>
+                <div class="code-block"><pre>&#160;
+    http://localhost:8082
+    &#160;</pre>
+                </div>
+                <h2>Using the Browser</h2>
+                <p>The page is divided into two parts. On the left is the “navigation pane” (menu), on the right is the “data pane” that corresponds to the active menu item on the left. The menu items are:</p>
+                <ul>
+                    <li value="1"><a name="kanchor451"></a>Database content: Displays database statistics and the current runtime information.</li>
+                    <li value="2">List of classes and indexes: class structure, index structure and statistics. Each class’ objects are displayed in the order of any of the indexes created for the class. The data pane allows creating and deleting objects, and editing object data.SQL</li>
+                    <li value="3">Viewer options: allows setting the number of objects per page and the number of elements for vector fields.</li>
+                </ul>
+                <p>If more than one database are opened in an application and are registered for browsing then the menu items "Database content", “List of classes” and “Indexes” will be accessible for each of the observable databases.</p>
+                <h2>Left pane</h2>
+                <p>All menu “lists” can be expanded and closed.</p>
+                <p>Next to the class name on the right there is a “[new]” item. Choosing “[new]” brings up a form to create a new object for the specified class. The object (being created/edited on the right) is highlighted in red.</p>
+                <p>Choose “SQL query” to enter and run a custom SQL query.</p>
+                <h2>Right pane</h2>
+                <p>All objects in the class are represented via a horizontal list of “object forms”. Depending on your screen resolution a certain number of objects are displayed on the page. The pages can be navigated using a small navigation bar positioned above the object list. The “object form” is represented as a vertical list of field names and values. The value being edited is highlighted in red. To the left of some fields there is a black circle that indicates that this field is included in the current index (selected in the left pane).</p>
+                <p>Depending on the field type, the values are represented in different ways: simple fields (<code>chars, ints</code>) are represented by the edit box, and are immediately available for editing; In order to edit <code>strings</code>, <code>blobs</code>, or <code>vectors</code> and <code>arrays</code> of <code>strings</code>, click on the field value and a separate form will appear.</p>
+                <p>Fields of types <code><a name="kanchor452"></a>autoid</code> and <code>ref</code> cannot be edited.</p>
+                <p><code>Optional structures</code> and <code>vectors</code> may or may not have values. If the value exists it is indicated by a solid black square next to the value. An empty square indicates that the value does not exist.</p>
+                <p>Pressing the small blue square next to the object form deletes the object. Pressing the small blue square next to a <code>vector</code> element value deletes the <code>vector</code> element.</p>
+                <p>Not all objects can be edited or deleted; only those that have <code>oid</code>, <code>autoid</code> or <code>auto_oid</code> index fields. <code>Auto_oid</code> is database wide indexing required if using the <i>e</i>X<i>treme</i>DB<i> High Availability</i> or Transaction Logging features. If <code>auto_oid</code> is defined then all objects of all classes in this database are editable in the database browser. On the other hand, if no <code>auto_oid</code> is defined then only objects of classes containing an <code>oid</code> or <code>autoid</code> fields may be edited or deleted via the database browser.</p>
+                <p>Please use the following links to view the APIs for the database browser:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Database_Browser/Database_Browser_C.htm">C</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The C APIs for the HTTP Browser</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">SQL</td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">The <i>e</i>X<i>treme</i>SQL APIs  for the HTTP Browser</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

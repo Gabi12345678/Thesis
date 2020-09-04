@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|C API Return Codes">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeDB Non-fatal Error Codes</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/ReturnCodes.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>DB Non-fatal Error Codes</h1>
+            <blockquote>
+                <p>The following error codes indicate miscellaneous non-fatal error conditions that the <i>e</i>X<i>treme</i>DB<a name="kanchor420"></a> runtime might return:</p>
+                <table style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../Resources/TableStyles/ReturnCodes.css');" class="TableStyle-ReturnCodes" cellspacing="0">
+                    <col class="TableStyle-ReturnCodes-Column-Column1" />
+                    <col class="TableStyle-ReturnCodes-Column-Column2" />
+                    <col class="TableStyle-ReturnCodes-Column-Column3" />
+                    <thead>
+                        <tr class="TableStyle-ReturnCodes-Head-Header1">
+                            <th class="TableStyle-ReturnCodes-HeadE-Column1-Header1">Mnemonic Constant Name</th>
+                            <th style="text-align: center;" class="TableStyle-ReturnCodes-HeadE-Column2-Header1">Value</th>
+                            <th class="TableStyle-ReturnCodes-HeadD-Column3-Header1">Meaning </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_TRANS_NOT_ACTIVE             </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">49</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Transaction is not active</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_CORE</td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">50</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Runtime Core error code base</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_INVALID_HANDLE</td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">51</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Normally invalid handle causes a fatal error</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_NOMEM                        </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">52</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">No memory</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_ACCESS                         </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">53</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Attempt to use a read only transaction for a write operation</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_TRANSACT                     </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">54</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Transaction is in the error state</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_INDEXLIMIT                   </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">55</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Vector index out of bounds</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_EMPTYVECTOREL                </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">56</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Vector element was not set (at given index)</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_UNSUPPORTED                  </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">57</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Unsupported call  </td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_EMPTYOPTIONAL               </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">58</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Optional structure has not been set</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_EMPTYBLOB                    </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">59</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Attempting to read a null blob</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_CURSOR_INVALID             </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">60</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Cursor is not valid</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_ILLEGAL_TYPE                 </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">61</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Search by <code>oid</code> type is not expected</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_ILLEGAL_PARAM               </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">62</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Illegal parameter. For example, illegal search operation type</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_CURSOR_MISMATCH             </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">63</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Cursor type and object type are incompatible</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_DELETED                      </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">64</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Attempt to update object, deleted in current transaction</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_LONG_TRANSACTON              </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">65</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Transaction length is more than <code>MCO_TRN_MAXLENGTH</code></td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_INSTANCE_DUPLICATE           </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">66</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Duplicate database instance</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_UPGRADE_FAILED               </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">67</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Transaction upgrade failed; write transactions is progress  </td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_NOINSTANCE                   </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">68</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Database instance is not found</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_OPENED_SESSIONS              </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">69</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Failed to close database because it has opened connections</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_PAGESIZE                     </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">70</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Page size is not acceptable</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_WRITE_STREAM                 </td>
+                            <td class="TableStyle-ReturnCodes-BodyE-Column2-Body1" style="text-align: center;">71</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Write stream failure</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1"> MCO_E_READ_STREAM                  </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">72</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Read stream failure  </td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_LOAD_DICT                    </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">73</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Attempt to load an incompatible dictionary in <code>db_load()</code></td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_LOAD_DATA                    </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">74</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Attempt to load a corrupted image in <code>db_load()</code></td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_VERS_MISMATCH                </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">75</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Version mismatch</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_VOLUNTARY_NOT_EXIST          </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">76</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Voluntary index has not been  created</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_EXCLUSIVE_MODE               </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">77</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Attempt to open a database that is already open in the exclusive mode</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_MAXEXTENDS                   </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">78</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Maximum number of extends reached</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_HIST_OBJECT                  </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">79</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Operation is illegal for the older version of the object</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_SHM_ERROR                    </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">80</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Failed attempt to create / attach to shared memory</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_NOTINIT                      </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">81</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Runtime was not initialized</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_SESLIMIT                     </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">82</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Sessions number limit reached</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_INSTANCES_LIMIT            </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">83</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Too many instances</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_MAXTRANSSIZE_LOCKED          </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">84</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">The maximum size of transaction cannot be changed</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_DEPRECATED                  </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">85</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Obsolete feature</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_NOUSERDEF_FUNCS              </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">86</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Database has userdef indexes defined, but no custom functions registered</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_CONFLICT                     </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">87</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1"><a name="kanchor421"></a>MVCC conflict</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_INMEM_ONLY_RUNTIME           </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">88</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">There are persistent classes in the schema but runtime in-memory only</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_ISOLATION_LEVEL_NOT_SUPPORTED</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">89</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Requested isolation level is not supported</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_REGISTRY_UNABLE_CREATE_CONNECT</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">90</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Unable to create a new registry</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_REGISTRY_UNABLE_CONNECT</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">91</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Unable to connect to the existing registry</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_REGISTRY_INVALID_SYNC</td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">92</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Invalid sync in the registry detected</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_MDEV_RUNTIME_START           </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">93</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Unable to initialize memory device for the registry</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_SYNC_RUNTIME_START           </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">94</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Unable to start sync runtime</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_ALIGN_ERROR                  </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">95</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Bit range get / set alignment error</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_PINNED_VERSION_LIMIT         </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">96</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Pinned version number limit is reached</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_VERSION_NOT_PINNED           </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">97</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Version is not pinned</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_CURSOR_CLOSED                </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">98</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Cursor is closed</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyE-Column1-Body1">MCO_E_CONVERSION                   </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyE-Column2-Body1">99</td>
+                            <td class="TableStyle-ReturnCodes-BodyD-Column3-Body1">Conversion error in binary schema evolution</td>
+                        </tr>
+                        <tr class="TableStyle-ReturnCodes-Body-Body1">
+                            <td class="TableStyle-ReturnCodes-BodyB-Column1-Body1">MCO_E_EVAL                         </td>
+                            <td style="text-align: center;" class="TableStyle-ReturnCodes-BodyB-Column2-Body1">999</td>
+                            <td class="TableStyle-ReturnCodes-BodyA-Column3-Body1">Evaluation version limitation</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><a href="javascript:void(0);" class="MCHelpControl MCHelpControl-Related relatedTopics" data-mc-topics="eXtremeDB Cluster Error Codes|Cluster_Error_Codes.htm||eXtremeDB Data Definition Language Error Codes|DDL_Error_Codes.htm||eXtremeDB Disk Manager Error Codes|Disk_Manager_Error_Codes.htm||eXtremeDB Fatal Error Codes|Fatal_Error_Codes.htm||eXtremeDB HA Error Codes|HA_Error_Codes.htm||eXtremeDB Network Error Codes|Network_Error_Codes.htm||eXtremeDB Non-fatal Error Codes|Non_Fatal_Error_Codes.htm||eXtremeDB Performance Monitor and Miscellaneous Error Codes|PMon_Misc_Error_Codes.htm||eXtremeDB Sequence Error Codes|Sequence_Error_Codes.htm||eXtremeDB Status Codes|Status_Codes.htm||eXtremeDB Transaction Logging Error Codes|Transaction_Logging_Error_Codes.htm||eXtremeDB UDA Error Codes|UDA_Error_Codes.htm||eXtremeDB XML Error Codes|XML_Error_Codes.htm"><span class="MCHelpControl-RelatedHotSpot_"><img class="MCHelpControl_Image_Icon" src="../../../../Skins/Default/Stylesheets/Images/transparent.gif" height="16" width="16" alt="Related Topics Link Icon" />Related Topics</span></a>
+                </p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

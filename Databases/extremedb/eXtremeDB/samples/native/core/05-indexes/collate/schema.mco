@@ -1,0 +1,16 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.     *
+ *                                                               *
+ *****************************************************************/
+
+declare database colldb;
+
+class Record
+{
+    string name;
+    unsigned<4> value;
+	
+    unique tree <name> tstd;
+    unique tree <name collate C1> tcoll;
+};

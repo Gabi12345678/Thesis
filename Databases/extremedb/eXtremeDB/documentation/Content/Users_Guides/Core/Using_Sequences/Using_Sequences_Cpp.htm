@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|C++ API|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Using Sequences in C++</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Using Sequences in C++</h1>
+            <p>As explained in the <a href="../Using_Sequences.htm">User's Guide</a> page, a sequence is an unbounded array of <i>e</i>X<i>treme</i>DB-supported scalar data elements. The C++ <i><a href="../../../Programming/C++/Classes/Sequence.htm">Sequence</a></i> class is used together with the generated C API <code style="font-style: italic;">classname_fieldname_*()</code> functions in C++ applications to manage database fields of type <a href="../Sequences.htm">sequence</a>. As <a href="../Sequences.htm">sequences</a> are effectively vectors of values, they are accessed through <i>iterators</i>. Whereas the C type <code><a href="../../../Programming/C/Structures/SequenceIterator.htm">mco_seq_iterator_h</a></code> is used in C applications, the C++ class <i><a href="../../../Programming/C++/Classes/Sequence.htm">Sequence</a></i> serves the equivalent role in C++ applications. The <i><a href="../../../Programming/C++/Classes/Sequence.htm">Sequence</a></i> class provides  a powerful set of <a href="../../../Programming/C++/Classes/Analytics_Methods/Methods_By_Category.htm">Analytics Methods</a> for performing mathematical and statistical operations on <a href="../Sequences.htm">sequences</a>.</p>
+            <h2>Inserting and Updating Sequences</h2>
+            <blockquote>
+                <p>Normally sequence data is inserted using the <a href="../../../Programming/C/Generated.htm">generated</a> C API <code><i>classname_fieldname</i>_append()</code>. For example consider the following schema definition:</p>
+                <div class="code-block"><pre>&#160;
+    #define uint4 unsigned&lt;4&gt;
+    &#160;
+    class Quote {
+        char&lt;16&gt;            symbol;
+        sequence&lt;uint4 asc&gt; day;
+        sequence&lt;float&gt;     price;
+        &#160;
+        tree&lt;symbol&gt; by_symbol;
+    };
+    &#160;</pre>
+                </div>
+                <p>With this class definition, the <i>Quote</i> sequence fields <code>day</code> and <code>price</code> can be populated with code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    #define  N_ITEMS                4
+    uint4 days[N_ITEMS] = { 1, 2, 4, 5 };
+    float prices[N_ITEMS] = { 10, 20, 40 ,50 };
+    ...
+    Quote q;
+    q.create(t);
+    q.symbol_put("IBM", (uint2)(strlen("IBM")));
+    q.day_append(days, N_ITEMS);
+    ...
+    q.price_append(prices, N_ITEMS);
+    &#160;</pre>
+                </div>
+                <p>It may sometimes be necessary to insert values into an ordered time series. Values can be  inserted into an existing sequence using the <a href="../../../Programming/C/Generated.htm">generated</a> C API &lt;classname&gt;_&lt;fieldname&gt;_insert(). For example, the following code snippet searches for the <i>Quote</i> object with symbol "<code>IBM</code>", then inserts <code>day</code> and <code>price</code> values:</p>
+                <div class="code-block"><pre>&#160;
+    #define  DAY_THREE              3
+    #define  DAY_THREE_PRICE        30
+    uint4 day_to_insert[1] = { DAY_THREE };
+    float price_to_insert[1] = { DAY_THREE_PRICE };
+    ...
+    mco_trans_h     t;
+    mco_cursor_t    cur;
+    ...
+    mco_trans_start(db, MCO_READ_WRITE, MCO_TRANS_FOREGROUND, &amp;t);
+    mco_cursor_first(t, &amp;cur);
+    rc = Quote::by_symbol::cursor(t, &amp;cur);
+    if (MCO_S_OK == rc)
+    {
+        rc = Quote::by_symbol::search(t, &amp;cur, MCO_GE, "IBM", 
+                        (uint2)(sizeof("IBM")));
+        if (MCO_S_OK == rc)
+        {
+            //insert here
+            Quote q;
+            q.create(t);
+&#160;
+            rc = q.from_cursor(t, &amp;cur);
+            Sequence&lt;uint4&gt; seq = q.day_iterator();
+            if (MCO_S_OK == rc)
+            {
+                rc = q.day_search(seq, 
+                            DAY_THREE, MCO_SEQ_BOUNDARY_EXCLUSIVE, 
+                            0, MCO_SEQ_BOUNDARY_OPEN);
+                mco_seq_no_t pos = seq.iter-&gt;first_seq_no;
+                rc = q.day_insert(pos, day_to_insert, 1);
+                ...
+                rc = q.price_insert(pos, price_to_insert, 1);
+                rc = mco_trans_commit(t);
+            }
+        }
+    }
+    &#160;</pre>
+                </div>
+                <h2>Iterating <i>Sequence</i>s </h2>
+                <p>Normally <a href="../Sequences.htm">sequence</a> data is iterated using the <i><a href="../../../Programming/C++/Classes/Sequence.htm">Sequence</a></i> method <code>next()</code>. For example, the <i>Quote</i> sequence fields <code>day</code> and <code>price</code> can be iterated with code like the following:</p>
+                <div class="code-block"><pre>&#160;
+    mco_trans_h trans;
+    MCO_RET rc;
+    ...
+    mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;trans);
+    if ( MCO_S_OK == rc )
+    {
+        Sequence&lt;uint4&gt; day_iterator;
+        ...
+        quote.day_search(day_iterator, DMY(1,1,2013), MCO_SEQ_BOUNDARY_INCLUSIVE, DMY(1,4,2013), MCO_SEQ_BOUNDARY_INCLUSIVE));
+        Sequence&lt;float&gt; price_iterator = quote.price_project(day_iterator);
+&#160;
+        /* Iterate day and price sequences */
+        while (day_iterator.next(day)) 
+        {
+            printf("%u: %f\n", day, ++price_iterator);
+        }
+        mco_trans_rollback(trans);
+    }
+    &#160;</pre>
+                </div>
+                <p>Note how the <code><a href="../../../Programming/C++/Classes/Analytics_Methods/Iterator_Methods.htm">next()</a></code> method is used to iterate through the <code>day</code> sequence and the convenient <a href="../../../Programming/C++/Classes/Analytics_Methods/Iterator_Methods.htm">++</a> operator is used to iterate the <code>price</code> sequence.</p>
+                <h2>Using Analytics Methods</h2>
+                <p>As mentione above, the <i><a href="../../../Programming/C++/Classes/Sequence.htm">Sequence</a></i> class provides a number of <a href="../../../Programming/C++/Classes/Analytics_Methods/Methods_By_Category.htm">Analytics Methods</a> to efficiently manipulate sequence data and perform a variety of statistical operations. For example, the following code snippet demonstrates how to  iterate a Grid Aggregate Maximum sequence of <i>Quote</i> <code>price</code> values using a generic sequence output function  <code>print_sequence()</code> (as demonstrated in SDK sample <code><a href="../../../Programming/C++/SDK_Samples/Cpp_Sequences_Api.htm"><code>samples/native/sequences/api/cpp</code></a></code>):</p>
+                <div class="code-block"><pre>    &#160;
+    mco_trans_h trans;
+    MCO_RET rc;
+    ...
+    mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;trans);
+    if ( MCO_S_OK == rc )
+    {
+        /* Iterate through all Quote objects */
+        Quote::by_sym::cursor(trans, &amp;quote_cursor);
+        for (rc = mco_cursor_first(trans, &amp;quote_cursor); 
+            rc != MCO_S_CURSOR_END; 
+            rc = mco_cursor_next(trans, &amp;quote_cursor)) 
+        {
+            /* Get current Quote object */
+            quote.from_cursor(trans, &amp;quote_cursor);
+&#160;
+            /* Print the Grid Aggregate sequence for price */
+            print_sequence(quote, quote.price_iterator().gridAggMax(7));
+        }
+        mco_trans_rollback(trans);
+    }
+    &#160;</pre>
+                </div>
+                <p>Note that the C type <code><a href="../../../Programming/C/Structures/SequenceIterator.htm"><code>sequence_iterator</code></a></code> returned by <a href="../../../Programming/C/Generated.htm">generated</a> function <code>quote.price_iterator()</code> is converted to a C++ <i><a href="../../../Programming/C++/Classes/Sequence.htm">Sequence</a></i> and its method <code><a href="../../../Programming/C++/Classes/Analytics_Methods/GridAgg_Methods.htm">gridAggMax()</a></code> is invoked in the call to function <code>print_sequence()</code>. This <i><a href="../../../Programming/C++/Classes/Sequence.htm">Sequence</a></i> is then iterated and printed out in <code>print_sequence()</code>. </p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,4 @@
+-include $(call mco_makefile_file, \
+JDBCBatch/makefile.project.jdbcbatch \
+SimpleJDBC/makefile.project.simplejdbc \
+)

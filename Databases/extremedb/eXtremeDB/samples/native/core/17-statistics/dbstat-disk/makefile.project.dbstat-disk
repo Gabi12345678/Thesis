@@ -1,0 +1,14 @@
+MCO_PRJ_LIST += 17-statistics-dbstat-disk
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 17-statistics-dbstat-disk
+PRJ_17-statistics-dbstat-disk_TAGS:=persistent sample core
+PRJ_17-statistics-dbstat-disk_DIR:=$(call mco_project_dir)
+PRJ_17-statistics-dbstat-disk_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_17-statistics-dbstat-disk_SCHEMAS:=$(call mco_project_file,dbstat.mco)
+PRJ_17-statistics-dbstat-disk_DATABASES:=dbstatdb
+PRJ_17-statistics-dbstat-disk_RUNTIME:=YES
+PRJ_17-statistics-dbstat-disk_MEMDEV:=PRIVATE
+PRJ_17-statistics-dbstat-disk_STORAGE:=PERSISTENT
+PRJ_17-statistics-dbstat-disk_STORAGEDEV:=AUTO
+PRJ_17-statistics-dbstat-disk_SYNC:=AUTO
+PRJ_17-statistics-dbstat-disk_TRANSMGR:=MURSIW

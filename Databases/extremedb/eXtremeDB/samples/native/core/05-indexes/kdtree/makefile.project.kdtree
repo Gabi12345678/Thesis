@@ -1,0 +1,13 @@
+MCO_PRJ_LIST += 05-indexes-kdtree
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 05-indexes-kdtree
+PRJ_05-indexes-kdtree_TAGS:=sample core kdtree
+PRJ_05-indexes-kdtree_DIR:=$(call mco_project_dir)
+PRJ_05-indexes-kdtree_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_05-indexes-kdtree_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_05-indexes-kdtree_DATABASES:=kdtreedb
+PRJ_05-indexes-kdtree_RUNTIME:=YES
+PRJ_05-indexes-kdtree_MEMDEV:=PRIVATE
+PRJ_05-indexes-kdtree_STORAGE:=TRANSIENT
+PRJ_05-indexes-kdtree_SYNC:=AUTO
+PRJ_05-indexes-kdtree_TRANSMGR:=MURSIW

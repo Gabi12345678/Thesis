@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Installing the McObject ODBC Driver on Windows 64 systems</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>DB ODBC DSN configuration on Windows systems</h1>
+            <blockquote>
+                <p>Please use these links to view an <a href="../ODBC_API.htm">overview</a> of the <i>e</i>X<i>treme</i>SQL <span class="Param">ODBC</span> implementation and <a href="../../Getting_Started/Installation/Installation_Windows.htm">installation steps</a>. Below are presented the steps to configure the McObject <span class="Param">ODBC</span> driver to connect to <i>e</i>X<i>treme</i>SQL applications.</p>
+                <p>The McObject <span class="Param">ODBC</span> Setup dialog can be used to configure a DSN for local or remote connections.</p>
+                <p>The Setup Dialog looks like the image below:</p>
+                <p>
+                    <img src="../../Resources/Images/ODBC_DSN/SetupDlg.png" />
+                </p>
+            </blockquote>
+            <h2>Connecting to a local database</h2>
+            <blockquote>
+                <p>To connect to a database on the current computer, enter the name of the database as it is passed to the <code>engine.open()</code> or <code>mco_db_open_dev()</code> function calls in the server application, an optional description and specify that the server is on this computer (localhost) and the port (eg. 5001) that it is listening on. The example below specifies the <code>tpcdb</code> database used by the SDK samples <code>samples\native\sql\tpc</code> and <code>odbc\samples\tpcodbc</code>:</p>
+                <p>
+                    <img src="../../Resources/Images/ODBC_DSN/SetupLocal.png" />
+                </p>
+                <p>Pressing <b>next</b> brings up the following screen to specify whether this is a local or remote connection. Naturally, to create a local connection, the <i>e</i>X<i>treme</i>DB database must be created in <b style="font-style: italic;">shared memory</b> (not conventional memory) so that it can be accessed by more than one application (at a minimum, the <i>e</i>X<i>treme</i>SQL application and the ODBC driver). So click the upper radio button and type the database name to connect to and click “Finish” to complete the DSN definition.</p>
+                <p>The screen below shows the specification for connecting to the TPC sample database.</p>
+                <p>
+                    <img src="../../Resources/Images/ODBC_DSN/Setup_TCPDb_Local.png" />
+                </p>
+                <p>To connect to the database from an <i>e</i>X<i>treme</i>SQL <span class="Param">ODBC</span> application (see for example <code>odbc\samples\tpcodbc.c</code>), specify the database name as the second  parameter of the <span class="Param">ODBC</span> function <code>SQLConnect()</code>. For example:</p>
+                <div class="code-block"><pre>&#160;
+    SQLRETURN SQL_API SQLConnect( SQLHDBC hDbc,
+                     SQLCHAR *dsnName,
+                     SQLSMALLINT nameLength1,
+                     SQLCHAR *userName,
+                     SQLSMALLINT nameLength2,
+                     SQLCHAR *authentication,
+                     SQLSMALLINT nameLength3 )
+                     &#160;</pre>
+                </div>
+                <p>The <span class="Param">nameLength1</span> parameter should be either the length of the <span class="Param">dsnName</span> argument, or <span class="Param">SQL_NTS</span>.  The parameters after <span class="Param">nameLength1</span> are ignored since <i>e</i>X<i>treme</i>SQL uses an embedded database and doesn’t have a concept of “users”.</p>
+                <p>Note that the <span class="Param">dsnName</span> argument is the same name that was given to the <i>e</i>X<i>treme</i>SQL API function <code>engine.open()</code> or the <i>e</i>X<i>treme</i>DB API function <code>mco_db_open_dev()</code>. So, for the TPC sample, the database is opened as follows:</p>
+                <div class="code-block"><pre>&#160;
+    engine.open("tpcdb", tpcdb_get_dictionary(),DATABASE_SIZE,PAGE_SIZE,MAP_ADDRESS);
+    &#160;</pre>
+                </div>
+                <p>Consequently the <code>SQLConnect()</code> call is</p>
+                <div class="code-block"><pre>&#160;
+    SQLConnect( hDbc, “tpcdb”, SQL_NTS, 0, 0, 0, 0);
+    &#160;</pre>
+                </div>
+                <p>Now, to run the SDK sample programs <code>tpc </code>and <code>tpcodbc </code>first start <code>tpc </code>as follows:</p>
+                <div class="code-block"><pre>&#160;
+    tpc -clients 1 -tpc 100000
+    &#160;</pre>
+                </div>
+                <p>The <code>tpc </code>program, acting as the database server, creates the in-memory database in shared memory and runs 100,000 iterations of the “TPC” test. When the test has completed wait (do not press the <b>Enter</b> key) to hold the <code>tpc</code> process (and its database) in memory. Now the <span class="Param">ODBC</span> driver can access the <code>tpcdb </code>database. Start the <code>tpcodbc </code>client program as follows:</p>
+                <div class="code-block"><pre>&#160;
+    tpcodbc -tpc  100000 -db tpcdb
+    &#160;</pre>
+                </div>
+                <p>This command line instructs the <span class="Param">ODBC</span> client program to run 100,000 iterations of the “TPC” test and will display results similar to <code>tpc </code>because they both access the same database on the local computer. The difference is simply that <code>tpc</code> accesses the database directly via the <i>e</i>X<i>treme</i>SQL API while <code>tpcodbc </code>accesses it through the <span class="Param">ODBC</span> driver.</p>
+                <p>
+                    <img src="../../Resources/Images/note.png" />Note that a subtle error can be introduced by copying and pasting the above commands into a console window. In some cases an unprintable ascii symbol is passed to the command line that causes the <code>tpc </code>sample to startup incorrectly. And consequently <code>tpcodbc </code>can’t connect to the database and throws an error. So we recommend typing the command lines manually. </p>
+            </blockquote>
+            <h2>Connecting to a remote database</h2>
+            <blockquote>
+                <p>To connect to a remote database, enter the name and description in the McObject <span class="Param">ODBC</span> Setup dialog as described above. Then type the IP address of the system that is hosting the database followed by a colon (“:”) and the port number on which the <i>e</i>X<i>treme</i>SQL server process is listening.</p>
+                <p>The example below specifies the <code>tpcdb </code>database used by the SDK samples <code>samples\native\sql\tpc</code> and <code>samples\native\sql\tpcodbc</code> hosted on the computer with IP <code>207.2.78.232</code> that is listening on port <code>6100:</code></p>
+                <p>
+                    <img src="../../Resources/Images/ODBC_DSN/Setup_TCPdb_Remote.png" />
+                </p>
+                <p>The connection to the remote database is done through the <i>xSQL</i> utility, which plays the role of the database server.</p>
+                <p>To demonstrate the remote connection, start the application on the host computer that will create the database.  Assuming the IP address of the host computer is <code>207.2.78.232</code> and using again the SDK sample programs <code>tpc </code>and <code>tpcodbc </code>first start <code>tpc </code>as follows:</p>
+                <div class="code-block"><pre>&#160;
+    tpc -clients 1 -tpc 100000
+    &#160;</pre>
+                </div>
+                <p>The <code>tpc </code>sample creates the database with the following function call:</p>
+                <div class="code-block"><pre>&#160;
+    engine.open("tpcdb", tpcdb_get_dictionary(),DATABASE_SIZE,PAGE_SIZE,MAP_ADDRESS);
+    &#160;</pre>
+                </div>
+                <p>As in the local connection example above, the database named <code>tpcdb </code>will be placed in shared memory, and the program runs 100,000 iterations of the “TPC” test. When the test has completed wait (do not press the <b>Enter</b> key) to hold the <code>tpc</code> process (and its database) in memory.</p>
+                <p>Next, on the same computer, start <i>xSQL</i> which will provide remote access to the in-memory database:</p>
+                <div class="code-block"><pre>&#160;
+    xsql tpcdb:6100
+    &#160;</pre>
+                </div>
+                <p>This command starts <i>xSQL</i>, instructs it to open the <code>tpcdb</code> database and to listen on port <code>6100</code> for remote processes wanting to connect to the database.</p>
+                <p>Finally, on another computer on the network, start the <code>tpcodbc</code> client program as follows:</p>
+                <div class="code-block"><pre>&#160;
+    tpcodbc -tpc  100000 -db 207.2.78.232:6100
+    &#160;</pre>
+                </div>
+                <p>This command line instructs the program to run 100,000 iterations of the “TPC” test, opening the <span class="Param">ODBC</span> data source name <code>207.2.78.232:6100</code> which is, of course, the <i>xSQL</i> process running on the host computer and listening on port <code>6100</code>.  The C source code in <code>tpcodbc </code>establishes the <span class="Param">ODBC</span> connection as follows:</p>
+                <div class="code-block"><pre>&#160;
+    database = argv[i]; // extract the data source name from the command line
+    SQLAllocEnv(&amp;hEnv); // allocate the environment handle
+    SQLAllocConnect(hEnv, &amp;hDbc); // allocate the connection handle
+    // connect to the data source (McObject ODBC driver)
+    SQLConnect(hDbc, database, SQL_NTS, NULL, 0, NULL, 0);
+    &#160;</pre>
+                </div>
+                <p>Now <code>tpcodbc</code> will display the results, although slower than <code>tpc</code> due to latency in the network subsystem processing the data transfer between the <span class="Param">ODBC</span> driver and the <i>e</i>X<i>treme</i>SQL remote server. (If the application appears to hang it may be advisable to reduce the number of tests by the command line argument, e.g.: “-tpc  100”.)</p>
+                <h2>Connection attributes</h2>
+                <p>It is possible extract connection attributes from the connection string. The following attributes are supported:</p>
+                <ul>
+                    <li value="1"><code>DRIVER</code> - the eXtremeDB driver name</li>
+                    <li value="2"><code>DSN </code>- DSN record</li>
+                    <li value="3"><code>SERVER </code>- the address or addresses divided by comma of the RSQL servers to connect to</li>
+                    <li value="4"><code>SQL_N_REPLICAS</code> - the number of replicas in the connection through the <i>DistributedSqlEngine</i> (corresponds to the <code>nReplicas</code> argument when calling the <code>DistributedSqlEngine::open() <span style="font-family: Arial;">C++ API</span></code><span style="font-family: Arial;">)</span></li>
+                    <li value="5"><code>SQL_CONNECT_ATTEMPTS</code> - the number of attempts to connect (corresponds to the <code>maxConnectAttempts </code> argument when calling the <code>RemoteSqlEngine::open()<span style="font-family: Arial;">or <code>DistributedSqlEngine::open()</code> C++ APIs</span></code><span style="font-family: Arial;">)</span> <![CDATA[ ]]></li>
+                    <li value="6"><code>SQL_CONNECT_TIMEOUT</code> - server connection timeout  (corresponds to the <code>connectTimeout</code> argument when calling the <code>RemoteSqlEngine::open()<span style="font-family: Arial;">or <code>DistributedSqlEngine::open()</code> C++ APIs</span></code><span style="font-family: Arial;">)</span></li>
+                    <li value="7"><code>SQL_READ_TIMEOUT</code> - server reply timeout (corresponds to the <code>readTimeout</code> argument when calling the <code>RemoteSqlEngine::open()<span style="font-family: Arial;">or <code>DistributedSqlEngine::open()</code> C++ APIs</span></code><span style="font-family: Arial;">)</span></li>
+                    <li value="8"><code>DATABASE </code>- the database name in the connections to the shared memory database</li>
+                </ul>
+                <p>When the <code>DSN</code> attribute is used, all connection data is taken from the DSN record. However if the <code>SERVER</code>, <code>SQL_N_REPLICAS</code>, <code>SQL_CONNECT_ATTEMPTS</code> and <code>DATABASE</code> attributes are specified separately, their values overwrite DSN values.</p>
+                <p>If the <code>DSN</code> attribute is not used, either the <code>DRIVER</code> or the <code>SERVER</code> must be specified for the remote (RSQL) connection and the <code>DATABASE</code> attribute must be specified to establish a shared memory database connection.</p>
+                <p>The driver name (<code>DRIVER</code>) for x32 systems is "McObject eXtremeDB driver" and for х64 systems it is "McObject eXtremeDB 64bit driver". The odbcad32 utility reflects these names.</p>
+                <p>Following is a C# code snippet showing how attributes can be specified:</p>
+                <div class="code-block"><pre xml:space="preserve">&#160;
+    // Manually specify the driver and two servers addresses (distributed RSQL connection)</pre><pre xml:space="preserve">    String connectionString = "Driver={McObject eXtremeDB driver};SERVER=localhost:6001,localhost:6002;";
+    // Get most of data source attributes from DSN 'xsql_dsn' but override the SERVER attribute
+    //String connectionString = "DSN=xsql_dsn;SERVER=localhost:6001;";</pre><pre xml:space="preserve">    // Get all data source attributes from DSN 'xsql_dsn'</pre><pre xml:space="preserve">    //String connectionString = "DSN=xsql_dsn";</pre><pre xml:space="preserve">
+    System.Data.Odbc.OdbcConnection dbconn;
+    dbconn = new System.Data.Odbc.OdbcConnection(connectionString);
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

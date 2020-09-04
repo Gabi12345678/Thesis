@@ -1,0 +1,16 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.     *
+ *                                                               *
+ *****************************************************************/
+
+#define int1      signed<1>
+
+declare database metersdb;
+
+class Meter {
+    int1 id;
+    sequence<datetime asc> timestamp;
+    sequence<float> value;
+    hash<id> by_id[1000];
+};

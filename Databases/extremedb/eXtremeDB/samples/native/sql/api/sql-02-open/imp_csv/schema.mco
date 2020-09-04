@@ -1,0 +1,29 @@
+/*******************************************************************
+ *                                                                 *
+ *  schema.mco                                                     *
+ *                                                                 *
+ *  This file is a part of the eXtremeDB source code               *
+ *  Copyright (c) 2001-2019 McObject LLC                           * 
+ *  All Rights Reserved                                            *
+ *                                                                 *
+ *******************************************************************/
+#define int1      signed<1>
+#define int2      signed<2>
+#define int4      signed<4>
+#define int8      signed<8>
+#define uint8     unsigned<8>
+#define uint4     unsigned<4>
+#define uint2     unsigned<2>
+#define uint1     unsigned<1>
+
+declare database  persondb;
+
+class Person
+{
+    string name;
+    uint4  ordinal;
+
+    list;
+    autoid[1000];
+    tree<name> pk;
+};

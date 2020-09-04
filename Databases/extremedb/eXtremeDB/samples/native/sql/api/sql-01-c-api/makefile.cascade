@@ -1,0 +1,9 @@
+-include $(call mco_makefile_file, \
+access/makefile.project.access \
+allocators/makefile.project.allocators \
+initialize/makefile.project.initialize \
+multifile/makefile.project.multifile \
+mursimul/makefile.project.mursimul \
+prepared/makefile.project.prepared \
+transactions/makefile.project.transactions \
+)

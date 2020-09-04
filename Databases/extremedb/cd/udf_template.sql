@@ -83,7 +83,6 @@ create function import_data() RETURNS string in 'python' as '
 		for j in range(columns):
 			current_line.append( float(line[j + 1]) )
 		cur.execute("INSERT INTO datapoints(t) VALUES (?)", (time, ) )
-
 		for j in range(0, columns, 50):
 			start_interval = j
 			end_interval = min(columns, start_interval + 50)

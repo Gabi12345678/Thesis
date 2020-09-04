@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Database Encryption in C</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Database Encryption and CRC in C</h1>
+            <blockquote>
+                <p>As explained in page <a href="../Database_Encryption.htm">Database Encryption and CRC</a>, <i>e</i>X<i>treme</i>DB provides the capability to encrypt in-memory and persistent databases with standard <a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard"> AES encryption</a> or by a <a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Custom_Encryption.htm">custom encryption implementation</a>. Also it is possible to change the CRC algorithm from the default CRC32.</p>
+                <h1>Data Encryption</h1>
+                <p>The encryption of data in memory is controlled by the <code>cipher_key</code> element of the parameter structure (<code><a href="../../../Programming/C/Structures/Database_Parameters.htm">mco_db_params_t</a></code>) passed into <a href="../../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm">mco_db_open_dev()</a>. If this parameter is not <code>NULL</code>, then pages are encrypted with the AES or custom encryption algorithm before being saved. Each page is encrypted individually. </p>
+                <p>It is also possible to enable encryption with the online backup feature. The encryption of backup files is enabled by specifying the <code>cipher</code> argument  of functions <code><a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Backup/create.htm">mco_backup_create()</a></code> and <a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Backup/restore.htm"><code>mco_backup_restore()</code></a>. Note that this option has no relation to the database parameter <code><a href="../../../Programming/C/Structures/Database_Parameters.htm"><code>mco_db_params_t::cipher_key</code></a></code>.</p>
+                <p>Database snapshot files are also encrypted by functions <code><a href="../../../Programming/C/Core_Functions/Static/Database_Control/save.htm">mco_db_save()</a></code>, and decrypted by <code><a href="../../../Programming/C/Core_Functions/Static/Database_Control/load.htm">mco_db_load()</a> <![CDATA[ ]]></code>if field <a href="../../../Programming/C/Structures/Database_Parameters.htm"><code>mco_db_params_t::cipher_key</code></a> is specified. Note that the exact same <i>cipher key</i> must be specified for saving and loading an encrypted snapshot.</p>
+                <p>The choice of encryption algorithm is determined by the library linked with the application. The <a href="https://en.wikipedia.org/wiki/Advanced_Encryption_Standard">AES algorithm</a> implementation is provided in library <code>mcocryptaes</code>. </p>
+                <p>For details regarding implementation of a custom encryption algorithm, please see page <a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Custom_Encryption.htm">Custom Encryption C API</a>.</p>
+                <h2>In-Memory Database Encryption</h2>
+                <p>Encryption of in-memory pages is enabled only when both the <code>cipher_key</code> is specified and flag <code>MCO_DB_INMEMORY_PROTECTION</code> is set in field <code><a href="../../../Programming/C/Structures/Database_Parameters.htm"><a href="../../../Programming/C/Structures/Database_Open_Modes.htm"><code>mco_db_params_t.mode_mask</code></a></a></code>. Internally, <code>MCO_DB_INMEMORY_PROTECTION</code> mode will cause the creation of a hash table of used database pages (pages being accessed by the application). The maximum number of pages accessed by one connection at a given time can be specified by the <code>max_active_pages</code> field of struct <code><a href="../../../Programming/C/Structures/Database_Parameters.htm">mco_db_params_t</a></code>. The default value is 32. The number of bundles in this hash table (used to minimize the number of lock conflicts in case of concurrent access by multiple threads) can be specified using the <code>page_hash_bundles</code> field of <code><a href="../../../Programming/C/Structures/Database_Parameters.htm">mco_db_params_t</a></code>. (This value should be set ideally to the maximum concurrency level; i.e. the number of CPU cores – the default value is 32).</p>
+                <p>The following code snippet demonstrates how to enable encryption with the C API:</p>
+                <div class="code-block"><pre>&#160;
+    int main(int argc, char* argv[])
+    {
+        MCO_RET            rc;
+        mco_db_h db = 0;
+        mco_device_t       dev[1]; 
+        mco_db_params_t    db_params;
+        ...
+        &#160;
+        /* Initialize and customize the database parameters */
+        mco_db_params_init ( &amp;db_params );                  /* Initialize the params with default values */
+        db_params.mem_page_size      = 128;    /* Set page size for in-memory storage */
+        db_params.disk_page_size     = 0;  /* Set page size 0 for in-memory storage */
+        db_params.db_max_connections = 1;                   /* Set total number of connections to the database */
+        db_params.cipher_key         = "my_secure_key";     /* Set cipher key filename */
+        db_params.mode_mask         = MCO_DB_INMEMORY_PROTECTION;     /* Set mode mask */
+        &#160;
+        rc = mco_db_open_dev(db_name, genericdb_get_dictionary(), dev, N_DEVICES, &amp;db_params );
+        if ( MCO_S_OK == rc ) 
+        {
+            /* Connect to the database, obtain a database handle */
+            mco_db_connect(db_name, &amp;db); /* No recovery connection data */
+            ...
+        }
+    &#160;</pre>
+                </div>
+                <p>
+                    <img src="../../../Resources/Images/note.png" /><a name="kanchor1042"></a> Note  that  in-memory protection can be used only for pure in-memory databases (i.e. no disk manager is used). So if this mode is specified when the <code>mcovtdsk</code> library is used, the function <code><a href="../../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm">mco_db_open_dev()</a></code> or <code>mco_<a href="../../../Programming/C/Core_Functions/Static/Database_Control/load.htm">db_load()</a></code> will return error code <code>MCO_E_ILLEGAL_PARAM</code>.</p>
+                <p>
+                    <img src="../../../Resources/Images/note.png" /> Also note that encryption of database pages can reduce application speed by 2-10 times, especially for index operations. Using the <code>MCO_DB_INCLUSIVE_BTREE</code> option can help to reduce this penalty (see the <a href="../Indexes_Cursors/Inclusive_Covering_Indexes.htm">Key-Value-Inclusive and Covering Indexes</a> page for further details).</p>
+                <h3>Compression and Encryption</h3>
+                <p>If the <code><a href="../../../Programming/C/Structures/Database_Open_Modes.htm"><code>mco_db_params_t::mode_mask</code></a></code> flag <code>MCO_DB_INMEMORY_COMPRESSION</code> is set, then memory pages are being compressed with the ZIP algorithm (see page <a href="../Compression/Compression_C.htm">Database Compression</a> for further details). If <a href="../../../Programming/C/Structures/Database_Parameters.htm">mco_db_params_t::cipher_key</a> is set in addition to the <code>mode_mask</code> flag <code>MCO_DB_INMEMORY_COMPRESSION</code> then transient database pages are both zipped and encrypted. However note that this combination is not compatible with the disk manager<i>,</i> <i>thus compression plus encryption is not applicable for hybrid databases</i> (with both transient and persistent classes) .</p>
+                <h2>Persistent Database Encryption</h2>
+                <p><i>e</i>X<i>treme</i>DB provides the capability to protect the persistent database memory arena, including the memory allocated for storage and the cache (page pool), through the operating system’s VM page-protection mechanism. However, note that it is only possible on UNIX platforms and should be done only for debugging purposes.</p>
+                <p>As for in-memory database pages, the encryption of data on persistent storage is controlled by the <code>cipher_key</code> element of the parameter structure  (<code><a href="../../../Programming/C/Structures/Database_Parameters.htm">mco_db_params_t</a></code>) passed into <a href="../../../Programming/C/Core_Functions/Static/Database_Control/open_dev.htm">mco_db_open_dev()</a>. If this parameter is not <code>NULL</code>, then pages are encrypted with the AES or custom encryption algorithm before being saved to “disk” and decrypted when loaded from the “disk”. Each page is encrypted individually.</p>
+                <p> AES  is a symmetric encryption algorithm. On the first pass, the data is encrypted, and on the second pass is decrypted back to its original form. Consequently in the encryption API there are not separate functions to <code>encrypt</code> and <code>decrypt</code>, but simply the one function <code>encrypt</code>(). </p>
+                <p> The stub library <code>mcocryptstub</code> contains empty API implementations which simply halt processing with the error code <code>MCO_E_UNSUPPORTED</code> and is provided for developers to implement a custom encryption algorithm. (See section <a href="#Custom">Custom Encryption Algorithm Implementation</a> below for further details.)</p>
+                <p>
+                    <img src="../../../Resources/Images/note.png" /> Note that encryption of database pages can reduce application speed by 2-10 times, especially for index operations. Using the <code>MCO_DB_INCLUSIVE_BTREE</code> option can help to reduce this penalty (see the <a href="../Indexes_Cursors/Inclusive_Covering_Indexes.htm">Key-Value-Inclusive and Covering Indexes</a> page for further details).</p>
+                <p>&#160;</p>
+                <h2>Encryption of other files external to the database</h2>
+                <p>Apart from protecting  persistent and transient databases, encryption can be used to protect database snapshots made by functions <code><a href="../../../Programming/C/Core_Functions/Static/Database_Control/save.htm">mco_db_save()</a></code> and <code><a href="../../../Programming/C/Core_Functions/Static/Database_Control/class_save.htm">mco_class_save()</a></code>, to protect the TL transaction log (created by <code><a href="../../../Programming/C/TL_Functions/start.htm">mco_translog_start()</a></code>) and also to protect backup files created by function <code><a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Backup/create.htm">mco_backup_create()</a></code>.</p>
+                <p>The encryption of database snapshots and transaction log files is automatically enabled by specifying the <code>cipher_key</code> field just as for the encryption of disk and memory pages. Encryption of backup operations is however independent of database open parameters and is directly specified by the <code>cipher</code> argument passed to functions  <code><a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Backup/create.htm"><code>mco_backup_create()</code></a></code> and <code><a href="../../../Programming/C/Core_Functions/Static/Auxiliary/Backup/restore.htm">mco_backup_restore()</a></code>.</p>
+                <p>&#160;</p>
+                <h2><a name="Encrypti"></a>Encryption Libraries</h2>
+                <p class="BodyParagraph">Please use the links below to view the AES encryption algorithm library and "stub"  library (as well as other libraries) provided for your development platform:</p>
+                <table class="TableStyle-FunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 51px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="../../../Getting_Started/Package_Contents/Package_Unix-Linux_Target_bin.htm">Unix-Linux</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Static libraries for Standard Unix or Linux 64bit or 32bit platforms</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="../../../Getting_Started/Package_Contents/Package_Win_Target_bin.htm">Windows</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Static libraries for Windows  7 (or later) platforms</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="../../../Getting_Started/Package_Contents/Package_Integrity_Target_bin.htm">Integrity</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Static libraries for Green Hills Integrity OS</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><a href="../../../Getting_Started/Package_Contents/Package_VxWorks_Target_bin.htm">VxWorks</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Static libraries for Wind River VxWorks OS</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>&#160;</p>
+                <h1>Changing the CRC Algorithm</h1>
+                <p>The default <code>CRC32</code> algorithm can be changed to a different implementation or CRC checking can be disabled by calling <code><a href="../../../Programming/C/Core_Functions/Static/Runtime_Control/runtime_setoption.htm" name="kanchor1043">mco_runtime_setoption()</a></code> to set the runtime option <code>MCO_RT_CRC_ALGORITHM</code> (which is set to <code>MCO_RT_CRC32C</code> by default). Less efficient calculation algorithms are available for backward compatibility with older versions of <i>e</i>X<i>treme</i>DB. (See page <a href="../../../Programming/C/Structures/Runtime_Options.htm">Runtime Options</a> for the list of available CRC algorithms.)</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

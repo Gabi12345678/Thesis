@@ -1,0 +1,5 @@
+-include $(call mco_makefile_file, \
+client/makefile.project.client \
+client_standalone/makefile.project.client_standalone \
+server/makefile.project.server \
+)

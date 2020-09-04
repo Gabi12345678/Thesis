@@ -1,0 +1,18 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Rights Reserved.    *
+ *                                                               *
+ *****************************************************************/
+declare database genericdb;
+
+transient class A {
+    unsigned<4> ui4;
+    
+    list;
+};
+
+persistent class B {
+    unsigned<4> ui4;
+    
+    list;
+};

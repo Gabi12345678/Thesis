@@ -1,0 +1,13 @@
+MCO_PRJ_LIST += 21-overflow-transient
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 21-overflow-transient
+PRJ_21-overflow-transient_TAGS:=sample core
+PRJ_21-overflow-transient_DIR:=$(call mco_project_dir)
+PRJ_21-overflow-transient_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_21-overflow-transient_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_21-overflow-transient_DATABASES:=overflowdb
+PRJ_21-overflow-transient_RUNTIME:=YES
+PRJ_21-overflow-transient_MEMDEV:=PRIVATE
+PRJ_21-overflow-transient_STORAGE:=TRANSIENT
+PRJ_21-overflow-transient_SYNC:=AUTO
+PRJ_21-overflow-transient_TRANSMGR:=MURSIW

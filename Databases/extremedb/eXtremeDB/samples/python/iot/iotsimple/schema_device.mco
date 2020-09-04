@@ -1,0 +1,18 @@
+declare database iotdevice;
+declare auto_oid[100];
+
+iot device 1000;
+
+uptable class Sensor {
+    datetime      ts;
+    unsigned<4>   sensorId;
+    double        value;
+    hash<ts, sensorId> idx[100];
+};
+
+downtable class Config {
+    unsigned<4>  param_id;
+    double       value;
+    tree<param_id> idx;
+};
+

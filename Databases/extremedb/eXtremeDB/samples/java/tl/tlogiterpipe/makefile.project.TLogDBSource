@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += TLogDBSource
+PRJ_TARGET_CLASS += TLogDBSource
+PRJ_TLogDBSource_TAGS:=sample tlog java
+PRJ_TLogDBSource_DIR :=$(call mco_project_dir)
+PRJ_TLogDBSource_SRC :=$(call mco_project_file,TLogDBSource.java)

@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += TLogDynamicPipe
+PRJ_TARGET_CLASS += TLogDynamicPipe
+PRJ_TLogDynamicPipe_TAGS:=sample tlog java
+PRJ_TLogDynamicPipe_DIR :=$(call mco_project_dir)
+PRJ_TLogDynamicPipe_SRC :=$(call mco_project_file,TLogDynamicPipe.java)

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Introduction to eXtremeDB Active Replication Fabric</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Introduction to <i>e</i>X<i>treme</i>DB Active Replication Fabric</h1>
+            <blockquote>
+                <p>As explained in the <a href="../Active_Data_Replication.htm"><i>e</i>X<i>treme</i>DB<i> Active Replication Fabric</i> page</a>, Active Replication Fabric is an <i>e</i>X<i>treme</i>DB-based foundation for distributed IoT applications. And, as further explained in <a href="The_IoT_Challenges.htm">The IoT Challenges</a> page, the volume of data collection points (<i>edge devices</i>), the constrained resources and CPU&#160;power of these devices, and the sporadic nature of connectivity between the devices and backend processors are the driving considerations for the Active Replication Fabric distributed architecture. </p>
+                <p>Active Replication Fabric applications can apply advanced analytics to IoT data enabling businesses to discover usage patterns, identify weaknesses in connected devices and, in the end, distribute available resources,  technological and financial, to help create better connected products.</p>
+                <h2>Theory of operation</h2>
+                <p>Functionally, data in the IoT environment can be put into three broad categories: <i>edge devices</i>, where the data is collected, <i>routers</i> and <i>servers</i>, where the data is analyzed. Edge devices capture or generate data, may do some initial filtering, and make sure that the data is safe for some period of time before they transmit the data to <i>servers</i> for further processing.</p>
+                <p>IoT routers can form one or more additional layers of nodes between <i>servers</i> and <i>edge devices</i>. The IoT topology looks like a tree where the server is the root, the devices are the leaves, and the routers are the inner nodes. Each node in this tree has a level (a 2-byte integer): the server always has level = 1, the level of devices is 65535 ( = 0xFFFF ) and routers have a level between 2 and 65534. The level of the router defines its position in the tree - the smaller the level value, the "closer" the node is to the <i>server</i><a name="kanchor37"></a>. The level of the routers (and their relative position) can be changed at runtime, but the basic type (device, server or router) cannot be changed after the database creation.</p>
+                <p>As well as <i>server</i> and <i>devices</i>, each <i>router</i> must have a unique agent ID. Note that the server always has fixed <code>agent_id = 1</code>. UP/DOWN tables on the server have an automatically generated field <code>agent_id</code>. For UP tables it denotes the node that created the record. For DOWN tables it denotes the receiver of the row created by the server. Routers have two generated fields in their UP/DOWN tables : <code>src_agent_id</code> (the creator of the record) and <code>dst_agent_id</code> (the receiver of the record). Tables in the device's database have no accessible auto-generated fields.</p>
+                <p>We use the term “storage containers” for databases maintained on edge devices  to differentiate them from the server-side databases. The <a href="ADR_Applications.htm"><i>e</i>X<i>treme</i>DB<i> Active Replication Fabric</i> APIs</a> allow device-based applications to collect data, then transmit the collected data to servers when connected; likewise they allow communicating server-side data to IoT devices, usually for new device configuration and provisioning. This data flow is fully application-controlled through the Active Replication Framework push / pull interfaces. The APIs provide automatic or on-demand data exchange between collection points and servers.</p>
+                <h2>Database Schema IoT Definition</h2>
+                <p>Two schema definition declarations are required for Active Replication Framework (IoT) applications.</p>
+                <h3>IoT Declarations</h3>
+                <p>The declaration <code>iot server | router | device</code> is used in the database schema definition to declare that the database is intended to be used in the Active Replication Framework (IoT) applications. For example:</p>
+                <div class="code-block"><pre>&#160;
+    iot server;
+    &#160;</pre>
+                </div>
+                <p>A router declaration must specify the <code>level </code>between 2 and 65534, and optionally an <code>agentId</code>. For example:</p>
+                <div class="code-block"><pre xml:space="preserve">&#160;
+    iot router&lt;100&gt; 15;
+    &#160;</pre>
+                </div>
+                <p>or</p>
+                <div class="code-block"><pre xml:space="preserve">&#160;
+    iot router&lt;100&gt;;
+    &#160;</pre>
+                </div>
+                <p>And an edge device has <code>level </code>65534 and can optionally specify the <code>agentId. F<span style="font-family: Arial;">or example:</span></code></p>
+                <div class="code-block"><pre xml:space="preserve">    &#160;
+    iot device 1000;
+    &#160;</pre>
+                </div>
+                <p>or</p>
+                <div class="code-block"><pre xml:space="preserve">    &#160;
+    iot device;
+    &#160;</pre>
+                </div>
+                <p>The declaration defines the role for the database: as a server or router database or a device storage container. Optionally, the <code>agentId</code> for the database can be specified. The <code>agentId</code> is a unique identifier for the database. If this <code>agentId</code> is not specified through the schema, it must be specified as a database parameter when opening the database.</p>
+                <p>When <code>iot</code> is declared, the database runtime creates two hidden classes (tables) <code>@sys_iot_ts</code> and <code>@sys_iot_del</code>. The first table contains information about data sent or received from other iot nodes. The second table contains information about objects that were deleted from the container, which is necessary to propagate deletes to other iot nodes.</p>
+                <h3>Uptable and Downtable Class Modifiers</h3>
+                <p>The class modifiers <code>uptable</code> and <code>downtable</code> are used to define the replication direction. Classes defined as <code>uptable</code> are synchronized from the device to the server: any data modifications made to the devices’ storage container are propagated up to the server’s database. The <code>downtable</code> classes are synchronized downwards, i.e. from the server to the connected devices. Note that classes (tables) that are not designated as an <code>uptable</code> or a <code>downtable</code> <i>are not replicated</i>.</p>
+                <p>An example of <code>uptable</code> classes could be sensor data collected in the devices’ storage container, which are replicated and then stored away in the server’s database. An example of a <code>downtable</code> class could be a device’s configuration parameters, or server-originated instructions, that are propagated to the device. </p>
+                <p>All <code>uptable</code> and <code>downtable</code> classes include the <i>automatically generated</i>  field <code>agent_id</code>; generated by the schema compiler. For the <code>uptable</code> classes, the <code>agent_id</code> identifies the device from which the object (record) was received. The server’s <code>downtable</code> tables’ the <code>agent_id</code> identifies the device nodes storage containers that the object (record) must be sent to. For example, the following class might be defined for the server database:</p>
+                <div class="code-block"><pre>&#160;
+    uptable class TempSensor 
+    {
+        datetime          ts;
+        unsigned&lt;4&gt;   sensorId;
+        double             value;
+&#160;
+        tree&lt;ts, agent_id, sensorId&gt; ats;
+    };
+    &#160;</pre>
+                </div>
+                <p>The <code>agent_id</code> field is not defined explicitly in the schema, but it can be used in indexes. For the <code>downtable</code> classes the default <code>agent_id</code> value is <code>MCO_IOT_ALL_AGENTS</code> which means that, by default, the server’s data is replicated to all device storage containers. It is possible to specify explicitly the value for <code>agent_id</code> which causes the server’s data to be replicated only to the specified node. </p>
+                <p> In addition to the <code>agent_id</code> field, the <code>uptable</code> and <code>downtable</code> classes are also generated with two hidden indexed fields that identify the object and the timestamp of its last modification. Both fields and their index are automatically updated by the database runtime during a transaction commit that has modified the object. However note that these internally managed fields (<code>iot_object_id@</code> and <code>iot_timestamp@</code>) <i>are not accessible to applications</i>. The <code>iot_object_id@</code> value is like an <code><a href="../../Programming/C/DDL/Declare.htm" name="kanchor38">autoid_oid</a></code> except that it is local to the class, so to create a global identity it is combined with the <code>agent_id</code> of the node that the object was created on. The <code>iot_timestamp@</code> value is the logical timestamp (not the wall time) of the last modification of the object. Every transaction increments this counter and stores the new value. This is necessary to enforce IoT synchronization policies which identify objects that need to be sent to the next IoT level during synchronization. Therefore, if a timestamp value is required by the application, it is necessary to define a field, like <code>ts</code> in the above schema, that can be accessed and included in indexes if desired.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

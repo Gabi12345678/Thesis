@@ -1,0 +1,14 @@
+MCO_PRJ_LIST += 18-backup-online
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 18-backup-online
+PRJ_18-backup-online_TAGS:=sample core backup
+PRJ_18-backup-online_DIR:=$(call mco_project_dir)
+PRJ_18-backup-online_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_18-backup-online_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_18-backup-online_DATABASES:=backupdb
+PRJ_18-backup-online_RUNTIME:=YES
+PRJ_18-backup-online_MEMDEV:=PRIVATE
+PRJ_18-backup-online_STORAGE:=TRANSIENT
+PRJ_18-backup-online_SYNC:=AUTO
+PRJ_18-backup-online_TRANSMGR:=MURSIW
+PRJ_18-backup-online_F_BACKUP:=YES

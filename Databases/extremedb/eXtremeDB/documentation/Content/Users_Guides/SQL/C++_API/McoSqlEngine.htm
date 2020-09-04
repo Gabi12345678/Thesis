@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The eXtremeSQL C++ Class McoSqlEngine</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>The <i>e</i>X<i>treme</i>SQL C++ Class <i>McoSqlEngine</i></h1>
+            <blockquote>
+                <p>The principle class for most <i>e</i>X<i>treme</i>SQL C++ applications is <i>McoSqlEngine</i>. (However, functionality for managing transactions and executing prepared statements, i.e. SQL statements that are created once and executed multiple times, is provided in the <i>McoSqlSession</i> class. Please refer to the <a href="Transactions.htm">Managing Transactions</a> page for further details.)</p>
+                <p>As explained in the <a href="Memory_Allocator.htm">Memory Allocator</a> page, memory allocation in <i>e</i>X<i>treme</i>SQLversion 6.5 and later is done internally through a static memory block allocator. Consequently instantiating the <i>McoSqlEngine</i> in global static memory  should be avoided. For example, instead of the declaration</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    McoSqlEngine engine;
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>in global static memory, <code>engine</code> should be instantiated in <code>main()</code> as follows:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    int main(int argc, char** argv)
+    {
+        McoSqlEngine engine;
+        ...
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>The <code>engine</code> is then initialized by calling its <code>open()</code> method and closed by the <code>close()</code> method:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    using namespace McoSql;
+    char * db_name = "persondb";
+    #define  DATABASE_SIZE        268435456
+    #define  MEMORY_PAGE_SIZE     128
+    int main(int argc, char* argv[])
+    {
+        McoSqlEngine engine;
+    &#160;
+        ...
+        &#160;
+        engine.open( db_name, persondb_get_dictionary(), DATABASE_SIZE, MEMORY_PAGE_SIZE);
+    &#160;
+        // Do normal database processing
+        &#160;
+        engine.close();
+        return 0;
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>To illustrate normal database processing, the following example creates two <i>Person</i> records in a simple database, then <code>selects</code>, <code>updates</code> and <code>deletes</code> them:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    /* Schema definition of database record Person */
+    class Person 
+    {
+        char&lt;64&gt; name;
+        int4     age;
+        float    weight;
+        tree&lt;name&gt; by_name;
+    };
+    &#160;
+    // Forward declaration of function describing database schema
+    GET_DICTIONARY(persondb);
+    &#160;
+    // Define the structure correponding to database record Person
+    struct _Person
+    {
+        char const* name;
+        int age;
+        float weight;
+    };
+    &#160;
+    int addPersons()
+    {
+        _Person p;
+        int count = 0;
+        &#160;
+        // Add two Person records
+        p.name = "John Smith";
+        p.age = 35;
+        p.weight = 72.1f;
+        engine.executeStatement("insert into Person %r", &amp;p);
+        p.name = "Peter Brown";
+        p.age = 40;
+        p.weight = 62.1f;
+        engine.executeStatement("insert into Person %r", &amp;p);
+    &#160;
+        // List the contents of the Person table
+        QueryResult result(engine.executeQuery("select * from Person order by age"));
+        showPersons( &amp;result );
+        &#160;
+        // Search for Person records by name
+        strcpy( name, "John%" );
+        engine.executeQuery("select * from Person where name like %s", name));
+        strcpy( name, "%Brown%" );
+        engine.executeQuery("select * from Person where name like %s", name));
+        &#160;
+        // Update two Person records by name
+        strcpy( name, "John Smith" ); age = 36; weight = 75.2;
+        count = engine.executeStatement("update Person set age=%i, weight=%f where name=%s",
+                            age, weight, name)
+        strcpy( name, "Peter Brown"); age = 41; weight = 65.0;
+        count = engine.executeStatement("update Person set age=%i, weight=%f where name=%s",
+                            age, weight, name)
+    &#160;
+        // Delete two Person records by name
+        strcpy( name, "John Smith" );
+        count = engine.executeStatement("delete from Person where name=%s", name);
+        count = engine.executeStatement("delete from Person”);
+    &#160;
+        // Close SQL engine and database
+        engine.close();
+        return 0;
+    }
+    &#160;
+    void showPersons(QueryResult * result)
+    {
+        Cursor* cursor = (*result)-&gt;records();
+        while (cursor-&gt;hasNext())
+        {
+            Record* rec = cursor-&gt;next();
+            _Person p;
+    &#160;
+            // Extract the Person record to the corresponding struct
+            (*result)-&gt;extract(rec, &amp;p, sizeof(p));
+            printf("\t\t%s: Age=%d Weight=%.2f\n", p.name, p.age, p.weight);
+        }
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>There are some important programming points to note in the code sample above:</p>
+                <ul>
+                    <li value="1">The macro <code>GET_DICTIONARY</code> (defined in <code>mcoapi.h</code>) defines the <code>get*_dictionary()</code> function as an <code>“extern C”</code> function (embedding the database name into the function name).</li>
+                    <li value="2">The C structure <code>_Person</code> is defined in the application to correspond exactly with the class <i>Person</i> in the database <code>schema</code>.  The C type (and consequently memory size) of each element of the structure must correspond exactly to the <i>e</i>X<i>treme</i>DB type used to define that field in the database class. (For type mappings see the <a href="#eXtremeD">table</a> below.)</li>
+                    <li value="3">The <code>_Person</code> field <code>name</code> is of type <code>char const*</code>, so to assign string values to this field we set the pointer value to the address of a static string instead of using a character array (<code>char[64]</code>) field type and then performing some variant of <code>strcpy()</code> to copy values.</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    p.name = "John Smith";
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <ul>
+                    <li value="1">The specialized <i>e</i>X<i>treme</i>SQL <code>%r</code> syntax for copying the entire contents of structure <code>_Person</code> into the SQL <code>insert</code> statement saves considerable programming:</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>&#160;
+    engine.executeStatement("insert into Person %r", &amp;p);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <ul>
+                    <li value="1">The <i>QueryResult</i> class provides a <code>cursor</code> that is conveniently used by function <code>showPersons()</code> to iterate through the result set.</li>
+                    <li value="2">When instantiated within a function like <code>showPersons()</code> the <i>QueryResult</i> object, its <code>cursor</code> (result set) and all memory associated with it is released by the class destructor when the object goes out of scope; i.e. when the function returns.</li>
+                    <li value="3">Again the <code>_Person</code> structure is used to extract data from the database records retrieved by the SQL <code>select</code>.  This works because the alignment of data in the structure exactly corresponds to the class definition.</li>
+                    <li value="4">The <code>executeStatement</code> method for <code>Update</code> and <code>Delete</code> statements returns a count of the actual rows updated or deleted.</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>&#160;
+    count = engine.executeStatement("update Person set age=%i, weight=%f where name=%s",age, weight, name)
+&#160;</pre>
+                    </div>
+                </blockquote>
+                <ul>
+                    <li value="1">The specialized <i>e</i>X<i>treme</i>SQL <code>%s</code>, <code>%i</code> and <code>%f</code> format specifiers for copying character strings, integer and floating-point values into the SQL <code>select</code>, <code>update</code> and <code>delete</code> statements directly substitutes the values in the parameters list into the SQL statement.  (Beware that there is a maximum of 10 parameter values in this list. Please refer to the <a href="../C_API/Argument_Substitution.htm">Argument Substitution</a> page for the complete list of <i>e</i>X<i>treme</i>DB format specifiers.)</li>
+                </ul>
+                <p>&#160;</p>
+                <h2>QueryResult usage</h2>
+                <p>The main purpose of the C++ <i>QueryResult</i> is to control the scope of the query and automatically release all allocated resources if the query is terminated abnormally. If the scope of the query (the lifetime of the <i>QueryResult</i><a name="kanchor1083"></a> object instance) is incorrect it will lead to a runtime error. Often this happens when the instance is used beyond the transaction it has been created in or still exists at the time the database instance is closed. The following code snippet demonstrates <b>incorrect usage</b>:</p>
+                <div class="code-block"><pre>    &#160;
+    main ()
+    {
+        McoSqlEngine engine;
+        engine.open( ... );
+        QueryResult result(engine.executeQuery("select * from aRecord"));
+        Cursor* cursor = result-&gt;records();
+        while (cursor-&gt;hasNext()) 
+        {
+            ...
+        } /* end of while loop */
+        engine.close(); /* database instance is destroyed here */
+        return 0;
+    &#160;
+        /* object of class QueryResult represented by local variable 'result' will be deleted
+        here. Since the database no longer exists, the QueryResult destructor crashes the
+        application */
+    }
+    &#160;</pre>
+                </div>
+                <p>Because the transaction context that created the object is kept within the object, if the transaction is no longer valid, any operation over its handle leads to an error. In the code above, the <i>QueryResult</i> destructor is called as the object result goes out of scope. But the transaction handle in result is no longer valid because the database has been closed. So the attempt to close the transaction causes the application to crash!</p>
+                <p>To avoid this, any instance of the <i>QueryResult</i> class must be deleted as soon as it is no longer required. This can be done by explicitly calling the <code>delete</code> operator on the object if it was created by <code>new</code>, or by using enclosing braces if the object is instantiated as a local variable.</p>
+                <p>Below are a two examples that demonstrate proper usage of the <i>QueryResult</i> class:</p>
+                <div class="code-block"><pre>    &#160;
+    main ()
+    {
+        McoSqlEngine engine;
+        engine.open( ... );
+        {
+            QueryResult result(engine.executeQuery("select * from aRecord"));
+            Cursor* cursor = result-&gt;records();
+            Record*  rec;
+            while (rec = cursor-&gt;next()) 
+            {
+                ...
+            } /* end of while loop */
+        } /* object of class QueryResult represented by local variable 'result' will be
+                                        deleted here */
+        engine.close(); /* database instance is destroyed here */
+        return 0;
+    }
+    &#160;</pre>
+                </div>
+                <p>Note that here the enclosing braces cause the <i>QueryResult</i> result defined within to go out of scope before the call to <code>engine.close()</code> causing its destructor to be called before the transaction handle in <code>result</code> becomes invalid. Perhaps a more convenient way to assure that <i>QueryResult</i> objects are properly scoped is to instantiate them in a separate query method as demonstrated below:</p>
+                <div class="code-block"><pre>    &#160;
+    void do_query(McoSqlEngine &amp;engine)
+    {
+        QueryResult result(engine.executeQuery("select * from aRecord"));
+        Cursor* cursor = result-&gt;records();
+        Record*  rec;
+        while ( rec = cursor-&gt;next()) 
+        {
+            ...
+        } /* end of while loop */
+        return;
+    } /* object of class QueryResult represented by local variable 'result' will be deleted here */
+    &#160;
+    main ()
+    {
+        McoSqlEngine engine;
+        engine.open( ... );
+        do_query(engine);
+        engine.close(); /* database instance is destroyed here */
+        return 0;
+    }
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <h2>A note on statement-level read consistency</h2>
+                <p>The <i>e</i>X<i>treme</i>SQL engine assures that statement-level read consistency is enforced. This means that the database runtime guarantees that all the data returned by a single query comes from a single point in time - the time that the query began. The performance is not affected when the <code><a href="../../Core/MVCC_Transaction_Manager.htm" name="kanchor1084">MVCC</a></code><a name="kanchor1085"></a> transaction manager is used. With the <code><a href="../../Core/MURSIW_Transaction_Manager.htm" name="kanchor1086">MURSIW</a></code> transaction manger some queries could be slower (though this is difficult to quantify). Specifically SQL queries that browse many objects over an index in the context of a read-only transaction could be slower (i.e.<code> select * from XXX order by key</code>).</p>
+                <p>&#160;</p>
+                <h2>Using fixed-size structures to optimize read and write operations via  SQL</h2>
+                <p><i>e</i>X<i>treme</i>SQL allows passing <code>structs</code> as SQL statement parameters by use of the “place holder” specifiers <code>%r</code> and <code>%R</code>. The latter requires a fixed-size structure to be substituted in place of the <code>%R</code>. When fixed-size structures are used the internal SQL API implementation can optimize the read or write operation by avoiding multiple calls to <code>*_get()</code> or <code>*_put()</code>.</p>
+                <p>For example, consider the following <code>struct</code>:</p>
+                <div class="code-block"><pre>    &#160;
+    struct Person
+    {
+        char const* name;
+        int age;
+        float weight;
+    };
+    &#160;</pre>
+                </div>
+                <p>As this structure has a <code>char*</code> element, it has a variable <code>size</code>. To pass this structure to an SQL statement, it would be necessary to use the <code>%r</code> specifier. For example:</p>
+                <div class="code-block"><pre>    &#160;
+    void addPerson(Person* p)
+    {
+        // Add new record to the table.
+        // Record will be initialized with data passed through the Person struct.
+        engine.executeStatement("insert into Person %r", p);
+    }
+    &#160;</pre>
+                </div>
+                <p>However, the structure could be defined as a fixed size <code>struct</code> (i.e. having no variable length elements) like the following:</p>
+                <div class="code-block"><pre>    &#160;
+    class Person {
+        char&lt;64&gt; name;
+        int4     age;
+        float    weight;
+        tree&lt;name&gt; by_name;
+    };
+    &#160;</pre>
+                </div>
+                <p>Now this structure can be passed to an SQL statement using the more efficient <code>%R</code> specifier as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    void addPerson(Person* p)
+    {
+        // Add new record to the table.
+        // Record will be initialized with data passed through Person struct.
+        engine.executeStatement("insert into Person %R", p);
+    }
+    &#160;</pre>
+                </div>
+                <p>In this case the <i>e</i>X<i>treme</i>SQL implementation is able to store data much more efficiently: it will not use data access wrappers but instead copy the data directly to the database pages. So there are no extra functions calls, and the destination page is not pinned / unpinned multiple times.</p>
+                <p>But note that this kind of optimization is possible only for classes that contain <i>only fixed-size</i> components.</p>
+                <p>&#160;</p>
+                <h2><i>e</i>X<i>treme</i>DB indexes and SQL</h2>
+                <p>Indexes are typically used to optimize ordering and search capabilities for database objects. The addition of indexes can significantly speed searches and provide enhanced filtering capabilities to the <code>select</code> statement. Whereas indexes are often introduced into a SQL database using the standard <code>DDL</code> statement <code>Create Index…</code>, in <i>e</i>X<i>treme</i>DB databases, indexes are more conveniently defined in the database <code>schema</code>. For example the following schema defines two indexes for a modified version of the <i>Person</i> class presented above:</p>
+                <div class="code-block"><pre>    &#160;
+    class Person 
+    {
+        int4     id;
+        char&lt;64&gt; name;
+        int4     age;
+        float    weight;
+        &#160;
+        hash&lt;id&gt;   by_id[1000];
+        tree&lt;name&gt; by_name;
+    };
+    &#160;</pre>
+                </div>
+                <p>Though not necessary, these indexes improve the performance of <code>select</code> statements on the <i>Person</i> table. The <code>tree</code> index <code>by_name</code> will be used by the <i>e</i>X<i>treme</i>SQL runtime (behind the scenes, as it were) to optimize a select statement like that performed above in the code snippet</p>
+                <div class="code-block"><pre>    &#160;
+    engine.executeQuery("select * from Person where name like %s", name);
+    &#160;</pre>
+                </div>
+                <p>Depending on the database design, sometimes an even better degree of optimization can be obtained using <code>hash</code> indexes like <code>by_id</code> to lookup objects by unique identifiers as, for example, in a statement like the following:</p>
+                <div class="code-block"><pre>    &#160;
+    engine.executeQuery("select * from Person where id = %d", personId);
+    &#160;</pre>
+                </div>
+                <p>As explained in the <i>e</i>X<i>treme</i>DB User Guide, <i>e</i>X<i>treme</i>DB offers a rich set of index types that can be specified in the schema definition to facilitate a variety of specialized data access operations. In particular, some extensions to the standard SQL language have been added to support one of these special index types, the <code>rtree</code>, which is used for <code>spatial</code> searches.</p>
+                <p>To illustrate a spatial search, consider a database schema like the following:</p>
+                <div class="code-block"><pre>    &#160;
+    class Consumer
+    {
+        int4 	ConsumerId;
+        double 	Coordinates1[4];
+        double	Coordinates2[4];
+        double	Coordinates3[4];
+        &#160;
+        hash&lt;ConsumerId&gt; by_id[1000];
+        rtree &lt;Coordinates1&gt;  ridx1;
+        rtree &lt;Coordinates2&gt;  ridx2;
+        rtree &lt;Coordinates3&gt;  ridx3;
+    };
+    &#160;</pre>
+                </div>
+                <p>Here the <i>Consumer</i> class has been defined with three <code>rtree</code> indexes using the <i>e</i>X<i>treme</i>DB native <code>DDL</code>. Now any SQL search on any of the Coordinates fields will use the appropriate index. The same <code>schema</code> can be defined with extended SQL as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    create table Consumer
+    (
+        ConsumerId int primary key,
+        Coordinates1 array(double, 4) using rtree index,
+        Coordinates2 array(double, 4) using rtree index,
+        Coordinates3 array (double, 4) using rtree index
+    );
+            &#160;</pre>
+                </div>
+                <p>With these indexes defined we can now perform a <code>spatial search</code> for objects having coordinates <code>Contained</code>, <code>Overlapping</code> or <code>Near</code> a specified point.  For example, the following script could be run with the <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> utility to create the  table, add some records and then perform a <code>spatial search</code>:</p>
+                <div class="code-block"><pre>    &#160;
+    create table Consumer
+    (
+        ConsumerId int primary key,
+        Coordinates1 array(double, 4) using rtree index,
+        Coordinates2 array(double, 4) using rtree index,
+        Coordinates3 array (double, 4) using rtree index
+    );
+    &#160;
+    insert into Consumer(ConsumerId, Coordinates1, Coordinates2, Coordinates3)
+    values(1, '{1.0, 1.0, 2.0, 2.0}', '{3.0, 3.0, 4.0, 4.0}', '{5.0, 5.0, 6.0, 6.0}');
+    &#160;
+    insert into Consumer(ConsumerId, Coordinates1, Coordinates2, Coordinates3)
+    values(2, '{10.0, 10.0, 20.0, 20.0}', '{30.0, 30.0, 40.0, 40.0}', '{50.0, 50.0, 60.0, 60.0}');
+    numformat "%4.1f"
+    &#160;
+    select * from Consumer;
+    &#160;
+    select * from Consumer where Coordinates1 contains '{3.5, 3.5, 3.5, 3.5}' union
+    select * from Consumer where Coordinates2 contains '{3.5, 3.5, 3.5, 3.5}' union
+    select * from Consumer where Coordinates3 contains '{3.5, 3.5, 3.5, 3.5}';
+    &#160;
+    select * from Consumer where Coordinates1 overlaps '{3.5, 3.5, 3.5, 3.5}' union
+    select * from Consumer where Coordinates2 overlaps '{3.5, 3.5, 3.5, 3.5}' union
+    select * from Consumer where Coordinates3 overlaps '{3.5, 3.5, 3.5, 3.5}';
+    &#160;
+    select * from Consumer where Coordinates1 near '{3.5, 3.5}' union
+    select * from Consumer where Coordinates2 near '{3.5, 3.5}' union
+    select * from Consumer where Coordinates3 near '{3.5, 3.5}';
+    &#160;</pre>
+                </div>
+                <p>Running this script in <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> will produce the following output:</p>
+                <div class="code-block"><pre>    &#160;
+    ConsumerId      Coordinates1    Coordinates2    Coordinates3
+    ------------------------------------------------------------------------------
+    1       [ 1.0, 1.0, 2.0, 2.0]   [ 3.0, 3.0, 4.0, 4.0]   [ 5.0, 5.0, 6.0, 6.0]
+    2       [10.0,10.0,20.0,20.0]   [30.0,30.0,40.0,40.0]   [50.0,50.0,60.0,60.0]
+    &#160;
+    Selected records: 2
+    ConsumerId      Coordinates1    Coordinates2    Coordinates3
+    ------------------------------------------------------------------------------
+    1       [ 1.0, 1.0, 2.0, 2.0]   [ 3.0, 3.0, 4.0, 4.0]   [ 5.0, 5.0, 6.0, 6.0]
+    &#160;
+    Selected records: 1
+    ConsumerId      Coordinates1    Coordinates2    Coordinates3
+    ------------------------------------------------------------------------------
+    1       [ 1.0, 1.0, 2.0, 2.0]   [ 3.0, 3.0, 4.0, 4.0]   [ 5.0, 5.0, 6.0, 6.0]
+    &#160;
+    Selected records: 1
+    ConsumerId      Coordinates1    Coordinates2    Coordinates3
+    ------------------------------------------------------------------------------
+    1       [ 1.0, 1.0, 2.0, 2.0]   [ 3.0, 3.0, 4.0, 4.0]   [ 5.0, 5.0, 6.0, 6.0]
+    2       [10.0,10.0,20.0,20.0]   [30.0,30.0,40.0,40.0]   [50.0,50.0,60.0,60.0]
+    &#160;
+    Selected records: 2
+    &#160;</pre>
+                </div>
+                <p>Note the following in this example:</p>
+                <ul>
+                    <li value="1"><code>rtree</code> indexes are defined for three <code>Coordinates</code> fields in the <i>Consumer</i> class with the extended SQL clause <code>using rtree index</code>.</li>
+                    <li value="2">	fields used in <code>rtree</code> indexes must be declared as arrays with dimension 4 to be treated as  rectangles: eg.  <code>array(double, 4)</code>.</li>
+                    <li value="3">	values are specified for the <code>insert</code> statement using <code>set</code> syntax like <code>{1.0,1.0,2.0,2.0}</code> to specify the <code>upper-left</code> (<code>1.0,1.0</code>)  and <code>lower-right</code> (<code>2.0,2.0</code>)  points of the rectangle.</li>
+                    <li value="4">	the <code>numformat</code> command is used to restrict the floating-point output (using standard C <code>printf</code> field width and precision specification)</li>
+                    <li value="5">	the SQL <code>union</code> construct is used to <code>or</code> the selection over fields <code>Coordinate1</code>, <code>Coordinate2</code> and <code>Coordinate3</code>.</li>
+                    <li value="6">	the SQL extensions <code>Contains</code>, <code>Overlaps</code> and <code>Near</code> implement the <code>spatial</code> search</li>
+                    <li value="7">	the result for the <code>Contains</code> and <code>Overlaps</code> searches is <code>record 1</code> whose <code>Coordinate2</code> rectangle does indeed contain and overlap the point (<code>3.5,3.5</code>) specified as a rectangle with zero width and height.</li>
+                    <li value="8">	the result for the <code>Near</code> search is both records in order of distance from the point (<code>3.5,3.5</code>).</li>
+                </ul>
+                <p>&#160;</p>
+                <h2><a name="eXtremeD"></a>eXtremeDB to C struct type mappings</h2>
+                <p>Currently, the schema compiler does not generate corresponding C structs for class / table definitions – the developer must supply the C structs in the application code.  The following table specifies the C <code>struct</code> type to be used for each <i>e</i>X<i>treme</i>DB field type:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col style="width: 10px;" class="TableStyle-FunctionReference-Column-Column2" />
+                    <col style="width: 10px;" class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><i>e</i>X<i>treme</i>DB <b>FIELD TYPE</b></td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><b>C STRUCT TYPE</b>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>signed&lt;1&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>Char</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>signed&lt;2&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>Short</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>signed&lt;4&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>Int</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>signed&lt;8&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>int64_t</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>unsigned&lt;1&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>unsigned char</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>unsigned&lt;2&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>unsigned shor</code>t</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>unsigned&lt;4&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>unsigned int</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>unsigned&lt;8&gt;</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>int64_t</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>float</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>float</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>double</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>double</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>string</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>char*</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>nstring</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>wchar_t*</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>vector</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>Array*</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>array</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>Array*</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>struct</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>Struct*</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a name="kanchor1087"></a>autoid_t</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>Reference*</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code>time</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>time_t</code>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><code>date</code>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1"><code>time_t</code>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>&#160;</p>
+                <h2>The McoSqlEngine:open() method</h2>
+                <p>The prototype for <code>McoSqlEngine::open</code> is:</p>
+                <div class="code-block"><pre>    &#160;
+    open(char const* name,
+        mco_dictionary_h dictionary,
+        size_t size,
+        size_t pageSize = 128,
+        void* mapAddress = (void*)0x20000000,
+        size_t maxTransSize = 0,
+        int flags = ALLOCATE_MEMORY|
+                SET_ERROR_HANDLER|
+                START_MCO_RUNTIME|
+                SET_SQL_ALLOCATOR|
+                INITIALIZE_DATABASE,
+        char const* databaseFile = NULL);
+        &#160;</pre>
+                </div>
+                <p>Internally, <code>McoSqlEngine::open()</code> does the following:</p>
+                <ol>
+                    <li value="1">	Checks for local or shared memory support.</li>
+                    <li value="2">	If local memory and (<code>flags &amp; ALLOCATE_MEMORY</code>) is true, then calls <code>malloc()</code> to allocate <code>DATABASE_SIZE</code> bytes.</li>
+                    <li value="3">	Sets the <i>e</i>X<i>treme</i>DB error handler to <code>McoDatabase::checkStatus</code>.</li>
+                    <li value="4">	Initializes the <i>e</i>X<i>treme</i>DB run-time.</li>
+                    <li value="5">	Sets the <i>McoSQL</i> memory allocator.</li>
+                    <li value="6">	Sets the maximal transaction size.</li>
+                    <li value="7">	Connects to or opens the <i>e</i>X<i>treme</i>DB database.</li>
+                    <li value="8">	Opens the SQL engine.</li>
+                </ol>
+                <h3>Loading and Saving database images</h3>
+                <p>The last optional parameter of the <code>McoSqlEngine::open()</code> method is a path to the database file, from which the database should be loaded. By default, the value of this parameter is <code>NULL</code> and the database is not loaded from disk. If the parameter is not <code>NULL</code>, then the <code>open()</code> method tries to load the database from the specified file and initializes and empty database if the file doesn't exist. There is also a <code>McoSqlDatabase::save()</code> method for saving a database in the specified file.</p>
+                <p>So to load a database from an image previously saved in a file, you must specify the last parameter of the open method, and to save a database image prior to closing the database, insert a call to the <code>save()</code> method before the database is closed.</p>
+                <h3>Saving and Loading class data</h3>
+                <p>It is sometimes useful to save and/or load the data for an entire class (table) to/from an external file. This is done with the <code>saveClass()</code> and <code>loadClass()</code> APIs:</p>
+                <div class="code-block"><pre>    &#160;
+    void saveClass(char const *filePath, char const *className);
+    &#160;
+    void loadClass(char const *filePath, char const *className = 0);
+    &#160;</pre>
+                </div>
+                <p>(Please refer to the <a href="../../Core/Data_Export_Import/Data_Export_Import_C.htm">Saving/Loading individual classes</a> page for further details.)</p>
+                <p>&#160;</p>
+                <h2>The McoSqlEngine:close() method</h2>
+                <p>Internally, <code>McoSqlEngine::close()</code> does the following:</p>
+                <ol>
+                    <li value="1">Releases the memory allocator.</li>
+                    <li value="2">Closes the database (<code>mco_db_disconnect() &amp; mco_db_close()</code>).</li>
+                    <li value="3">Releases the memory, if it was allocated during initialization.</li>
+                    <li value="4">Terminates the <i>e</i>X<i>treme</i>DB run-time.</li>
+                </ol>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

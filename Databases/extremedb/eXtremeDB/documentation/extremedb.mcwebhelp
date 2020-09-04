@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WebHelpSystem DefaultUrl="Content/eXtremeDB_Product_Family.htm" Toc="Data/Tocs/Master.js" Index="Data/Index.js" Concepts="Data/Concepts.js" Glossary="Data/Glossary.js" SearchDatabase="Data/Search.js" Alias="Data/Alias.xml" Synonyms="Data/Synonyms.xml" PathToScriptsFolder="Resources/Scripts/" SkinName="McO Skin" SkinID="McO_Skin" Multilingual="false" Skins="McO Skin" BuildTime="12/16/2019 10:54:42 PM" BuildVersion="13.2.6355.27565" TargetType="WebHelp2" SkinTemplateFolder="Skin/" InPreviewMode="false" TopNavTocPath="true" MoveOutputContentToRoot="false" ReplaceReservedCharacters="false" MakeFileLowerCase="false" UseCustomTopicFileExtension="false" PreventExternalUrls="false" EnableResponsiveOutput="false" IncludeGlossarySearchResults="true" ResultsPerPage="20" xml:lang="en-us" LanguageName="English" SearchEngine="MadCapSearch">
+    <CatapultSkin Version="2" SkinType="WebHelp2" Comment="HTML5 Default Tripane skin" Anchors="Width,Height" Width="800" Height="600" Top="0" Left="0" Bottom="0" Right="0" Tabs="TOC" DefaultTab="TOC" UseBrowserDefaultSize="True" UseDefaultBrowserSetup="True" EnableResponsiveOutput="false" IndexPartialWordSearch="false" GlossaryPartialWordSearch="false" RemoveImagesOnSave="true" AutoSyncTOC="true" Name="McO Skin" SkinID="McO_Skin" SkinClass="_Skins_McO_Skin" HideNavOnStartup="False" LogoUrl="">
+        <Toolbar EnableCustomLayout="true" Buttons="Print|PreviousTopic|NextTopic" />
+        <WebHelpOptions NavigationPanePosition="Left" />
+    </CatapultSkin>
+</WebHelpSystem>

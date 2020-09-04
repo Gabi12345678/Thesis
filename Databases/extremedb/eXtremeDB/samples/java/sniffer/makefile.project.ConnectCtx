@@ -1,0 +1,5 @@
+MCO_PRJ_LIST += ConnectCtx
+PRJ_TARGET_CLASS += ConnectCtx
+PRJ_ConnectCtx_TAGS:=sample core java
+PRJ_ConnectCtx_DIR :=$(call mco_project_dir)
+PRJ_ConnectCtx_SRC :=$(call mco_project_file,ConnectCtx.java)

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Control Structures used in the C API|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>UDA Value</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><a name="kanchor103"></a>UDA Value</h1>
+            <p>A structure of type <code>mco_uda_value_t</code> is required in the UDA data access calls like <a href="../Core_Functions/Static/UDA/uda_register_udf.htm"><code>mco_uda_put()</code></a> and <a href="../Core_Functions/Static/UDA/uda_register_udf.htm"><code>mco_uda_get()</code></a>. It is defined as follows in <code>mcouda.h</code>:</p>
+            <div class="code-block"><pre><a name="kanchor104"></a>    &#160;
+    typedef struct tag_mco_uda_value_t_ {
+        mco_dict_type_t type;
+        union {
+            unsigned char           u1;   /* MCO_DD_UINT1 */
+            unsigned short          u2;   /* MCO_DD_UINT2 */
+            unsigned int            u4;   /* MCO_DD_UINT4, MCO_DD_DATE, MCO_DD_TIME */
+            uint8                   u8;   /* MCO_DD_UINT8, MCO_DD_AUTOID, MCO_DD_AUTOOID, MCO_DD_DATETIME */
+            char                    i1;   /* MCO_DD_INT1 */
+            short                   i2;   /* MCO_DD_INT2 */
+            int                     i4;   /* MCO_DD_INT4 */
+            mco_int8                i8;   /* MCO_DD_INT8 */
+            #ifdef MCO_TARGET_FLOAT_SUPPORTED
+                float               f;    /* MCO_DD_FLOAT */
+                double              d;    /* MCO_DD_DOUBLE */
+            #endif
+            mco_uda_object_handle_t o;    /* MCO_DD_STRUCT */
+            struct {
+                unsigned int        size; /* size of a buffer in bytes */
+                unsigned int        len;  /* length of a string in characters */
+                union {
+                    char          * c;    /* char strings: MCO_DD_STRING, MCO_DD_CHAR, MCO_DD_BINARY, MCO_DD_VARBINARY */
+                    nchar_t       * n;    /* nchar strings: MCO_DD_NCHAR_STRING, MCO_DD_NCHAR_CHAR */
+                    #ifdef MCO_CFG_WCHAR_SUPPORT
+                        wchar_t   * w;    /* wchar strings: MCO_DD_WCHAR_STRING, MCO_DD_WIDE_CHAR */
+                    #endif
+                    void          * v;    /* general pointer : MCO_DD_BLOB, MCO_DD_REF, MCO_DD_OID */
+                } p;                      /* pointer to the buffer */
+            } p;
+        } v;
+    } mco_uda_value_t, * mco_uda_value_p;
+    &#160;</pre>
+            </div>
+            <p>&#160;</p>
+            <p>So the UDA value has two elements, a <code>type</code> and a value <code>v</code>. The type must be of the following:</p>
+            <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <col class="TableStyle-FunctionReference-Column-Column2" style="width: 25px;" />
+                <tbody>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_UINT1</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">An unsigned 1 byte integer</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_UINT2</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">An unsigned 2 byte integer</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_UINT4</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">An unsigned 4 byte integer</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_UINT8</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">An unsigned 8 byte integer</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_INT1</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A signed 1 byte integer</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_INT2</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A signed 2 byte integer</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_INT4</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A signed 4 byte integer</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_INT8</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A signed 8 byte integer</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_FLOAT</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A float</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_DOUBLE</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A double</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_DATE</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A 4 byte unsigned integer</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_TIME</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A 4 byte unsigned integer</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_DATETIME</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">An 8 byte unsigned integer</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_CHAR</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A 1 byte character</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_NCHAR_CHAR</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A 2 byte Unicode character</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_WIDE_CHAR</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A 2 byte Unicode character</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_NCHAR_STRING</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A unicode (2 byte char) string</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_WCHAR_STRING</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A unicode (2 byte char) string</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_REF</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A 4 byte reference to an object's OID or autoid</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_AUTOID</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A 4 byte autoid</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_AUTOOID</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Undefined (for internal use only)</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_STRUCT</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Structure</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_BLOB</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A Binary Large OBject</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_OID</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A user-defined Object ID</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_BOOL</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A 1 byte boolean</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_SEQUENCE_UINT1</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A sequence of unsigned 1 byte integers</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_SEQUENCE_UINT2</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A sequence of unsigned 2 byte integers</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_SEQUENCE_UINT4</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A sequence of unsigned 4 byte integers</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_SEQUENCE_UINT8</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A sequence of unsigned 8 byte integers</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_SEQUENCE_INT1</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A sequence of signed 1 byte integers</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_SEQUENCE_INT2</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A sequence of signed 2 byte integers</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_SEQUENCE_INT4</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A sequence of signed 4 byte integers</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_SEQUENCE_INT8</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A sequence of signed 8 byte integers</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_SEQUENCE_FLOAT</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A sequence of  floats</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DD_SEQUENCE_DOUBLE</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A sequence of doubles</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">MCO_DD_SEQUENCE_CHAR</td>
+                        <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">A sequence of char</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2>Setting UDA Value elements for database fields</h2>
+            <p>To prepare a <code>mco_uda_value_t</code> structure <b>val</b> to set a database object's field value with <code>mco_uda_put()</code>, the appropriate elements of <b>val</b> must be set according to the type of the field. The sections below demonstrate how to prepare <b>val</b> for fields of different types.</p>
+            <h3>Simple scalar types</h3>
+            <p>For simple scalar types, such as <code>integer</code>, <code>float</code>, <code>double</code>, <code>date</code>, <code>time</code>, <code>datetime</code>, <code>bool</code>, and <code>autoid</code>, set the appropriate element of <code>val.v</code>. For example:</p>
+            <div class="code-block"><pre>&#160;
+    mco_uda_object_handle_t rec;
+    mco_uda_value_t val;
+    unsigned short field_1 = 1;
+    unsigned short field_2 = 2;
+    unsigned short field_3 = 3;
+&#160;
+    /* Put  simple values */
+    val.type = MCO_DD_UINT4; /* Set field's type */
+    val.v.u4   = 999;      /* Set appropriate union field */
+    mco_uda_put(&amp;rec, field_1, 0, &amp;val);
+    &#160;
+    &#160;
+    val.type = MCO_DD_FLOAT; /* Set field's type */
+    val.v.f   = 999.999;      /* Set appropriate union field */
+    mco_uda_put(&amp;rec, field_3, 0, &amp;val);
+    &#160;
+    val.type = MCO_DD_AUTOID; /* Set field's type */
+    val.v.u8   = 3;      /* Set appropriate union field */
+    mco_uda_put(&amp;rec, field_3, 0, &amp;val);
+    &#160;
+    &#160;</pre>
+            </div>
+            <h3>String types</h3>
+            <p>For <code>strings</code>, <code>byte arrays</code> and <code>blobs</code>, the application needs to provide a buffer, assign it to the appropriate buffer element and set the <code>size</code> and <code>len</code> elements as demonstrated in the following examples.</p>
+            <p>For types <code>MCO_DD_CHAR</code> or <code>MCO_DD_STRING</code> set elements <code>val.v.p.p.c</code> and <code>val.v.p.len</code>:</p>
+            <div class="code-block"><pre>&#160;
+    Schema struct definition:
+    &#160;
+    struct InnerStruct
+    {
+        vector&lt;string&gt; inner_vstr;
+        uint4 inner_data;
+    };
+    &#160;
+    Application code snippet:
+    &#160;
+    mco_uda_object_handle_t rec;
+    mco_uda_value_t val;
+    unsigned short field_no = 2;
+    unsigned short inner_field_no = 3;
+    unsigned short vlength = 3;
+    InnerStruct inner; /* a struct defined in the schema */
+    char buf[1024];
+    char msg[256];
+    &#160;
+    /* Put a vector of chars */
+    mco_uda_field_alloc(&amp;rec, field_no, vLength); /* Allocate vector */
+    val.type = MCO_DD_CHAR;  /* Set field's type */
+    val.v.p.p.c = buf;       /* Set pointer to buffer */
+    val.v.p.len = 20;        /* Set string length */
+    for (j = 0; j &lt; vLength; ++j) 
+    {
+        sprintf(buf, "vch-%d:%d", 1, j); /* Put value to buffer */
+        mco_uda_put(&amp;rec, field_no, j, &amp;val); /* Put value to object */
+    }
+    &#160;
+    /* Put a vector of strings  */
+    mco_uda_field_alloc(&amp;inner, inner_field_no, vLength); /* allocate vector */
+    val.type = MCO_DD_STRING;
+    val.v.p.p.c = msg;
+    val.v.p.len = 20;
+    for (j = 0; j &lt; vLength; ++j) {
+        sprintf(msg, "vstr-%d:%d", 2, j);
+        mco_uda_put(&amp;rec, inner_field_no, j, &amp;val);
+    }
+     </pre>
+            </div>
+            <p>For types <code>MCO_DD_NCHAR_CHAR</code> or <code>MCO_DD_NCHAR_STRING</code> set elements <code>v.p.p.n</code>  and <code>val.v.p.len</code>:</p>
+            <div class="code-block"><pre>&#160;
+    Schema struct definition:
+    &#160;
+    struct InnerStruct
+    {
+        vector&lt;string&gt; inner_vstr;
+        uint4 inner_data;
+    };
+    &#160;
+    Application code snippet:
+    &#160;
+    mco_uda_object_handle_t rec;
+    mco_uda_value_t val;
+    unsigned short field_no = 2;
+    unsigned short inner_field_no = 3;
+    unsigned short vlength = 3;
+    InnerStruct inner; /* a struct defined in the schema */
+    char buf[1024];
+    char msg[256];
+    &#160;
+    /* Put a vector of Unicode chars */
+    mco_uda_field_alloc(&amp;rec, field_no, vLength); /* Allocate vector */
+    val.type = MCO_DD_NCHAR;  /* Set field's type */
+    val.v.p.p.n = buf;       /* Set pointer to chars */
+    val.v.p.len = 20;        /* Set string length */
+    for (j = 0; j &lt; vLength; ++j) 
+    {
+        sprintf(buf, "vch-%d:%d", 1, j); /* Put value to buffer */
+        mco_uda_put(&amp;rec, inner_field_no, j, &amp;val); /* Put value to object */
+    }
+    &#160;
+    /* Put a vector of strings  */
+    mco_uda_field_alloc(&amp;inner, inner_field_no, vLength); /* allocate vector */
+    val.type = MCO_DD_NCHAR_STRING;
+    val.v.p.p.n = msg;
+    val.v.p.len = 20;
+    for (j = 0; j &lt; vLength; ++j) {
+        sprintf(msg, "vstr-%d:%d", 2, j);
+        mco_uda_put(&amp;rec, inner_field_no, j, &amp;val);
+    } </pre>
+            </div>
+            <h3>BLOB, OID and REF types</h3>
+            <p>For types <code>MCO_DD_BLOB</code>, <code>MCO_DD_OID</code> or <code>MCO_DD_REF</code> set element <code>val-&gt;v.p.p.v</code>  and <code>val.v.p.len</code>:</p>
+            <div class="code-block"><pre>    &#160;
+    mco_uda_object_handle_t rec;
+    mco_uda_value_t val;
+    unsigned short field_1 = 1;
+    unsigned short field_2 = 2;
+    unsigned short vlength = 3;
+    char buf[1024];
+    char msg[256];
+    &#160;
+    /* Put a BLOB value */
+    val.type = MCO_DD_BLOB; /* Set field's type */
+    val.v.p.p.v = buf;      /* Set pointer to blob data */
+    val.v.p.len = 128;      /* Set blob's length */
+    mco_uda_put(&amp;rec, field_3, 0, &amp;val);
+    &#160;</pre>
+            </div>
+            <h3>Structure types</h3>
+            <p>For structure-based fields (which must be defined in the database schema) first set <code>val.type</code> to <code>MCO_DD_STRUCT</code> then fill out element <code>val.v.o</code> with the structure element values:</p>
+            <div class="code-block"><pre>    &#160;
+    Schema struct definition:
+    &#160;
+    struct InnerStruct
+    {
+        vector&lt;string&gt; inner_vstr;
+        uint4 inner_data;
+    };
+    &#160;
+    Application code snippet:
+    &#160;
+    mco_uda_object_handle_t rec;
+    mco_uda_value_t val;
+    unsigned short struct_no = 1;
+    unsigned short inner_field_no = 3;
+    unsigned short vlength = 3;
+    InnerStruct inner; /* a struct defined in the schema */
+    &#160;
+    /* Put a STRUCT value */
+    val.type = MCO_DD_STRUCT; /* Set struct type */
+    mco_uda_put(&amp;rec, struct_no, 0, &amp;val); /* Initialize the struct handle */
+    &#160;
+    /* Assign inner to the struct handle and set element val.v */
+    inner = val.v.o;
+    val.type = MCO_DD_UINT4;
+    val.v.u4   = 999;
+    mco_uda_put(&amp;inner, field_no, 0, &amp;val);
+&#160;
+    &#160;</pre>
+            </div>
+            <h2>Retrieving database field values into UDA Value elements</h2>
+            <p>To prepare a <code>mco_uda_value_t</code> structure <code>val</code> to retrieve a database object's field value with <code>mco_uda_get()</code>, the appropriate elements of <code>val</code> must be set according to the type of the field. The sections below demonstrate how to prepare <code>val</code> for fields of different types.</p>
+            <h3>Simple scalar types</h3>
+            <p>For simple scalar types, such as <code>integer</code>, <code>float</code>, <code>double</code>, <code>date</code>, <code>time</code>, <code>datetime</code>, <code>bool</code>, and <code>autoid</code>, set <code>val.type</code> to the appropriate type, then call <code>mco_uda_get()</code> to retrieve the database field value into the appropriate element of <code>val.v</code>. For example:</p>
+            <div class="code-block"><pre>&#160;
+    mco_uda_object_handle_t rec;
+    mco_uda_value_t val;
+    unsigned short field_1 = 1;
+    unsigned short field_2 = 2;
+    unsigned short field_3 = 3;
+&#160;
+    /* Get simple values */
+    val.type = MCO_DD_UINT4; /* Set field's type */
+    rc = mco_uda_get(&amp;rec, field1, 0, &amp;value);
+    printf("\n\tGet Record.u4                  : %d", val.v.u4);
+    &#160;
+    val.type = MCO_DD_FLOAT; /* Set field's type */
+    rc = mco_uda_get(&amp;rec, field2, 0, &amp;value);
+    printf("\n\tGet Record.u4                  : %d", val.v.f);
+    &#160;
+    val.type = MCO_DD_AUTOID; /* Set field's type */
+    rc = mco_uda_get(&amp;rec, field2, 0, &amp;value);
+    printf("\n\tGet Record.u4                  : %d", val.v.u8);
+    &#160;
+    &#160;</pre>
+            </div>
+            <h3>String types</h3>
+            <p>For <code>strings</code>, <code>byte arrays</code> and <code>blobs</code>, the application needs to provide a buffer, assign it to the appropriate buffer element and set the <code>size</code> and <code>len</code> elements as demonstrated in the following examples.</p>
+            <p>For types <code>MCO_DD_CHAR</code> or <code>MCO_DD_STRING</code> set elements <code>val.v.p.p.c</code> and <code>val.v.p.len</code>:</p>
+            <div class="code-block"><pre>&#160;
+    Schema struct definition:
+    &#160;
+    struct InnerStruct
+    {
+        vector&lt;string&gt; inner_vstr;
+        uint4 inner_data;
+    };
+    &#160;
+    Application code snippet:
+    &#160;
+    mco_uda_object_handle_t rec;
+    mco_uda_value_t val;
+    unsigned short field_no = 2;
+    unsigned short inner_field_no = 3;
+    unsigned short vlength = 3;
+    InnerStruct inner; /* a struct defined in the schema */
+    char buf[1024];
+    char msg[256];
+    &#160;
+    /* Get a vector of chars */
+    mco_uda_field_alloc(&amp;rec, field_no, vLength); /* Allocate vector */
+    val.type = MCO_DD_CHAR;  /* Set field's type */
+    val.v.p.p.c = buf;       /* Set pointer to buf */
+    val.v.p.size = sizeof(buf); /* Set buffer size */
+    for (j = 0; j &lt; vLength; ++j) 
+    {
+        mco_uda_get(&amp;rec, inner_field_no, j, &amp;value); 
+        printf("\n\tGet Record.vch[%d]              : '%s', length %d", j, buf, val.v.p.len);
+    }
+    &#160;
+    /* Gut a vector of strings  */
+    mco_uda_field_alloc(&amp;inner, inner_field_no, vLength); /* allocate vector */
+    val.type = MCO_DD_NSTRING;
+    val.v.p.size = sizeof(buf);
+    for (j = 0; j &lt; vLength; ++j) 
+    {
+        mco_uda_get(&amp;inner, inner_field_no, j, &amp;val);
+        printf("\n\tGet Record.inner.inner_vstr[%d] : '%s', length %d", j, buf, val.v.p.len);
+    }
+    &#160;</pre>
+            </div>
+            <p>The buffer to receive a string field value can also be dynamically allocated. To determine the exact size of the string to be retrieved, the  <code>val-&gt;v.p.p.c</code> element can be set to 0 to cause <code>mco_uda_get()</code> to return just the size of the string in the specified database field. Then <code>val.p.p.c</code> can be allocated and the string value retrieved by a second <code>mco_uda_get()</code> call. For example:</p>
+            <div class="code-block"><pre>    &#160;
+    mco_uda_value_t val;
+    &#160;
+    val.type = MCO_DD_STRING;
+    val.v.p.p.c = 0; /* figure out the actual size we need to allocate */
+    mco_uda_get(&amp;obj, my_field_no, 0, &amp;val);
+    val.v.p.p.c = malloc(val.v.p.size);
+    mco_uda_get(&amp;obj, field_no, 0, &amp;val); /* get the value */
+    printf("\n\tGet Record.vch[%d]              : '%s', length %d", j, val.v.p.p.c, val.v.p.len);
+    free(val.v.p.p.c); /* free up memory */
+    &#160;</pre>
+            </div>
+            <p>For types <code>MCO_DD_NCHAR_CHAR</code> or <code>MCO_DD_NCHAR_STRING</code> set elements <code>v.p.p.n</code>  and <code>val.v.p.size</code>:</p>
+            <div class="code-block"><pre>&#160;
+    Schema struct definition:
+    &#160;
+    struct InnerStruct
+    {
+        vector&lt;string&gt; inner_vstr;
+        uint4 inner_data;
+    };
+    &#160;
+    Application code snippet:
+    &#160;
+    mco_uda_object_handle_t rec;
+    mco_uda_value_t val;
+    unsigned short field_no = 2;
+    unsigned short inner_field_no = 3;
+    unsigned short inner_vstr_field_no = 4;
+    unsigned short vlength = 3;
+    InnerStruct inner; /* a struct defined in the schema */
+    char buf[1024];
+    char msg[256];
+    &#160;
+    /* Get a vector of Unicode chars */
+    mco_uda_field_alloc(&amp;rec, field_no, vLength); /* Allocate vector */
+    val.type = MCO_DD_NCHAR;  /* Set field's type */
+    val.v.p.p.n = buf;       /* Set pointer to buf */
+    val.v.p.size = sizeof(buf); /* Set buffer size */
+    for (j = 0; j &lt; vLength; ++j) 
+    {
+        mco_uda_get(&amp;rec, inner_field_no, j, &amp;value); 
+        printf("\n\tGet Record.vch[%d]              : '%s', length %d", j, buf, value.v.p.len);
+    }
+    &#160;
+    /* Get a vector of strings  */
+    mco_uda_field_alloc(&amp;inner, inner_vstr_field_no, vLength); /* allocate vector */
+    val.type = MCO_DD_NCHAR_STRING;
+    val.v.p.p.n = buf;  /* Set pointer to buf */
+    val.v.p.size = sizeof(buf); /* Set buffer size */
+    for (j = 0; j &lt; vLength; ++j) {
+        mco_uda_get(&amp;inner, inner_field_no, j, &amp;value);
+        printf("\n\tGet Record.inner.inner_vstr[%d] : '%s', length %d", j, buf, val.v.p.len);
+    } </pre>
+            </div>
+            <h3>BLOB, OID and REF types</h3>
+            <p>For types <code>MCO_DD_BLOB</code>, <code>MCO_DD_OID</code> or <code>MCO_DD_REF</code> set element <code>val-&gt;v.p.p.v</code>  and <code>val.v.p.size</code>:</p>
+            <div class="code-block"><pre>    &#160;
+    mco_uda_object_handle_t rec;
+    mco_uda_value_t val;
+    unsigned short field_1 = 1;
+    char buf[1024];
+    &#160;
+    /* Put a BLOB value */
+    val.type = MCO_DD_BLOB; /* Set field's type */
+    val.v.p.p.v = buf;      /* Set pointer to blob data */
+    val.v.p.size = sizeof(buf); /* Set buffer size */
+    mco_uda_get(&amp;rec, field_1, 0, &amp;val);
+    printf("\n\tGet Record.b value             : length %d", val.v.p.len);
+    &#160;</pre>
+            </div>
+            <h3>Structure types</h3>
+            <p>For structure-based fields (which must be defined in the database schema) first set <code>val.type</code> to <code>MCO_DD_STRUCT</code> then call <code>mco_uda_get()</code> to retrieve the struct field into element <code>val.v.o</code>. Then call <code>mco_uda_get()</code> again for each of the structure element values:</p>
+            <div class="code-block"><pre>    &#160;
+    Schema struct definition:
+    &#160;
+    struct InnerStruct
+    {
+        vector&lt;string&gt; inner_vstr;
+        uint4 inner_data;
+    };
+    &#160;
+    Application code snippet:
+    &#160;
+    mco_uda_object_handle_t rec;
+    mco_uda_value_t val;
+    unsigned short struct_no = 1;
+    unsigned short field_no = 2;
+    unsigned short inner_field_no = 3;
+    unsigned short inner_data_field_no = 5;
+    InnerStruct inner; /* a struct defined in the schema */
+    &#160;
+    /* Get STRUCT value and get simple value from the inner struct */
+    val.type = MCO_DD_STRUCT; /* Set struct type */
+    mco_uda_get(&amp;rec, inner_field_no, 0, &amp;val); /* Initialize inner struct handler */
+    inner = val.v.o; /* Get inner struct handle */
+    val.type = MCO_DD_UINT4;
+    mco_uda_get(&amp;inner, inner_data_field_no, 0, &amp;val);
+    printf("\n\tGet Record.inner.inner_data    : %d", val.v.u4);
+    &#160;</pre>
+            </div>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

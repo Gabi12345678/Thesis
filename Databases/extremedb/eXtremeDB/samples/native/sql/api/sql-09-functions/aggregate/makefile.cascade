@@ -1,0 +1,3 @@
+include $(call mco_makefile_file, \
+makefile.project.aggregate \
+)

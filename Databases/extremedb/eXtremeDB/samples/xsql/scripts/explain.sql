@@ -1,0 +1,27 @@
+create table foo (x integer primary key, y varchar);
+insert into foo values (1, 'one');
+insert into foo values (2, 'two');
+insert into foo values (3, 'three');
+select * from Metatable;
+select * from Metaindex;
+select * from foo; 
+select * from foo where x=1;
+select * from foo where x=1 and y='one';
+select * from foo where x=1 or x=2;
+select * from foo where x in (1, 2, 3, 4, 5);
+select * from foo where y='one';
+select * from foo where x > 0 order by x;
+select * from foo where x > 0 order by x desc;
+select * from foo order by x asc; 
+select * from foo order by x desc; 
+explain select * from foo; 
+explain select * from foo where x=1;
+explain select * from foo where x=1 and y='one';
+explain select * from foo where x=1 or x=2;
+explain select * from foo where x in (1, 2, 3, 4, 5);
+explain select * from foo where y='one';
+explain select * from foo where x > 1 order by x;
+explain select * from foo where x > 1 order by x desc;
+explain select * from foo order by x asc; 
+explain select * from foo order by x desc; 
+

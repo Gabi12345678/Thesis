@@ -1,0 +1,13 @@
+MCO_PRJ_LIST += 07-transactions-nested
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 07-transactions-nested
+PRJ_07-transactions-nested_TAGS:=sample core
+PRJ_07-transactions-nested_DIR:=$(call mco_project_dir)
+PRJ_07-transactions-nested_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_07-transactions-nested_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_07-transactions-nested_DATABASES:=transdb
+PRJ_07-transactions-nested_RUNTIME:=YES
+PRJ_07-transactions-nested_MEMDEV:=PRIVATE
+PRJ_07-transactions-nested_STORAGE:=TRANSIENT
+PRJ_07-transactions-nested_SYNC:=AUTO
+PRJ_07-transactions-nested_TRANSMGR:=MURSIW

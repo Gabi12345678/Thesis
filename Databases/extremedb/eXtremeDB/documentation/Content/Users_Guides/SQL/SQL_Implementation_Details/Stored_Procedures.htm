@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeSQL User Defined Functions</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>SQL User Defined Functions</h1>
+            <blockquote>
+                <p><i>e</i>X<i>treme</i>SQL supports “stored procedures” by allowing developers to create their own <i>Lua </i>User-Defined Functions (UDF). An <i>e</i>X<i>treme</i>SQL UDF can also be written in Python or C/C++. These methods are described in the sections below. The <i>e</i>X<i>treme</i>SQL server provides a service (an internal function) that lists all UDFs through a meta table called <i>Metafunction</i> which can be queried like any SQL table:</p>
+                <div class="code-block"><pre>&#160;
+    select * from Metafunction;
+    Name	Profile	ReturnType	nArguments	Language
+    -------------------------------------------
+    format	String(...)	15	2	         C++
+    choice	String(...)	15	3	         C++
+    trim	String(...)    15	1	         C++
+    ...
+    &#160;</pre>
+                </div>
+                <p>Note that the <i>Metafunction</i> pseudo-table returns information about statically registered functions (written in C++) as well as dynamically created functions which were created by the current connection via the <a href="../../../Programming/SQL/DDL_Statements/Create_Function.htm">CREATE FUNCTION</a> statement. A Complete list of all user defined function can be found in the <i>Functions</i> table (if it exists).</p>
+                <p>If the <code>preloadUDF</code> parameter of the <i><a href="../../../Programming/C++/Classes/SqlOptimizerParameters.htm">SqlOptimizerParameters</a></i> is set to <code>true</code>, then all of these functions are loaded at the database open time and the <i>Metafunction</i> table will contain the complete list of all functions (dynamically-loaded and statically-linked).</p>
+                <p>Also note that if the number of arguments is listed as <code>-1</code>, this indicates a variable number of arguments.</p>
+                <h2><i>Lua</i> UDFs</h2>
+                <p><i>Lua</i> is a very elegant, popular and easy-to-adopt scripting language, with extensive grammar that supports operator overloading, encapsulation, inheritance, polymorphism and more. <i>Lua</i>'s sophisticated and blazingly fast dynamic Just-in-time compiler <i>LuaJIT</i> and small footprint makes it a great procedural language to develop complex database user-defined functions and stored procedures for the <i>e</i>X<i>treme</i>SQL server. <i>Lua</i>-based UDFs run in the context of the SQL server eliminating inherent client-server IPC and network overhead and fully utilizing the multi-core nature of modern hardware.</p>
+                <p>(Please see the <a href="../Lua/Lua_Users_Guide.htm">Using Lua with <i>e</i>X<i>treme</i>SQL</a> for further details.) </p>
+                <h2>Python UDFs</h2>
+                <p>It is also possible to create UDFs in the Python language if the Python class <i><a href="../../../Programming/Python/Classes/SqlEngine.htm">SqlEngine</a></i> is used to create the <i>e</i>X<i>treme</i>DB database. The following steps are involved:</p>
+                <blockquote>
+                    <p>1. The supported python version is 2.7, and there is a requirement to have shared library on the machine. (For Linux this is <code>libpython2.7.so</code>.)</p>
+                    <p>By default, this library is searched in the standard system library load path. This can be altered using the environment variable <code>PYTHONLI</code>B; for example:</p>
+                    <div class="code-block"><pre>&#160;
+    export PYTHONLIB=/opt/build/my/python/libpython2.7.so
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <blockquote>
+                    <p>2. Declare the python function that performs the desired operations. The arguments of this function will be the arguments of the UDF and the return value will be translated to an SQL value. For example;</p>
+                    <div class="code-block"><pre>&#160;
+    def gen_quotes(Bid, BidSize):
+    ...
+    Bid.append(some_bids)
+    BidSize.append(some_bid_sizes)
+&#160;
+    return len(some_bids)
+    &#160;</pre>
+                    </div>
+                    <p>The code indicated by the ellipsis (…) would use <i>sequence iterators</i> to generate a list of bid values and sizes from fields <code>Bid</code> and <code>BidSz</code> into the variables s<code>ome_bids</code> and <code>some_bid_sizes</code>.</p>
+                    <p>2. Register the UDF in the SQL engine using a <i>SqlEngine</i> object created (by default) for the local connection:</p>
+                    <div class="code-block"><pre>&#160;
+    conn.engine.registerFunction(int, "gen_quotes", gen_quotes, -1)
+    &#160;</pre>
+                    </div>
+                    <p>3. Call the UDF as part of a SQL <code>SELECT</code> statement. Consider that we have a table with columns <code>Bid</code> and <code>BidSz</code> and table is populated with some records. We can then generate bids and return the total count of bids generated as follows:</p>
+                    <div class="code-block"><pre>&#160;
+    SELECT sum(gen_quotes(Bid, BidSz)) FROM Bids FOR UPDATE;
+    &#160;</pre>
+                    </div>
+                    <p>(Note that the <code>FOR UPDATE</code>  clause in this example is required because the UDF will append values to sequences <code>Bid</code> and <code>BidSz</code> using <i>sequence iterators</i>.</p>
+                </blockquote>
+                <h2>C/C++ UDFs</h2>
+                <p>A C/C++ <code>UDF</code> must be defined as returning type <code>static String*</code> and can accept arguments of type <code>Value*</code>. Or a user-defined aggregate function must be defined as returning type <code>static Value*</code> and can accept arguments of type <code>Value*</code>. (Please see page <a href="Dynamic Memory_Allocation.htm">Dynamic Memory Allocation in SQL</a> for details on processing queries in UDFs.)</p>
+                <p>The UDF can be statically linked by “registering” it with the <i>e</i>X<i>treme</i>SQL<a name="kanchor283"></a> runtime using the C/C++ API. This is done in the <i>e</i>X<i>treme</i>SQL application by declaring a function of type <code>static SqlFunctionDeclaration udf()</code> with arguments specifying the type returned, the name used to call it, a pointer to the function and the number of arguments required. (Note that <i>e</i>X<i>treme</i>DB has another concept of user defined functions for indexes described in <i>e</i>X<i>treme</i>DB User Guide. This section describes only SQL <code>UDF</code>s.)  For example consider the following definition:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    extern "C" 
+    {
+        McoSql::Value* toggleTrace(McoSql::SqlEngine* engine,
+        McoSql::Vector&lt;McoSql::Value&gt;* args)
+        {
+            McoSql::Value *enable = args-&gt;getAt(0);
+            return BoolValue::create(func-&gt;engine-&gt;trace(enable-&gt;isTrue()));
+        }
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>(Note that the <code>extern "C"</code> declaration is necessary in order to give the function a de-mangled name.)</p>
+                <p>The <code>UDF</code> can also be loaded dynamically using the SQL <code>CREATE FUNCTION</code> statement which has the following form:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    create function NAME ( param1_name param1_type, ...,
+    paramN_name paramN_type)
+    returns result_type as 'LIBRARY-NAME' [, 'C_FUNCTION-NAME'];
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>For example:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    create function toggleTrace(enable bit) returns bit as 'mysharedlib';
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>(Note that if the name of the library the function belongs to, suppose it is 'xxx', doesn't include a suffix, then on UNIX systems it is transformed to the <code>libxxx.so</code>, and on Windows systems it is called <code>xxx.dll</code>.)</p>
+                <p>Now this <code>UDF</code> can be invoked via the <code>SELECT</code> statement as follows:</p>
+            </blockquote>
+            <blockquote>
+                <div class="code-block"><pre>&#160;
+    select toggleTrace(true);
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <blockquote>
+                <p>Unlike functions declared in C statically, the functions declared dynamically internally keep information about their arguments types. The types are checked by the SQL compiler. The SQL engine internally represents all integer types as a 64-bit integer (through the <code>int8</code> type), and the floating-point types as doubles through the <code>real8</code> type. When a function argument is declared as any other than an <code>int8</code> or <code>real8</code> scalar type, <code>implicit</code> conversion is applied. Thus the function can be declared as a <code>float</code> with a <code>float</code> argument, but it will actually receive a <code>double</code> value (represented using a <code>RealValue</code> object) and should return a <code>RealValue</code> as well. (there is no way to return a float value in the SQL API).</p>
+                <h3>Modifying Data Using Dynamically Loaded UDFs</h3>
+                <p>Using UDFs it is possible to change data in the database, execute SQL statements and/or queries, work with <code>sequence</code> iterators, etc. For example consider the following UDF definition:</p>
+                <div class="code-block"><pre>&#160;
+    McoSql::Value *load_cme_trades(McoSql::SqlEngine *engine,
+                McoSql::Vector&lt;McoSql::Value&gt; *args)
+    {
+        McoSql::DataSource *res =  engine-&gt;executeQuery(
+            engine-&gt;getCurrentTransaction(), "SELECT TradeDateTime, 
+                SeqNum, GroupCode, ProductCode, InstrumentName,
+                EntryPrice, EntryQuantity, AggressorSide, TickDirection
+                FROM TOBSeq
+                WHERE Book = %s AND
+                SecurityID = %i AND
+                EntryType = %s",
+                Book.c_str(), SecurityID,
+                EntryType.c_str() );
+        ...
+    }
+    &#160;</pre>
+                </div>
+                <p>Subsequent operations are performed in the context of the transaction calling this UDF, so if changing data in the database within the UDF, this transaction must be <code>READ_WRITE</code>. For <code>INSERT</code> and <code>UPDATE</code> statements the transaction will be upgraded automatically, but if it is necessary to change <code>sequence</code> data using a <i>sequence iterator</i>, the transaction must be upgraded explicitly in UDF code. For example the following could be a continuation of the previous code fragment:</p>
+                <div class="code-block"><pre>&#160;
+        ...
+        McoSql::Cursor *cursor = res-&gt;records();
+        McoSql::Record *rec = cursor-&gt;next();
+        McoSequence&lt;int8&gt; *fldEntryPrice = dynamic_cast
+            &lt;McoSequence&lt;int8&gt;*&gt;(rec-&gt;get(5));
+&#160;
+        engine-&gt;getCurrentTransaction()-&gt;upgrade();
+        EntryPrice-&gt;append(values, 1000);
+        ...
+        &#160;</pre>
+                </div>
+                <p>where <code>EntryPrice</code> is a <code>sequence</code> field in the database object <i>TOBSeq</i>.</p>
+                <h3>Notes on Using Sequences with UDFs</h3>
+                <p>As seen above, UDF code can access <i>sequence iterators</i> and perform operations on them. A <i>sequence iterator</i> is represented as an object of class <i>McoGenericSequence</i> or one of its descendants. Please note the following when using sequences within UDFs:</p>
+                <blockquote>
+                    <h3>Appending to a sequence</h3>
+                    <p>It's possible to append values to a sequence using the <code>McoGenericSequence::append()</code> method only to a <i><a href="../../../Programming/Common/Analytics/Materialized.htm">materialized</a></i> <code>sequence</code>. A <i><a href="../../../Programming/Common/Analytics/Materialized.htm">materialized</a> sequence</i> is represented with an object of type <i>McoSequence&lt;T&gt;</i> which has the following method:</p>
+                    <div class="code-block"><pre>&#160;
+    virtual void append(T const* items, mco_size_t nItems);
+    &#160;</pre>
+                    </div>
+                    <p>Here <code>T</code> is the actual sequence data type. Again, it is not possible to append items to a <code>sequence</code> that is not <i><a href="../../../Programming/Common/Analytics/Materialized.htm">materialized</a></i>. Note that a transaction must be opened in <code>READ_WRITE</code> mode when appending elements. If using automatic transactions and the <code>SELECT</code> statement to access sequence fields, it should be in form of <code>SELECT ... FOR UPDATE</code> as in the example above.</p>
+                    <h3>Iterating over sequences</h3>
+                    <p>Sequences may be iterated:</p>
+                    <blockquote>
+                        <p>1.	using low-level iterators obtained with method <code>McoGenericSequence::getIterator()</code></p>
+                        <p>2.	using method <code>McoSql::Value* McoGenericSequence::next();</code> This method will return an <code>IntValue, RealValue</code> or <code>String</code> representing the <code>sequence</code> element value or <code>NULL</code> if there are no more elements.</p>
+                        <p>Note that in different scenarios the iterator may be not initialized, so before calling <code>next()</code> it is a good practice to call <code>getIterator()</code> which performs initialization. For example:</p>
+                        <div class="code-block"><pre>&#160;
+    {
+        McoGenericSequence *time_it = dynamic_cast
+            &lt;McoGenericSequence *&gt;(args-&gt;get(0));
+        if (time_it == NULL) 
+        {
+            process_error();
+        }
+        time_it-&gt;getIterator();
+        for (McoSql::Value *vt; vt != NULL; vt = time_it-&gt;next()) 
+        {
+            ...
+        }
+    }
+    &#160;</pre>
+                        </div>
+                    </blockquote>
+                    <h3>Sequence classes</h3>
+                    <p>As mentioned in the "Appending to a sequence" section above, <code>sequences</code> may be represented either as <i>McoGenericSequence</i> class or <i>McoSequence&lt;T&gt;</i> which are inherited in differing scenarios. The best practice is to use <i>McoSequence&lt;T&gt;</i> in UDFs only when required, i.e. for updating or appending to a <code>sequence</code>.</p>
+                </blockquote>
+                <h2>NULL Arguments to UDFs</h2>
+                <p>It is possible to pass NULL&#160;as an argument value to a user-defined function. For example:</p>
+                <div class="code-block"><pre>&#160;
+    create function sf(s string) returns string in 'lua' as 'return s end';
+    create table t(s string);
+    insert into t values(['hello', null]);
+    select sf(s) from t;
+    select sf(null);
+    &#160;
+    #1
+    ------------------------------------------------------------------------------
+    hello
+    null
+&#160;
+    Selected records: 2
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

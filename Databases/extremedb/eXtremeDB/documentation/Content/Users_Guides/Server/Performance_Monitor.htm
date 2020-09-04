@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The eXtremeDB Performance Monitor</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>The <i>e</i>X<i>treme</i>DB Performance Monitor</h1>
+            <blockquote>
+                <p><i>e</i>X<i>treme</i>DB <i>for HPC</i> includes an HTML-based Performance Monitor that utilizes the Javascript tool <i>Highcharts</i> from Highsoft.  Included is one licensed run-time copy with each <i>e</i>X<i>treme</i>DB <i>for HPC</i> SDK purchased.  (If more run-time licenses are required, you must purchase them from <a href="http://www.highsoft.com/" title="Highsoft website" alt="Highsoft website">http://www.highsoft.com</a>.)</p>
+                <p>The Performance Monitor consists of:</p>
+                <ul>
+                    <li value="1">an in-memory database</li>
+                    <li value="2">a <i>monitor</i> thread that collects and stores metrics in the database</li>
+                    <li value="3">a separate module for the HTTP Viewer (HV) which can display performance counters in a web-based GUI</li>
+                </ul>
+                <p>Any <i>e</i>X<i>treme</i>DB database can be attached to the   <i>monitor</i> which takes "readings" at regular intervals and stores counter values in an in-memory <a href="../../Programming/C/Structures/Perfmon_Db.htm">database</a> called "perfmon". These values are then rolled up into metrics that can be viewed using the HTTP&#160;Viewer GUI interface described <a href="#Performa">below</a>. The <a href="#Performa2">APIs</a> for implementing custom queries of the monitor database are described in the following section.</p>
+                <p>Also, included in the  SDK samples is the source code for <code>samples/core/23-httpviewpmon</code> that incorporates the performance monitor, from which the screen shots that follow are taken.  This example program demonstrates some usage of the “perfmon” C language API.</p>
+                <h2><a name="Performa2"></a>Performance Monitor APIs</h2>
+                <p>The  performance monitor APIs consist of a small set of functions or class methods that implement the following four operations: <i>initialize</i>, <i>get / set options</i>, <i>attach</i> and <i>detach</i> the database.  Please use the links below to view detailed explanations for your development environment:</p>
+                <table class="TableStyle-FunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../Resources/TableStyles/FunctionReference.css');" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Perfornamce_Monitor/Perfmon_C.htm">C</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Performance monitor C API</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Perfornamce_Monitor/Perfmon_xSQL.htm">xSQL</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Performance monitor with xSQL</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">
+                                <p><a href="Perfornamce_Monitor/Perfmon_Python.htm">Python</a>
+                                </p>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">
+                                <p>Performance monitor Python API</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2>Performance Metrics</h2>
+                <p>The   <i>monitor</i> reads and stores scalar value statistics  such as: <code>error count, connection count, connects, host CPU load, host memory usage, opened transactions, opened cursors, last snapshot size, max connections, database total pages, database free pages, database used pages, database file size, database log file size, database used file size, cache hit count, cache miss count, cache pages allocated, cache pages used, cache pages pinned, cache pages modified, cache pages dirty, cache pages copied, cache pages write delayed.</code></p>
+                <p>Then, over the entire monitoring period, the <i>monitor</i> calculates and updates aggregated counters so that each of the operations listed is reflected in the values. Most of these values are calculated using simple statistics functions such as: <code>current</code> (the latest value), <code>min, max, avg, count, total count.</code> The aggregated counters are for operations such as: <code>Disk read, Disk write, Log write, Commit time, Rollback time, Snapshot duration.</code></p>
+                <h2><a name="Performa"></a>Performance Monitor Browser Interface</h2>
+                <p>To view the performance monitor interface, please build and run the example <code>samples/core/23-httpviewpmon</code>, then open your browser and specify the URL <code>http://localhost:8082/</code>. </p>
+                <p>This will bring up the main (initial) performance monitor window:</p>
+                <p>
+                    <img src="../../Resources/Images/Perfmon/image002.png" />
+                </p>
+            </blockquote>
+            <blockquote>
+                <p>Each class in the database can be explored:</p>
+                <p>
+                    <img src="../../Resources/Images/Perfmon/image002.png" />
+                </p>
+                <p>And each index for each class:</p>
+                <p>
+                    <img src="../../Resources/Images/Perfmon/image004.png" />
+                </p>
+                <p>Clicking on the database name under “Performance” in the left pane opens this tabbed window. Clicking on the tabs displays the following performance statistics:</p>
+                <p>
+                    <img src="../../Resources/Images/Perfmon/image006.png" />
+                </p>
+                <p>
+                    <img src="../../Resources/Images/Perfmon/image008.png" />
+                </p>
+                <p>
+                    <img src="../../Resources/Images/Perfmon/image010.png" />
+                </p>
+                <p>
+                    <img src="../../Resources/Images/Perfmon/image012.png" />
+                </p>
+                <p>
+                    <img src="../../Resources/Images/Perfmon/image014.png" />
+                </p>
+                <p>Clicking on “Options” allows you to control certain run-time options of the performance monitor:</p>
+                <p>
+                    <img src="../../Resources/Images/Perfmon/image016.png" />
+                </p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

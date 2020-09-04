@@ -1,0 +1,13 @@
+MCO_PRJ_LIST += 03-connect-single-task
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 03-connect-single-task
+PRJ_03-connect-single-task_TAGS:=sample core
+PRJ_03-connect-single-task_DIR:=$(call mco_project_dir)
+PRJ_03-connect-single-task_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_03-connect-single-task_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_03-connect-single-task_DATABASES:=simpledb
+PRJ_03-connect-single-task_RUNTIME:=YES
+PRJ_03-connect-single-task_MEMDEV:=PRIVATE
+PRJ_03-connect-single-task_STORAGE:=TRANSIENT
+PRJ_03-connect-single-task_SYNC:=AUTO
+PRJ_03-connect-single-task_TRANSMGR:=MURSIW

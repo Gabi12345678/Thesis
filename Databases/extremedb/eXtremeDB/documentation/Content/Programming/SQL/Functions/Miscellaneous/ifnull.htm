@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>ifnull</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>ifnull</h1>
+            <blockquote>
+                <p>Return the first argument if null, otherwise return the second argument.</p>
+                <h3>For an overview see page <a href="../../../../Users_Guides/SQL/SQL_Language_Reference/Functions.htm">eX<i>treme</i>SQL Functions</a></h3>
+                <h3>Prototype</h3>
+                <div class="code-block"><pre>    &#160;
+    ifnull( x, y );
+    &#160;</pre>
+                </div>
+                <h3>Arguments</h3>
+                <table class="TableStyle-IndentedFunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../../Resources/TableStyles/IndentedFunctionReference.css');" cellspacing="0">
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" style="width: 162px;" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1"><code>x</code>
+                            </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">The argument to test for null; returned if <code>x</code> is not null</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">y</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">The value to return if <code>x</code> is null</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Description</h3>
+                <blockquote>
+                    <p>This function is an alternative for <code><a href="coalesce.htm">coalesce()</a></code>. It returns <code>x</code> if not null; otherwise it returns <code>y</code>. The arguments can be a constant value, an array, a <code><a href="../../../../Users_Guides/Core/Sequences.htm">sequence</a></code>, <code>time</code>, or a table column of any of these types. This can be useful when a result is required but it is not know when a field value is present.</p>
+                </blockquote>
+                <h3>Example 1</h3>
+                <p>The <code>ifnull()</code> function can be used with simple arguments such as the following:</p>
+                <div class="code-block"><pre>&#160;
+    select ifnull( 1, 2), ifnull( null, 2);
+    #1      #2
+    --------------------------------------------------------
+    1       2
+    &#160;</pre>
+                </div>
+                <h3>Example 2</h3>
+                <p>Or it can be used with table columns of different types. For example, consider the table <code>t</code> below initialized with the following two rows of values:</p>
+                <div class="code-block"><pre>&#160;
+    create table t(
+        i1 int, i2 int,
+        ch1 char(20), ch2 char(20),
+        sc1 sequence(char(5)), sc2 sequence(char(5)),
+        si1 sequence(int), si2 sequence(int),
+        a1 array(int), a2 array(int),
+        t1 time, t2 time,
+        d1 decimal(15,2), d2 decimal(15,2),
+        b1 boolean, b2 boolean
+    );
+    insert into t values(null, 1, 
+                null, 'ch1', 
+                null, ['1','2','3','4','5'], 
+                null, [1,2,3,4,5], 
+                null, [1,2,3,4,5,6,7,8,9,0], 
+                null, '04-02-2019 10:19', 
+                null, 10.2,
+                null, true);
+    insert into t values(2, NULL, 
+                'ch2', null, 
+                ['a1','a2','a3','a4','a5'], null,
+                [11,12,13,14,15], null,
+                [10,20,30,40,50], null,
+                '04-02-2019 10:23', null,
+                10.02, null,
+                null, false);
+                &#160;</pre>
+                </div>
+                <p>The following <code>select</code> statement uses function <code>ifnull()</code> to extract the non-null value from each of the specified fields (note that the <code>select</code> results are reformatted here to make it easier to see how they correlate with the fields):</p>
+                <div class="code-block"><pre>    &#160;
+    select ifnull(i1, i2) as i, 
+        ifnull(ch1, ch2) as ch, 
+        ifnull(sc1, sc2) as sc, 
+        ifnull(si1, si2) as si, 
+         ifnull(a1, a2) as a,
+        ifnull(t1, t2) as t,
+        ifnull(d1, d2) as d,
+        ifnull(b1, b2) as b 
+         from t order by i;
+&#160;
+        i 
+          ch      
+    sc      
+    si 
+         a 
+          t 
+          d 
+          b
+    --------------------------------------------------------
+    1 
+          ch1 
+        {1, 2, 3, 4, 5} 
+    {1, 2, 3, 4, 5} 
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]  
+    04/02/2019 10:19:00 
+        10.20
+    true
+    &#160;
+    2       
+    ch2 
+        {a1, a2, a3, a4, a5} 
+       {11, 12, 13, 14, 15} 
+       [10, 20, 30, 40, 50]    
+    04/02/2019 10:23:00
+    10.02 
+      false
+&#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

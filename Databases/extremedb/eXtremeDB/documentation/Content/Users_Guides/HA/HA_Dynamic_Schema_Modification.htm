@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|High Availability User's Guide">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>HA&#160;Dynamic Schema Modification</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Dynamic Schema Modification</h1>
+            <blockquote>
+                <p>With <i>e</i>X<i>treme</i>DB version 7.1 and later it is possible to modify an SQL database schema through the standard SQL DDL statements <code>create table/index</code>, <code>drop table/index</code> and <code>alter table/index</code>. (Please refer to the <a href="../SQL_Users_Guide.htm"><i>e</i>X<i>treme</i>SQL User’s Guide</a> for further details about SQL DDL.)</p>
+                <h2>Replica-side replay of Dynamic Schema Modification</h2>
+                <p>This enhancement stems from a request to register and propagate master-side <code>CRUD</code> events to the replica-side application when the database schema on the master is dynamically modified. This is accomplished by implementing an application-side iterator callback that lets the <i>e</i>X<i>treme</i>DB<i> High Availability</i><a name="kanchor174"></a> database runtime publish information regarding the database modifications to the applications in <code>JSON</code> format. The iterator is available for all supported host languages, and as well can be enabled in the <code>xSQL</code> configuration file.</p>
+                <h3>C API</h3>
+                <p>The replica side <code><a href="../../Programming/C/Structures/HA_Parameters.htm">mco_HA_replica_params_t</a></code> is extended with two additional fields:</p>
+                <div class="code-block"><pre>    &#160;
+    mco_trans_iterator_callback_t iterator;
+    void                         *iterator_context;
+    &#160;</pre>
+                </div>
+                <p>Where:</p>
+                <ul>
+                    <li value="1">	Iterator is the application’s callback function that the database runtime calls when <code>CRUD</code> and some other events happen. The prototype for the callback is defined as the following in <code>mco.h</code>:</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>  
+    typedef MCO_RET (*mco_trans_iterator_callback_t)(mco_trans_h trans,
+    MCO_Hf* obj, int cid, int obj_state, void* user_ctx);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <ul>
+                    <li value="1"><code>	iterator_context</code> is the application's context passed into the callback through its last parameter <code>user_ctx</code>\</li>
+                </ul>
+                <h3>JSON output</h3>
+                <p>Though applications can use the generic format for the callback function and implement custom output format, implemented and included into <i>e</i>X<i>treme</i>DB<i> High Availability</i> distributions is an iterator that represents the database contents in <code>JSON</code> format (RFC 7159). The <code>JSON</code> converter synopsis as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    mco_trans_iterator_h mco_create_json_converter(mco_stream_h stream,
+    mco_json_converter_params_t *params);
+    &#160;</pre>
+                </div>
+                <p>The callback arguments are as follows:</p>
+                <ul>
+                    <li value="1"><![CDATA[	]]><code>stream</code> is a stream to write <code>JSON</code> values to. Must not be <code>NULL</code></li>
+                    <li value="2"><![CDATA[	]]><code>params</code> is an optional parameters struct as defined below (It can be <code>NULL</code>, in which case the default values described below are used:</li>
+                </ul>
+                <p>The <code>parameters</code> struct is defined as follows:</p>
+                <div class="code-block"><pre>&#160;
+    typedef struct {
+        mco_bool         compact;
+        mco_bool         ignore_stream_errors;
+        MCO_RET          last_error;
+        int              last_errno;
+    } mco_json_converter_params_t;
+    &#160;</pre>
+                </div>
+                <p>Where:</p>
+                <ul>
+                    <li value="1"><code>compact</code> If set to true (default) a compact <code>JSON</code> is generated (with no spaces). false generates human-readable <code>JSON</code> format.</li>
+                    <li value="2"><code>	ignore_stream_errors</code> indicates whether to ignore errors while writing <code>JSON</code> to a stream. If set to false (default), any stream error causes the HA replication to stop-- the <code><a href="../../Programming/C/HA_Functions/attach_master.htm">mco_HA_attach_master()</a></code> returns <code>MCO_E_WRITE_STREAM</code> error and stopReason is set to <code>MCO_HA_REPLICA_ITERATOR_ERROR</code>. If true, errors are ignored and replication continues.</li>
+                    <li value="3"><![CDATA[	]]><code>last_error</code> OUT: serves to return <code>MCO_E_</code>... errors from the <code>mco_create_json_converter()</code> function.</li>
+                    <li value="4"><code>	last_errno</code> OUT: serves to return an OS-level error (errno) from the <code>mco_create_json_converter()</code> function.</li>
+                </ul>
+                <p>The optional parameters are initialized with default values by calling:</p>
+                <div class="code-block"><pre>    &#160;
+    void mco_json_converter_params_init(mco_json_converter_params_t *params);
+    &#160;</pre>
+                </div>
+                <p>If successful, the function has allocated and returned a pointer to the <code href="../../Programming/C/Structures/Transaction.htm">mco_trans_iterator_t</code> structure (which is a common structure for all future iterator callback implementations) defined as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    typedef struct mco_trans_iterator_t {
+        mco_trans_iterator_callback_t callback;
+        MCO_RET                       last_error;
+        int                           last_errno;
+    } mco_trans_iterator_t, *mco_trans_iterator_h;
+    &#160;</pre>
+                </div>
+                <p>Note that the <a href="../../Programming/C/Structures/Transaction_Iterator_Callback.htm"><a href="../../Programming/C/Structures/Transaction.htm">mco_trans_iterator_t</a></a> represents a <code>header</code>, similar to a <code>base class</code> in C++ terminology. Any custom iterator adds its own custom fields that are allocated beyond the header.</p>
+                <p>Following is an example:</p>
+                <div class="code-block"><pre>&#160;
+    mco_trans_iterator_h json;
+    mco_stream_h stream;
+    mco_json_converter_params_t json_params; // declare parameters
+    stream = ... &lt;create stream, see below&gt; ...
+    &#160;
+    void mco_json_converter_params_init(&amp;json_params); // initialize parameters
+    json_params.compact = true; // change default parameter value
+    json = mco_create_json_converter(stream, &amp;json_params); // create JSON iterator
+    &#160;
+    if (! json) 
+    {
+        // Handle errors
+    }
+    &#160;
+    mco_HA_replica_params_t replica_params;
+    mco_HA_replica_params_init(&amp;replica_params);
+    replica_params.iterator         = json-&gt;callback; // set callback function
+    replica_params.iterator_context = json;           // set context
+    mco_HA_attach_master(db, conn_string, &amp;replica_params, stop_reason, timeout);
+    &#160;</pre>
+                </div>
+                <p>Database objects rendered to the <code>JSON</code> object stream are separated by <code>\0</code> (zero is not present in <code>JSON</code>). Therefore the stream can be processed as in the following code snippet (Java is used for simplicity):</p>
+                <div class="code-block"><pre>    &#160;
+    InputStream fis = (new java.net.Socket("127.0.0.1", 5566)).getInputStream();
+    java.util.Scanner s = new java.util.Scanner(fis).useDelimiter("\\\0");
+    while (s.hasNext()) 
+    {
+        JSONObject obj = new JSONObject(s.next());
+        .....
+    }
+    &#160;</pre>
+                </div>
+                <p>Each JSON object includes an operation field, which can be assigned one of the following values:</p>
+                <ul>
+                    <li value="1"><![CDATA[	]]><code>TRANS_BEGIN</code> – A transaction was started</li>
+                    <li value="2"><![CDATA[	]]><code>TRANS_END</code> - Transaction was completed via a <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/rollback.htm">rollback</a></code> or <code><a href="../../Programming/C/Core_Functions/Static/Transaction_Control/commit.htm">commit</a></code></li>
+                    <li value="3"><![CDATA[	]]><code>OBJ_NEW</code> - A new object was created inside a transaction</li>
+                    <li value="4"><![CDATA[	]]><code>OBJ_UPDATE</code> - An existing object was modified (inside a transaction)</li>
+                    <li value="5"><![CDATA[	]]><code>OBJ_DELETE</code> - An object was deleted inside a transaction</li>
+                    <li value="6"><![CDATA[	]]><code>DELETE_ALL</code> - All object from a class were erased (inside a transaction)</li>
+                    <li value="7"><![CDATA[	]]><code>DB_CLEAN</code> - Master application executed <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/clean.htm">mco_db_clean()</a></code> outside a transaction</li>
+                    <li value="8"><code>SCHEMA_CHANGED</code> - The database schema was modified outside a transaction</li>
+                </ul>
+                <p>In addition JSON objects for <code>OBJ_NEW</code>, <code>OBJ_UPDATE</code>, <code>OBJ_DELETE</code> and <code>DELETE_ALL</code> operations include a table field. The value of the field indicates the table (class name) the affected object(s) belongs to. For the <code>OBJ_NEW</code>, <code>OBJ_UPDATE</code> and <code>OBJ_DELETE</code> operations an object field is included into the <code>JSON</code> object. The object field layout (the structure and data fields types) corresponds to the database object layout. Note the following:</p>
+                <blockquote>
+                    <p>1.	Database arrays and vectors are represented via <code>JSON</code> arrays</p>
+                    <p>2.	Nested structures are represented as separate <code>JSON</code> objects</p>
+                    <p>3.	It is assumed that <code>char</code> and <code>string</code> database fields contain zero-terminated strings in the <code>UTF-8</code> format</p>
+                    <p>4.	<code>nchar</code> and <code>nstrings</code> database field values are zero-terminated <code>UTF-16</code> strings</p>
+                    <p>5.	<code>wchar</code> and <code>wstring</code> values are zero-terminated <code>UTF-32</code> strings</p>
+                    <p>6.	<code>BLOB</code>s are represented as base64 <code>JSON</code> strings</p>
+                    <p>7.	<code>NULL</code> values and missing optional structure values are represented through the <code>JSON</code> -integrated literal null</p>
+                </blockquote>
+                <p>For example, for the following SQL layout and content:</p>
+                <div class="code-block"><pre>&#160;
+    create table a (i int, j int, s string);
+    insert into a values (1,2,'test');
+    &#160;</pre>
+                </div>
+                <p>The following <code>JSON</code> would be generated:</p>
+                <div class="code-block"><pre>    &#160;
+    {
+    "operation":"SCHEMA_CHANGED"
+    }
+    {
+    "operation":"TRANS_BEGIN"
+    }
+    {
+        "operation":"OBJ_NEW",
+        "table":"a",
+        "object":{
+        "auto_oid@":1,
+        "i":1,
+        "j":2,
+        "s":"test"
+        }
+    }
+    {
+        "operation":"TRANS_END"
+    }
+    &#160;</pre>
+                </div>
+                <h2>Extended <i>e</i>X<i>treme</i>DB Streams</h2>
+                <p>The <i>e</i>X<i>treme</i>DB runtime customarily uses streams to output the database content to an external media and to import data into the database from an external media or a storage device. The <i>e</i>X<i>treme</i>DB export / import APIs, <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/save.htm">mco_db_save()</a></code> and <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/load.htm">mco_db_load()</a></code> and some other functions use read- and write-streams to import / export data. The iterator extends stream functions with the ability to retain and then return error information from the stream back to the calling application or database runtime. The stream is represented through the <code>mco_stream_h</code> structure defined as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    typedef struct mco_stream_t {
+        mco_stream_write writer;
+        MCO_RET          (*close) (struct mco_stream_t *self);
+        MCO_RET          last_error;
+        int              last_errno;
+    } mco_stream_t, *mco_stream_h;
+    &#160;</pre>
+                </div>
+                <p>Here:</p>
+                <ul>
+                    <li value="1"><![CDATA[	]]><code>writer</code> is a standard <i>e</i>X<i>treme</i>DB <code href="../../Programming/C/Structures/Stream_Writer.htm">stream_writer</code>:</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    typedef mco_size_sig_t(*mco_stream_write)(void* stream_handle,
+                            const void* from, mco_size_t nbytes);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <ul>
+                    <li value="1"><code>close</code> represents the stream <code>destructor</code></li>
+                    <li value="2"><code>last_error</code> are <code>MCO_E</code>_... errors</li>
+                    <li value="3"><code>last_errno</code> are OS-level errno values</li>
+                </ul>
+                <p>Currently implemented are file-based, server_socket - based, client_socket –based and tee_stream -based stream functions.</p>
+                <h3>File-based stream</h3>
+                <p>File streams are created with either of the following functions:</p>
+                <div class="code-block"><pre>&#160;
+    mco_stream_h mco_create_mcofile_stream(const char *filename,
+                            mco_file_stream_params_t *params);
+    &#160;</pre>
+                </div>
+                <p>or</p>
+                <div class="code-block"><pre>&#160;
+    mco_stream_h mco_create_stdfile_stream(const char *filename,
+                            mco_file_stream_params_t *params);
+    &#160;</pre>
+                </div>
+                <p>The first function makes use of the <i>e</i>X<i>treme</i>DB <code>fs</code> library through the <code>mco_file_h</code> handle, while the second uses the standard I/O (<code>stdio.h</code>) <code>FILE*</code> handle. Currently the only required parameter is the filename, which indicates the file name to write to, it must not be <code>NULL</code>. There are no optimal parameters at present, and the stream parameters structure only includes fields where to return errors received from the stream:</p>
+                <div class="code-block"><pre>&#160;
+    typedef struct {
+        MCO_RET          last_error;
+        int              last_errno;
+    } mco_file_stream_params_t;
+&#160;</pre>
+                </div>
+                <p>However in the future some additional optional parameters (such as encryption) are possible, so the following function is called to initialize them:</p>
+                <div class="code-block"><pre>&#160;
+    void mco_file_stream_params_init(mco_file_stream_params_t *params);
+    &#160;</pre>
+                </div>
+                <p>Following is a usage example:</p>
+                <div class="code-block"><pre>&#160;
+    mco_stream_h stream;
+    mco_file_stream_params_t file_params;
+    mco_file_stream_params_init(&amp;file_params);
+    stream = mco_create_stdfile_stream("myfile.txt", &amp;file_params);
+    &#160;</pre>
+                </div>
+                <p>or</p>
+                <div class="code-block"><pre>&#160;
+    mco_stream_h stream = mco_create_stdfile_stream("myfile.txt", 0);
+    &#160;</pre>
+                </div>
+                <h3>Server-socket stream</h3>
+                <p>The following function is called to create a server-socket stream:</p>
+                <div class="code-block"><pre>    &#160;
+    mco_stream_h mco_create_server_socket_stream(int port, mco_server_socket_stream_params_t *params);
+    &#160;</pre>
+                </div>
+                <p>The only required parameter is the port number to listen on. Optional parameters are defined by the following structure:</p>
+                <div class="code-block"><pre>    &#160;
+    typedef struct {
+        timer_unit        write_timeout;
+        mco_size_t        buffer_size;
+        mco_size_t        max_clients;
+        const char       *net_interface;
+        mco_sock_params_t sock_params;
+        MCO_RET           last_error;
+        int               last_errno;
+    } mco_server_socket_stream_params_t;
+    &#160;</pre>
+                </div>
+                <p>Where:</p>
+                <ul>
+                    <li value="1"><code>write_timeout</code> is the write socket timeout in milliseconds The default is 1000 (1 second)</li>
+                    <li value="2"><code>buffer_size</code> indicates the size of the buffer accumulating data to pass to the socket <code>send()</code> function. In bytes, the default is <code>16*1024</code></li>
+                    <li value="3"><code>max_clients</code> - the maximum number of concurrently connected clients. The default is <code>16</code></li>
+                    <li value="4"><code>net_interface</code> - network interface address to listen on. The default is <code>0.0.0.0</code> -- all interfaces</li>
+                    <li value="5"><code>sock_params</code> - socket parameters: <code>type</code>, <code>domain</code>, <code>SSL</code>, etc.,</li>
+                    <li value="6"><code>last_error</code> - OUT: serves to return <code>MCO_E_</code>... errors from the <code>mco_create_server_socket_stream()</code> function</li>
+                    <li value="7"><code>last_errno</code> - OUT: serves to return OS-level error (errno) from the <code>mco_create_server_socket_stream()</code> function</li>
+                </ul>
+                <h3>Client-socket stream</h3>
+                <p>The following function is called to create a client-socket stream:</p>
+                <div class="code-block"><pre>    &#160;
+    mco_stream_h mco_create_client_socket_stream(const char *hostname, int port,
+    mco_client_socket_stream_params_t *params);
+    &#160;</pre>
+                </div>
+                <p>The required arguments are <code>hostname</code> (the name and IP addresses) and <code>port</code> (the port number). Optional parameters are defined by the following structure:</p>
+                <div class="code-block"><pre>    &#160;
+    typedef struct {
+        timer_unit        write_timeout;
+        timer_unit        connect_timeout;
+        int               connect_attempts;
+        timer_unit        connect_interval;
+        mco_bool          auto_reconnect;
+        mco_size_t        buffer_size;
+        mco_sock_params_t sock_params;
+        MCO_RET           last_error;
+        int               last_errno;
+    } mco_client_socket_stream_params_t;
+    &#160;</pre>
+                </div>
+                <p>Where:</p>
+                <ul>
+                    <li value="1"><code>write_timeout</code> - write socket timeout in milliseconds The default is 1000 (1 second)</li>
+                    <li value="2"><code>connect_timeout</code> - a timeout for the <code>connect()</code> function in milliseconds. The default is 2000 (2 seconds)</li>
+                    <li value="3"><code>connect_attempts</code> - A number of attempts to call <code>connect()</code> until the connection has been established. By default 3</li>
+                    <li value="4"><code>connect_interval</code> - how long to wait before attempting to <code>connect()</code> again after unsuccessful attempt. By default no wait –0</li>
+                    <li value="5"><code>buffer_size</code> - indicates the size of the buffer accumulating data to pass to the socket <code>send()</code> function. In bytes, the default is <code>16*1024</code></li>
+                    <li value="6"><code>sock_params</code> - socket parameters: type, domain, <code>SSL</code>, etc.,</li>
+                    <li value="7"><code>last_error</code> - OUT: serves to return <code>MCO_E_</code>... errors from the <code>mco_create_client_socket_stream()</code> function</li>
+                    <li value="8"><code>last_errno</code> - OUT: serves to return OS-level error (errno) from the <code>mco_create_client_socket_stream()</code> function</li>
+                </ul>
+                <p>Default values are initialized by calling:</p>
+                <div class="code-block"><pre>    &#160;
+    void mco_client_socket_stream_params_init(mco_client_socket_stream_params_t *params);
+    &#160;</pre>
+                </div>
+                <p>Following is a usage example:</p>
+                <div class="code-block"><pre>    &#160;
+    mco_stream_h stream;
+    mco_client_socket_stream_params_t stream_params;
+    mco_client_socket_stream_params_init(&amp;stream_params);
+    stream_params.connect_timeout = 3000; // change connect timeout
+    // connect to myhost.com:10023
+    stream = mco_create_client_socket_stream("myhost.com", 10023, &amp;stream_params);
+    &#160;</pre>
+                </div>
+                <p>or</p>
+                <div class="code-block"><pre>    &#160;
+    // connect to myhost.com:10023
+    mco_stream_h stream = mco_create_client_socket_stream("myhost.com", 10023, 0);
+    &#160;</pre>
+                </div>
+                <h3>Tee stream</h3>
+                <p>A tee-stream allows the iterator to write into two separate output streams simultaneously. For example one of the output streams can be a socket, while the other could be a file. Tee streams can be nested.</p>
+                <p>The following function is called to create a tee-stream:</p>
+                <div class="code-block"><pre>    &#160;
+    mco_stream_h mco_create_tee_stream(mco_stream_h stream1,
+    mco_stream_h stream2, mco_bool any_ok);
+    &#160;</pre>
+                </div>
+                <p>Where:</p>
+                <ul>
+                    <li value="1"><![CDATA[	]]><code>stream1</code> – the first output stream</li>
+                    <li value="2"><code>stream2</code> - the second output stream</li>
+                    <li value="3"><![CDATA[	]]><code>any_ok</code> - if set to true, the write is deemed successful if the data was written successfully into any of the output streams. If set to false, both writes must have succeeded</li>
+                </ul>
+                <p>Following is a usage example:</p>
+                <div class="code-block"><pre>    &#160;
+    // create file stream
+    mco_stream_h file_stream   = mco_create_stdfile_stream("file.txt", 0);
+    &#160;
+    // create socket stream
+    mco_stream_h socket_stream = mco_create_client_socket_stream("myhost.com",
+                                        10023, 0);
+    // join file and socket stream
+    mco_stream_h tee_stream    = mco_create_tee_stream(file_stream, socket_stream, false);
+    &#160;
+    // create JSON iterator writing to both file and socket
+    mco_trans_iterator_h json  = mco_create_json_converter(tee_stream, 0);
+    &#160;</pre>
+                </div>
+                <h3>Custom stream</h3>
+                <p>It is possible to inherit the functionality of an existing stream implementations and create a custom stream handle <code>mco_stream_h</code> based on the existing <code>stream_handle</code> and <code>stream_writer</code>:</p>
+                <div class="code-block"><pre>    &#160;
+    mco_stream_h mco_create_custom_stream(void* stream_handle, 
+                    mco_stream_write output_stream_writer, 
+                    MCO_RET(*close)(void *));
+    &#160;</pre>
+                </div>
+                <p>Where:</p>
+                <ul>
+                    <li value="1"><code>stream_handle</code> –stream context</li>
+                    <li value="2"><code>stream_writer</code> - the stream function</li>
+                    <li value="3"><code>close</code> - stream <code>destructor</code>, can be <code>NULL</code></li>
+                </ul>
+                <p>Following is a usage example:</p>
+                <div class="code-block"><pre>    &#160;
+    static mco_size_sig_t file_writer(void* stream_handle, const void* from, mco_size_t nbytes)
+    {
+        FILE *f = (FILE *) stream_handle;
+        return fwrite(from, 1, nbytes, f);
+    }
+        &#160;
+    FILE *f = fopen(filename, "w");
+    mco_stream_h stream = mco_create_custom_stream(f, file_writer,(MCO_RET (*)(void*)) fclose);
+        &#160;</pre>
+                </div>
+                <h2>Notes</h2>
+                <ul>
+                    <li value="1">In case of errors all the above <code>mco_create_XXX_stream()</code> functions return <code>NULL</code> and set the appropriate error codes in <code>params-&gt;last_error</code> and <code>params_last_errno</code> (if defined)</li>
+                    <li value="2">If a stream is destroyed, all nested streams are destroyed as well. For example for the tee stream:</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    MCO_RET mco_destroy_stream(mco_stream_h s);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <ul>
+                    <li value="1">	When the iterator is destroyed, all dependent resources (streams) are also destroyed: </li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    MCO_RET mco_destroy_trans_iterator(mco_trans_iterator_h t);
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <blockquote>
+                    <p>For example:</p>
+                    <div class="code-block"><pre>&#160;
+    // create file stream
+    mco_stream_h file_stream   = mco_create_stdfile_stream("file.txt", 0);
+    &#160;
+    // create socket stream 
+    mco_stream_h socket_stream = mco_create_client_socket_stream("myhost.com", 10023, 0);
+    &#160;
+    // join file and socket stream
+    mco_stream_h tee_stream    = mco_create_tee_stream(file_stream,
+    socket_stream, false);
+    &#160;
+    // create JSON iterator writing to both file and socket
+    mco_trans_iterator_h json  = mco_create_json_converter(tee_stream, 0);
+    &#160;
+    //... Use iterator ...
+    mco_destroy_trans_iterator(json);
+    &#160;
+    // Don't call mco_destroy_stream() for file_stream, socket_stream, tee_stream
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <ul>
+                    <li value="1">	The iterator and the <code>mco_stream_h</code> are implemented in the <code>target/mcoiter</code> library. This library makes use only of the <i>e</i>X<i>treme</i>DB public API (<code>mco.h</code>, <code>mcouda.h</code> and <code>mconet.h</code>). In addition the standard I/O (<code>stdio.h</code>) is utilized for the <code>mco_create_stdfile_stream()</code>. The use of the stdio can be turned off through the pound-define <code>MCO_STDIO_FILE_STREAM</code> in the <code>target/mcoiter/mcoiter.c</code> file:</li>
+                </ul>
+                <blockquote>
+                    <div class="code-block"><pre>    &#160;
+    #define MCO_STDIO_FILE_STREAM 0
+    &#160;</pre>
+                    </div>
+                </blockquote>
+                <p>&#160;</p>
+                <p>Finally, the "new style" streams can also be used with the <i>e</i>X<i>treme</i>DB API functions written for the "old style" streams. The following snippet illustrates how to connect to the server and export the database content using the <code><a href="../../Programming/C/Core_Functions/Static/Database_Control/save.htm">mco_db_save()</a></code> API and the "new style" socket stream:</p>
+                <div class="code-block"><pre>    &#160;
+    mco_stream_h socket_stream = mco_create_client_socket_stream("myhost.com", 10023, 0);
+    if (socket_stream) 
+    {
+        mco_db_save(socket_stream, socket_stream-&gt;writer, connection);
+        mco_destroy_stream(socket_stream);
+    }
+    &#160;</pre>
+                </div>
+                <p><b style="font-style: italic;">Java API</b>
+                </p>
+                <p>The Java-based iterator makes use of the standard Java <i>OutputStream</i> to output database content. The iterators themselves are defined in the <i>TransIterator</i> class:</p>
+                <div class="code-block"><pre>    &#160;
+    public class TransIterator {
+    public abstract static class Iterator 
+    {
+        public void close();
+    }
+    &#160;
+    public static class JsonConverter extends Iterator 
+    {
+        public JsonConverter(java.io.OutputStream os, boolean compact,
+                    boolean ignoreStreamErrors);
+                    &#160;
+    public JsonConverter(java.io.OutputStream os);
+    }
+}</pre>
+                </div>
+                <p>Here the <i>TransIterator.Iterator</i> represents the base class for all interior types and <i>TransIterator.JsonConverter</i> implements the JSON-based iterator.</p>
+                <p>Following is an example for the JSON iterator writing into a file:</p>
+                <div class="code-block"><pre>    &#160;
+    ReplicaConnection con = new ReplicaConnection(db);
+    ReplicaConnection.Parameters replParams = new ReplicaConnection.Parameters();
+    replParams.iterator = new TransIterator.JsonConverter(new java.io.FileOutputStream("myfile.txt"), false, false);
+    con.attachMaster(connectionString, replParams, CONNECT_TIMEOUT);
+    replParams.iterator.close();
+    &#160;</pre>
+                </div>
+                <p style="font-weight: bold;font-style: italic;">C# API</p>
+                <p>Similar to Java the standard .NET <code>input/output</code> streams are used:</p>
+                <div class="code-block"><pre>    &#160;
+    public class TransIterator
+    {
+        public abstract class Iterator
+        {
+            public Iterator(Connection con);
+            public void Close();
+        }
+        public class JsonIterator : Iterator
+        {
+            public JsonIterator(Connection con, System.IO.Stream s, bool compact,
+            bool ignore_stream_errors);
+            public JsonIterator(Connection con, System.IO.Stream s);
+        }
+    }
+    &#160;</pre>
+                </div>
+                <p>Following is an example for the <code>JSON</code> iterator writing into a file:</p>
+                <div class="code-block"><pre>    &#160;
+    ReplicaConnection con = new ReplicaConnection(db);
+    ReplicaConnection.Parameters replParams = new ReplicaConnection.Parameters();
+    replParams.Iterator = new TransIterator.JsonIterator(con, new System.IO.FileStream("myfile.txt", System.IO.FileMode.Create));
+    con.AttachMaster(connectionString, replParams, CONNECT_TIMEOUT);
+    replParams.Iterator.Close();
+    &#160;</pre>
+                </div>
+                <p style="font-weight: bold;font-style: italic;">Python API</p>
+                <p>The Python API is a wrapper around the C language <code>mco_stream_h</code>. As such most Python methods and their parameters are the same as the corresponding C functions.</p>
+                <p>To create a file-stream:</p>
+                <div class="code-block"><pre>&#160;
+    def create_file_stream(filename)
+    &#160;</pre>
+                </div>
+                <p>To create a Server <code>(listen=True)</code> and client stream <code>(listen= False)</code>:</p>
+                <div class="code-block"><pre>    &#160;
+    def create_socket_stream(hostname, port, listen = False,
+    write_timeout = -1, buffer_size = -1, max_clients = -1,
+    connect_timeout = -1, connect_attempts = -1, c
+    onnect_interval = -1, reconnect = -1, socket_domain = -1 )
+    &#160;</pre>
+                </div>
+                <p>Note that for the server type socket the <code>hostname</code> can be None. If the hostname is not equal to None, then it corresponds to the <code>mco_server_socket_stream_params_t::net_interface</code>. The <code>buffer_size</code>, <code>write_timeout</code>, <code>socket_domain</code> parameters are common for both the client and the server sockets, while the <code>max_clients</code> parameter is defined only for the server, and <code>connect_timeout</code>, <code>connect_attempts</code>, <code>connect_interval</code>, reconnect only for the client sockets.</p>
+                <p>Following is an example for the <code>JSON/Tee</code> stream usage:</p>
+                <div class="code-block"><pre>    &#160;
+    db = exdb.open_database(dbname="rpldb", dictionary=dict, is_disk=is_disk,
+    log_params=log_params)
+    sock_stream = exdb.create_socket_stream("myhost.com", 10023, listen=False,
+    write_timeout=200);
+    file_stream = exdb.create_file_stream("out1.txt");
+    tee_stream  = exdb.create_tee_stream(sock_stream, file_stream);
+    json_ierator = exdb.create_json_iterator(tee_stream);
+    replcon = exdb.ReplicaConnection(db)
+    params = exdb.ReplicaConnectionParameters()
+    params.iterator = json_iterator;
+    replcon.attachMaster(ha_replica_connstr, params, CONNECT_TIMEOUT):
+    exdb.destroy_trans_iterator(params.iterator);
+    &#160;</pre>
+                </div>
+                <p><b style="font-style: italic;">xSQL API</b>
+                </p>
+                <p>For <code><span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span></code> the iterator is described in the configuration file in the form of a <code>JSON</code> object. Each iterator contains a type field, which currently must be set to <code>json</code>. Other fields and their values depend on the iterator type. For the <code>json</code> type the fields are <code>stream</code>, <code>compact</code> (optional, boolean) and <code>ignore_stream_errors</code> (optional, boolean)<span style="color: #000000;">.</span></p>
+                <p>The Stream is also defined in the configuration file. The type of the stream can be <code>file</code>, <code>socket</code> or <code>tee</code>. Other fields and their values depend on the stream type.</p>For type <code>file</code>:<div class="code-block"><pre>    &#160;
+    {
+        type : "file",
+        name : "myfile" # имя файла
+    }
+    &#160;
+    *type: "socket", listen: true (server-side socket:
+    {
+        type : "socket",
+        listen : true,
+        port   : 10000, # listen port
+    &#160;
+        buffer_size : 1k,  # optional, mco_server_socket_stream_params_t::buffer_size
+        max_clients : 3,   # optional, mco_server_socket_stream_params_t::max_clients
+        net_interface : 192.168.0.3, # optional, mco_server_socket_stream_params_t::net_interface
+        write_timeout : 1000,  # optional, mco_server_socket_stream_params_t::write_timeout
+        &#160;
+        sock_params : {   # optional
+            domain : "inet" # other options are "local" or "sdp", 
+                        # mco_server_socket_stream_params_t::sock_params::domain
+            mode   : ["nodelay"], # combination of "nodelay", "do_not_reuse_address", 
+                        # "non_blocking", "keep_alive" or 
+                        # "do_not_cloexec", mco_server_socket stream_params_t::sock_params::mode
+            sndbuf : 16k, # mco_server_socket_stream_params_t::sock_params::sndbuf
+            use_ssl : false, # apply "ssl_params" for this socket or not
+        }
+    }
+    &#160;</pre></div><p>For type <code>socket</code>, <code>listen: false (client socket)</code>:</p><div class="code-block"><pre>&#160;
+    {
+        type : "socket",
+        listen : false,
+        hostname : "192.168.0.1" # host to connect to,
+        port     : 10023 # port to connect
+        auto_reconnect : true,  # optional, mco_client_socket_stream_params_t::auto_reconnect
+        buffer_size : 1k,   # optional, mco_client_socket_stream_params_t::buffer_size
+        connect_attempts : 3,   # optional, mco_client_socket_stream_params_t::connect_attempts
+        connect_interval : 1000, # optional, mco_client_socket_stream_params_t::connect_attempts
+        connect_timeout : 2000, # optional, mco_client_socket_stream_params_t::connect_timeout
+        write_timeout : 500, # optional, mco_client_socket_stream_params_t::write_timeout
+        &#160;
+        sock_params : { optional,
+        domain : "inet" # other options are "local" or "sdp", 
+                    # mco_server_socket_stream_params_t::sock_params::domain
+        mode   : ["nodelay"], # combination of "nodelay", "do_not_reuse_address", 
+                    # "non_blocking", "keep_alive" or 
+                    # "do_not_cloexec", mco_server_socket_stream_params_t::sock_params::mode
+        sndbuf : 16k, # mco_server_socket_stream_params_t::sock_params::sndbuf
+        use_ssl : false, # apply "ssl_params" for this socket or not
+        }
+    }
+    &#160;</pre></div><p>For type <code>tee</code>:</p><div class="code-block"><pre>    &#160;
+    {
+        type : "tee",
+        stream1 : {
+            ...
+        }
+        stream2 : {
+            ...
+        }
+    }
+    &#160;</pre></div><p>For example, the following configuration defines a replica-side <code>JSON</code> iterator that writes the file called <code>myfile.txt</code> and into a socket <code>127.0.0.1:10023</code></p><div class="code-block"><pre>    &#160;
+    ha_params : {
+        connection_strings : "127.0.0.1:10000",
+        &#160;
+        replica_params : {
+            iterator : {
+            type : "json",
+            compact : false,
+            stream : {
+                type   : "tee",
+                stream1 : {
+                    type     : "socket",
+                    listen   : false,
+                    hostname : "127.0.0.1",
+                    port     : 10023,
+                },
+    &#160;
+                stream2 : {
+                    type : "file",
+                    name : "myfile.txt"
+                }
+             }
+          }
+       }
+    }
+    &#160;</pre></div></blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

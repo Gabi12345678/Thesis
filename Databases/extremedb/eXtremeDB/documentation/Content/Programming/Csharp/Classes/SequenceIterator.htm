@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The Java SequenceIterator Class </title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <h1>The Java  <i>SequenceIterator</i>  Class </h1>
+            <p><i>SequenceIterator</i> is used to iterate <code><a href="../../../Users_Guides/Core/Sequences.htm">sequence</a></code> fields. Note that iteration is performed in tile mode; i.e. more than one <code><a href="../../../Users_Guides/Core/Sequences.htm">sequence</a></code> items are fetched at each iteration.</p>
+            <p>All these items in the tile can be obtained using method <code>tileItems()</code>. The main iterator method is <code>nextTile()</code> which position the iterator on the next tile. The size of a tile is implementation specific; currently the size is 100 items but at the end of a sequence the tile may be shorter.</p>
+            <p>An alternative way of performing iteration is to use the <code>get()</code> method. This method extracts items into a provided array. If iteration in scalar mode (item-by-item) is preferred, then an array with size 1 can be passed to the <code>get()</code> method.</p>
+            <h3>For an overview see page <a href="../Java_Classes.htm">Java Classes</a></h3>
+            <h3>Class Definitions</h3>
+            <div class="code-block"><pre>&#160;
+    public  class SequenceIterator implements java.io.Closeable
+    {
+        long handle;
+        &#160;
+        SequenceIterator(long hnd) 
+        {
+            handle = hnd;
+        }
+        &#160;
+        // Iterator Methods
+        public int get(Object buffer)  {…};
+           public Object next()  {…};
+        public int nextInt()  {…};
+        public long nextLong()  {…};
+        public float nextFloat()  {…};
+        public byte[] nextBytes()  {…};
+        public String nextString()  {…};
+        public Date nextDate()  {…};
+        public long firstPosition()  {…};
+        public long lastPosition()  {…};
+        public long nextPosition()  {…};
+        public boolean nextTile()  {…};
+        public int elemSize()  {…};
+        public Object tileItems()  {…};
+        
+        public Sequence.Type type()  {…};
+        static native public boolean isRLE()  {…};
+        public int itemRepeatCount(int i)  {…};
+        public SequenceIterator rleDecode()  {…};
+        public void reset()  {…};
+        
+        public void close()  {…};
+        
+        &#160;
+        // Top Operations
+        public SequenceIterator topMax(int top)   {…};
+        public SequenceIterator topMin(int top)   {…};
+        public SequenceIterator topPosMax(int top)   {…};
+        public SequenceIterator topPosMin(int top)   {…};
+        &#160;
+        // Unary Operations
+        public SequenceIterator abs()  {…};
+        public SequenceIterator neq()   {…};
+        public SequenceIterator match(String pattern)  {…};
+        &#160;
+        // Binary Operations
+        public SequenceIterator add(SequenceIterator other)  {…};
+        public SequenceIterator sub(SequenceIterator other)  {…};
+        public SequenceIterator div(SequenceIterator other)  {…};
+        public SequenceIterator mul(SequenceIterator other)  {…};
+        public SequenceIterator mod(SequenceIterator other)  {…};
+        public SequenceIterator max(SequenceIterator other)  {…};
+        public SequenceIterator min(SequenceIterator other)  {…};
+        &#160;
+        // Comparison_Operators
+        public SequenceIterator eq(SequenceIterator other)  {…};
+        public SequenceIterator ne(SequenceIterator other)  {…};
+        public SequenceIterator lt(SequenceIterator other)  {…};
+        public SequenceIterator gt(SequenceIterator other)  {…};
+        public SequenceIterator le(SequenceIterator other)  {…};
+        public SequenceIterator ge(SequenceIterator other)  {…};
+        &#160;
+        // Logical Operators
+        public SequenceIterator and(SequenceIterator other)  {…};
+        public SequenceIterator or(SequenceIterator other)  {…};
+        public SequenceIterator xor(SequenceIterator other)  {…};
+        public SequenceIterator not()  {…};
+        &#160;
+        // Collapse Operations
+        public SequenceIterator wsum(SequenceIterator weights)  {…};
+        public SequenceIterator wavg(SequenceIterator weights)  {…};
+        public SequenceIterator cov(SequenceIterator other)  {…};
+        public SequenceIterator corr(SequenceIterator other)  {…};
+        &#160;
+        // Conditional Operations
+        public SequenceIterator iif(SequenceIterator then, 
+            SequenceIterator otherwise, boolean lazy)   {…};
+        public SequenceIterator filter(SequenceIterator cond)   {…};
+        public SequenceIterator filterPos()   {…};
+        &#160;
+        // Grand Aggregate
+        public SequenceIterator aggCount()   {…};
+        
+        public SequenceIterator aggMax()   {…};
+        
+        public SequenceIterator aggMin()   {…};
+        
+        public SequenceIterator aggSum()   {…};
+        
+        public SequenceIterator aggPrd()   {…};
+        
+        public SequenceIterator aggAvg()   {…};
+        
+        public SequenceIterator aggVar()   {…};
+        public SequenceIterator aggDev()   {…};
+        public SequenceIterator aggVarSamp()   {…};
+        public SequenceIterator aggDevSamp()   {…};
+        public SequenceIterator aggApproxDC()   {…};
+        public SequenceIterator aggApproxHashDC()   {…};
+        public SequenceIterator aggMinMax()   {…};
+        &#160;
+        // Group-By Aggregate
+        public SequenceIterator groupAggWavg(SequenceIterator weight, SequenceIterator groupBy)   {…};
+        public SequenceIterator groupAggMax(SequenceIterator groupBy)   {…};
+        public SequenceIterator groupAggMin(SequenceIterator groupBy)   {…};
+        public SequenceIterator groupAggSum(SequenceIterator groupBy)   {…};
+        public SequenceIterator groupAggAvg(SequenceIterator groupBy)   {…};
+        public SequenceIterator groupAggVar(SequenceIterator groupBy)   {…};
+        public SequenceIterator groupAggDev(SequenceIterator groupBy)   {…};
+        public SequenceIterator groupAggVarSamp(SequenceIterator groupBy)   {…};
+        public SequenceIterator groupAggDevSamp(SequenceIterator groupBy)   {…};
+        public SequenceIterator groupAggFirst(SequenceIterator groupBy)   {…};
+        public SequenceIterator groupAggLast(SequenceIterator groupBy)   {…};
+        public SequenceIterator groupAggCount()   {…};
+        public SequenceIterator groupAggApproxDC(SequenceIterator groupBy)   {…};
+        public SequenceIterator groupAggApproxHashDC(SequenceIterator groupBy)   {…};
+        &#160;
+        // Grid Aggregate
+        public SequenceIterator gridAggMax(int interval)   {…};
+        public SequenceIterator gridAggMin(int interval)   {…};
+        public SequenceIterator gridAggSum(int interval)   {…};
+        public SequenceIterator gridAggAvg(int interval)   {…};
+        public SequenceIterator gridAggVar(int interval)   {…};
+        public SequenceIterator gridAggDev(int interval)   {…};
+        public SequenceIterator gridAggVarSamp(int interval)   {…};
+        public SequenceIterator gridAggDevSamp(int interval)   {…};
+        &#160;
+        // Window Aggregate
+        public SequenceIterator windowAggMax(int interval)   {…};
+        public SequenceIterator windowAggMin(int interval)   {…};
+        public SequenceIterator windowAggSum(int interval)   {…};
+        public SequenceIterator windowAggAvg(int interval)   {…};
+        public SequenceIterator windowAggVar(int interval)   {…};
+        public SequenceIterator windowAggDev(int interval)   {…};
+        public SequenceIterator windowAggVarSamp(int interval)   {…};
+        public SequenceIterator windowAggDevSamp(int interval)   {…};
+        public SequenceIterator windowAggEma(int period)   {…};
+        public SequenceIterator windowAggAtr(int period)   {…};
+        &#160;
+        // Hash Aggregate
+        public GroupByResult hashAggMax(SequenceIterator groupBy, int nGroups)   {…};
+        public GroupByResult hashAggMin(SequenceIterator groupBy, int nGroups)   {…};
+        public GroupByResult hashAggSum(SequenceIterator groupBy, int nGroups)   {…};
+        public GroupByResult hashAggAvg(SequenceIterator groupBy, int nGroups)   {…};
+        public GroupByResult hashAggCount(int nGroups)   {…};
+        public GroupByResult hashAggApproxdc(SequenceIterator groupBy, int nGroups)   {…};
+        public GroupByResult hashAggDistinctCount(SequenceIterator groupBy, int nGroups, int nPairs)   {…};
+        public GroupByResult hashAggDupCount(SequenceIterator groupBy, int nGroups, int nPairs, int minOccurrences)   {…};
+        &#160;
+        // Cumulative Aggregate
+        public SequenceIterator cumAggMax()   {…};
+        public SequenceIterator cumAggMin()   {…};
+        public SequenceIterator cumAggSum()   {…};
+        public SequenceIterator cumAggPrd()   {…};
+        public SequenceIterator cumAggAvg()   {…};
+        public SequenceIterator cumAggVar()   {…};
+        public SequenceIterator cumAggDev()   {…};
+        public SequenceIterator cumAggVarSamp()   {…};
+        public SequenceIterator cumAggDevSamp()   {…};
+        &#160;
+        // Sequence Manipulator Operations
+        public static SequenceIterator parse(String val, Sequence.Type type) {…};
+        public SequenceIterator map(SequenceIterator positions)  {…};
+        public SequenceIterator[] tee()
+        public static SequenceIterator constant(double val, Sequence.Type type)  {…};
+        public static SequenceIterator constant(long val, Sequence.Type type)  {…};
+        public static SequenceIterator constant(byte[] val, Sequence.Type type)  {…};
+        public SequenceIterator concat(SequenceIterator tail)  {…};
+        public SequenceIterator cat(SequenceIterator other)  {…};
+        public SequenceIterator unique()   {…};
+        public SequenceIterator normalize()   {…};
+        public SequenceIterator thin(long origin, long step)   {…};
+        public SequenceIterator limit(long from, long till)   {…};
+        public SequenceIterator reverse()   {…};
+        public SequenceIterator diff()   {…};
+        public SequenceIterator trend()   {…};
+        public SequenceIterator repeat(int count)   {…};
+        public SequenceIterator stretch(SequenceIterator ts1, SequenceIterator ts2, long filler)   {…};
+        public SequenceIterator stretch(SequenceIterator ts1, SequenceIterator ts2, double filler)   {…};
+        public SequenceIterator stretch0(SequenceIterator ts1, SequenceIterator ts2, long filler)   {…};
+        public SequenceIterator stretch0(SequenceIterator ts1, SequenceIterator ts2, double filler)   {…};
+        public SequenceIterator asofJoin(SequenceIterator ts1, SequenceIterator ts2)   {…};
+        public SequenceIterator cast(Sequence.Type type)   {…};
+        public SequenceIterator cross(int firstCrossDirection)   {…};
+        public SequenceIterator extrema(int firstExtremum)   {…};
+        public SequenceIterator hash()   {…};
+        
+        public SequenceIterator hash(SequenceIterator other)   {…};
+        
+        &#160;
+        // Miscellaneous
+        public SequenceIterator histogram(long low, long high, int nIntervals)   {…};
+        public SequenceIterator histogram(double low, double high, int nIntervals)   {…};
+        public void sort(Object arr, long[] permutation, Sequence.Order order)   {…};
+        &#160;
+    };
+    &#160;</pre>
+            </div>
+            <h3>Methods</h3>
+            <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                <col class="TableStyle-FunctionReference-Column-Column2" style="width: 364px;" />
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><b>SequenceIterator</b>(long hnd)</code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Constructor: return a <i>SequenceIterator</i> instance</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/Iterator_Methods.htm">get(), next(), nextInt(), nextLong(), nextFloat(), nextDouble(), nextBytes(), nextString(), nextDate(), firstPosition(), lastPosition(), nextPosition(), nextTile(), elemSize(), tileSize(), type(), isRLE(), itemRepeatCount(), rleDecode(), reset(), close()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="Analytics_Methods/Iterator_Methods.htm">Iterator methods</a> are used to extract and iterate  the object's sequence elements, determine the  sequence element type, size and position within the <i>iterator's</i> sequence, determine the sequence <a href="../../../Users_Guides/Core/RLE_Compression.htm">tile</a> size, and, for <a href="../../../Users_Guides/Core/RLE_Compression.htm">RLE</a> encoded sequences, determine the repeat count or decode the <a href="../../../Users_Guides/Core/RLE_Compression.htm">RLE</a> sequence to a non-RLE sequence</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/Top_Methods.htm">topMax(), topMin(), topPosMax(), topPosMin()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="Analytics_Methods/Top_Methods.htm">Top methods</a> produce result sequences of the top <code>n</code> maximum or minimum elements or their positions</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/Unary_Operators.htm">abs(), neg(), match()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="Analytics_Methods/Unary_Operators.htm">Unary methods</a> returning the sequence of absolute values, negatives or a boolean sequence indicating the elements that match the given string</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/Binary_Methods.htm">add(), sub(), mul(), div(), mod(), max(), min()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="Analytics_Methods/Binary_Methods.htm">Binary methods</a> returning the sequence of results from performing the indicated operations</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/Comparison_Methods.htm">eq(), ne(), gt(), ge(), lt() le()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="Analytics_Methods/Comparison_Methods.htm">Comparison methods</a> returning a  boolean <i>result</i> sequence by applying the specified comparison operator on the object's sequence and the corresponding elements in the <i>input</i> sequence</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/Logical_Operators.htm">not(), and(), or(), xor()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p><a href="Analytics_Methods/Logical_Operators.htm">Logical methods</a> returning a  boolean <i>result</i> sequence by applying the specified operation on the object's sequence and the corresponding elements in the <i>input</i> sequence</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/Collapse_Methods.htm">wsum(), wavg(), cov(), corr()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p><a href="Analytics_Methods/Collapse_Methods.htm">Collapse methods</a> returning a  boolean <i>result</i> sequence by applying the specified operation on the object's sequence and the corresponding elements in the <i>input</i> sequence</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/Conditional_Methods.htm">iif(), filter(), filterPos()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">
+                            <p><a href="Analytics_Methods/Conditional_Methods.htm">Conditional methods</a> returning a  boolean <i>result</i> sequence by applying the specified operation on the object's sequence and the corresponding elements in the <i>input</i> sequence</p>
+                        </td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/GrandAgg_Methods.htm">aggCount(), aggMax(), aggMin(), aggSum(), aggPrd(), aggAvg(), aggVar(), aggVarSamp(), aggDev(), aggDevSamp(), aggApproxDC(), aggApproxHashDC(), aggMinMax()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="Analytics_Methods/Binary_Methods.htm">Grand Aggregate methods</a> returning a <code>double</code> <i>SequenceIterator</i> the first element of which is the operation result</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/GroupAgg_Methods.htm">groupAggCount(), groupAggMax(), groupAggMin(), groupAggSum(), groupAggPrd(), groupAggAvg(), groupAggVar(), groupAggVarSamp(), groupAggDev(), groupAggDevSamp(), groupAggApproxDC(), groupAggApproxHashDC(), groupAggWavg()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="Analytics_Methods/GroupAgg_Methods.htm">Group-By Aggregate methods</a> produce a result sequence containing the calculated aggregate for each group</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/GridAgg_Methods.htm">gridAggMax(), gridAggMin(), gridAggSum(), gridAggPrd(), gridAggAvg(), gridAggVar(), gridAggVarSamp(), gridAggDev(), gridAggDevSamp()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="Analytics_Methods/GridAgg_Methods.htm">Grid Aggregate methods</a> produce a result sequence containing the calculated aggregate for each <i>interval</i></td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/WindowAgg_Methods.htm">windowAggMax(), windowAggMin(), windowAggSum(), windowAggPrd(), windowAggAvg(), windowAggVar(), windowAggVarSamp(), windowAggDev(), windowAggDevSamp(), windowAggEma(), windowAggAtr()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="Analytics_Methods/WindowAgg_Methods.htm">Window Aggregate methods</a> produce a result sequence the calculated aggregate for each <i>window</i>. For the <code> windowAggEma()</code>and <code>windowAggAtr()</code> methods, the first element of the sequence is the operation result</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/HashAgg_Methods.htm">hashAggCount(), hashAggMax(), hashAggMin(), hashAggSum(), hashAggAvg(), hashAggApproxdc(), hashAggDistinctCount(), hashAggDupCount()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="Analytics_Methods/HashAgg_Methods.htm">Hash Aggregate methods </a>produce a <i>GroupByResult</i> for the grouping values which can then be converted to a <i>SequenceIterator</i> by calling method <code>getIterator()</code></td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/CumulativeAgg_Methods.htm">cumAggMax(), cumAggMin(), cumAggSum(), cumAggPrd(), cumAggAvg(), cumAggVar(), cumAggVarSamp(), cumAggDev(), cumAggDevSamp()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="Analytics_Methods/CumulativeAgg_Methods.htm">Cumulative Aggregate methods</a> produce a result sequence in which the value of each element is the result of the specified operation on all of the preceding elements.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><code><a href="Analytics_Methods/Manipulator_Methods.htm">parse(), map(), tee(), constant(), concat(), cat(), unique(), normalize(), thin(), limit(), reverse(), diff(), trend(), repeat() stretch(), stretch0(), asOfJoin(), cast(), cross(), extrema(), hash()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a href="Analytics_Methods/Manipulator_Methods.htm">Manipulator methods</a> produce a variety of different sequence results</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><code><a href="Analytics_Methods/Miscellaneous_Methods.htm">histogram(), sort()</a></code>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyA-Column2-Body1"><a href="Analytics_Methods/Miscellaneous_Methods.htm">Miscellaneous methods</a> produce a sequence result representing a histogram of the input sequence values, or sort the sequence</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

@@ -1,0 +1,14 @@
+MCO_PRJ_LIST += 21-overflow-persistent-cache
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 21-overflow-persistent-cache
+PRJ_21-overflow-persistent-cache_TAGS:=persistent sample core
+PRJ_21-overflow-persistent-cache_DIR:=$(call mco_project_dir)
+PRJ_21-overflow-persistent-cache_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_21-overflow-persistent-cache_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_21-overflow-persistent-cache_DATABASES:=overflowdb
+PRJ_21-overflow-persistent-cache_RUNTIME:=YES
+PRJ_21-overflow-persistent-cache_MEMDEV:=PRIVATE
+PRJ_21-overflow-persistent-cache_STORAGE:=PERSISTENT
+PRJ_21-overflow-persistent-cache_STORAGEDEV:=AUTO
+PRJ_21-overflow-persistent-cache_SYNC:=AUTO
+PRJ_21-overflow-persistent-cache_TRANSMGR:=MURSIW

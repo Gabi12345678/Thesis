@@ -1,0 +1,15 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Rights Reserved.    *
+ *                                                               *
+ *****************************************************************/
+
+declare database  patriciadb;
+
+class AreaCode
+{
+	string			areaCode;
+	char<4>			strAreaCode;
+	
+	patricia <areaCode> IareaCode;
+};

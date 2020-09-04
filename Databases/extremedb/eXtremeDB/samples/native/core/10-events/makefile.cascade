@@ -1,0 +1,4 @@
+-include $(call mco_makefile_file, \
+asynch/makefile.project.asynch \
+synch/makefile.project.synch \
+)

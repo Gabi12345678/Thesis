@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|C++ API|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Analytics C++ Sequence Methods by Category</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Analytics C++ <i>Sequence</i> Methods by Category</h1>
+            <blockquote>
+                <p>The C++ class <i><a href="../Sequence.htm">Sequence</a></i> provides a set of analytics methods that operate on <code><a href="../../../../Users_Guides/Core/Sequences.htm">sequences</a></code>. These methods inherit functionality from the specialized C API type <code><a href="../../../C/Structures/SequenceIterator.htm"><code>mco_seq_iterator_t</code></a></code> as the "handle" to manage <a href="../../../../Users_Guides/Core/Sequences.htm">sequence</a> fields. The table below links to pages describing the methods in detail. The examples in these pages use the following schema definition for a database of stock quotes:</p>
+                <div class="code-block"><pre>&#160;
+    #define uint4 unsigned&lt;4&gt;
+    #define MAX_SYMBOL_LEN 21
+    &#160;
+    declare database stockdb;
+&#160;
+    class Quote 
+    {
+        char&lt;MAX_SYMBOL_LEN&gt; symbol;
+        sequence&lt;date asc&gt; day;
+        sequence&lt;float&gt; low;
+        sequence&lt;float&gt; high;
+        sequence&lt;float&gt; open;
+        sequence&lt;float&gt; close;
+        sequence&lt;uint4&gt; volume;
+        sequence&lt;char&lt;15&gt;&gt; day_str;
+&#160;
+        unique tree&lt;symbol&gt; by_sym;
+    };
+    &#160;</pre>
+                </div>
+                <p>Note that the primary key for this table is the unique index <code>by_sym</code> on field <code>symbol</code> and all of the other fields except <code>day_str</code> are of type <a href="../../../../Users_Guides/Core/Sequences.htm">sequence</a> where the field <code>day</code> is an ordered <a href="../../../../Users_Guides/Core/Sequences.htm">sequence</a>. The <code>day_str</code> field is added to provide a convenient character array representation of the <i>date</i> type stored in field <code>day</code>. Typically analytics operations are performed on one or more sequence fields extracted from a <i>Quote</i> object which is effectively a "row" from a "result set" cursor. For example, the following code snippet iterates through the entire database printing out the values of the <i>Quote</i> character field <code>symbol</code> and sequence fields <code>day</code> and <code>high</code>:</p>
+                <div class="code-block"><pre>&#160;
+    mco_trans_h trans;
+    mco_date day;
+    mco_cursor_t quote_cursor;
+    Quote quote;
+    MCO_RET rc;
+    &#160;
+    rc = mco_trans_start(db, MCO_READ_ONLY, MCO_TRANS_FOREGROUND, &amp;trans);
+    if ( MCO_S_OK == rc )
+    {
+&#160;
+        /* Iterate through all Quote objects */
+        Quote::by_sym::cursor(trans, &amp;quote_cursor);
+        for (rc = mco_cursor_first(trans, &amp;quote_cursor); 
+            rc != MCO_S_CURSOR_END; 
+            rc = mco_cursor_next(trans, &amp;quote_cursor)) 
+        {
+            /* Get current object */
+            quote.from_cursor(trans, &amp;quote_cursor);
+            &#160;
+            /* Initialize iterators */
+            Sequence&lt;uint4&gt; day_iterator = quote.day_iterator();
+            Sequence&lt;float&gt; high_iterator = quote.high_iterator();
+            Sequence&lt; Char&lt;15&gt; &gt; day_str_iterator = quote.day_str_iterator();
+&#160;
+            /* Iterate sequence fields */
+            while (day_iterator.next(day)) 
+            {
+                Char&lt;MAX_SYMBOL_LEN&gt; symbol = quote.symbol;
+                Char&lt;15&gt; day_str = ++day_str_iterator;
+                printf("%s[%u(%s)]: %f\n", (char*)symbol, day, 
+                    (char*)day_str, ++high_iterator);
+            }
+        }
+        mco_trans_commit(trans);
+    }
+    &#160;</pre>
+                </div>
+                <p>Please use the links below to view descriptions and examples of these functions by category:</p>
+                <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 166px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Unary_Operators.htm">Unary_Operators</a><![CDATA[  ]]></td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that take a single input sequence and produce a result sequence of values such as: <b>abs, neg, match</b></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Binary_Methods.htm">Binary_Methods</a> <![CDATA[ ]]></td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that take two input sequences and produce a result sequence of values such as: <b>add, sub, mul, div, mod, max, min</b></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Comparison_Operators.htm">Comparison_Operators</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that take two input sequences and produce a  result sequence of Boolean values for the comparison operators: <b>==, !=, &gt;, &gt;=, &lt;, &lt;=</b></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Logical_Operators.htm">Logical_Operators</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that take two input sequences and produce a  result sequence of Boolean values from the following logical operators: <b>not, and, or, xor</b></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Collapse_Methods.htm">Collapse_Methods</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that collapse two sequences to scalar values such as: <b>weighted sum, weighted average, covariance, correlation</b></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Conditional_Methods.htm">Conditional_Methods</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that perform operations on one or two input sequences based on a condition such as: <b>if, cond, filter, filter_pos</b></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Manipulator_Methods.htm">Manipulator_Methods</a><![CDATA[  ]]></td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that perform various manipulations of input sequences</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Iterator_Methods.htm">Iterator_Methods</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that extract values from and reset sequence iterators such as: <b>next, reset</b></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="Top_Methods.htm">Top_Methods</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that return the top <code>n</code> elements (or their positions) of the input sequence: <b>top_max, top_min, top_pos_max, top_pos_min</b></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="RLE_Methods.htm">RLE_Methods</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that perform Run Length Encryption (RLE) operations: <b>count, decode,  is_rle</b></td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="GrandAgg_Methods.htm">Grand Aggregate</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that take a single input sequence iterator argument and produce a scalar  value in the result sequence</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="GroupAgg_Methods.htm">Group_Aggregate</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that split the input sequence into groups based on the values of a <code>group_by</code> argument </td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="GridAgg_Methods.htm">Grid_Aggregate</a><![CDATA[  ]]></td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that split the input sequence into intervals specified by the interval argument  which determines the maximum number of elements in the group</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="WindowAgg_Methods.htm">Window_Aggregate</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Like the “Grid” methods illustrated above, however the interval argument indicates the next N elements from the input sequence</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="HashAgg_Methods.htm">Hash_Aggregate</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that group the resulting sequence by  grouping sequence that is not ordered</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyE-Column2-Body1"><a href="CumulativeAgg_Methods.htm">Cumulative_Aggregate</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Methods that accumulate the average, sum, product, etc. of all preceding elements in the result sequence</td>
+                        </tr>
+                        <tr class="TableStyle-FunctionReference-Body-Body1">
+                            <td class="TableStyle-FunctionReference-BodyB-Column2-Body1"><a href="Miscellaneous_Methods.htm">Miscellaneous</a>
+                            </td>
+                            <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Methods that provide <b>sort</b>,  <b>rank</b> and <b>histogram</b> functionalities</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

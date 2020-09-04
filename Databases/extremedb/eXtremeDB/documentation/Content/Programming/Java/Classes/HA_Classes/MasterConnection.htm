@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|Java API|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>The Java MasterConnection Class</title>
+        <link href="../../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>The Java <i>MasterConnection</i> Class</h1>
+            <p><i>MasterConnection</i> extends the <i>Connection</i> class for <i>e</i>X<i>treme</i>DB<i> High Availability</i> <i>master</i> applications. The replication <i>master</i> application must use an instance of this class instead of class <i>Connnection</i>.</p>
+            <h3>Class Definition</h3>
+            <div class="code-block"><pre>&#160;
+    public class MasterConnection extends Connection 
+    {
+        /**
+        * Enable HA commit sharing.
+        */
+        public static final int MCO_HAMODE_MULTIPROCESS_COMMIT = 0x2;
+&#160;
+        /**
+        * Activae HA Asynchronous replication mode, if used, the notification flag
+        * and the notification callback routine address MUST also be set.
+        */
+        public static final int MCO_HAMODE_ASYNCH = 0x4;
+        &#160;
+        /**
+        * Enable multicast replication mode .
+        */
+        public static final int MCO_HAMODE_MCAST = 0x8;
+&#160;
+        /**
+        * Enable multicast reliable mode.
+        */
+        public static final int MCO_HAMODE_MCAST_RELIABLE = 0x10;
+&#160;
+        /**
+        * Enable Hot synchroniation mode.
+        */
+        public static final int MCO_HAMODE_HOTSYNCH = 0x20;
+        &#160;
+        /**
+        * Activate HA stateful replication mode.  This mode allows acceleration of the restart process
+        * after a short-term disconnect by the replica. The master saves the last trans_log_length
+        * transactions in its database. If a replica re-attaches quickly, it will have missed only
+        * a few of the master's transactions. So if the replica missed less than trans_log_length
+        * transactions, the master can send only these skipped transactions to the replica instead
+        * of a full initial synchronization.
+        */
+        public static final int MCO_HAMODE_STATEFUL_REPLICATION = 0x40;
+&#160;
+        /**
+        * Enable binary evolution mode.
+        */
+        public static final int MCO_HAMODE_BINEVOLUTION = 0x80;
+&#160;
+        public interface ErrorHandler 
+        {
+            public void handler(int errCode, int replicaNo);
+        };
+&#160;
+        /**
+        * The replication connection parameters.
+        */
+        public static class Parameters
+        {
+            /**
+            * The timeout for read transaction data.
+            */
+            public int commitTimeout;
+&#160;
+            /**
+            * The timeout (wait limit) for initial synchronization.
+            */
+            public int initialTimeout;
+&#160;
+            /**
+            * The amount of time a replica waits for a next commit.
+            */
+            public int synchTimeout;
+&#160;
+            /**
+            * The amount of time a replica waits for a next commit.
+            */
+            public int detachTimeout;
+&#160;
+            /**
+            * A combination of MCO_HAMODE_* bit flags.
+            */
+            public int modeFlags;
+&#160;
+            /**
+            * The maximum number of replicas for a master.
+            */
+            public int maxReplicas;
+&#160;
+            /**
+            * 
+            */
+            public int transLogLength;
+&#160;
+            /**
+            * Device representing asynchronous buffer
+            */
+            public Database.Device asyncBuf;
+    &#160;
+            /**
+            * Detach replica callback
+            */
+            public ErrorHandler errorHandler;
+&#160;
+            /**
+            * Multicast support
+            */
+            public int mcastPort;
+            public String mcastAddr;
+&#160;
+            /**
+            * Number of objects to send at once during hot-synchronization
+            */
+            public int hotsyncMsgObjects;
+&#160;
+            /**
+            * Max message size during hot-synchronization
+            */
+            public int hotsyncMsgSize;
+&#160;
+            /**
+            * Minimum number of connected replicas in order to the master database to accept write transactions
+            */
+            public int quorum;
+&#160;
+            /**
+            * SSL parameters or null if SSL not used
+            */
+            public Database.SSLParameters sslParameters = null;
+&#160;
+            /**
+            * Compression level: 0..9, 0 - no compression
+            */
+            public int compressionLevel;
+&#160;
+            public Parameters() 
+            {
+                initParameters(this);
+                asyncBuf = null;
+            }
+&#160;
+            public Parameters(int mode) 
+            {
+                this();
+                modeFlags = mode;
+            }
+&#160;
+        }
+        &#160;
+        public MasterConnection(Database db) 
+        {
+            super(db);
+        }
+&#160;
+        /**
+        * Set the replication mode.
+        * @param params Replication parameters.
+        */
+        public void setReplicationMode(MasterConnection.Parameters params) 
+        {
+            setReplicationMode(id, params);
+        }
+&#160;
+        /**
+        * This method is called by the master application (primary master process for a shared memory application)
+        * to wait for a connection request from a replica.
+        * @param masterPort the transport-layer-dependent address of the master.
+        * @param timeout the connection timeout period.
+        * @return true if the new replica is successfully attached, false if no replicas connect within this period,
+        */
+        public boolean attachReplica(String masterPort, int timeout) 
+        {
+            return attachReplica(id, masterPort, timeout);
+        }
+&#160;
+        /**
+        * This method detaches (disconnects) the $replica identified by the index.
+        * @param index the index of the replica (valid indexes range from 0 to getNumberOfReplicas()).
+        */
+        public void detachReplica(int index) 
+        {
+            detachReplica(id, index);
+        }
+&#160;
+        /**
+        * Get mode flags
+        */
+        public int getMode() 
+        {
+            return getMode(id);
+        }
+&#160;
+        /**
+        * This method detaches (disconnects) all connected replicas.
+        */
+        public void detachAllReplicas() 
+        {
+            detachAllReplicas(id);
+        }
+&#160;
+        /**
+        * Close this connection.
+        */
+        public void disconnect() 
+        {
+            super.disconnect();
+            releaseResources(buf);
+        }
+&#160;
+        /**
+        * Close this connection. The same as disconnect.
+        */
+        public void close() 
+        {
+            disconnect();
+        }
+&#160;
+        /**
+        * This method is called by the master to set the transaction packet size.  With synchronous replication
+        * (default mode), a replica does not confirm each of the master's transactions, but a transaction packet
+        * as a whole. Thus, the larger the window_size, the fewer confirmations the replica will send to the
+        * master.  This can improve the speed of replication, but the replica can "lag" behind the master up
+        * to window_size transactions.
+        * @param size the transaction packet size.
+        */
+        public void setTransWindowSize(int size) 
+        {
+            setTransWindowSize(id, size);
+        }
+&#160;
+        /**
+        * This method is called by the master to force replicas to confirm a transaction package.
+        * It is useful when the transaction window size is more than 1 (see setTransWindowSize).
+        */
+        public void commitWindow() 
+        {
+            commitWindow(id);
+        }
+&#160;
+        /**
+        * This method is called by the master to set the quorum - minimum number of connected replicas
+        * in order to the master database to accept write transactions
+        * @param quorum new quorum value.
+        */
+        public void setQuorum(int quorum) 
+        {
+            setQuorum(id, quorum);
+        }
+&#160;
+        /**
+        * This function returns the current number of replicas attached to the master.
+        */
+        public int getNumberOfReplicas() 
+        {
+            return getNumberOfReplicas(id);
+        }
+&#160;
+        /**
+        * This function is used by the master to send the "KEEP_ALIVE" signal to replicas.
+        */
+        public void keepAlive(int timeout) 
+        {
+            keepAlive(id, timeout);
+        }
+&#160;
+        /**
+        * This method shutdowns the HA subsystem.
+        */
+        public void stopReplication() 
+        {
+            stopReplication(id);
+        }
+&#160;
+        /**
+        * This method is called by the master if asynchronous replication mode is enabled to send transaction
+        * data from its buffer to replicas.
+        * @return true if the replication was sucessfully performed, false if replication was stopped by method stopReplication.
+        */
+        public boolean asyncSendDataToReplicas() 
+        {
+            return asyncSendDataToReplicas(id);
+        }
+&#160;
+        /**
+        * This function can be called by a separate thread of the primary master process in order to implement
+        * synchronization of committed transactions completed by other (secondary) masters attached to a
+        * shared memory database.
+        */
+        public void transCommitSync() 
+        {
+            transCommitSync(id);
+        }
+&#160;
+        public static class ReplicaAddress 
+        {
+            public String ip;
+            public int    port;
+            public ReplicaAddress(String ip, int port) 
+            {
+                this.ip = ip;
+                this.port = port;
+            }
+        }
+&#160;
+        /**
+        * Get replica IP address and port
+        * @param no replica number
+        * @return replica connection address
+        */
+        public ReplicaAddress getReplicaAddress(int no) 
+        {
+            return getReplicaAddress(id, no);
+        }
+&#160;
+        /**
+        * Enable or disable replication filter for "local" classes
+        */
+        public void enableFilter(boolean enabled) 
+        {
+            enableFilter(id, enabled);
+        }
+&#160;
+        public Database.HAChannelInfo getReplicaInfo(int no) 
+        {
+            return getReplicaInfo(id, no);
+        }
+        &#160;
+        long buf;
+&#160;
+        private native boolean attachReplica(long id, String masterPort, int timeout);
+        private native void detachReplica(long id, int index);
+        private native void detachAllReplicas(long id);
+        private native void setReplicationMode(long id, MasterConnection.Parameters params);
+        private native void releaseResources(long buf);
+        private native void setTransWindowSize(long id, int size);
+        private native void setQuorum(long id, int quorum);
+        private native void commitWindow(long id);
+        private native int  getNumberOfReplicas(long id);
+        private native void keepAlive(long id, int timeout);
+        private native void stopReplication(long id);
+        private native boolean asyncSendDataToReplicas(long id);
+        private native void transCommitSync(long id);
+        private native ReplicaAddress getReplicaAddress(long id, int no);
+        private native void enableFilter(long id, boolean enabled);
+        private static native void initParameters(MasterConnection.Parameters params);
+        private native int  getMode(long id);
+        private native Database.HAChannelInfo getReplicaInfo(long id, int no);
+    }
+    &#160;</pre>
+            </div>
+            <h3> Methods</h3>
+            <table class="TableStyle-IndentedFunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../../Resources/TableStyles/IndentedFunctionReference.css');" cellspacing="0">
+                <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                        <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1"><code><a href="MasterConnection/setQuorum.htm">setQuorum(int quorum)</a></code>
+                        </td>
+                        <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1"><a name="kanchor976"></a>Set the number of active replicas that is acceptable (including 0) at runtime</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

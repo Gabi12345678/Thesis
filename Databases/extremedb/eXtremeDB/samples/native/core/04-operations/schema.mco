@@ -1,0 +1,22 @@
+declare database simpledb;
+
+struct B {
+    signed<1> i1;
+    signed<2> i2;
+    signed<4> i4;
+    float     f;  
+    char<10>  c10;
+};
+
+class A {
+    unsigned<1>   ui1;
+    unsigned<2>   ui2;
+    unsigned<4>   ui4;
+    double        d;
+    numeric<10,3> num;
+    decimal<10,3> dec; 
+    B             b;
+    string        s;
+    
+    list;
+};

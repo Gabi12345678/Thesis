@@ -1,0 +1,9 @@
+create table PSPC_SCNR_DMSC_3600SBAR (STNR_DATE date, SCNR_ID varchar, STND_ISCD varchar, STNR_TIME time);
+insert into PSPC_SCNR_DMSC_3600SBAR values ('10/04/2015', '4', 'KR7005270004' , '19:37');
+insert into PSPC_SCNR_DMSC_3600SBAR values ('10/04/2015', '4', 'KR7005270004' , '19:38');
+insert into PSPC_SCNR_DMSC_3600SBAR values ('10/03/2015', '4', 'KR7005270004' , '10:00');
+insert into PSPC_SCNR_DMSC_3600SBAR values ('10/03/2015', '4', 'KR7005270004' , '11:00');
+insert into PSPC_SCNR_DMSC_3600SBAR values ('10/03/2015', '4', 'KR7005270004' , '12:00');
+select STNR_DATE,STNR_TIME from PSPC_SCNR_DMSC_3600SBAR where trim(SCNR_ID)='4' and STND_ISCD='KR7005270004' group by STNR_DATE,STNR_TIME order by STNR_DATE, STNR_TIME  limit 100;
+select STNR_DATE, min(STNR_TIME) from PSPC_SCNR_DMSC_3600SBAR group by STNR_DATE order by STNR_DATE;
+select STNR_DATE, min(STNR_TIME) from PSPC_SCNR_DMSC_3600SBAR group by STNR_DATE order by STNR_DATE limit 100;

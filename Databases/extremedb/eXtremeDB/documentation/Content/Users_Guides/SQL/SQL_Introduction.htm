@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeDB SQL  Introduction</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>DB SQL  Introduction</h1>
+            <blockquote>
+                <p><b style="font-style: italic; font-weight: normal;">McObject </b>'s <i>e</i>X<i>treme</i>SQL is a high-performance implementation of the SQL programming language for interfacing with <i>e</i>X<i>treme</i>DB databases. With <i>e</i>X<i>treme</i>SQL <b style="font-style: italic; font-weight: normal;">McObject </b> targets the real-time enterprise software market for developers using SQL for application development in fields such as banking and securities trading, where real-time responsiveness is a must and SQL is the dominant database language.</p>
+                <p>Built on the unsurpassed performance of <i>e</i>X<i>treme</i>DB, and a SQL optimizer tuned for main memory database access, <i>e</i>X<i>treme</i>SQL delivers blazingly fast processing of dynamic SQL queries.</p>
+                <p>Some of the benefits of using <i>e</i>X<i>treme</i>SQL are:</p>
+                <ul>
+                    <li value="1">Co-existence with native <i>e</i>X<i>treme</i>DB - Use <i>e</i>X<i>treme</i>SQL alongside the <i>e</i>X<i>treme</i>DB API in the same application. Where maximum performance is critical, the <i>e</i>X<i>treme</i>DB API can’t be beat. When a higher level of access would be advantageous, such as retrieving data from multiple tables or performing aggregation, then use standard SQL statements with <i>e</i>X<i>treme</i>SQL.</li>
+                    <li value="2">Broad coverage of the SQL-89 standard - <i>e</i>X<i>treme</i>SQL  implements much of the ANSI SQL-89 specification.</li>
+                    <li value="3">Extensions to exploit <i>e</i>X<i>treme</i>DB features and data types - In addition, <i>e</i>X<i>treme</i>SQL implements <i>e</i>X<i>treme</i>DB-specific extensions including support for structures, arrays and vectors, as well as query optimizations based on specific <i>e</i>X<i>treme</i>DB capabilities.</li>
+                    <li value="4">Compatibility with all <i>e</i>X<i>treme</i>DB editions - <i>e</i>X<i>treme</i>SQL is fully compatible and interoperable with <i>e</i>X<i>treme</i>DB APIs, <i>e</i>X<i>treme</i>DB<i> Transaction Logging</i>, <i>e</i>X<i>treme</i>DB<i> High Availability</i>, and <i style="font-weight: normal;">e</i>X<i style="font-weight: normal;">treme</i>DB <i style="font-weight: normal;">Cluster</i>. There is no need to worry about the migration path within the <a href="../../eXtremeDB_Product_Family.htm"><i>e</i>X<i>treme</i>DB product family</a>.</li>
+                    <li value="5">No client / server inter-process communications - Like <i>e</i>X<i>treme</i>DB, <i>e</i>X<i>treme</i>SQL can be embedded in the application, not deployed as a separate process. This eliminates client / server inter-process communication round-trips from the execution path, resulting in breakthrough performance and zero administration.</li>
+                    <li value="6">Interactive SQL utilities - <i>e</i>X<i>treme</i>SQL comes with the powerful interactive SQL tool <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> which can be used to manage <i>e</i>X<i>treme</i>DB databases and test SQL statements independently from application programs. (Please use this <a href="../../Getting_Started/Quick_Start/QS_xSQL_Embedded.htm">link</a> for a basic introduction to this versatile tool.)</li>
+                </ul>
+                <h2>Introduction to SQL</h2>
+                <p>SQL (Structured Query Language) was developed by IBM in the mid ‘70s as a way to get information in and out of database systems. Contrary to what its name suggests, SQL is not only a query language, but also a language for manipulating (adding, changing or deleting) information already in the database.</p>
+                <p>SQL is a declarative language, whereas conventional programming languages (C/C++, Java, etc.) are procedural languages. Practically speaking, this means that SQL has no control statements (if and while, for example).</p>
+                <p>SQL has been widely adopted by database vendors and has been institutionalized as a standard by the ANSI and ISO organizations. SQL skills learned with one database system can be largely carried over to other SQL-capable database systems, though virtually every vendor implements proprietary extensions to the language to exploit capabilities of their own database technology.</p>
+                <p>The ANSI SQL standard has evolved over the years, beginning with the SQL-89 standard, followed by SQL-92 and, most recently, the SQL-99 standard. <i>e</i>X<i>treme</i>SQL provides broad implementation of the SQL-89 standard for SQL DML statements.</p>
+                <p>SQL consists of a set of statements, which are categorized into:</p>
+                <ul>
+                    <li value="1">Data Definition Language (DDL) statements</li>
+                    <li value="2">Data Manipulation Language (DML) statements.</li>
+                    <li value="3">Data Control Language (DCL) statements</li>
+                </ul>
+                <p>DDL statements are used to describe the data stored in the database. Examples are <code>CREATE TABLE</code> and <code>CREATE INDEX</code> statements. The DDL can also define constraints and other attributes of the data.</p>
+                <p>DML statements manipulate or retrieve data, as opposed to define or control access to data. The DML consists of four statements:</p>
+                <ul>
+                    <li value="1">SELECT</li>
+                    <li value="2">INSERT</li>
+                    <li value="3">UPDATE</li>
+                    <li value="4">DELETE</li>
+                </ul>
+                <p>DCL statements define privileges to access the data by means of statements such as GRANT and REVOKE.</p>
+                <p>Note that <i>e</i>X<i>treme</i>SQL does not implement SQL DCL statements.</p>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

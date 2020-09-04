@@ -298,7 +298,7 @@ POOL_WORKERS = int(os.environ.get('GRAPHITE_POOL_WORKERS', '1'))
 #INTRACLUSTER_HTTPS = False
 
 # These are timeout values (in seconds) for requests to remote webapps
-REMOTE_FIND_TIMEOUT = float(os.environ.get('GRAPHITE_REMOTE_FIND_TIMEOUT', '30'))    # Timeout for metric find requests
+REMOTE_FIND_TIMEOUT = float(1000)    # Timeout for metric find requests
 REMOTE_FETCH_TIMEOUT = float(1000)  # Timeout to fetch series data
 REMOTE_RETRY_DELAY = float(os.environ.get('GRAPHITE_REMOTE_RETRY_DELAY', '0'))       # Time before retrying a failed remote webapp
 

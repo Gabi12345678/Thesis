@@ -1,0 +1,13 @@
+declare database inmemdb;
+
+class A {
+    unsigned<4> ui4;
+    
+    list;
+};
+
+class B {
+    unsigned<4> ui4;
+    
+    list;
+};

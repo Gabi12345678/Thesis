@@ -1,0 +1,55 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.     *
+ *                                                               *
+ *****************************************************************/
+
+#define int1      signed<1>
+#define int2      signed<2>
+#define int4      signed<4>
+#define int8      signed<8>
+#define uint8     unsigned<8>
+#define uint4     unsigned<4>
+#define uint2     unsigned<2>
+#define uint1     unsigned<1>
+
+declare database uda1;
+declare auto_oid[100];
+
+struct st_oid {
+    uint4 id;
+};
+
+declare oid st_oid[10];
+
+struct Inner
+{
+    vector<string> vstr;
+    uint4 inner_data;
+
+};
+
+
+class Record
+{
+    nullable uint4 u4;
+    string strs[12];
+    vector <char<10>> vch;
+    blob b;
+    Inner inner;
+    vector <Inner> vinner;
+    Inner ainner[15];
+    
+    tree<u4> tu4;
+    hash<u4> hu4[10000];
+    hash<vch> tvch[10000];
+    unique tree <inner.inner_data> tinner;
+    oid;
+    autoid[100];
+};
+
+
+class Simple 
+{
+    uint2 u2;
+};

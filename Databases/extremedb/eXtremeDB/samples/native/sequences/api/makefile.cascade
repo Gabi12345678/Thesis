@@ -1,0 +1,4 @@
+-include $(call mco_makefile_file, \
+api/c/makefile.project.c \
+api/cpp/makefile.project.cpp \
+)

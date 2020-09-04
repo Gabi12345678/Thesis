@@ -1,0 +1,18 @@
+/****************************************************************
+ *                                                              *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.    *
+ *                                                              *
+ ****************************************************************/
+
+#define uint4     unsigned<4>
+
+declare database  groupbydb;
+
+class Contributions 
+{
+   string name;
+   uint4  date_val; // Custom date value stored as yy*10000 + mm*100 + dd
+   uint4  amount;   // Integer value associated with this event
+
+   autoid[10000];
+};

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Static API|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>mco_HA_replica_params_init</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>mco_HA_replica_params_init</h1>
+            <p><a name="kanchor356"></a>This function is called by the replica to initialize the replica HA runtime parameters to default values.</p>
+            <h3>For an overview see page <a href="../../../Users_Guides/HA/HA_Applications.htm">HA Applications</a></h3>
+            <h3>Prototype</h3>
+            <div class="code-block"><pre>&#160;
+    void	mco_HA_replica_params_init(	mco_HA_replica_params_t* params )
+&#160;</pre>
+            </div>
+            <h3>Arguments</h3>
+            <table class="TableStyle-FunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');" cellspacing="0">
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">params</td>
+                        <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">HA replica parameters defined in structure <a href="../Structures/HA_Parameters.htm">mco_HA_replica_params_t</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Description</h3>
+            <p>This function is called by a replica  to initialize the replica HA runtime parameters to default values. The parameters are then set according to  the application’s needs and passed to <code><a href="attach_master.htm"><code>mco_HA_attach_master()</code></a></code>.</p>
+            <h3>Return Codes</h3>
+            <table class="TableStyle-FunctionReference" style="margin-left: 0;margin-right: auto;mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');" cellspacing="0">
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">void</td>
+                        <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">No value returned</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>The <code>mco_HA_replica_params_t</code> structure are defined as follows:</p>
+            <div class="code-block"><pre>&#160;
+    typedef struct
+    {
+        uint4 mode_flags;
+        timer_unit initial_timeout;
+        timer_unit commit_timeout;
+        timer_unit wait_data_timeout;
+        mco_ha_notifying notifying_callback;
+        void* notifying_context;
+        uint2 repeat_counter;
+        uint2 mcast_port;
+        const char *mcast_addr;
+        const char* cancelpoint_addr;
+    } mco_HA_replica_params_t;
+    &#160;</pre>
+            </div>
+            <p>&#160;</p>
+            <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                <col class="TableStyle-FunctionReference-Column-Column2" style="width: 126px;" />
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">mode_flags</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A bit flag having one or more of the values described below.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">initial_timeout</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The time window during which initial synchronization with the master must complete.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">commit_timeout</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The time window during which a replica must receive transaction data from master.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">wait_data_timeout</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The max. time between two consecutive transactions.  If the transaction rate on the master is low, the master should periodically call <a href="keep_alive.htm">mco_HA_keep_alive()</a> to prevent a timeout error.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">notifying_callback</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">A pointer to the user-defined callback function. This can be used to receive notification about the state of replica.  To enable this feature, use flag <code>MCO_HAMODE_REPLICA_NOTIFICATION</code>.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">notifying_context</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The parameter <code>pcontext</code> for the user-defined notification callback function (see below).</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">repeat_counter</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The max. number of attempts to repeat the commit for reliable multicast mode (MCO_HAMODE_MCAST_RELIABLE).</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">mcast_port</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">For multicast.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">mcast_addr</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">For multicast.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">cancelpoint_addr</td>
+                        <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">A connection string that contains the IP address (optionally) and the port number for the process that creates the cancel socket, for example, “127.0.0.1:9999” or simply “9999”. This is used if flag <code>MCO_HAMODE_ALLOW_CANCEL</code> is set in flags. If the application does not use the <a href="create_cancel_socket.htm"><code>mco_HA_create_cancel_socket()</code></a> and <code><a href="destroy_cancel_socket.htm">mco_HA_destroy_cancel_socket()</a></code> calls, then <code><a href="attach_master.htm">mco_HA_attach_master()</a></code> implicitly creates the cancel socket before connecting to the master and closes it before exit. In other words, <code><a href="attach_master.htm">mco_HA_attach_master()</a></code> "manages" the cancel socket.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>The possible values for the <code>mode_flags</code> argument are defined as follows:</p>
+            <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_HAMODE_ALLOW_CANCEL</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Enables the cancellation feature (see <code><a href="cancel.htm">mco_HA_cancel()</a></code>. (Note that the cancellation feature is implemented only for TCP and UDP transports.)</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_HAMODE_FORCE_MASTER</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Causes the replica to be synchronized with the master with the intent of becoming the master itself after synchronization is complete.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_HAMODE_REPLICA_NOTIFICATION</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Enables replica notifications (see parameters <code>notifying_callback</code> and <code>notifying_context</code>).</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_HAMODE_SEND_RESTLIST</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">&#160;</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">MCO_HAMODE_EXPLICIT_WRITE_ACCESS</td>
+                        <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">Using this flag means that WRITE access to the replica's database will not be restored automatically after returning from the <code><a href="attach_master.htm">mco_HA_attach_master()</a></code> API. To enable write operations, the application must explicitly call <a href="set_master_params.htm"><code>mco_HA_set_master_params()</code></a>. <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> uses this flag to prohibit write/DDL operations in replica switch mode even if the replica is not currently connected to the master. Changing switch mode to <code>master</code>, <code>auto</code> or <code>standalone</code> (using the <code>xsql_ha_set_switch_mode()</code> UDF) will enable write access to the database.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Notification callback</h3>
+            <p>The notification callback prototype is as follows:</p>
+            <div class="code-block"><pre>&#160;
+    typedef void(*mco_ha_notifying)
+        (uint2 notification_code, uint4 param1, void *param2, void *pcontext);
+        &#160;</pre>
+            </div>
+            <p>where the arguments <code>param1</code> and <code>param2</code> are optional parameters sent to the callback (to indicate error codes, replica channel, etc.), argument <code>pcontext</code> is a user-defined parameter passed via the <code>notifying_context</code> field, and the argument <code>notification_code</code> can have one of the following values:</p>
+            <table class="TableStyle-FunctionReference" style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <col class="TableStyle-FunctionReference-Column-Column2" />
+                <tbody>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_CONNECTED</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Replica successfully connected to master.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_CONNECT_FAILED</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Replica is unable to connect to the master.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_DB_EQUAL</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The databases on the master and replica sides are equal, so initial synchronization is not needed.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_DB_LOAD_BEGIN</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The initial synchronization has started.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_DB_LOAD_FAILED</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">An error occurred during the initial synchronization. The param1 argument to the notification callback function contains the MCO_RET code.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_DB_LOAD_OK</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The initial synchronization has completed successfully. The param1 argument to the notification callback function contains the MCO_E_HA_REPLICA_STOP_REASON code.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_COMMIT_FAILED</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">An error occurred during replication (wrong transaction data, or a broken connection). The param1 argument to the notification callback function contains the MCO_RET code.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_REPLICA_STOPPED</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">The replica was stopped by the master or a local request.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_DB_CREATION_FAILED</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">“Database creation failed” notification,. The param1 argument of the  notification callback contains the  MCO_RET code.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_HOTSYNC</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">“Hot” synchronization has started .</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_EOHOTSYNC</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">“Hot” synchronization has completed successfully.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPL_NOTIFY_STATEFUL_SYNC</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">“Stateful” synchronization started .</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyB-Column2-Body1">MCO_REPL_NOTIFY_STATEFUL_SYNC_END</td>
+                        <td class="TableStyle-FunctionReference-BodyA-Column2-Body1">“Stateful” synchronization has completed successfully.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

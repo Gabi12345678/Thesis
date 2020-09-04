@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Programming with eXtremeDB|Native APIs|[%=System.LinkedTitle%]|Control Structures used in the C API">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Transaction Control</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../../Resources/TableStyles/FunctionReference.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>Transaction Control</h1>
+            <blockquote>
+                <h2>Transaction Types</h2>
+                <p>All database access occurs within <b style="font-style: italic;">transactions</b> which are defined by the enumerated values described in the following sections.</p>
+                <p> The following <i>e</i>X<i>treme</i>DB Transaction Types are defined by enum <code>MCO_TRANS_TYPE</code> in <code>mco.h</code>:</p>
+                <div class="code-block"><pre>    &#160;
+    typedef enum MCO_TRANS_TYPE_E_
+    {
+        MCO_READ_ONLY = 0, MCO_UPDATE = 1, MCO_READ_WRITE = 2, MCO_EXCLUSIVE = 3
+        &#160;
+    } MCO_TRANS_TYPE;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <table style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" class="TableStyle-FunctionReference" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 169px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_READ_ONLY</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Transaction for <code>READ_ONLY</code> access to data.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_UPDATE</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Transaction for "read with intent to update" instead of <code>READ_ONLY</code>. If the intent is to find a database object for modification (Update of Delete) the <code>MCO_UPDATE</code>  transaction type should be specified. To update a database object a new <code>READ_WRITE</code> transaction must be started, or the current transaction must be upgraded by calling function <code><a href="../Core_Functions/Static/Transaction_Control/upgrade.htm">mco_trans_upgrade()</a></code>.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_READ_WRITE</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Transaction for <code>READ_WRITE</code> access to data.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_EXCLUSIVE</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><a name="kanchor481"></a>(AKA "Global Lock") No other transaction can run in parallel even if the Transaction Manager would normally allow it: <code><a href="../../../Users_Guides/Core/MVCC_Transaction_Manager.htm" name="kanchor482">MVCC</a></code> will not allow <code>READ_ONLY</code> or <code>READ_WRITE</code> transactions while <code>EXCLUSIVE </code>transaction is working, <code><a href="../../../Users_Guides/Core/MURSIW_Transaction_Manager.htm" name="kanchor483"><code>MURSIW</code></a></code> will postpone execution on other <code>READ_ONLY</code> transactions while <code>EXCLUSIVE</code> transaction is working (<code>EXCLUSIVE</code> Transaction Manager ignores any type of transaction because it runs just one transaction at a time regardless of type)</td>
+                    </tr>
+                </table>
+                <p>&#160;</p>
+                <h2>Transaction Priorities</h2>
+                <p>Transaction scheduling is partially determined by the transaction priority. Enum <code>MCO_TRANS_PRIORITY</code> is defined in <code>mco.h</code> as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    typedef enum MCO_TRANS_PRIORITY_E_
+    {
+        MCO_TRANS_IDLE       = -2,   /* Least important transactions */
+        MCO_TRANS_BACKGROUND = -1,
+        MCO_TRANS_FOREGROUND = 0,    /* Normal priority transactions */
+        MCO_TRANS_HIGH       = 1,
+        MCO_TRANS_ISR        = 2     /* Very Important Transactions */
+    &#160;
+    } MCO_TRANS_PRIORITY;
+    &#160;</pre>
+                </div>
+                <p>Transaction priority can be set to one of the following values:</p>
+                <table style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');" class="TableStyle-FunctionReference" cellspacing="0">
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_TRANS_IDLE</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Least important transactions</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_TRANS_BACKGROUND</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Less important then foreground but more important then idle</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_TRANS_FOREGROUND</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Normal priority transactions</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_TRANS_HIGH</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">More important then foreground but less important then ISR</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_TRANS_ISR</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Very Important Transactions</td>
+                    </tr>
+                </table>
+                <p>&#160;</p>
+                <h2>Transaction Scheduling Policy</h2>
+                <p>The transaction scheduling policy for transactions with the same priority can be set to one of the following values as defined by enum <code>MCO_TRANS_SCHED_POLICY</code> in <code>mco.h</code>:</p>
+                <div class="code-block"><pre>    &#160;
+    typedef enum MCO_TRANS_SCHED_POLICY_E_
+    {
+        MCO_SCHED_FIFO = 0,                    /* First In First Out */
+        MCO_SCHED_READER_FAVOR = 1,            /* Run read-only transactions first */
+        MCO_SCHED_WRITER_FAVOR = 2             /* Run read-write transactions first */
+    &#160;
+    } MCO_TRANS_SCHED_POLICY;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <table style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');" class="TableStyle-FunctionReference" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <col style="width: 22px;" class="TableStyle-FunctionReference-Column-Column2" />
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_SCHED_FIFO</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">First In First Out</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_SCHED_READER_FAVOR</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Run read-only transactions first</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_SCHED_WRITER_FAVOR</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Run read-write transactions first</td>
+                    </tr>
+                </table>
+                <p>&#160;</p>
+                <h2>Transaction Object States</h2>
+                <p>Within a transaction, objects can have one of the following states as defined by enum <code>MCO_TRANS_OBJ_STATE</code>  in <code>mco.h</code>:</p>
+                <div class="code-block"><pre>    &#160;
+    typedef enum MCO_TRANS_OBJ_STATE_
+    {
+        MCO_TRANS_OBJ_CREATED     = 0x01,
+        MCO_TRANS_OBJ_DELETED     = 0x02,
+        MCO_TRANS_OBJ_ALL_DELETED = 0x04
+    &#160;
+    } MCO_TRANS_OBJ_STATE;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <table style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');" class="TableStyle-FunctionReference" cellspacing="0">
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_TRANS_OBJ_CREATED</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">This object is being created.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_TRANS_OBJ_DELETED</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">This object is being deleted.</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_TRANS_OBJ_ALL_DELETED</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">All objects of this class are being deleted.</td>
+                    </tr>
+                </table>
+                <p>&#160;</p>
+                <h2>Transaction Isolation Levels</h2>
+                <p>The transaction isolation level can be or one of the following types as defined by enum <code>MCO_TRANS_ISOLATION_LEVEL</code>  in <code>mco.h</code>::</p>
+                <div class="code-block"><pre>    &#160;
+    typedef enum MCO_TRANS_ISOLATION_LEVEL_E_
+    {
+        MCO_DEFAULT_ISOLATION_LEVEL = 0x0, /* MCO_REPEATABLE_READ for MVCC,  MCO_SERIALIZABLE for GlobalLock / MURSIW */
+        MCO_READ_COMMITTED          = 0x1, /* Guarantees that any data read was committed at the moment is read. 
+                            It restricts the reader from seeing any uncommitted data. */
+        MCO_REPEATABLE_READ         = 0x2, /* In addition to MCO_READ_COMMITTED guarantees that any data read cannot change, 
+                            if the transaction reads the same data again,
+                            it will find the previously read data in place, unchanged, 
+                            and available to read. */
+        MCO_SERIALIZABLE            = 0x4  /* Emulates serial transaction execution */
+    &#160;
+    } MCO_TRANS_ISOLATION_LEVEL;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <table style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');margin-left: 0;margin-right: auto;" class="TableStyle-FunctionReference" cellspacing="0">
+                    <col class="TableStyle-FunctionReference-Column-Column2" style="width: 215px;" />
+                    <col class="TableStyle-FunctionReference-Column-Column2" />
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_DEFAULT_ISOLATION_LEVEL</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1"><code>MCO_REPEATABLE_READ</code> for MVCC,  <code>MCO_SERIALIZABLE</code> for GlobalLock / MURSIW</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_READ_COMMITTED</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Guarantees that any data read was committed at the moment was read. It restricts the reader from seeing any uncommitted data</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_REPEATABLE_READ</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">In addition to <code>MCO_READ_COMMITTED</code> guarantees that any data read cannot change; if the transaction reads the same data again, 
+                                                  it will find the previously read data in place, unchanged, and available to read</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_SERIALIZABLE</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Emulates serial transaction execution</td>
+                    </tr>
+                </table>
+                <p>&#160;</p>
+                <h2><a name="kanchor484"></a>Transaction Commit Policy</h2>
+                <p>The transaction commit policy can be one of the following:</p>
+                <div class="code-block"><pre><a name="kanchor485"></a>&#160;
+    typedef enum MCO_COMMIT_POLICY_E
+    {
+        MCO_COMMIT_SYNC_FLUSH, /* Flush to disk on each commit (default)  */
+        MCO_COMMIT_BUFFERED,   /* Runtime buffered transactions */
+        MCO_COMMIT_DELAYED,    /* Runtime buffered transactions, with commit criteria */
+        MCO_COMMIT_NO_SYNC     /* Changes are not synchronously written to the disk */
+    &#160;
+    } MCO_COMMIT_POLICY;
+    &#160;</pre>
+                </div>
+                <p>&#160;</p>
+                <table style="mc-table-style: url('../../../Resources/TableStyles/FunctionReference.css');" class="TableStyle-FunctionReference" cellspacing="0">
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">
+                            <p>MCO_COMMIT_SYNC_FLUSH</p>
+                        </td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Flush to disk on each commit (default)</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_COMMIT_BUFFERED</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Runtime buffered transactions</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_COMMIT_DELAYED</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Runtime buffered transactions with commit criteria</td>
+                    </tr>
+                    <tr class="TableStyle-FunctionReference-Body-Body1">
+                        <td class="TableStyle-FunctionReference-BodyE-Column2-Body1">MCO_COMMIT_NO_SYNC</td>
+                        <td class="TableStyle-FunctionReference-BodyD-Column2-Body1">Changes are not synchronously written to the disk</td>
+                    </tr>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

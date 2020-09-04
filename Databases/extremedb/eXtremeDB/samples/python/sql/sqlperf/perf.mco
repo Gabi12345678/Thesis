@@ -1,0 +1,14 @@
+
+#define int4      signed<4>
+
+declare database perfdb;
+
+class Record
+{
+    int4 hkey;
+
+    int4 tkey;
+
+    hash <hkey> hidx[100000];
+    unique tree <tkey> tidx;
+};

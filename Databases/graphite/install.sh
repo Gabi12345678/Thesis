@@ -1,13 +1,18 @@
 sudo rm docker-graphite-git -R
 sudo rm storage -R
-sudo rm for-install/udf/* -R
+#sudo rm for-install/udf/* -R
 
 mkdir docker-graphite-git
 cd docker-graphite-git
 git clone https://github.com/graphite-project/docker-graphite-statsd.git
 cd docker-graphite-statsd
 
-sed -i '/ && pip3 install \\/a numpy \\' Dockerfile
+sed -i '/LABEL/aENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk' Dockerfile
+sed -i '/LABEL/aENV PATH $PATH:/usr/lib/jvm/java-1.8-openjdk/jre/bin:/usr/lib/jvm/java-1.8-openjdk/bin' Dockerfile
+#sed -i '/FROM base as build/a RUN ls /usr/lib/jvm/' Dockerfile
+sed -i '/jansson/a\ openjdk8\ \\' Dockerfile
+sed -i '/psycopg2/a\ saxpy numpy setuptools cython pyjnius\ \\' Dockerfile
+sed -i 's/go==1.13.11-r0/go==1.13.14-r0/' Dockerfile
 
 cp -f ../../for-install/storage-schemas.conf ./conf/opt/graphite/conf/
 cp -f ../../for-install/carbon.conf ./conf/opt/graphite/conf/
@@ -16,10 +21,14 @@ cp -f ../../for-install/local_settings.py ./conf/opt/graphite/webapp/graphite/
 cp -f ../../../../Algorithms/centroid_decomposition/cd_ssv.py ../../for-install/udf/
 cp -f ../../../../Algorithms/kmeans/kmeans.py ../../for-install/udf/
 cp -f ../../../../Algorithms/recovdb/recovery.py ../../for-install/udf/
+cp -f ../../../../Algorithms/hot_sax/hotsax.py ../../for-install/udf/
+cp -f ../../../../Algorithms/znormalization/znormalization.py ../../for-install/udf/
+#cp -f ../../../../Algorithms/screen/screen.py ../../for-install/udf/
+#cp -f ../../../../Algorithms/screen/Screen.jar ../../for-install/udf/
 
 sudo su <<START
 echo "Building with Docker"
-docker build --tag custom-graphite .
+docker build --tag custom-graphite --build-arg python_binary=python3 .
 echo "Killing graphite"
 docker kill graphite
 echo "Removing Graphite"
@@ -36,5 +45,8 @@ docker run -d \
  -p 8126:8126 \
  -v $PWD/../../storage:/opt/graphite/storage \
  -v $PWD/../../for-install/udf:/opt/graphite/webapp/graphite/functions/custom \
+ -v $PWD/../../for-install/log:/var/log \
  custom-graphite
+
+echo "y" | docker image prune
 START

@@ -1,0 +1,5 @@
+-include $(call mco_makefile_file, \
+multi-process/makefile.project.multi-process \
+multi-task/makefile.project.multi-task \
+single-task/makefile.project.single-task \
+)

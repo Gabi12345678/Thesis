@@ -1,0 +1,17 @@
+/****************************************************************
+ *                                                              *
+ * Copyright (c) 2001-2019 McObject LLC. All Right Reserved.    *
+ *                                                              *
+ ****************************************************************/
+
+#define uint4     unsigned<4>
+
+declare database  searchdb;
+
+class AnObject
+{
+    uint4 id;
+    uint4 value;
+    
+    tree <value> Idx;
+};

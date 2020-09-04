@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>Security Parameters</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>xSQL</i> Security Parameters</h1>
+            <blockquote>
+                <p><span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> has the ability to password-protect a remote SQL connection. </p>
+                <h3>For an overview see page <a href="../xSQL_Server_Instrumentation.htm"><i>xSQL</i> Server Instrumentation</a></h3>
+                <p>Password protection is implemented on the server by setting the <code><a href="../Startup_Options/Config_File_Sections/ExtremeSQL_Params.htm">sql_auth_required</a></code> parameter in the configuration file:</p>
+                <div class="code-block"><pre>&#160;
+    sql_auth_required : true,
+    &#160;</pre>
+                </div>
+                <p>On the client side the credentials can be either submitted through the configuration file:</p>
+                <div class="code-block"><pre>&#160;
+    sql_login : 'user1',
+    sql_password : 'mypass',
+    &#160;</pre>
+                </div>
+                <p>or alternatively on the commend-line when starting xSQL:</p>
+                <div class="code-block"><pre>&#160;
+    ./xsql ... -user user1 -password mypass
+    &#160;</pre>
+                </div>
+                <h2>Authentication</h2>
+                <p>The authentication requires a table <i>Users</i> with two required string fields, <code>login</code> and <code>password</code> to keep usernames and passwords. For example:</p>
+                <div class="code-block"><pre>&#160;
+    create table Users (login string primary key, password string);
+    insert into Users values ('user1', 'mypass');
+    insert into Users values ('user2', 'hYfjdKK2');
+    &#160;</pre>
+                </div>
+                <p>Remote client applications must provide the credentials to match those found in the table <i>Users</i> in order to connect to the database. Note the following important characteristics of this password-protection feature:</p>
+                <ul>
+                    <li value="1">The <i>Users</i> table can include fields in addition to <code>login</code> and <code>password</code>.</li>
+                    <li value="2"><a name="kanchor972"></a>The credentials are not encrypted by the database runtime. If desired, it is the application's responsibility to either encrypt or somehow protect the content of the <i>Users</i> table.</li>
+                    <li value="3">The transmission of the credentials through the Remote SQL Engine protocol is not encrypted either. However it is possible to use the Remote server authentication in conjunction with <span class="Param">SSL</span> encryption.</li>
+                    <li value="4">If  <span class="Param">SSL</span> encryption (without authentication) is enabled when using <span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span>, the password transmission will be protected.</li>
+                </ul>
+                <p>For more powerful security, see the <span class="Param">SSL</span> section below.</p>
+                <h2>SSL support</h2>
+                <p><span style="color: #000000; font-style: italic; font-weight: normal;">xSQL</span> supports SSL for both server and client Remote SQL connections, as well as for High Availability and Cluster connections. SSL is enabled when the <a href="../Startup_Options/Config_File_Sections/SSL_Params.htm"><code>ssl_params</code></a> section is present in the  <a href="../Startup_Options/Config_File_Sections/SSL_Params.htm">configuration file</a>. Following is an example of the <code>ssl_params</code> configuration file settings for encrypted client-server exchange with peer verification (both client's and server's certificates must be signed by the same CA certificate stored in the <code>ca.pem</code> file):</p>
+                <div class="code-block"><pre>    Server:
+    &#160;
+    ssl_params : {
+        verify_mode: ["verify_peer", "verify_fail_if_no_cert"],
+        cert_file_pem: "../certs/server.crt",
+        pkey_file_pem: "../certs/server.key",
+        ca_file: "../certs/ca.pem",
+    }
+    &#160;
+    Client:
+    &#160;
+    ssl_params : {
+        verify_mode: ["verify_peer", "verify_fail_if_no_cert"],
+        cert_file_pem: "../certs/client.crt",
+        pkey_file_pem: "../certs/client.key",
+        ca_file: "../certs/ca.pem",
+    }
+    &#160;</pre>
+                </div>
+                <p>Note that the only difference between the client and the server parameters is the certificate and the private key. For peer verification the peers are required to have certificates signed by the same CA.</p>
+                <p>However, if only encryption without authentication is required (and the inherent security risk is acceptable), the "aNULL" family of ciphers can be used. For example, a configuration for encrypted client-server exchange without peer verification would have identical <code>ssl_params</code> sections like the following in the configuration files for both the server and the client:</p>
+                <div class="code-block"><pre>&#160;
+    ssl_params : {
+        cipher_list: "aNULL",
+        verify_mode: ["verify_none"],
+    }
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

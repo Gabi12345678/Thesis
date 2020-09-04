@@ -1,0 +1,14 @@
+MCO_PRJ_LIST += 13-xml-xml_policy
+PRJ_TARGET_EXECUTABLE_DPTR +=
+PRJ_TARGET_EXECUTABLE_OFFS += 13-xml-xml_policy
+PRJ_13-xml-xml_policy_TAGS:=sample core xml
+PRJ_13-xml-xml_policy_DIR:=$(call mco_project_dir)
+PRJ_13-xml-xml_policy_SRC:=$(call mco_project_file,main.c) $(MCO_SAMPLES_COMMON_DIR)/common.c
+PRJ_13-xml-xml_policy_SCHEMAS:=$(call mco_project_file,schema.mco)
+PRJ_13-xml-xml_policy_DATABASES:=xmlpoldb
+PRJ_13-xml-xml_policy_RUNTIME:=YES
+PRJ_13-xml-xml_policy_MEMDEV:=PRIVATE
+PRJ_13-xml-xml_policy_STORAGE:=TRANSIENT
+PRJ_13-xml-xml_policy_SYNC:=AUTO
+PRJ_13-xml-xml_policy_TRANSMGR:=MURSIW
+PRJ_13-xml-xml_policy_F_XML:=YES

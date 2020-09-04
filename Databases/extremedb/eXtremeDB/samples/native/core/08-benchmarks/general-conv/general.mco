@@ -1,0 +1,38 @@
+/*****************************************************************
+ *                                                               *
+ * Copyright (c) 2001-2019 McObject LLC. All Rights Reserved.    *
+ *                                                               *
+ *****************************************************************/
+
+#define int1      signed<1>
+#define int2      signed<2>
+#define int4      signed<4>
+#define uint8   unsigned<8>
+#define uint4   unsigned<4>
+#define uint2   unsigned<2>
+#define uint1   unsigned<1>
+
+declare database general;
+
+class FixedSizeRecord
+{
+	uint4 key4;
+	uint8 key8;
+    char<10> key10;
+    uint4 value;
+
+	hash <key4> hkey4[500000];
+	tree <key4> tkey4;
+	hash <key8> hkey8[500000];
+	tree <key8> tkey8;
+	hash <key10> hkey10[500000];
+	tree <key10> tkey10;
+};
+
+class VaryingSizeRecord
+{
+	string key;
+    string value;
+	hash <key> hkey[20000];
+	tree <key> tkey;
+};

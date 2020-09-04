@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="Getting Started with eXtremeDB|eXtremeDB Package Contents">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>New Libraries with eXtremeDB 8.0</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <link href="../../Resources/TableStyles/IndentedFunctionReference.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1>New Libraries with <i>e</i>X<i>treme</i>DB 8.0</h1>
+            <blockquote>
+                <p>The <i>e</i>X<i>treme</i>DB packages delivered with version 8.0 and successive releases have newly introduced libraries with respect to previous versions. Please see page <a href="../Package_Contents.htm">Package Contents</a> for a complete description of these libraries and other package contents for your development environment. The sections below describe briefly the newly introduced libraries and those that have been deprecated. Also see page <a href="Upgrading.htm#Upgradin">Upgrading from <i>e</i>X<i>treme</i>DB version 7.1</a> for specific instructions on substituting libraries for applications built with previous releases.</p>
+                <p>Note that the library filenames will be different depending on the development platform. The filenames for static libraries in Unix-Linux packages (including <i>Integrity</i> and <i>VxWorks</i>) begin with the <b>libmco</b> prefix followed by the library name, and have extension <b>.a</b>. The corresponding Windows filenames have the prefix <b>mco</b> and extension <b>.lib</b>. For example, the basic core library <b>mcolib</b> in Unix-Linux packages has filename <b>libmcolib.a</b>, whereas in Windows packages it is named <b>mcolib.lib</b>. In the following sections we use simply the root library name, for example <b>mcolib</b>.</p>
+                <p>Also note that some of the library names contain one of the following acronyms indicating the subsystem to which they belong:</p>
+                <ul>
+                    <li value="1"><b>sal</b> - the System Access Layer (SAL) libraries providing interfaces to underlying platform-dependent operating system services</li>
+                    <li value="2"><b>seq</b> - the <a href="../../Users_Guides/Core/Sequences.htm">Sequences</a> libraries providing  specialized APIs for <a href="../../Users_Guides/Core/Features/Vertical_Storage.htm">vertical data storage</a></li>
+                    <li value="3"><b>sql</b> - the <i>e</i>X<i>treme</i>SQL libraries providing SQL access to <i>e</i>X<i>treme</i>DB databases</li>
+                    <li value="4"><b>iot</b> - the <a href="../../Users_Guides/Active_Data_Replication.htm"><i>e</i>X<i>treme</i>DB<i> Active Replication Fabric</i></a> libraries providing data exchange APIs between "Internet of Things" (IoT) edge devices and database storage </li>
+                    <li value="5"><b>rest</b> - the Web Services libraries providing the popular REST (<a href="./​https://en.wikipedia.org/wiki/Representational_state_transfer">Representational State Transfer</a>) protocol</li>
+                    <li value="6"><b>lua</b> - the <i><a href="../../Users_Guides/SQL/Lua/Lua_Users_Guide.htm"><i>Lua</i></a></i> libraries providing <i>e</i>X<i>treme</i>SQL support for User-Defined Functions ("stored procedures") implemented in the <i>Lua</i> programming language</li>
+                </ul>
+                <h2>Newly Introduced Libraries with Version 8.0</h2>
+                <p>The following libraries are introduced in <i>e</i>X<i>treme</i>DB version 8.0:</p>
+                <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column2" style="width: 562px;" />
+                    <tbody>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcosalmem</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                <p>SAL system memory allocator</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcosalatomic </td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">SAL atomic implementation</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcosallatches</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">SAL latches implementation</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcosaldload</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                <p>SAL dynamic loader</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcosaltimer</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                <p>SAL timer implementations</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcosalsmp</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">SAL inter-process communication</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcosalhollow</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">SAL hollow library (Stub functions <i>for in-memory database single-threaded applications only</i>)</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcoseqmath</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Sequences math implementation</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcoseqrlemath</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                <p>Sequences math implementation for compressed sequences</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcosqlmini</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">SQL stubs / proxy for <i>remote-client-only</i> SQL applications</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcoiotcomm</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">IOT communication library</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcoiotrepl</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                <p>IOT replication</p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcorest</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">REST interface implementation</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcorestdb</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">REST-related database interaction library</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcorestperf</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">REST-related library, access to the performance counters</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcorestsql</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">REST-related library, SQL interface</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcoluaapi</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">LUA module</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcoluaload</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">LUA loader, loads <i>e</i>X<i>treme</i>DB core libraries depending on required functionality</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">libmcoloader</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">
+                                <p>Core loader - used to dynamically load parts of the <i>e</i>X<i>treme</i>DB core on request</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2>Deprecated Libraries</h2>
+                <p>The following libraries have been deprecated with <i>e</i>X<i>treme</i>DB version 8.0:</p>
+                <table class="TableStyle-IndentedFunctionReference" style="mc-table-style: url('../../Resources/TableStyles/IndentedFunctionReference.css');margin-left: 0;margin-right: auto;" cellspacing="0">
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column1" />
+                    <col class="TableStyle-IndentedFunctionReference-Column-Column2" />
+                    <tbody>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">fhcmn</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Eliminated by the FeedHandler libraries re-design</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">testfeed</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Eliminated by the FeedHandler libraries re-design</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">trfeed</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Eliminated by the FeedHandler libraries re-design</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">smdsfeed</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Eliminated by the FeedHandler libraries re-design</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcoapi</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">
+                                <p>Moved to library <b>mcosql </b></p>
+                            </td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcomem</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Moved to SAL</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyE-Column1-Body1">mcosmp</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyD-Column2-Body1">Moved to SAL</td>
+                        </tr>
+                        <tr class="TableStyle-IndentedFunctionReference-Body-Body1">
+                            <td class="TableStyle-IndentedFunctionReference-BodyB-Column1-Body1">mcostrerror</td>
+                            <td class="TableStyle-IndentedFunctionReference-BodyA-Column2-Body1">Moved to <code>mcotrace</code> library</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

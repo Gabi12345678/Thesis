@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title> Incremental Backup and Restore in Python</title>
+        <link href="../../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1> Incremental Backup and Restore in Python</h1>
+            <blockquote>
+                <p><a href="Incremental_Backup.htm">Incremental online backup</a> can be performed while normal database activity proceeds uninterrupted using the  methods described below. Alternatively, there are APIs to save a database image or class data. (See the <a href="../Data_Export_Import/Data_Export_Import_Python.htm">Data Export and Import</a> page for further details.)</p>
+                <h2>BACKUP</h2>
+                <p>The <i>e</i>X<i>treme</i>DB database backup and restore functionality is implemented by the Python class <i>Backup</i> which is used to backup and restore database data to/from an external file. The class is defined with the following constants (which correspond to <code>enum mco_backup_type</code>, <code>enum mco_backup_flags</code> in <a href="../../../Programming/C/Structures/Database_Parameters.htm"><code>struct mco_db_params_t </code></a>in the C API :</p>
+                <div class="code-block"><pre>&#160;
+    class Backup(object):
+        MCO_BACKUP_TYPE_AUTO        = 0
+        MCO_BACKUP_TYPE_SNAPSHOT    = 1
+        MCO_BACKUP_TYPE_INCREMENTAL = 2
+        &#160;
+        MCO_BACKUP_FLAG_COMPRESSED  = 1
+        MCO_BACKUP_FLAG_ENCRYPTED   = 2
+        &#160;</pre>
+                </div>
+                <p>The backup and restore methods are defined as follows:</p>
+                <h3>createBackup()</h3>
+                <div class="code-block"><pre>    &#160;
+    def createBackup(filename = None, label = None, type = MCO_BACKUP_TYPE_AUTO,
+                        compression_level = 0, cipher = None)
+    &#160;</pre>
+                </div>
+                <h3>restoreBackup()</h3>
+                <div class="code-block"><pre>    &#160;
+    def restoreBackup(filename = None, label = None, cipher = None)
+    &#160;</pre>
+                </div>
+                <h3>listBackup()</h3>
+                <p>In addition It is possible to retrieve information from a backup file with method <code>listBackup()</code> defined as follows:</p>
+                <div class="code-block"><pre>&#160;
+    def listBackup(filename = None)
+    &#160;</pre>
+                </div>
+                <p>The <code>listBackup()</code> method returns a list of Python objects with fields <code>Magic, ProtocolVersion, Type, Flags, BackupNo, Timestamp, Size, Offset, Crc, TransNo, MemPageSize, DiskPageSize, NPagesTotal, DbName, Label</code> which correspond to the to <code>struct mco_backup_info_t</code> in <a href="../../../Programming/C/Structures/Database_Parameters.htm"><code>struct mco_db_params_t </code></a>in the C API :</p>
+                <h3>Additional backup parameters</h3>
+                <p>Further backup parameters can be specified in the <i>Database.Parameters</i> used for the <code> exdb.open_database()</code> method that map to the corresponding parameters in the C API:</p>
+                <div class="code-block"><pre>    &#160;
+    def open_database(..., 
+                backup_map_size = 0, backup_min_pages = 0, 
+                backup_max_passes = 10, backup_map_filename = None)
+    &#160;</pre>
+                </div>
+                <p>And, for SQL connections, these parameters are defined as follows:</p>
+                <div class="code-block"><pre>    &#160;
+    class SqlOpenParameters(object):
+        def __init__(..., backupMapSize = 0, backupMinPages = 0,
+        backupMaxPasses = 10, backupMapFile = None)
+        &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>

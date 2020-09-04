@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" lang="en-us" xml:lang="en-us" data-mc-search-type="Stem" data-mc-help-system-file-name="extremedb.xml" data-mc-path-to-help-system="../../../" data-mc-target-type="WebHelp2" data-mc-runtime-file-type="Topic" data-mc-preload-images="false" data-mc-in-preview-mode="false" data-mc-toc-path="[%=System.LinkedTitle%]|High Availability User's Guide|Cluster User's Guide|[%=System.LinkedTitle%]">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>eXtremeDB Cluster Applications in Python</title>
+        <link href="../../../Skins/Default/Stylesheets/Slideshow.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/TextEffects.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Topic.css" rel="stylesheet" />
+        <link href="../../../Skins/Default/Stylesheets/Components/Styles.css" rel="stylesheet" />
+        <link href="../../Resources/Stylesheets/KB_Style.css" rel="stylesheet" />
+        <script src="../../../Resources/Scripts/custom.modernizr.js">
+        </script>
+        <script src="../../../Resources/Scripts/jquery.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/require.config.js">
+        </script>
+        <script src="../../../Resources/Scripts/foundation.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/plugins.min.js">
+        </script>
+        <script src="../../../Resources/Scripts/MadCapAll.js">
+        </script>
+    </head>
+    <body>
+        <div class="TopicContent">
+            <div class="nocontent">
+                <div class="MCBreadcrumbsBox_0 breadcrumbs" data-mc-breadcrumbs-divider=" &gt; " data-mc-breadcrumbs-count="7" data-mc-toc="True"><span class="MCBreadcrumbsPrefix">ToC path: </span>
+                </div>
+            </div>
+            <h1><i>e</i>X<i>treme</i>DB Cluster Applications in Python</h1>
+            <blockquote>
+                <p>Python cluster support is a thin layer over the top of <i>e</i>X<i>treme</i>DB Cluster. To implement a cluster application with Python, an array of Cluster nodes is initialized then the <code>exdb.open_database()</code> method is called and a Listener thread is created for each node. </p>
+                <p><a name="kanchor486"></a>Before creating the cluster, the Python runtime must load the cluster-enabled <i>e</i>X<i>treme</i>DB runtime. This is done by passing parameter <code>cluster = True</code> to method <code>exdb.init_runtime()</code>. (Note that only the <a href="../Core/MVCC_Transaction_Manager.htm" name="kanchor487">MVCC</a><a name="kanchor488"></a> transaction manager is supported for Cluster.)</p>
+                <div class="code-block"><pre>&#160;
+    exdb.init_runtime(is_disk, 'mvcc', is_shm, is_debug, cluster = True)
+    &#160;</pre>
+                </div>
+                <p>Then each node is created by calling <code>exdb.open_database()</code>. For example:</p>
+                <div class="code-block"><pre>&#160;
+    db = exdb.open_database(dbname='clusterdb_%s' % node_id, dictionary=dict, clusterParams=cluster_params,
+                    is_disk=is_disk, db_segment_size=128*1024*1024);
+                    &#160;</pre>
+                </div>
+                <p>Here the database name <code>dbname</code> is made unique by concatenating a unique <code>node_id</code>. The parameter <code>clusterParams</code> is an instance of the Python class exdb.<i>ClusterParams</i> which corresponds with the C API structure <a href="../../Programming/C/Structures/Cluster_Parameters.htm">mco_cluster_params_t</a> . The <code>clusterParams</code> could be initialized as follows to use different ports on the localhost:</p>
+                <div class="code-block"><pre>&#160;
+    nodes = [exdb.ClusterNodeParams("127.0.0.1:2001"),
+            exdb.ClusterNodeParams("127.0.0.1:2002"),
+            exdb.ClusterNodeParams("127.0.0.1:2003")]
+&#160;
+    cluster_params = exdb.ClusterParams(nwtype = 'TCP', nodeId = int(node_id), 
+                    nodes = nodes, notifyCallback=onNotify)
+    &#160;</pre>
+                </div>
+                <p>The<i> ClusterNodeParams</i> class has the following constructor:</p>
+                <div class="code-block"><pre>&#160;
+    def __init__(self, addr, qrank = 1):
+        self.addr = addr
+        self.qrank = qrank
+        &#160;</pre>
+                </div>
+                <p>where <code>addr</code> is the TCP address of node and <code>qrank</code> is quorum rank for this node. </p>
+                <p>&#160;</p>
+                <h2>ClusterParams</h2>
+                <p>The constructor for class <i>exdb.ClusterParams</i> is defined as:</p>
+                <div class="code-block"><pre>&#160;
+    def __init__(self, nodeId, nwtype, nodes = [], nwparams = None, MPICluster = False,
+            window = None, conn_pool_factor = 50, sync_msg_objects = 100, sync_msg_size = 0,
+            notifyCallback = None, quorumCallback = None,
+            clusterSendBuf = 0, clusterRecvBuf = 0, mode_mask = 0):
+            &#160;</pre>
+                </div>
+                <p>where the elements are as follows:</p>
+                <blockquote>
+                    <h3>nodeId </h3>
+                    <p>The integer identifier of this cluster node. Translated to the <code>node_id</code> cluster parameter.</p>
+                    <h3>nwtype </h3>
+                    <p>The type of cluster. Can be either 'TCP' or 'MPI'.</p>
+                    <h3>nodes</h3>
+                    <p>The list of nodes in the cluster. Each node is represented as an instance of class <i>ClusterNodeParams</i>.</p>
+                    <h3>nwparams</h3>
+                    <p>Optional network parameters. A dictionary, setting network parameters for the cluster. keys for the dictionary for a TCP cluster: </p>
+                    <ul>
+                        <li value="1">"connectTimeout"</li>
+                        <li value="2">"connectInterval"</li>
+                        <li value="3">"socketSendBuf"</li>
+                        <li value="4">"socketRecvBuf"</li>
+                        <li value="5">"socketDomain"</li>
+                        <li value="6">"keepAliveTime"</li>
+                        <li value="7">"keepAliveProbes"</li>
+                        <li value="8">"ssl_params" </li>
+                    </ul>
+                    <p>If <code>ssl_params</code> is specified an SSL&#160;layer is used; the parameters for setting an SSL encrypted connection is a dictionary consisting of:</p>
+                    <ul>
+                        <li value="1">"cipher_list" - string</li>
+                        <li value="2">"max_cert_list" - long</li>
+                        <li value="3">"verify_mode" - int</li>
+                        <li value="4">"verify_depth" - long</li>
+                        <li value="5">"cert_file_pem" - string</li>
+                        <li value="6">"pkey_file_pem" - string</li>
+                    </ul>
+                    <p>An example of <code>nwparams</code> parameter usage:</p>
+                    <div class="code-block"><pre>&#160;
+    nwparams = {"connectTimeout" : 15000, "keepAliveTime" : 600}
+    &#160;</pre>
+                    </div>
+                    <h3>MPICluster</h3>
+                    <p>Set to <code>True</code> if <a href="CL_MPI.htm">MPI channel</a> is used.</p>
+                    <h3>window</h3>
+                    <p>An object of type <i>ClusterWindow</i> which is declared as follows:</p>
+                    <div class="code-block"><pre>&#160;
+    class ClusterWindow(object):
+        def __init__(self, bsize = 0, length = 0, timeout = 1):
+                self.bsize   = bsize
+                self.length  = length
+                self.timeout = timeout
+                &#160;</pre>
+                    </div>
+                    <h3>conn_pool_factor</h3>
+                    <p>An integer value specifying the size of the connection pool (as a percent of <code><a href="../../Programming/C/Structures/Database_Parameters.htm"><code>db_max_connections</code></a></code>).</p>
+                    <h3>sync_msg_objects</h3>
+                    <p>An integer value specifying the maximum number of objects per message during synchronization.</p>
+                    <h3>sync_msg_size</h3>
+                    <p>An integer value specifying the maximum size of a message in bytes during synchronization.</p>
+                    <h3>notifyCallback</h3>
+                    <p>Python callback functions to receive cluster notifications. For example:</p>
+                    <div class="code-block"><pre>&#160;
+    notifications = ["connect", "disconnect"]
+    &#160;
+    def onNotify(notification_code, node_info):
+        print 'Cluster notification: code %s info %s' % (notifications[notification_code], node_info)
+    &#160;</pre>
+                    </div>
+                    <h3>quorumCallback</h3>
+                    <p>A callback function to be called when a Cluster Quorum is not reached</p>
+                    <h3>clusterSendBuf</h3>
+                    <p>An integer value specifying the internal send buffer size in bytes.</p>
+                    <h3>clusterRecvBuf</h3>
+                    <p>An integer value specifying the internal receive buffer size in bytes.</p>
+                    <h3>mode_mask</h3>
+                    <p>A cluster mode mask (<code><a href="../../Programming/C/Structures/Cluster_Parameters.htm"><code>mco_cluster_params_t::mode_mask</code></a></code>); combination of <code>debug_output</code> (<code>MCO_CLUSTER_MODE_DEBUG_OUTPUT</code>) and</p>
+                    <p><code>early_data_send</code> (<code>MCO_CLUSTER_MODE_EARLY_DATA_SEND</code>).</p>
+                    <p>&#160;</p>
+                </blockquote>
+                <h2>Example</h2>
+                <p>The following code snippet (from sample <code>samples/python/cluster</code>) demonstrates how a simple Python Cluster application performs these steps:</p>
+                <div class="code-block"><pre>    &#160;
+    class ListenThread(threading.Thread):
+        def __init__(self, db):
+            self.db = db
+            super(ListenThread, self).__init__()
+&#160;
+        def run(self):
+            print "Listen thread started"
+            con = self.db.connect()
+            print "Listen thread connected:", con
+            con.listen()
+            con.close()
+        }
+    &#160;
+    ...
+    notifications = ["connect", "disconnect"]
+&#160;
+    def onNotify(notification_code, node_info):
+        print 'Cluster notification: code %s info %s' % (notifications[notification_code], node_info)
+    &#160;
+    ...
+    &#160;
+    def start_node(n_nodes, node_id, q = None):
+    ...
+&#160;
+    exdb.init_runtime(is_disk, 'mvcc', is_shm, is_debug, cluster = True)
+    db = None
+    try:
+        # use different ports on the localhost
+        nodes = [exdb.ClusterNodeParams("127.0.0.1:200%s" % (10 + i * 10)) for i in xrange(n_nodes)]
+&#160;
+        cluster_params = exdb.ClusterParams(nwtype = 'TCP', nodeId = int(node_id), 
+                            nodes = nodes, notifyCallback=onNotify)
+&#160;
+        dict = exdb.load_dictionary(schema, persistent=is_disk, debug=is_debug)
+        db = exdb.open_database(dbname='clusterdb_%s' % node_id, dictionary=dict, 
+                    clusterParams=cluster_params,
+                    is_disk=is_disk, db_segment_size=128*1024*1024);
+        print 'Node %s: Database opened' % node_id
+&#160;
+        listenThread = ListenThread(db)
+        listenThread.start()
+&#160;
+        print 'Node %s: ListenThread started' % node_id
+        with db.connect() as con:
+            print 'Node %s: Database connected' % node_id
+            startTime = time.time()
+            doWork(con, n_nodes, node_id)
+            stopTime = time.time()
+            print 'Node %s: Work finished' % node_id
+            con.stop() # stop cluster runtime. Returns after ALL nodes call stop()
+            stopAllTime = time.time()
+            print 'Node %s: Connection stopped' % node_id
+            &#160;
+            listenThread.join()
+            ...
+    finally:
+        if not db is None:
+        db.close()
+    return
+    &#160;</pre>
+                </div>
+            </blockquote>
+            <p style="font-size: 6pt;margin-top: 0;margin-bottom: 0;">&#160;</p>
+            <hr width="100%" size="0" align="center" />
+            <p class="copyright" style="font-size: 8pt;"><a href="../../Copyright_Notice.htm" title="Copyright Notice" alt="Copyright Notice">© 2001-2019 McObject LLC. All rights reserved</a>.</p>
+            <p class="copyright" style="font-size: 8pt;">&#160;</p>
+            <p class="copyrightFeedback" style="font-size: 8pt;"><a href="mailto:Support@McObject.com?subject=Online Documentation feedback">Send feedback</a> <span style="color: #000000;">on this topic to McObject. </span></p>
+        </div>
+    </body>
+    <script id="MCO-LINKS">/* <![CDATA[ */
+		(function(){
+		var isFramed = false;
+		try {
+		isFramed = window != window.top || document != top.document || self.location != top.location;
+		} catch (e) {
+		isFramed = true;
+		}
+		if (!isFramed) {
+		var link1 = document.createElement('a');
+		link1.setAttribute('href','#');
+		link1.setAttribute('id','back-id');
+		link1.setAttribute('title','Go back');
+		link1.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M0 0h24v24H0z" fill="none" /><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg>';
+		var link2 = document.createElement('a');
+		link2.setAttribute('href','/');
+		link2.setAttribute('title','Go to mcobject.com');
+		link2.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var link3 = document.createElement('a');
+		link3.setAttribute('href','/docs/extremedb.htm');
+		link3.setAttribute('title','Go to table of content');
+		link3.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#555555"><path d="M3 9h14V7H3v2zm0 4h14v-2H3v2zm0 4h14v-2H3v2zm16 0h2v-2h-2v2zm0-10v2h2V7h-2zm0 6h2v-2h-2v2z" /><path d="M0 0h24v24H0z" fill="none" /></svg>';
+		var el = document.createElement('div');
+		el.style.cssText = 'position:fixed;display:flex;flex-direction:column;right:16px;top:8px;background:#f7f7f7;box-shadow:4px 4px 4px #777777;padding:4px 8px;';
+		el.appendChild(link1);
+		el.appendChild(link2);
+		el.appendChild(link3);
+		document.body.append(el);
+		document.querySelector('#back-id').addEventListener('click',function(e){e.preventDefault(); window.history.back();});
+		}
+		})();
+	/* ]]> */</script>
+</html>
