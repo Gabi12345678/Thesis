@@ -1,34 +1,31 @@
 # Script to run individual algorithms directly from files
 
-___
 ## Python requirements
 ```bash
 pip3 install -r requirements.txt
 ```
 
-___
-## Running an algoirth
+## Running an algoirthm
 
 Simple usage
 ```bash
-./run --algorithm <algorithm_name> --datafile <filepath>
+./run.py --algorithm <algorithm_name> --datafile <filepath>
 ```
 
 Example for KMeans
 ```bash
-./run --algorithm kmeans --datafile ./data.txt
+./run.py --algorithm kmeans --datafile ./data.txt
 ```
 
 Some algorithm might require additional parameters. Please consult script help if unsure
 ```bash
-./run --help
+./run.py --help
 ```
 
 Example of setting additional parameters for KMeans
 ```bash
-./run --algorithm kmeans --clusters 20 --iterations 10
+./run.py --algorithm kmeans --clusters 20 --iterations 10
 ```
 
-___
 ## Note
 Note that the data provided in this directory only serves as an example and was hand-generated for testing purposes.
