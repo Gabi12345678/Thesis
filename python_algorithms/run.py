@@ -3,6 +3,9 @@
 import argparse
 import sys
 import numpy as np
+import warnings
+
+warnings.filterwarnings('ignore')
 
 parser = argparse.ArgumentParser(description = 'Script to run any algorithm directly from data files.')
 
@@ -38,6 +41,12 @@ kmeansGroup.add_argument('--iterations',
 				default = 10,
 				help = 'Number of iterations of the algorithm.')
 
+hotsaxGroup = parser.add_argument_group(title = 'HOTSAX parameters')
+hotsaxGroup.add_argument('--saxwindow',
+				nargs = '?',
+				type = int,
+				default = 10,
+				help = 'Size of the window.')
 
 recovGroup = parser.add_argument_group(title = 'Recov parameters')
 recovGroup.add_argument('--trunc_col',
@@ -68,7 +77,7 @@ screenGroup.add_argument('--smin',
 				type = float,
 				default = -0.01,
 				help = 'Minimum speed increase for Screen - Note, this is usually a negative value, to signify decrease')
-screenGroup.add_argument('--windowSize',
+screenGroup.add_argument('--screenwindow',
 				nargs = '?',
 				type = int,
 				default = 5,
@@ -137,10 +146,10 @@ elif args.algorithm == 'sax':
 			outfile.write("\n".join(result))
 
 elif args.algorithm == 'hotsax':
-	print('Running Anomaly detection(HotSax) algorithm')
+	print('Running HotSax algorithm')
 
 	from hot_sax.hotsax import hotsax
-	result = hotsax(data)
+	result = hotsax(data, args.saxwindow)
 	if args.outfile:
 		with open(args.outfile, "w") as outfile:
 			outfile.write("\n".join( map(str, result)))
@@ -152,9 +161,9 @@ elif args.algorithm == 'screen':
 		sys.exit()
 
 	from screen.screen import screen
-	result = screen(data, timestamps, args.smax, args.smin, args.windowSize)
+	result = screen(data, timestamps, args.smax, args.smin, args.screenwindow)
 	if args.outfile:
-		np.savetxt(args.outfile, result, delimite = ' ')
+		np.savetxt(args.outfile, result, delimiter = ' ')
 
 elif args.algorithm == 'znormalization':
 	print('Running ZNormalization algorithm')
