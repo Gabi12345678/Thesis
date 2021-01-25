@@ -1,5 +1,5 @@
-CREATE TABLE datapoints(t TIMESTAMP, <column_types>);
-CREATE TABLE missing_values(t TIMESTAMP, <column_types>);
+CREATE TABLE datapoints(t TIMESTAMP, d ARRAY(DOUBLE));
+CREATE TABLE missing_values(t TIMESTAMP, d ARRAY(DOUBLE));
 CREATE TABLE metrics_insert(current_time DOUBLE, disk_usage INTEGER);
 CREATE TABLE metrics_udf (current_time DOUBLE);
 
@@ -41,38 +41,38 @@ create function udf() RETURNS string in 'python' as '
 	timestamps = []
 
 	for i in range(lines):
-		current_line = []
-		for j in range(columns):
-			current_line.append(results[i][j+1])
-		current_line = np.array(current_line)
-		matrix.append(current_line)
-		timestamps.append(results[i][0])
+		matrix.append( np.array( results[i][1] ) )
+		timestamps.append( results[i][0] )
 	matrix = np.array(matrix)
 	
 	n = matrix.shape[0]
 	m = matrix.shape[1]
-	k = m - 1
-	rec_time,iterations,rmse,rec_mat = recovery.recovery(matrix,n,m,k,0,0)
+	k = 3
+	rec_time,iterations,rmse,rec_mat = recovery.recovery(matrix,n,m,k,0.2,10)
 	rec_mat = rec_mat.tolist()
 	
 	start_epoch = <start_time>
 	for i in range(len(rec_mat)):
 		time = timestamps[i]
-		cur.execute("INSERT INTO missing_values(t) VALUES (?)", (time,) )
-		for j in range(0, columns, 50):
-			start_interval = j
-			end_interval = min(columns, start_interval + 50)
-			update_sql = "UPDATE missing_values SET"
-			for t in range(start_interval, end_interval):
-				update_sql = update_sql + " d" + str(t) + " = ?,"
-			update_sql = update_sql[:-1] + " WHERE t = ?"
-			cur.execute(update_sql, tuple(rec_mat[i][start_interval:end_interval]) + (time,))
+		cur.execute("INSERT INTO missing_values(t, d) VALUES (?, ?)", (timestamps[i], tuple(rec_mat[i])))
 
 	return "success"
 
 ';
 
 create function import_data() RETURNS string in 'python' as '
+	def get_datetime(s):
+		from datetime import datetime
+		try:
+			return (datetime.strptime(s, "%Y-%m-%dT%H:%M:%S"), "seconds")
+		except ValueError:
+			pass
+		try:
+			return (datetime.strptime(s, "%Y-%m-%dT%H:%M"), "minutes")
+		except ValueError:
+			pass
+		return (datetime.strptime(s, "%Y-%m-%d"), "days")
+
 	import datetime
 	import numpy as np
 	exdb.init_runtime(skip_load = True)
@@ -84,23 +84,9 @@ create function import_data() RETURNS string in 'python' as '
 	columns = <columns>
 	for i in range(lines):
 		line = f.readline()[:-1].split(",")
-		time = datetime.datetime.strptime(line[0], "%Y-%m-%dT%H:%M:%S")
-		current_line = []
-		for j in range(columns):
-			try:
-				current_line.append( float(line[j + 1]) )
-			except ValueError:
-				current_line.append( np.nan )
-		cur.execute("INSERT INTO datapoints(t) VALUES (?)", (time, ))
-
-		for j in range(0, columns, 50):
-			start_interval = j
-			end_interval = min(columns, start_interval + 50)
-			update_sql = "UPDATE datapoints SET"
-			for t in range(start_interval, end_interval):
-				update_sql = update_sql + " d" + str(t) + " = ?,"
-			update_sql = update_sql[:-1] + " WHERE t = ?"
-			cur.execute(update_sql, tuple(current_line[start_interval:end_interval]) + (time, ) )
+		time = get_datetime(line[0])[0]
+		data = [float(x) for x in line[1:]]
+		cur.execute("INSERT INTO datapoints(t, d) VALUES (?, ?)", (time, data))
 
 	return "success"
 

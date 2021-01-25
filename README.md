@@ -16,8 +16,3 @@ Downloads that Datasets and installs all databases analysed. Please note that so
 ```bash
 $ sh install_all.sh
 ```
-
-___
-## Execution
-
-TODO after creating a common script.

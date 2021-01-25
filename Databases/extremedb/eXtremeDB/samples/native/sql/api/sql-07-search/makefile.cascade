@@ -1,7 +1,0 @@
--include $(call mco_makefile_file, \
-btree/makefile.project.btree \
-cursor/makefile.project.cursor \
-hash/makefile.project.hash \
-patricia/makefile.project.patricia \
-rtree/makefile.project.rtree \
-)

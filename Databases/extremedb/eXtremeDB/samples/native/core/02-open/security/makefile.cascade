@@ -1,4 +1,0 @@
--include $(call mco_makefile_file, \
-disk_cipher/makefile.project.disk_cipher \
-disk_crc/makefile.project.disk_crc \
-)

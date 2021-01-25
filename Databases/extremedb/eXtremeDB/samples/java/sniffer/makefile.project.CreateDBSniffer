@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += CreateDBSniffer
-PRJ_TARGET_CLASS += CreateDBSniffer
-PRJ_CreateDBSniffer_TAGS:=sample core java
-PRJ_CreateDBSniffer_DIR :=$(call mco_project_dir)
-PRJ_CreateDBSniffer_SRC :=$(call mco_project_file,CreateDBSniffer.java)

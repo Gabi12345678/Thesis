@@ -91,6 +91,7 @@ class KMeansHandler(Handler):
 
     output_file = open("<output_file>", "a")
     output_file.write(str(self.matrix.shape) + " -- " + str((self.final_time - self.initial_time).total_seconds()) + "\n")
+    output_file.close()
 
 if __name__ == '__main__':
   agent = Agent()

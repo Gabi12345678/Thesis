@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += Open2
-PRJ_TARGET_CLASS += Open2
-PRJ_Open2_TAGS:=sample java core
-PRJ_Open2_DIR :=$(call mco_project_dir)
-PRJ_Open2_SRC :=$(call mco_project_file,Open2.java)

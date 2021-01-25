@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += Open
-PRJ_TARGET_CLASS += Open
-PRJ_Open_TAGS:=sample java core
-PRJ_Open_DIR :=$(call mco_project_dir)
-PRJ_Open_SRC :=$(call mco_project_file,Open.java)

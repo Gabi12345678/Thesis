@@ -1,9 +1,0 @@
--include $(call mco_makefile_file, \
-bse-conv/makefile.project.bse-conv \
-bse-disk/makefile.project.bse-disk \
-db-conv/makefile.project.db-conv \
-db-disk/makefile.project.db-disk \
-migrate/makefile.project.migrate \
-online/makefile.project.online \
-online-async/makefile.project.online-async \
-)

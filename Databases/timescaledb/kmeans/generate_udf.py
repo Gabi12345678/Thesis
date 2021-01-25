@@ -5,7 +5,7 @@ import os
 
 
 parser = argparse.ArgumentParser(description = 'Script to run K-means in TimescaleDB')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synth_1K.txt')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/hydraulic.txt')
 parser.add_argument('--lines', nargs='*', type=int, default=[100],
 	help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 30" will try (20, 30)')
 parser.add_argument('--columns', nargs='*', type=int, default=[100],
@@ -26,9 +26,7 @@ for lines in args.lines:
 		g = open(args.file + ".csv", "w")
 		for i in tqdm(range(lines)):
 			values = f.readline()[:-1].split(" ")
-			time = datetime.fromtimestamp(args.start_time + i * 10).strftime("%Y-%m-%d %H:%M:%S")
-			values = [time] + values[:columns]
-			g.write(",".join(values) + "\n")
+			g.write(values[0] + ",\"{" + ",".join(values[1:(columns + 1)]) + "}\"\n")
 		f.close()
 		g.close()
 
@@ -39,10 +37,10 @@ for lines in args.lines:
 		f = open(args.udf_template, "r")
 		g = open(args.udf_template + ".sql", "w")
 		for l in f.readlines():
-			g.write( l.replace("<column_types>", column_types).replace("<lines>", str(lines)).replace("<columns>", str(columns)).replace("<data_file>", args.file + ".csv").replace("<implementation_path>", args.implementation_path) )
+			g.write( l.replace("<lines>", str(lines)).replace("<columns>", str(columns)).replace("<data_file>", args.file + ".csv").replace("<implementation_path>", args.implementation_path) )
 		f.close()
 		g.close()
-
+		
 		os.system("psql -f " + args.udf_template + ".sql")
 		os.system("rm " + args.udf_template + ".sql")
 		os.system("rm " + args.file + ".csv")

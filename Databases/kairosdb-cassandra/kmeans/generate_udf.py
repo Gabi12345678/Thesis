@@ -10,8 +10,20 @@ import time
 from datetime import datetime
 from cassandra.cluster import Cluster, NoHostAvailable
 
-parser = argparse.ArgumentParser(description = 'Script to run K-Means in Kairos')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synth_1K.txt')
+def get_datetime(s):
+    from datetime import datetime
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M:%S"), "seconds")
+    except ValueError:
+        pass
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M"), "minutes")
+    except ValueError:
+        pass
+    return (datetime.strptime(s, "%Y-%m-%d"), "days")
+
+parser = argparse.ArgumentParser(description = 'Script to run KMeans in Kairos')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/alabama_weather.txt')
 parser.add_argument('--lines', nargs='*', type=int, default = [100],
         help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 10 --columns 4" will try (10, 4)')
 parser.add_argument('--columns', nargs='*', type=int, default = [100],
@@ -46,12 +58,14 @@ for lines in args.lines:
 		except subprocess.CalledProcessError:
 			pass
 		try:
-			Cluster(['localhost']).connect('kairosdb').execute('drop keyspace kairosdb;')
+			session = Cluster(['localhost']).connect('kairosdb')
+			session.default_timeout = 1200
+			session.execute('drop keyspace kairosdb;')
 			print("Data deleted.")
 		except NoHostAvailable:
-			print("No previous data exists. Skipping delete.")
+			print("No previous data exists. Skipping delete")
 		print("Starting Kairosdb")
-		kairos = subprocess.Popen([args.kairos_path, "run"])#, stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
+		kairos = subprocess.Popen([args.kairos_path, "run"], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
 		time.sleep(4)
 		while True:
 			try:
@@ -63,17 +77,22 @@ for lines in args.lines:
 			break
 		print("Kairos is ready")
 		print("Generating data for (" + str(lines) + ", " + str(columns) + ")")
-		
+
 		initial_time = current_time()
+		start_interval = 10**12
+		end_interval = 0
 		f = open(args.file, "r")
 		for i in tqdm(range(lines)):
 			values = f.readline()[:-1].split(" ")
-			t = (args.start_time + i * 10) * 1000
+			t = (get_datetime(values[0])[0] - datetime(1970, 1, 1)).total_seconds() * 1000
+			t = int(t)
+			start_interval = min(start_interval, t)
+			end_interval = max(end_interval, t)
 			data = []
 			for j in range(columns):
 				data.append({
 					"name": "master.data",
-					"datapoints": [[t, values[j]]],
+					"datapoints": [[t, values[j + 1]]],
 					"tags": {
 						"dim": "dim" + str(j)
 					}
@@ -81,17 +100,19 @@ for lines in args.lines:
 			r = requests.post("http://localhost:8080/api/v1/datapoints", data = json.dumps(data))
 		print("Waiting for data to be commited")
 		session = Cluster(['localhost']).connect('kairosdb')
+		session.default_timeout = 1200
 		cnt = [r for r in session.execute('select count(*) from data_points;')][0].count
 		print(cnt)
-		while cnt != lines * columns:
+		while cnt < lines * columns:
 			time.sleep(0.01)
-			cnt = [r for r in session.execute('select count(*) from data_points;')][0].count
 			print(cnt)
+			cnt = [r for r in session.execute('select count(*) from data_points;')][0].count
 		final_time = current_time()
-
+	
+		print("Starting UDF")
 		dataSave = {
-			"start_absolute": (args.start_time - 10) * 1000,
-			"end_absolute": (args.start_time + 10 + 10 * lines) * 1000, 
+			"start_absolute": start_interval - 10000,
+			"end_absolute": end_interval + 10000,
 			"metrics": [ 
 				{ 
 					"name": "master.data", 
@@ -134,5 +155,5 @@ for lines in args.lines:
 		print("Throughput (V/sec):", 1.0 * lines * columns / (final_time - initial_time))
 		print("KMeans time:", final_time_udf - initial_time_udf)
 		print("*" * 100)
-		
+
 		subprocess.check_output("rm " + args.queue_dir + " -R", shell=True)

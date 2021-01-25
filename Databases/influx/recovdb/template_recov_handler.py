@@ -67,7 +67,7 @@ class RecovHandler(Handler):
 
     n, m = self.matrix.shape
     start_time = datetime.now()
-    rec_time, iter, rmse, rec_mat = recovery.recovery(self.matrix, n, m, m - 1, 0.2, 1)
+    rec_time, iter, rmse, rec_mat = recovery.recovery(self.matrix, n, m, 3, 0.2, 10)
     logger.info(str(rec_mat))
     end_time = datetime.now()
 

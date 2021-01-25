@@ -1,5 +1,0 @@
--include $(call mco_makefile_file, \
-autoid_ref/makefile.project.autoid_ref \
-autoid_vector/makefile.project.autoid_vector \
-index_join/makefile.project.index_join \
-)

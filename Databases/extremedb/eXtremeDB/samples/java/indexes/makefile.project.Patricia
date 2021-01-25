@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += Patricia
-PRJ_TARGET_CLASS += Patricia
-PRJ_Patricia_TAGS:=sample core java
-PRJ_Patricia_DIR :=$(call mco_project_dir)
-PRJ_Patricia_SRC :=$(call mco_project_file,Patricia.java)

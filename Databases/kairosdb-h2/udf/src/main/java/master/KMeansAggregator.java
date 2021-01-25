@@ -1,6 +1,5 @@
 package master;
 
-import master.NumpyDataPointGroup;
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import org.kairosdb.plugin.*;
@@ -8,7 +7,6 @@ import org.kairosdb.core.datastore.*;
 import org.kairosdb.core.datapoints.*;
 import org.kairosdb.core.*;
 import org.kairosdb.core.annotation.*;
-import jep.*;
 import java.util.*;
 import java.lang.*;
 import java.io.*;
@@ -22,7 +20,6 @@ import javax.inject.Inject;
 public class KMeansAggregator implements Aggregator {
 	public static final Logger logger = (Logger) LoggerFactory.getLogger(KMeansAggregator.class);
 
-	private String pythonKMeansImplementation;
 	private DoubleDataPointFactory dataPointFactory;
 	private ArrayList<DataPoint> dataPointList;
 	private HashSet<Long> uniqueTimestamps;
@@ -42,9 +39,7 @@ public class KMeansAggregator implements Aggregator {
 	private int columns;
 
 	@Inject
-	public KMeansAggregator(@Named("kairosdb.udf.kmeans.implementation") String pythonKMeansImplementation,
-				DoubleDataPointFactory dataPointFactory) {
-		this.pythonKMeansImplementation = pythonKMeansImplementation;
+	public KMeansAggregator(DoubleDataPointFactory dataPointFactory) {
 		this.dataPointFactory = dataPointFactory;
 		this.dataPointList = new ArrayList<DataPoint>();
 		this.uniqueTimestamps = new HashSet<Long>();
@@ -61,7 +56,6 @@ public class KMeansAggregator implements Aggregator {
 
 	@Override
 	public DataPointGroup aggregate(DataPointGroup dataPointGroup) {
-		try {
 			while (dataPointGroup.hasNext()) {
 				DataPoint currentDataPoint = dataPointGroup.next();
 				dataPointList.add(currentDataPoint);
@@ -83,37 +77,22 @@ public class KMeansAggregator implements Aggregator {
 				index++;
 			}
 
-			float[] data = new float[lines * columns];
+			double[][] data = new double[lines][columns];
 			for (int i = 0; i < dataPointList.size(); ++i) {	
 				DataPoint dp = dataPointList.get(i);
 				String[] dimTags = dp.getDataPointGroup().getTagValues("dim").toArray(new String[0]);
 				Integer indexLine = indexLines.get(dp.getTimestamp());
 				Integer indexColumn = Integer.parseInt(dimTags[0].substring(3));
-				data[indexLine * columns + indexColumn] = (float) dp.getDoubleValue();
-				
+				data[indexLine][indexColumn] = (double) dp.getDoubleValue();
 			}
-			NDArray<float[]> numpyArray = new NDArray<float[]>(data, lines, columns);
-			
-			SharedInterpreter interp = new SharedInterpreter();
-			interp.exec("import sys");
-			interp.exec("sys.path.append('" + pythonKMeansImplementation + "')");
-			interp.exec("import kmeans");
-			interp.set("data", numpyArray);
-			interp.exec("clusters = kmeans.kmeans(data, 10, 20)");
-			NDArray<float[]> clusters = interp.getValue("clusters", numpyArray.getClass());
-			interp.close();
+		 	
+			double[][] clusters = KMeans.kmeans(data, 10, 20);
+
 			logger.info("Applied KMeans");
 
 			cleanData();
 
-			return new NumpyDataPointGroup(this.dataPointFactory, dataPointGroup.getName() + ".result", clusters, timestamps); 
-		} catch (JepException e){
-			StringWriter w = new StringWriter();
-                        e.printStackTrace(new PrintWriter(w));
-                        logger.info(w.toString());
-		}
-		cleanData();
-		return dataPointGroup;
+			return new MatrixDataPointGroup(this.dataPointFactory, dataPointGroup.getName() + ".result", clusters, timestamps); 
 	}
 
 	@Override

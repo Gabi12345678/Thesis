@@ -4,7 +4,7 @@ import argparse
 import os
 
 parser = argparse.ArgumentParser(description = 'Script to run K-Means in eXtremeDB')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synth_1K.txt')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/hydraulic.txt')
 parser.add_argument('--lines', nargs='*', type=int, default=[1000], help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 4" will try (20, 4)')
 parser.add_argument('--columns', nargs='*', type=int, default=[100], help='list of integers representing the number of lines to try out. Used together with --lines. For example "--lines 20 --columns 4" will try (20, 4)')
 parser.add_argument('--start_time', nargs='?', type=int, help='epoch time of the first datasample. All other will be set at 10 seconds intervals', default=1583000000)
@@ -22,8 +22,7 @@ for lines in args.lines:
 		g = open(args.file + ".csv", "w")
 		for i in tqdm(range(lines)):
 			values = f.readline()[:-1].split(" ")
-			time = datetime.fromtimestamp(args.start_time + i * 10).strftime("%Y-%m-%d %H:%M:%S")
-			values = [time] + values[:columns]
+			values = values[:columns + 1]
 			g.write(",".join(values) + "\n")
 		f.close()
 		g.close()
@@ -53,5 +52,5 @@ for lines in args.lines:
 		os.system("rm mydb*")
 		os.system("PYTHONPATH=../eXtremeDB/target/bin/python ../eXtremeDB/target/bin/xsql -c db.config -f udf_template.sql.sql -b")
 		os.system("rm " + args.file + ".csv")
-os.system("rm " + args.udf_template + ".sql")
+#os.system("rm " + args.udf_template + ".sql")
 os.system("rm mydb*")

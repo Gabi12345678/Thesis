@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += Ttl
-PRJ_TARGET_CLASS += Ttl
-PRJ_Ttl_TAGS:=sample java core
-PRJ_Ttl_DIR :=$(call mco_project_dir)
-PRJ_Ttl_SRC :=$(call mco_project_file,Ttl.java)

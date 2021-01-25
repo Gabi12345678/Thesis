@@ -1,8 +1,0 @@
-declare database backupdb;
-
-class A {
-    unsigned<4> id;
-    
-    tree<id> by_id;
-};
-

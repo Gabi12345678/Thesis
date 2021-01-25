@@ -1,3 +1,0 @@
-MCO_FILE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
--include $(MCO_FILE_DIR)makefile.project.TLogDBSource
--include $(MCO_FILE_DIR)makefile.project.TLogIterPipe_Native

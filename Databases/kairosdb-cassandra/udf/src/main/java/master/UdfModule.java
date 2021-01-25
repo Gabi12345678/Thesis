@@ -14,6 +14,9 @@ public class UdfModule extends AbstractModule
 		bind(HotSaxAggregator.class);
 		bind(ZScoreAggregator.class);
 		bind(ScreenAggregator.class);
-		bind(ZScoreJava.class);
+		bind(DstreeIndexAggregator.class);
+		bind(DstreeSearchAggregator.class);
+		bind(SaxRepresentationAggregator.class);
+		bind(KNNAggregator.class);
 	}
 }

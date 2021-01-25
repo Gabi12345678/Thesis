@@ -1,6 +1,6 @@
 package master;
 
-import master.NumpyDataPointGroup;
+import master.ZScore;
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import org.kairosdb.plugin.*;
@@ -8,7 +8,6 @@ import org.kairosdb.core.datastore.*;
 import org.kairosdb.core.datapoints.*;
 import org.kairosdb.core.*;
 import org.kairosdb.core.annotation.*;
-import jep.*;
 import java.util.*;
 import java.lang.*;
 import java.io.*;
@@ -17,12 +16,11 @@ import javax.inject.Inject;
 
 @FeatureComponent(
         name = "zscore",
-	description = "UDF for ZScore."
+	description = "UDF for ZScore in Java."
 )
 public class ZScoreAggregator implements Aggregator {
-	public static final Logger logger = (Logger) LoggerFactory.getLogger(KMeansAggregator.class);
+	public static final Logger logger = (Logger) LoggerFactory.getLogger(ZScoreAggregator.class);
 
-	private String pythonZScoreImplementation;
 	private DoubleDataPointFactory dataPointFactory;
 	private ArrayList<DataPoint> dataPointList;
 	private HashSet<Long> uniqueTimestamps;
@@ -42,9 +40,7 @@ public class ZScoreAggregator implements Aggregator {
 	private int columns;
 
 	@Inject
-	public ZScoreAggregator(@Named("kairosdb.udf.zscore.implementation") String pythonZScoreImplementation,
-				DoubleDataPointFactory dataPointFactory) {
-		this.pythonZScoreImplementation = pythonZScoreImplementation;
+	public ZScoreAggregator(DoubleDataPointFactory dataPointFactory) {
 		this.dataPointFactory = dataPointFactory;
 		this.dataPointList = new ArrayList<DataPoint>();
 		this.uniqueTimestamps = new HashSet<Long>();
@@ -61,7 +57,6 @@ public class ZScoreAggregator implements Aggregator {
 
 	@Override
 	public DataPointGroup aggregate(DataPointGroup dataPointGroup) {
-		try {
 			while (dataPointGroup.hasNext()) {
 				DataPoint currentDataPoint = dataPointGroup.next();
 				dataPointList.add(currentDataPoint);
@@ -83,39 +78,29 @@ public class ZScoreAggregator implements Aggregator {
 				index++;
 			}
 
-			float[] data = new float[lines * columns];
+			float[][] data = new float[lines][columns];
 			for (int i = 0; i < dataPointList.size(); ++i) {	
 				DataPoint dp = dataPointList.get(i);
 				String[] dimTags = dp.getDataPointGroup().getTagValues("dim").toArray(new String[0]);
 				Integer indexLine = indexLines.get(dp.getTimestamp());
 				Integer indexColumn = Integer.parseInt(dimTags[0].substring(3));
-				data[indexLine * columns + indexColumn] = (float) dp.getDoubleValue();
+				data[indexLine][indexColumn] = (float) dp.getDoubleValue();
 				
 			}
-			NDArray<float[]> numpyArray = new NDArray<float[]>(data, lines, columns);
+			data = ZScore.zScore(data);
 			
-			SharedInterpreter interp = new SharedInterpreter();
-			interp.exec("import sys");
-			interp.exec("sys.path.append('" + pythonZScoreImplementation + "')");
-			interp.exec("import znormalization");
-			interp.exec("import numpy as np");
-			interp.set("data", numpyArray);
-			interp.exec("zscore = znormalization.zscore(data)");
-			interp.exec("zscore = zscore.astype(np.float32)");
-			NDArray<float[]> zscore = interp.getValue("zscore", numpyArray.getClass());
-			interp.close();
-			logger.info("Applied ZNormalization");
+			double[][] result = new double[lines][columns];
+			for (int i = 0; i < lines; ++i) {
+				for (int j = 0; j < columns; ++j) {
+					result[i][j] = (double) data[i][j];
+				}
+			}
+			
+			logger.info("Applied Normalization");
 
 			cleanData();
 
-			return new NumpyDataPointGroup(this.dataPointFactory, dataPointGroup.getName() + ".result", zscore, timestamps); 
-		} catch (JepException e){
-			StringWriter w = new StringWriter();
-                        e.printStackTrace(new PrintWriter(w));
-                        logger.info(w.toString());
-		}
-		cleanData();
-		return dataPointGroup;
+			return new MatrixDataPointGroup(this.dataPointFactory, dataPointGroup.getName() + ".result", result, timestamps); 
 	}
 
 	@Override

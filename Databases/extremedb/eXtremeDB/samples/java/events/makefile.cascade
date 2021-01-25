@@ -1,5 +1,0 @@
--include $(call mco_makefile_file, \
-asyncbasic/makefile.project.AsyncEvent \
-asyncnative/makefile.project.AsyncNative \
-asyncnative/makefile.project.Async_Native \
-)

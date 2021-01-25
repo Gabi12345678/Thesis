@@ -1,7 +1,0 @@
-#MCO_ROOT=$(abspath .)
--include $(call mco_makefile_file,host/makefile.cascade\
-target/makefile.cascade\
-odbc/makefile.cascade\
-samples/makefile.cascade\
-licensing/makefile.cascade\
-)

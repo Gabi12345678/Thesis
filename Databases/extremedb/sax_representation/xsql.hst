@@ -1,0 +1,21 @@
+show tables;
+select * from datapoints;
+ 
+select * from datapoints;
+SELECT * from datapoints;
+select * from screen;
+select * from screen;
+select * from screen;
+q
+;
+q
+;
+ 
+ 
+q;
+\q
+;
+\quit;
+select * from datapoints;
+select * from result_sax;
+select count(*) from result_sax;

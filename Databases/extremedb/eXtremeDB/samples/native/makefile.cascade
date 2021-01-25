@@ -1,9 +1,0 @@
--include $(call mco_makefile_file, \
-core/makefile.cascade \
-sql/makefile.cascade \
-cluster/makefile.cascade \
-ha/makefile.cascade \
-iot/makefile.cascade \
-tl/makefile.cascade \
-sequences/makefile.cascade \
-) 

@@ -6,8 +6,24 @@ import socket
 import time
 import requests
 
+def get_datetime(s):
+    from datetime import datetime
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M:%S"), "seconds")
+    except ValueError:
+        pass
+    try:
+        f = datetime.strptime(s, "%Y-%m-%dT%H:%M")
+        if f < datetime(2020, 11, 1):
+            return (f, "minutes.long")
+        else:
+            return (f, "minutes.short")
+    except ValueError:
+        pass
+    return (datetime.strptime(s, "%Y-%m-%d"), "days")
+
 parser = argparse.ArgumentParser(description = 'Script to run K-Means in Graphite')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synth_1K.txt')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/hydraulic.txt')
 parser.add_argument('--lines', nargs='*', type=int, default = [100],
         help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 10 --columns 4" will try (10, 4)')
 parser.add_argument('--columns', nargs='*', type=int, default = [100],
@@ -31,7 +47,6 @@ def get_size(start_path = args.storage_path):
 	return total_size
 
 
-
 for lines in args.lines:
 	for columns in args.columns:
 		print("Deleting previous data")
@@ -46,61 +61,80 @@ for lines in args.lines:
 		sock.setblocking(1)
 
 		initial_size = get_size()
-		initial_time = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
 
 		f = open(args.file, "r")
+		t1 = 10**12
+		t2 = -1
+		values = [[]] * lines
 		for i in tqdm(range(lines)):
-			values = f.readline()[:-1].split(" ")
-			currentTime = args.start_time + i * 10
-			for j in range(columns):
-				insert_value = "master.dim" + str(j) + " " + values[j] + " " + str(currentTime) + "\n"
-				sock.sendall( bytes(insert_value, "UTF-8") )
+			values[i] = f.readline()[:-1].split(" ")
+			currentTime, args.format = get_datetime(values[i][0])
+			currentTime = (currentTime - datetime(1970, 1, 1)).total_seconds()
+			currentTime = int(currentTime)
+			t1 = min(t1, currentTime)
+			t2 = max(t2, currentTime)
 		f.close()
+		
+		bucket_size = 2000
+		total_time = 0.0
+		initial_time = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+		for j in tqdm(range(columns)):
+			for i in range(lines):
+				currentTime, args.format = get_datetime(values[i][0])
+				currentTime = (currentTime - datetime(1970, 1, 1)).total_seconds()
+				currentTime = int(currentTime)
+				insert_value = "master." + args.format + ".dim" + str(j) + " " + values[i][j + 1] + " " + str(currentTime) + "\n"
+				sock.sendall( bytes(insert_value, "UTF-8") )
+			if (j + 1) % bucket_size == 0 or j == columns - 1:	
+				while True:
+					try:
+						initial_last_modified = os.path.getmtime(args.storage_path + "/" + args.format.replace(".", "/"))
+					except FileNotFoundError:
+						continue
+					break
+				time.sleep(60)
+				current_last_modified = os.path.getmtime(args.storage_path + "/" + args.format.replace(".", "/"))
+				print(current_last_modified)
+				while current_last_modified != initial_last_modified:
+					initial_last_modified = current_last_modified
+					time.sleep(60)
+					current_last_modified = os.path.getmtime(args.storage_path + "/" + args.format.replace(".", "/"))
+					print(current_last_modified)
+				total_time = total_time + (current_last_modified - initial_time)
+				initial_time = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
 		sock.close()
-
-		print("Waiting for Graphite to commit data to disk...")
-		while True:
-			try:
-				initial_last_modified = os.path.getmtime(args.storage_path)
-			except FileNotFoundError:
-				continue
-			break
-		time.sleep(1)
-		current_last_modified = os.path.getmtime(args.storage_path)
-		while current_last_modified != initial_last_modified:
-			initial_last_modified = current_last_modified
-			time.sleep(1)
-			current_last_modified = os.path.getmtime(args.storage_path)
-
+			
 		final_size = get_size()
-		final_time = current_last_modified
 
 		print("+" * 100)
 		print("Total size bytes: ", final_size - initial_size)
 		print("Total size megabytes: ", float(final_size - initial_size) / 1024.0 / 1024.0)
-		print("Total time in seconds: ", final_time - initial_time)
-		print("Throughput inserts per second: ", float(lines) / (final_time - initial_time))
-		print("Throughput valuess per second: ", float(lines * columns) / (final_time - initial_time))
+		print("Total time in seconds: ", total_time)
+		print("Throughput inserts per second: ", float(lines) / total_time)
+		print("Throughput valuess per second: ", float(lines * columns) / total_time)
 		print("+" * 100)
 
 		initial_time = (datetime.now() - datetime(1970, 1, 1)).total_seconds()	
 
 		params = {
-			'from': args.start_time - 20,
-			'until': args.start_time + (lines + 2) * 10,
+			'from': t1 - 20,
+			'until': t2 + 20,
 			'format': 'csv',
-			'target': 'kmeans(master.dim*)',
+			'target': 'kmeans(master.' + args.format + '.dim*)',
 		}
 		
 		r = requests.get(url = "http://localhost/render", params = params)
-		print(r.text)
 		final_time = (datetime.now() - datetime(1970, 1, 1)).total_seconds()
+		q = open("out.txt", "w")
+		q.write(r.text)
+		q.close()
 		print("+" * 100)
 		print("KMeans time: ", final_time - initial_time)
 		print("+" * 100)
 
 print("Cleaning up data")
-return_value = os.system("sudo rm -rf " + args.storage_path)
+#return_value = os.system("sudo rm -rf " + args.storage_path)
+return_value = 0
 while return_value != 0:
 	print("Error while cleaning up. Retrying...")
 	return_value = os.system("sudo rm -rf " + args.storage_path)

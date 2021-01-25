@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from datetime import datetime
 
 def distance(datapoint, cluster):
 	return np.sum( np.square( datapoint - cluster ) )
@@ -9,7 +10,7 @@ def kmeans(datapoints, clusters_count, iterations):
 	columns = datapoints.shape[1]
 
 	clusters = np.asarray( random.sample(list(datapoints), clusters_count) )
-	for t in range(iterations):		
+	for t in range(iterations):	
 		sum_clusters = np.zeros([clusters_count, columns])
 		count_clusters = np.zeros([clusters_count])
 		for i in range(lines):

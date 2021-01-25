@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += Autoid_vector
-PRJ_TARGET_CLASS += Autoid_vector
-PRJ_Autoid_vector_TAGS:=sample core java
-PRJ_Autoid_vector_DIR :=$(call mco_project_dir)
-PRJ_Autoid_vector_SRC :=$(call mco_project_file,Autoid_vector.java)

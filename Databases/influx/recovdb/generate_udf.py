@@ -2,15 +2,28 @@ import subprocess
 from datetime import datetime
 from tqdm import tqdm
 from influxdb import InfluxDBClient
+import influxdb
 import argparse
 import os
 import time
 import socket
 import sys
 
+def get_datetime(s):
+    from datetime import datetime
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M:%S"), "seconds")
+    except ValueError:
+        pass
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M"), "minutes")
+    except ValueError:
+        pass
+    return (datetime.strptime(s, "%Y-%m-%d"), "days")
+
 # Arguments
 parser = argparse.ArgumentParser(description = 'Script to run RecovDB in Influx')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/real.txt')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/alabama_weather.txt')
 parser.add_argument('--lines', nargs='*', type=int, default=[100],help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 4" will try (20, 4)')
 parser.add_argument('--columns', nargs='*', type=int, default=[10],help='list of integers representing the number of columns to try out. Used together with --lines. For example "--lines 20 --columns 4" will try (20, 4)')
 parser.add_argument('--start_time', nargs='?', type=int, help = "Epoch time in second for the first measurement. All others will be 10 seconds apart", default=1583000000)
@@ -93,16 +106,24 @@ for line in args.lines:
 
 		f = open(args.file, "r")
 		l = []
+		bucket_size = 100
+		if line > 10000:
+			bucket_size = 10
 		for x in tqdm(range(line)):
 			s = f.readline()[:-1].split(" ")
-			t = int((datetime.strptime(s[0], "%Y-%m-%dT%H:%M:%S") - datetime(1970, 1, 1)).total_seconds())
+			t = int((get_datetime(s[0])[0] - datetime(1970, 1, 1)).total_seconds())
 			v = {}
 			for y in range(column):
 				v["dim" + str(y)] = float(s[y + 1])
 			body = {"measurement": "puncte", "time": t * 1000000000, "fields": v }
 			l.append(body)
-			if len(l) == 10000:
-				client.write_points(l)
+			if len(l) == bucket_size:
+				while True:
+					try:
+						client.write_points(l)
+					except influxdb.exceptions.InfluxDBServerError:
+						continue
+					break
 				l = []
 		client.write_points(l)
 
@@ -122,7 +143,7 @@ for line in args.lines:
 		subprocess.run([args.kapacitor_path, "delete", "replays", "udf-replay"])
 		subprocess.run([args.kapacitor_path, "delete", "recordings", "udf-recording"])
 
-		subprocess.run([args.kapacitor_path, "record", "batch", "-past", "10000d", "-recording-id", "udf-recording", "-task", "udf"])
+		subprocess.run([args.kapacitor_path, "record", "batch", "-past", "4000d", "-recording-id", "udf-recording", "-task", "udf"])
 		subprocess.run([args.kapacitor_path, "replay", "-recording", "udf-recording", "-replay-id", "udf-replay", "-task", "udf"])
 
 print("Terminating kapacitor")
@@ -131,6 +152,6 @@ kapacitor.terminate()
 print("Terminating influx")
 influx.terminate()
 
-#subprocess.run(["rm", args.kapacitor_config_path])
-#subprocess.run(["rm", args.recov_handler_path])
+subprocess.run(["rm", args.kapacitor_config_path])
+subprocess.run(["rm", args.recov_handler_path])
 

@@ -29,7 +29,11 @@ public class CentroidDecomposition {
 		result.z = new Array2DRowRealMatrix(n, m);
 
 		for (int i = 0; i < m; ++i) {
-			result.z.setColumnMatrix(i, SSV_init(matrix) );
+			if (n < 5000) {
+				result.z.setColumnMatrix(i, SSV(matrix) );
+			} else {
+				result.z.setColumnMatrix(i, SSV_init(matrix) );
+			}
 
 			double norm = matrix.transpose().multiply( result.z.getColumnMatrix(i) ).getFrobeniusNorm();
 			if (norm <= 0.0)

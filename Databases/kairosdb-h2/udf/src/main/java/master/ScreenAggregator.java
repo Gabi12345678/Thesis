@@ -1,6 +1,5 @@
 package master;
 
-import master.NumpyDataPointGroup;
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import org.kairosdb.plugin.*;
@@ -8,7 +7,6 @@ import org.kairosdb.core.datastore.*;
 import org.kairosdb.core.datapoints.*;
 import org.kairosdb.core.*;
 import org.kairosdb.core.annotation.*;
-import jep.*;
 import java.util.*;
 import java.lang.*;
 import java.io.*;
@@ -90,31 +88,29 @@ public class ScreenAggregator implements Aggregator {
 				data[indexLine][indexColumn] = (float) dp.getDoubleValue();
 				
 			}
-			float[] result = new float[lines * columns];
+			double[][] result = new double[lines][columns];
 			for (int j = 0; j < columns; ++j) {
 				ArrayList<TimePoint> timePoints = new ArrayList<TimePoint>();
 				for (int i = 0; i < lines; ++i) {
 					timePoints.add( new TimePoint(timestamps.get(i), data[i][j]));
 				}
-				Screen screenAlg = new Screen(new TimeSeries(timePoints), 0.00001, -0.00001, 4);
+				Screen screenAlg = new Screen(new TimeSeries(timePoints), 0.0001, -0.0001, 300000);
 				ArrayList<TimePoint> ts = screenAlg.mainScreen().getTimeseries();
 				for(int i = 0; i < lines; ++i) {
 					TimePoint p = ts.get(i);
 					if (p.isModified()) {
-						result[i * columns + j] = (float) p.getModify();
+						result[i][j] = (float) p.getModify();
 					} else {
-						result[i * columns + j] = (float) p.getValue();
+						result[i][j] = (float) p.getValue();
 					}
 				}
 			}
-			
-			NDArray<float[]> screen = new NDArray<float[]>(result, lines, columns);
 			
 			logger.info("Applied Normalization");
 
 			cleanData();
 
-			return new NumpyDataPointGroup(this.dataPointFactory, dataPointGroup.getName() + ".result", screen, timestamps); 
+			return new MatrixDataPointGroup(this.dataPointFactory, dataPointGroup.getName() + ".result", result, timestamps);
 	}
 
 	@Override

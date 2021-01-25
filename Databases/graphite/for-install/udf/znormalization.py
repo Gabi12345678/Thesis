@@ -14,6 +14,8 @@ def zscore(datapoints):
 		for i in range(lines): 
 			stdev = stdev + ((datapoints[i][j] - avg) ** 2)
 		stdev = math.sqrt(stdev / lines)
+		if (stdev <= 0.001) and (stdev >= -0.001):
+			stdev = 1.0
 		for i in range(lines):	
 			result[i][j] = (datapoints[i][j] - avg) / stdev
 	return result

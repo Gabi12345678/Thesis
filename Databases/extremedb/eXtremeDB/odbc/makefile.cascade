@@ -1,4 +1,0 @@
--include $(call mco_makefile_file, \
-src/makefile.cascade \
-samples/makefile.cascade \
-)

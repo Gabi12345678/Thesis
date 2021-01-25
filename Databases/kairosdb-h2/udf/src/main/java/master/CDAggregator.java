@@ -1,6 +1,5 @@
 package master;
 
-import master.NumpyDataPointGroup;
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import org.kairosdb.plugin.*;
@@ -8,21 +7,20 @@ import org.kairosdb.core.datastore.*;
 import org.kairosdb.core.datapoints.*;
 import org.kairosdb.core.*;
 import org.kairosdb.core.annotation.*;
-import jep.*;
 import java.util.*;
 import java.lang.*;
 import java.io.*;
 import com.google.inject.name.Named;
 import javax.inject.Inject;
+import org.apache.commons.math3.linear.*;
 
 @FeatureComponent(
         name = "cd",
-	description = "UDF for CD."
+	description = "UDF for CD"
 )
 public class CDAggregator implements Aggregator {
 	public static final Logger logger = (Logger) LoggerFactory.getLogger(CDAggregator.class);
 
-	private String pythonCDImplementation;
 	private DoubleDataPointFactory dataPointFactory;
 	private ArrayList<DataPoint> dataPointList;
 	private HashSet<Long> uniqueTimestamps;
@@ -42,9 +40,7 @@ public class CDAggregator implements Aggregator {
 	private int columns;
 
 	@Inject
-	public CDAggregator(@Named("kairosdb.udf.cd.implementation") String pythonCDImplementation,
-				DoubleDataPointFactory dataPointFactory) {
-		this.pythonCDImplementation = pythonCDImplementation;
+	public CDAggregator(DoubleDataPointFactory dataPointFactory) {
 		this.dataPointFactory = dataPointFactory;
 		this.dataPointList = new ArrayList<DataPoint>();
 		this.uniqueTimestamps = new HashSet<Long>();
@@ -61,7 +57,6 @@ public class CDAggregator implements Aggregator {
 
 	@Override
 	public DataPointGroup aggregate(DataPointGroup dataPointGroup) {
-		try {
 			while (dataPointGroup.hasNext()) {
 				DataPoint currentDataPoint = dataPointGroup.next();
 				dataPointList.add(currentDataPoint);
@@ -83,38 +78,23 @@ public class CDAggregator implements Aggregator {
 				index++;
 			}
 
-			float[] data = new float[lines * columns];
+			double[][] data = new double[lines][columns];
 			for (int i = 0; i < dataPointList.size(); ++i) {	
 				DataPoint dp = dataPointList.get(i);
 				String[] dimTags = dp.getDataPointGroup().getTagValues("dim").toArray(new String[0]);
 				Integer indexLine = indexLines.get(dp.getTimestamp());
 				Integer indexColumn = Integer.parseInt(dimTags[0].substring(3));
-				data[indexLine * columns + indexColumn] = (float) dp.getDoubleValue();
-				
+				data[indexLine][indexColumn] = (double) dp.getDoubleValue();
 			}
-			NDArray<float[]> numpyArray = new NDArray<float[]>(data, lines, columns);
+		 	
+			RealMatrix input = new Array2DRowRealMatrix( data );
+			CentroidDecompositionResult result = CentroidDecomposition.CD(input);
 			
-			SharedInterpreter interp = new SharedInterpreter();
-			interp.exec("import sys");
-			interp.exec("sys.path.append('" + pythonCDImplementation + "')");
-			interp.exec("import cd_ssv");
-			interp.exec("import numpy as np");
-			interp.set("data", numpyArray);
-			interp.exec("matrix_l, matrix_r, z = cd_ssv.CD(data, " + lines + ", " + columns + ")");
-			interp.exec("matrix_r = matrix_r.astype(np.float32)");
-			NDArray<float[]> matrixR = interp.getValue("matrix_r", numpyArray.getClass());
-			interp.close();
 			logger.info("Applied CD");
 
 			cleanData();
-			return new NumpyDataPointGroup(this.dataPointFactory, dataPointGroup.getName() + ".result", matrixR, timestamps); 
-		} catch (JepException e){
-			StringWriter w = new StringWriter();
-                        e.printStackTrace(new PrintWriter(w));
-                        logger.info(w.toString());
-		}
-		cleanData();
-		return dataPointGroup;
+
+			return new MatrixDataPointGroup(this.dataPointFactory, dataPointGroup.getName() + ".result", result.R.getData(), timestamps); 
 	}
 
 	@Override

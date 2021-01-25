@@ -9,8 +9,20 @@ import subprocess
 import time
 from datetime import datetime
 
+def get_datetime(s):
+    from datetime import datetime
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M:%S"), "seconds")
+    except ValueError:
+        pass
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M"), "minutes")
+    except ValueError:
+        pass
+    return (datetime.strptime(s, "%Y-%m-%d"), "days")
+
 parser = argparse.ArgumentParser(description = 'Script to run Recov in Kairos')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/real.txt')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/alabama_weather.txt')
 parser.add_argument('--lines', nargs='*', type=int, default = [100],
         help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 10 --columns 4" will try (10, 4)')
 parser.add_argument('--columns', nargs='*', type=int, default = [100],
@@ -56,15 +68,20 @@ for lines in args.lines:
 		r = requests.delete("http://localhost:8080/api/v1/metric/master.data.result")
 
 		initial_time = current_time()
+		start_interval = 1000000000000000
+		end_interval = 0
 		f = open(args.file, "r")
 		for i in tqdm(range(lines)):
 			values = f.readline()[:-1].split(" ")
-			t = (args.start_time + i * 10) * 1000
+			t = (get_datetime(values[0])[0] - datetime(1970, 1, 1)).total_seconds() * 1000
+			t = int(t)
+			start_interval = min(start_interval, t)
+			end_interval = max(end_interval, t)
 			data = []
 			for j in range(columns):
 				data.append({
 					"name": "master.data",
-					"datapoints": [[t, values[j]]],
+					"datapoints": [[t, values[j + 1]]],
 					"tags": {
 						"dim": "dim" + str(j)
 					}
@@ -73,8 +90,8 @@ for lines in args.lines:
 		final_time = current_time()
 
 		dataSave = {
-			"start_absolute": (args.start_time - 10) * 1000,
-			"end_absolute": (args.start_time + 10 + 10 * lines) * 1000, 
+			"start_absolute": start_interval - 10000,
+			"end_absolute": end_interval + 10000, 
 			"metrics": [ 
 				{ 
 					"name": "master.data", 

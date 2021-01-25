@@ -102,11 +102,15 @@ def ZCD(x,z,k,n,m):
 def zcd_recovery(X_tilde,n,m,trunc_col,epsilon,missing_rows,missing_cols,z):
     iteration=1
     X_init = np.zeros([n, m])
+    print("Iteration = 1")
+    print(X_tilde)
     while ((LA.norm(X_init[missing_rows,missing_cols]-X_tilde[missing_rows,missing_cols]))/(len(missing_rows))>epsilon) and (iteration<200):
         iteration+=1
         X_init=X_tilde.copy()
         L,R = ZCD(X_tilde,z,(X_tilde.shape[1]-trunc_col),n,m)
         X_new=np.dot(L,np.transpose(R))
+        print("Iteration =", iteration)
+        print(X_new)
         X_tilde[missing_rows,missing_cols]=X_new[missing_rows,missing_cols]              
     return X_tilde,iteration 
 
@@ -180,6 +184,9 @@ def recovery(input_matrix,n,m,trunc_col,perc,col_drop):
    epsilon=1
    ts1 = time.time()
    L,R,z = CD(X_tilde,(X_tilde.shape[1]-trunc_col),n,m)
+   print("L=\n", L)
+   print("R=\n", R)
+   print("Z=\n", z)
    X_rec,iteration= zcd_recovery(X_tilde,n,m,trunc_col,epsilon,missing_rows,missing_cols,z)
    ts2 = time.time()
    return (ts2 - ts1),iteration,rmse((X_rec/1e5), (input_matrix/1e5)),X_rec

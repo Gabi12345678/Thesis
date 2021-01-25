@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += RTree
-PRJ_TARGET_CLASS += RTree
-PRJ_RTree_TAGS:=sample core java rtree
-PRJ_RTree_DIR :=$(call mco_project_dir)
-PRJ_RTree_SRC :=$(call mco_project_file,RTree.java)

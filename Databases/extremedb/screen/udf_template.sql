@@ -1,5 +1,5 @@
-CREATE TABLE datapoints (t TIMESTAMP, <column_types>);
-CREATE TABLE screen (t TIMESTAMP, <column_types>);
+CREATE TABLE datapoints (t TIMESTAMP, d ARRAY(DOUBLE));
+CREATE TABLE screen (t TIMESTAMP, d ARRAY(DOUBLE));
 CREATE TABLE metrics_insert (current_time DOUBLE, disk_usage INTEGER);
 CREATE TABLE metrics_udf (current_time DOUBLE);
 
@@ -35,41 +35,38 @@ create function udf() RETURNS string in 'python' as '
 	cur = current_session.cursor()
 	cur.execute("SELECT * FROM datapoints")
 	results = cur.fetchall()
-	
+
 	lines = <lines>
 	columns = <columns>
 	matrix = []
 	
 	timestamps = []
 	for i in range(lines):
-		current_line = []
-		timestamps.append(results[i][0])
-		for j in range(columns):
-			current_line.append(results[i][j+1])
-		current_line = np.array(current_line)
-		matrix.append(current_line)
+		matrix.append( np.array( results[i][1] ) )
+		timestamps.append( results[i][0] )
 	timestamps = [int((x - datetime(1970, 1, 1)).total_seconds()) for x in timestamps]
-	open("/home/gabi/debug.txt", "w").write(str(timestamps))
 	matrix = np.array(matrix)
-	screen = screen.screen(matrix, timestamps, 0.1, -0.1, 5)
+	s = screen.screen(matrix, timestamps, 0.1, -0.1, 300)
 
-	start_epoch = <start_time>
-	for i in range(lines):
-		time = datetime.fromtimestamp(start_epoch + i * 10)
-		cur.execute("INSERT INTO screen(t) VALUES (?)", (time,) )
-		for j in range(0, columns, 50):
-			start_interval = j
-			end_interval = min(columns, start_interval + 50)
-			update_sql = "UPDATE screen SET"
-			for t in range(start_interval, end_interval):
-				update_sql = update_sql + " d" + str(t) + " = ?,"
-			update_sql = update_sql[:-1] + " WHERE t = ?"
-			cur.execute(update_sql, tuple(screen[i][start_interval:end_interval]) + (time,))
-
+	for i in range(len(s)):
+		cur.execute("INSERT INTO screen(t, d) VALUES (?, ?)", (timestamps[i], tuple(s[i])))
+	
 	return "success"
 ';
 
 create function import_data() RETURNS string in 'python' as '
+	def get_datetime(s):
+		from datetime import datetime
+		try:
+			return (datetime.strptime(s, "%Y-%m-%dT%H:%M:%S"), "seconds")
+		except ValueError:
+			pass
+		try:
+			return (datetime.strptime(s, "%Y-%m-%dT%H:%M"), "minutes")
+		except ValueError:
+			pass
+		return (datetime.strptime(s, "%Y-%m-%d"), "days")
+
 	import datetime
 	exdb.init_runtime(skip_load = True)
 	cur = current_session.cursor()
@@ -80,20 +77,9 @@ create function import_data() RETURNS string in 'python' as '
 	columns = <columns>
 	for i in range(lines):
 		line = f.readline()[:-1].split(",")
-		time = datetime.datetime.strptime(line[0], "%Y-%m-%d %H:%M:%S")
-		current_line = []
-		for j in range(columns):
-			current_line.append( float(line[j + 1]) )
-		cur.execute("INSERT INTO datapoints(t) VALUES (?)", (time, ))
-		
-		for j in range(0, columns, 50):
-			start_interval = j
-			end_interval = min(columns, start_interval + 50)
-			update_sql = "UPDATE datapoints SET"
-			for t in range(start_interval, end_interval):
-				update_sql = update_sql + " d" + str(t) + " = ?,"
-			update_sql = update_sql[:-1] + " WHERE t = ?"
-			cur.execute(update_sql, tuple(current_line[start_interval:end_interval]) + (time, ) )
+		time = get_datetime(line[0])[0]
+		data = [float(x) for x in line[1:]]
+		cur.execute("INSERT INTO datapoints(t, d) VALUES (?, ?)", (time, data))
 	
 	return "success"
 ';

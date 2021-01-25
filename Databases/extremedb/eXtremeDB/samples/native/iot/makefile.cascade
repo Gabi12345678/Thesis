@@ -1,7 +1,0 @@
--include $(call mco_makefile_file, \
-iot_simple/device/makefile.project.iot_simple_dev \
-iot_simple/server/makefile.project.iot_simple_srv \
-iot_notify/device/makefile.project.iot_notify_dev \
-iot_notify/router/makefile.project.iot_notify_rt \
-iot_notify/server/makefile.project.iot_notify_srv \
-)

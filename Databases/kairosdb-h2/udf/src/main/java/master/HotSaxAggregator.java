@@ -1,6 +1,5 @@
 package master;
 
-import master.NumpyDataPointGroup;
 import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 import org.kairosdb.plugin.*;
@@ -8,26 +7,26 @@ import org.kairosdb.core.datastore.*;
 import org.kairosdb.core.datapoints.*;
 import org.kairosdb.core.*;
 import org.kairosdb.core.annotation.*;
-import jep.*;
 import java.util.*;
 import java.lang.*;
 import java.io.*;
 import com.google.inject.name.Named;
 import javax.inject.Inject;
+import org.apache.commons.math3.linear.*;
+import java.util.stream.Collectors;
 
 @FeatureComponent(
-	name = "hotsax",
-	description = "UDF for Hot Sax."
+        name = "hotsax",
+	description = "UDF for CD"
 )
 public class HotSaxAggregator implements Aggregator {
 	public static final Logger logger = (Logger) LoggerFactory.getLogger(HotSaxAggregator.class);
 
-	private String pythonHotSaxImplementation;
 	private DoubleDataPointFactory dataPointFactory;
 	private ArrayList<DataPoint> dataPointList;
 	private HashSet<Long> uniqueTimestamps;
 
-	@FeatureProperty(
+	@FeatureProperty( 
 		name = "lines",
 		label = "Lines",
 		description = "Number of datapoints for each of the measurements."
@@ -42,15 +41,13 @@ public class HotSaxAggregator implements Aggregator {
 	private int columns;
 
 	@Inject
-	public HotSaxAggregator(@Named("kairosdb.udf.sax.implementation") String pythonHotSaxImplementation,
-				DoubleDataPointFactory dataPointFactory) {
-		this.pythonHotSaxImplementation = pythonHotSaxImplementation;
+	public HotSaxAggregator(DoubleDataPointFactory dataPointFactory) {
 		this.dataPointFactory = dataPointFactory;
 		this.dataPointList = new ArrayList<DataPoint>();
 		this.uniqueTimestamps = new HashSet<Long>();
 	}
 
-
+	
 	public void setLines(int lines) {
 		this.lines = lines;
 	}
@@ -61,7 +58,6 @@ public class HotSaxAggregator implements Aggregator {
 
 	@Override
 	public DataPointGroup aggregate(DataPointGroup dataPointGroup) {
-		try {
 			while (dataPointGroup.hasNext()) {
 				DataPoint currentDataPoint = dataPointGroup.next();
 				dataPointList.add(currentDataPoint);
@@ -83,39 +79,35 @@ public class HotSaxAggregator implements Aggregator {
 				index++;
 			}
 
-			float[] data = new float[lines * columns];
-			for (int i = 0; i < dataPointList.size(); ++i) {
-                                DataPoint dp = dataPointList.get(i);
- 				String[] dimTags = dp.getDataPointGroup().getTagValues("dim").toArray(new String[0]);
+			double[][] data = new double[lines][columns];
+			for (int i = 0; i < dataPointList.size(); ++i) {	
+				DataPoint dp = dataPointList.get(i);
+				String[] dimTags = dp.getDataPointGroup().getTagValues("dim").toArray(new String[0]);
 				Integer indexLine = indexLines.get(dp.getTimestamp());
 				Integer indexColumn = Integer.parseInt(dimTags[0].substring(3));
-				data[indexLine * columns + indexColumn] = (float) dp.getDoubleValue();
-
+				data[indexLine][indexColumn] = (double) dp.getDoubleValue();
 			}
-			NDArray<float[]> numpyArray = new NDArray<float[]>(data, lines, columns);
-
-			SharedInterpreter interp = new SharedInterpreter();
-			interp.exec("import sys");
-			interp.exec("sys.path.append('" + pythonHotSaxImplementation + "')");
-			interp.exec("import hotsax");
-			interp.exec("import numpy as np");
-			interp.set("data", numpyArray);
-			interp.exec("discords = hotsax.hotsax(data)");
-			interp.exec("discords = np.array(discords).astype(np.float32)");
-			NDArray<float[]> discords = interp.getValue("discords", numpyArray.getClass());
-			interp.close();
+		 
+			List<Discord> discords = new ArrayList<Discord>();
+			for (int i = 0; i < columns; ++i) {
+				List<Double> current_column = new ArrayList<Double>();
+				for (int j = 0; j < lines; ++j) {
+					current_column.add(data[j][i]);
+				}
+				List<Discord> current_discords = HotSax.find_discords_hotsax(current_column, 100, 2, 3, 3, 0.01); 
+				discords.addAll(current_discords);
+			}
+			double[][] result = new double[discords.size()][2];
+			for (int i = 0; i < discords.size(); ++i) {
+				result[i][0] = discords.get(i).distance;
+				result[i][1] = timestamps.get( discords.get(i).position );
+			}
+			logger.info(Arrays.deepToString(result));
 			logger.info("Applied HotSax");
 
 			cleanData();
 
-			return new NumpyDataPointGroup(this.dataPointFactory, dataPointGroup.getName() + ".result", discords, timestamps);
-		} catch (JepException e){
-			StringWriter w = new StringWriter();
-			e.printStackTrace(new PrintWriter(w));
-			logger.info(w.toString());
-		}
-		cleanData();
-		return dataPointGroup;
+			return new MatrixDataPointGroup(this.dataPointFactory, dataPointGroup.getName() + ".result", result, timestamps); 
 	}
 
 	@Override
@@ -133,4 +125,3 @@ public class HotSaxAggregator implements Aggregator {
 		this.uniqueTimestamps = new HashSet<Long>();
 	}
 }
-

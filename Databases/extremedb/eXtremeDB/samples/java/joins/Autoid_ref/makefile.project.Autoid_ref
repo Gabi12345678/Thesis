@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += Autoid_ref
-PRJ_TARGET_CLASS += Autoid_ref
-PRJ_Autoid_ref_TAGS:=sample core java
-PRJ_Autoid_ref_DIR :=$(call mco_project_dir)
-PRJ_Autoid_ref_SRC :=$(call mco_project_file,Autoid_ref.java)

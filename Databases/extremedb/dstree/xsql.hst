@@ -1,0 +1,13 @@
+select * from dastapoints
+;
+select * from datapoints
+;
+select * from datapoints;
+select * from datapoints;
+select * from distances;
+\t
+;
+select * from datapoints;
+select * from datapoints;
+select * from distances;
+SELECT * FROM metrics_insert;

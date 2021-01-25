@@ -1,0 +1,15 @@
+dbrp "master"."autogen"
+
+batch
+	|query('SELECT * AS dist FROM "master"."autogen"."puncte"')
+		.every(4000d)
+		.period(4000d)
+	|eval(lambda: sqrt(pow("a0" - "b0", 2.0) + pow("a1" - "b1", 2.0)))
+		.as('dist')
+		.keep('dist')
+	|influxDBOut()
+		.database('master')
+		.retentionPolicy('autogen')
+		.measurement('output')
+	
+	

@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += JDBCBatch
-PRJ_TARGET_CLASS += JDBCBatch
-PRJ_JDBCBatch_TAGS:=sample java jdbc
-PRJ_JDBCBatch_DIR :=$(call mco_project_dir)
-PRJ_JDBCBatch_SRC :=$(call mco_project_file,JDBCBatch.java)

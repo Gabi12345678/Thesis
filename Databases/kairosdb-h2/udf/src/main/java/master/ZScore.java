@@ -18,6 +18,9 @@ public class ZScore {
 				stdev = stdev + (datapoints[i][j] - avg) * (datapoints[i][j] - avg);
 			}
 			stdev = (float) Math.sqrt(stdev / lines);
+			if (stdev <= 0.001 && stdev >= -0.001) {
+				stdev = (float) 1.0;
+			}
 			for (int i = 0; i < lines; i++) {
 				result[i][j] = (datapoints[i][j] - avg) / stdev;
 			}

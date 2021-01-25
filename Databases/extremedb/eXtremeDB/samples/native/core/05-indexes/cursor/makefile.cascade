@@ -1,4 +1,0 @@
--include $(call mco_makefile_file, \
-basic/makefile.project.basic \
-store/makefile.project.store \
-)

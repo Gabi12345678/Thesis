@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += sqlserver
-PRJ_TARGET_CLASS += sqlserver
-PRJ_sqlserver_TAGS:=sample java sql net
-PRJ_sqlserver_DIR :=$(call mco_project_dir)
-PRJ_sqlserver_SRC :=$(call mco_project_file,sqlserver.java)

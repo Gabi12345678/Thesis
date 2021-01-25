@@ -1,4 +1,0 @@
--include $(call mco_makefile_file, \
-diskrecovery/makefile.project.diskrecovery \
-sniffer/makefile.project.sniffer \
-)

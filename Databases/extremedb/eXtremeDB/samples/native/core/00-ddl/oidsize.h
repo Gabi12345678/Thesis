@@ -1,1 +1,0 @@
-#define OID_SIZE 10000

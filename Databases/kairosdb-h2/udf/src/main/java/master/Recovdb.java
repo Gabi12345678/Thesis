@@ -1,9 +1,13 @@
 package master;
 
+import ch.qos.logback.classic.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.math3.linear.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Recovdb {
+	public static final Logger logger = (Logger) LoggerFactory.getLogger(Recovdb.class);
 	public static void main(String[] args) {
 		System.out.println("\n\n\n***********************************************************************\n");
 		Array2DRowRealMatrix input = new Array2DRowRealMatrix(
@@ -64,6 +68,8 @@ public class Recovdb {
 						next_value = matrix.getEntry(mb_end, column);
 					if (mb_start == 0)
 						prev_value = next_value;
+					if (mb_end == n)
+						next_value = prev_value;
 					step = (next_value - prev_value) / (mb_end - mb_start + 1);
 				}
 				matrix.setEntry(i, column, prev_value + step * (i - mb_start + 1));
@@ -124,14 +130,15 @@ public class Recovdb {
 		result.L = new Array2DRowRealMatrix(n, m);
 		result.R = new Array2DRowRealMatrix(m, m);
 		result.z = new Array2DRowRealMatrix(n, m);
-
 		for (int i = 0; i < k; ++i) {
-			result.z.setColumnMatrix(i, SSV_init(matrix) );
-
+			if (n < 5000) {
+				result.z.setColumnMatrix(i, SSV(matrix) );
+			} else {
+				result.z.setColumnMatrix(i, SSV_init(matrix) );
+			}
 			double norm = matrix.transpose().multiply( result.z.getColumnMatrix(i) ).getFrobeniusNorm();
 			if (norm <= 0.0)
 				break;
-			
 			result.R.setColumnMatrix(i, 
 				matrix.transpose().multiply( result.z.getColumnMatrix(i) ).scalarMultiply(1.0 / norm) );
 			result.L.setColumnMatrix(i,
@@ -189,11 +196,14 @@ public class Recovdb {
 
                 int pos = -1;
                 RealMatrix z = LSV(x);
-                RealMatrix v = x.multiply( ones(1, n).multiply(x).transpose() ).subtract(
-                                pointwiseMultiplication(x, x).multiply( ones(m, 1) )
-                        );
+		RealMatrix s = x.multiply( x.transpose().multiply(z) );
+		RealMatrix xxt = pointwiseMultiplication(z, pointwiseMultiplication(x, x).multiply( ones(m, 1) ) );
+		RealMatrix v = s.subtract(xxt);
+
                 boolean var_bool = true;
+		int iterations = 1;
                 while (var_bool || (pos != -1)) {
+			++iterations;
                         var_bool = false;
                         if (pos != -1) {
                                 z.setEntry(pos, 0, z.getEntry(pos, 0) * -1);
@@ -219,7 +229,6 @@ public class Recovdb {
                                 pos = -1;
                         }
                 }
-
 
                 return z;
         }

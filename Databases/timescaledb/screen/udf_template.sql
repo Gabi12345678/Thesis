@@ -6,8 +6,8 @@ DROP TYPE IF EXISTS datapoint CASCADE;
 DROP TYPE IF EXISTS result_type CASCADE;
 DROP FUNCTION IF EXISTS get_size;
 
-CREATE TYPE datapoint AS ( time TIMESTAMP WITHOUT TIME ZONE, <column_types> );
-CREATE TYPE result_type AS ( <column_types> );
+CREATE TYPE datapoint AS ( time TIMESTAMP WITHOUT TIME ZONE, d DOUBLE PRECISION ARRAY );
+CREATE TYPE result_type AS ( d DOUBLE PRECISION ARRAY );
 
 CREATE TABLE datapoints OF datapoint;
 CREATE TABLE screen OF result_type;
@@ -34,26 +34,21 @@ CREATE OR REPLACE FUNCTION screen() RETURNS SETOF result_type AS $$
 	import screen
 	from datetime import datetime
 	
-	a = plpy.execute("SELECT * FROM datapoints;")
+	a = plpy.execute("SELECT * FROM datapoints ORDER BY time ASC;")
 
 	lines = <lines>
 	columns = <columns>
-	
 	matrix = []
 	timestamps = []
 	for i in range(lines):
-		current_row = []
-		timestamps.append(a[i]['time'])
-		for j in range(columns):
-			current_row.append( a[i]['d' + str(j)] )
-		current_row = np.array(current_row)
-		matrix.append( current_row )
+		matrix.append( a[i]['d'] )
+		timestamps.append( a[i]['time'] )
 	timestamps = [ int( (datetime.strptime(x, '%Y-%m-%d %H:%M:%S') - datetime(1970, 1, 1)).total_seconds() ) for x in timestamps]
 	matrix = np.array( matrix )
-	result = screen.screen(matrix, timestamps, 0.01, -0.01, 5)
-	
 
-	return result
+	result = screen.screen(matrix, timestamps, 0.1, -0.1, 300)
+	
+	return [ [x] for x in result ]
 $$ LANGUAGE plpythonu;
 
 DO $load_data$
@@ -93,5 +88,5 @@ BEGIN
 END;
 $screen$;
 
-SELECT * FROM datapoints;
-SELECT * FROM screen;
+--SELECT * FROM datapoints;
+--SELECT * FROM screen;

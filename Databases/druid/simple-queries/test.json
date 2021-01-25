@@ -1,0 +1,23 @@
+{
+  "queryType": "movingAverage",
+  "dataSource": "master",
+  "granularity": "minute",
+  "intervals": [
+    "2011-11-24T08:18:00Z/2011-11-24T08:58:00Z"
+  ],
+  "aggregations": [
+    {
+      "name": "test",
+      "fieldName": "dim",
+      "type": "doubleSum"
+    }
+  ],
+  "averagers": [
+    {
+      "name": "moving",
+      "fieldName": "test",
+      "type": "doubleMean",
+      "buckets": 2
+    }
+  ]
+}

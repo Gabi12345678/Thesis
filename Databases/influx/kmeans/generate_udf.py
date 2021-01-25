@@ -2,15 +2,28 @@ import subprocess
 from datetime import datetime
 from tqdm import tqdm
 from influxdb import InfluxDBClient
+import influxdb
 import argparse
 import os
 import time
 import socket
 import sys
 
+def get_datetime(s):
+    from datetime import datetime
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M:%S"), "seconds")
+    except ValueError:
+        pass
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M"), "minutes")
+    except ValueError:
+        pass
+    return (datetime.strptime(s, "%Y-%m-%d"), "days")
+
 # Arguments
 parser = argparse.ArgumentParser(description = 'Script to run K-Means in Influx')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synth_1K.txt')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/hydraulic.txt')
 parser.add_argument('--lines', nargs='*', type=int, default=[100],
         help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 4" will try (20, 4)')
 parser.add_argument('--columns', nargs='*', type=int, default=[100],
@@ -96,15 +109,25 @@ for line in args.lines:
 
 		f = open(args.file, "r")
 		l = []
+		bucket_size = 100
+		if line > 10000:
+			bucket_size = 10
 		for x in tqdm(range(line)):
 			s = f.readline()[:-1].split(" ")
 			v = {}
 			for y in range(column):
-				v["dim" + str(y)] = float(s[y])
-			body = {"measurement": "puncte", "time": (args.start_time + 10 * x) * 1000000000, "fields": v }
+				v["dim" + str(y)] = float(s[y + 1])
+			time = (get_datetime(s[0])[0] - datetime(1970, 1, 1)).total_seconds() * 1000000000
+			time = int(time)
+			body = {"measurement": "puncte", "time": time, "fields": v }
 			l.append(body)
-			if len(l) == 100:
-				client.write_points(l)
+			if len(l) == bucket_size:
+				while True:
+					try:
+						client.write_points(l)
+					except influxdb.exceptions.InfluxDBServerError:
+						continue
+					break
 				l = []
 		client.write_points(l)
 
@@ -114,7 +137,8 @@ for line in args.lines:
 		seconds = (final_time - initial_time).total_seconds()
 
 		print("Memory in bytes: ", final_size - initial_size)
-		print("Memory in megabytes: ", float(final_size - initial_size) / 1024.0 / 1024.0)
+		#print("Memory in megabytes: ", float(final_size - initial_size) / 1024.0 / 1024.0)
+		print("Insert time: ", seconds)
 		print("Throughput tps: ", line / seconds)
 		print("Throughput vps: ", line * column / seconds)
 
@@ -123,7 +147,7 @@ for line in args.lines:
 		subprocess.run([args.kapacitor_path, "delete", "replays", "udf-replay"])
 		subprocess.run([args.kapacitor_path, "delete", "recordings", "udf-recording"])
 
-		subprocess.run([args.kapacitor_path, "record", "batch", "-past", "200d", "-recording-id", "udf-recording", "-task", "udf"])
+		subprocess.run([args.kapacitor_path, "record", "batch", "-past", "4000d", "-recording-id", "udf-recording", "-task", "udf"])
 		subprocess.run([args.kapacitor_path, "replay", "-recording", "udf-recording", "-replay-id", "udf-replay", "-task", "udf"])
 
 print("Terminating kapacitor")

@@ -19,3 +19,10 @@ sudo apt-get update
 sudo apt install timescaledb-postgresql-11
 sudp apt install postgresql-contrib
 sudo apt install postgresql-plpython-11
+
+sudo -u postgres createuser $USER
+sudo -u postgres createdb $USER
+sudo -u postgres psql -c "ALTER USER $USER WITH SUPERUSER;"
+
+sudo -u postgres sh -c "echo \"shared_preload_libraries = 'timescaledb'\" >> /etc/postgresql/11/main/postgresql.conf"
+sudo -u postgres /etc/init.d/postgresql restart

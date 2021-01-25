@@ -1,0 +1,11 @@
+dbrp "master"."autogen"
+
+batch
+	|query('SELECT MOVING_AVERAGE(v, <moving_average_rows>) FROM "master"."autogen"."puncte"')
+		.every(4000d)
+		.period(4000d)
+	|influxDBOut()
+		.database('master')
+		.retentionPolicy('autogen')
+		.measurement('output_moving')
+

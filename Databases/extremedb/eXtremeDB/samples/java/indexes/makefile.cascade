@@ -1,8 +1,0 @@
-MCO_FILE_DIR:=$(dir $(lastword $(MAKEFILE_LIST)))
--include $(MCO_FILE_DIR)makefile.project.BTree
--include $(MCO_FILE_DIR)makefile.project.Compound
--include $(MCO_FILE_DIR)makefile.project.FullText
--include $(MCO_FILE_DIR)makefile.project.Hashtable
--include $(MCO_FILE_DIR)makefile.project.Patricia
--include $(MCO_FILE_DIR)makefile.project.RTree
--include $(MCO_FILE_DIR)makefile.project.Trigram

@@ -6,8 +6,8 @@ DROP TYPE IF EXISTS datapoint CASCADE;
 DROP TYPE IF EXISTS result_type CASCADE;
 DROP FUNCTION IF EXISTS get_size;
 
-CREATE TYPE datapoint AS ( time TIMESTAMP WITHOUT TIME ZONE, <column_types> );
-CREATE TYPE result_type AS ( <column_types> );
+CREATE TYPE datapoint AS ( time TIMESTAMP WITHOUT TIME ZONE, d DOUBLE PRECISION ARRAY );
+CREATE TYPE result_type AS ( d DOUBLE PRECISION ARRAY );
 
 CREATE TABLE datapoints OF datapoint;
 CREATE TABLE matrix_r OF result_type;
@@ -33,18 +33,14 @@ CREATE OR REPLACE FUNCTION cd() RETURNS SETOF result_type AS $$
 	sys.path.append('<implementation_path>/')
 	import cd_ssv
 	
-	a = plpy.execute("SELECT * FROM datapoints;")
+	a = plpy.execute("SELECT * FROM datapoints ORDER BY time ASC;")
 
 	lines = <lines>
 	columns = <columns>
 	
 	matrix = []
 	for i in range(lines):
-		current_row = []
-		for j in range(columns):
-			current_row.append( a[i]['d' + str(j)] )
-		current_row = np.array(current_row)
-		matrix.append( current_row )
+		matrix.append( a[i]['d'] )
 	matrix = np.array( matrix )
 	
 	matrix_l, matrix_r, z = cd_ssv.CD(matrix, lines, columns)
@@ -52,7 +48,7 @@ CREATE OR REPLACE FUNCTION cd() RETURNS SETOF result_type AS $$
 	
 	result = []
 	for i in range(columns):
-		result.append( matrix_r[i].tolist() )
+		result.append( [matrix_r[i].tolist()] )
 
 	return result
 $$ LANGUAGE plpythonu;
@@ -93,4 +89,4 @@ BEGIN
 
 	RAISE NOTICE 'CentroidDecomposition time seconds = %', delta;
 END;
-$centroid_decomposition$
+$centroid_decomposition$;

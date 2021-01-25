@@ -1,7 +1,0 @@
--include $(call mco_makefile_file, \
-errorhandler/makefile.project.errorhandler \
-fatalerrex/makefile.project.fatalerrex \
-fatalerr/makefile.project.fatalerr \
-nonfatalerr/makefile.project.nonfatalerr \
-statuscode/makefile.project.statuscode \
-)

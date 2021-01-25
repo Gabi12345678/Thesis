@@ -1,5 +1,0 @@
--include $(call mco_makefile_file, \
-aggregate/makefile.project.aggregate \
-group-by/makefile.project.group-by \
-math/makefile.project.math \
-)

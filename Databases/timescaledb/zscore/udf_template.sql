@@ -6,8 +6,8 @@ DROP TYPE IF EXISTS datapoint CASCADE;
 DROP TYPE IF EXISTS result_type CASCADE;
 DROP FUNCTION IF EXISTS get_size;
 
-CREATE TYPE datapoint AS ( time TIMESTAMP WITHOUT TIME ZONE, <column_types> );
-CREATE TYPE result_type AS ( <column_types> );
+CREATE TYPE datapoint AS ( time TIMESTAMP WITHOUT TIME ZONE, d DOUBLE PRECISION ARRAY);
+CREATE TYPE result_type AS ( d DOUBLE PRECISION ARRAY );
 
 CREATE TABLE datapoints OF datapoint;
 CREATE TABLE zscore OF result_type;
@@ -33,26 +33,21 @@ CREATE OR REPLACE FUNCTION znorm() RETURNS SETOF result_type AS $$
 	sys.path.append('<implementation_path>/')
 	import znormalization
 	
-	a = plpy.execute("SELECT * FROM datapoints;")
+	a = plpy.execute("SELECT * FROM datapoints ORDER BY time ASC;")
 
 	lines = <lines>
 	columns = <columns>
 	
 	matrix = []
 	for i in range(lines):
-		current_row = []
-		for j in range(columns):
-			current_row.append( a[i]['d' + str(j)] )
-		current_row = np.array(current_row)
-		matrix.append( current_row )
+		matrix.append( a[i]['d'] )
 	matrix = np.array( matrix )
 	
 	zscore = znormalization.zscore(matrix)
-
 	
 	result = []
-	for i in range(10):
-		result.append( zscore[i].tolist() )
+	for i in range(lines):
+		result.append( [zscore[i].tolist()] )
 
 	return result
 $$ LANGUAGE plpythonu;
@@ -95,4 +90,5 @@ BEGIN
 END;
 $zscore$;
 
+--select * from datapoints;
 --select * from zscore;

@@ -27,13 +27,5 @@ Example of setting additional parameters for KMeans
 ./run.py --algorithm kmeans --clusters 20 --iterations 10
 ```
 
-## Running all algorithms
-
-A script that runs all algorithms at once is also provided.
-```bash
-./run_all.sh
-```
-
 ## Note
 Note that the data provided in this directory only serves as an example and was hand-generated for testing purposes.
-

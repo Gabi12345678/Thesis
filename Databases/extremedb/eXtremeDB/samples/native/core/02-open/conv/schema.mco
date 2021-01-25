@@ -1,8 +1,0 @@
-declare database convdb;
-
-class A {
-    unsigned<4> ui4;
-    
-    list;
-};
-

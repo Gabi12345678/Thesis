@@ -66,7 +66,7 @@ class ScreenHandler(Handler):
     self.matrix = np.array(self.matrix)
 
     start_time = datetime.now()
-    results = screen.screen(self.matrix, self.timestamps, 0.01, 0.01, 4)
+    results = screen.screen(self.matrix, self.timestamps, 0.1, -0.1, 300)
     end_time = datetime.now()
     t = (end_time - start_time).total_seconds()
     response = udf_pb2.Response()

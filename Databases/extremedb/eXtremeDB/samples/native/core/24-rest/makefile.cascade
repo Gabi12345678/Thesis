@@ -1,4 +1,0 @@
--include $(call mco_makefile_file, \
-multithreaded/makefile.project.multithreaded \
-singlethreaded/makefile.project.singlethreaded \
-)

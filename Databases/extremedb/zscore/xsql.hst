@@ -1,0 +1,19 @@
+create table datapoints ( t TIMESTAMP, d ARRAY(DOUBLE) );
+INSERT INTO datapoints VALUES ('2020-01-01','{1,2,3}');
+INSERT INTO datapoints VALUES ('2020-01-02','{4,5,6}');
+INSERT INTO datapoints VALUES ('2020-01-03','{7,8,9}');
+select * from datapoints;
+SELECT time, nr, elem         FROM datapoints, UNNEST(d) WITH ORDINALITY a(elem, nr);
+SELECT time, nr, elem FROM datapoints, UNNEST(d) WITH ORDINALITY a(elem, nr);
+select sum(d) from datapoints;
+select sum(d[0]) from datapoints;
+select sum(d[(]) from datapoints;
+select sum(d[(]) from datapoints;
+select sum(d[*]) from datapoints;
+create table a ( i INTEGER);
+insert into a values (1);
+insert into a values (2)
+;
+insert into a values (0);
+select a.nr, datapoints.d[a.nr] FROM a, datapoints;
+select a.i, datapoints.d[a.i] FROM a, datapoints;

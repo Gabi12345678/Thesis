@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += SqlSeq
-PRJ_TARGET_CLASS += SqlSeq
-PRJ_SqlSeq_TAGS:=sample java sql sequences
-PRJ_SqlSeq_DIR :=$(call mco_project_dir)
-PRJ_SqlSeq_SRC :=$(call mco_project_file,SqlSeq.java)

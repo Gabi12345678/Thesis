@@ -2,8 +2,8 @@ dbrp "master"."autogen"
 
 batch
 	|query('SELECT * FROM "master"."autogen"."puncte"')
-		.every(200d)
-		.period(200d)
+		.every(4000d)
+		.period(4000d)
 	@znormalization()
 
 //output the result from kmeans into influxdb

@@ -1,7 +1,7 @@
 import numpy as np
 import time
 from numpy import linalg as LA
-
+from datetime import datetime
 
 # Calculate maximizing sign vector z
 def LSV(x, n, m):
@@ -84,5 +84,3 @@ def CD(x, n, m):
         L[:, i] = np.dot(x, R[:, i])
         x = x - np.dot(L[:, [i]], np.transpose(R[:, [i]]))
     return L, R, z
-
-

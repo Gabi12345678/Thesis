@@ -2,15 +2,28 @@ import subprocess
 from datetime import datetime
 from tqdm import tqdm
 from influxdb import InfluxDBClient
+import influxdb
 import argparse
 import os
 import time
 import socket
 import sys
 
+def get_datetime(s):
+    from datetime import datetime
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M:%S"), "seconds")
+    except ValueError:
+        pass
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M"), "minutes")
+    except ValueError:
+        pass
+    return (datetime.strptime(s, "%Y-%m-%d"), "days")
+
 # Arguments
 parser = argparse.ArgumentParser(description = 'Script to run Screen in Influx')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synth_1K.txt')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/alabama_weather.txt')
 parser.add_argument('--lines', nargs='*', type=int, default=[100],
         help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 4" will try (20, 4)')
 parser.add_argument('--columns', nargs='*', type=int, default=[100],
@@ -30,7 +43,7 @@ args.screen_handler_template_path = os.path.abspath('template_screen_handler.py'
 args.screen_handler_path = os.path.abspath('screen_handler.py')
 args.influxd_path = os.path.abspath('../influxdb-1.7.10-1/usr/bin/influxd')
 args.tick_path = os.path.abspath('udf.tick')
-args.implementation_path = os.path.abspath('../../../Algorithms/screen/')
+args.implementation_path = os.path.abspath('../../../Algorithms/screen_python/')
 args.kapacitor_library = os.path.abspath('../kapacitor-master/udf/agent/py')
 args.output_file = os.path.abspath('time.txt')
 
@@ -72,7 +85,7 @@ while True:
 		continue
 	break
 print("Influx is ready to accept data.")
-kapacitor = subprocess.Popen([args.kapacitord_path, "-config", args.kapacitor_config_path], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+kapacitor = subprocess.Popen([args.kapacitord_path, "-config", args.kapacitor_config_path], stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
 while True:
 	try:
 		subprocess.check_output("curl localhost:9092", shell=True, stderr = subprocess.DEVNULL)
@@ -96,15 +109,26 @@ for line in args.lines:
 
 		f = open(args.file, "r")
 		l = []
+		bucket_size = 100
+		if line > 10000 or column > 10000:
+			bucket_size = 10
+		print(bucket_size)
 		for x in tqdm(range(line)):
 			s = f.readline()[:-1].split(" ")
 			v = {}
 			for y in range(column):
-				v["dim" + str(y)] = float(s[y])
-			body = {"measurement": "puncte", "time": (args.start_time + 10 * x) * 1000000000, "fields": v }
+				v["dim" + str(y)] = float(s[y + 1])
+			time = (get_datetime(s[0])[0] - datetime(1970, 1, 1)).total_seconds() * 1000000000
+			time = int(time)
+			body = {"measurement": "puncte", "time": time, "fields": v }
 			l.append(body)
-			if len(l) == 100:
-				client.write_points(l)
+			if len(l) == bucket_size:
+				while True:
+					try:
+						client.write_points(l)
+					except influxdb.exceptions.InfluxDBServerError:
+						continue
+					break
 				l = []
 		client.write_points(l)
 
@@ -123,7 +147,7 @@ for line in args.lines:
 		subprocess.run([args.kapacitor_path, "delete", "replays", "udf-replay"])
 		subprocess.run([args.kapacitor_path, "delete", "recordings", "udf-recording"])
 
-		subprocess.run([args.kapacitor_path, "record", "batch", "-past", "200d", "-recording-id", "udf-recording", "-task", "udf"])
+		subprocess.run([args.kapacitor_path, "record", "batch", "-past", "4000d", "-recording-id", "udf-recording", "-task", "udf"])
 		subprocess.run([args.kapacitor_path, "replay", "-recording", "udf-recording", "-replay-id", "udf-replay", "-task", "udf"])
 
 print("Terminating kapacitor")

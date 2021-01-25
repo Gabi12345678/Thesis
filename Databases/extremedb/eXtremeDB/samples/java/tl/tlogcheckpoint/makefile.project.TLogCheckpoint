@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += TLogCheckpoint
-PRJ_TARGET_CLASS += TLogCheckpoint
-PRJ_TLogCheckpoint_TAGS:=sample tlog java
-PRJ_TLogCheckpoint_DIR :=$(call mco_project_dir)
-PRJ_TLogCheckpoint_SRC :=$(call mco_project_file,TLogCheckpoint.java)

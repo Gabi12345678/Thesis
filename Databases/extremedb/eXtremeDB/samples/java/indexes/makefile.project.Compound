@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += Compound
-PRJ_TARGET_CLASS += Compound
-PRJ_Compound_TAGS:=sample core java
-PRJ_Compound_DIR :=$(call mco_project_dir)
-PRJ_Compound_SRC :=$(call mco_project_file,Compound.java)

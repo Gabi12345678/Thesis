@@ -1,0 +1,17 @@
+dbrp "master"."autogen"
+
+batch
+	|query('SELECT * FROM "master"."autogen"."puncte"')
+		.every(4000d)
+		.period(4000d)
+	@cartesian()
+	|eval(lambda: sqrt(pow("l0" - "d0", 2.0) + pow("l1" - "d1", 2.0) + pow("l2" - "d2", 2.0) + pow("l3" - "d3", 2.0) + pow("l4" - "d4", 2.0) + pow("l5" - "d5", 2.0) + pow("l6" - "d6", 2.0) + pow("l7" - "d7", 2.0) + pow("l8" - "d8", 2.0) + pow("l9" - "d9", 2.0) + pow("l10" - "d10", 2.0) + pow("l11" - "d11", 2.0) + pow("l12" - "d12", 2.0) + pow("l13" - "d13", 2.0) + pow("l14" - "d14", 2.0) + pow("l15" - "d15", 2.0) + pow("l16" - "d16", 2.0) + pow("l17" - "d17", 2.0) + pow("l18" - "d18", 2.0) + pow("l19" - "d19", 2.0) + pow("l20" - "d20", 2.0) + pow("l21" - "d21", 2.0) + pow("l22" - "d22", 2.0) + pow("l23" - "d23", 2.0) + pow("l24" - "d24", 2.0) + pow("l25" - "d25", 2.0) + pow("l26" - "d26", 2.0) + pow("l27" - "d27", 2.0) + pow("l28" - "d28", 2.0) + pow("l29" - "d29", 2.0) + pow("l30" - "d30", 2.0) + pow("l31" - "d31", 2.0) + pow("l32" - "d32", 2.0) + pow("l33" - "d33", 2.0) + pow("l34" - "d34", 2.0) + pow("l35" - "d35", 2.0) + pow("l36" - "d36", 2.0) + pow("l37" - "d37", 2.0) + pow("l38" - "d38", 2.0) + pow("l39" - "d39", 2.0) + pow("l40" - "d40", 2.0) + pow("l41" - "d41", 2.0) + pow("l42" - "d42", 2.0) + pow("l43" - "d43", 2.0) + pow("l44" - "d44", 2.0) + pow("l45" - "d45", 2.0)))
+		.as('dist')
+		.keep('original_time', 'dist', 'label')
+	@knn()
+	|influxDBOut()
+		.database('master')
+		.retentionPolicy('autogen')
+		.measurement('output')
+	
+	

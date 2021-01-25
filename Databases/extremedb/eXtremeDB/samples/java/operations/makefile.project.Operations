@@ -1,5 +1,0 @@
-MCO_PRJ_LIST += Operations
-PRJ_TARGET_CLASS += Operations
-PRJ_Operations_TAGS:=sample java core
-PRJ_Operations_DIR :=$(call mco_project_dir)
-PRJ_Operations_SRC :=$(call mco_project_file,Operations.java)

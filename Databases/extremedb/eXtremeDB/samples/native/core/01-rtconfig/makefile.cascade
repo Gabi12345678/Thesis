@@ -1,5 +1,0 @@
--include $(call mco_makefile_file, \
-direct_ptr/makefile.project.direct_ptr \
-inmem/makefile.project.inmem \
-mixed/makefile.project.mixed \
-)

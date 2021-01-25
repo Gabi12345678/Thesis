@@ -1,9 +1,0 @@
-odbc/samples
-samples/csharp/RSql
-samples/csharp/Sql
-samples/java/rsql
-samples/java/sql
-samples/jdbc
-samples/native/sql/...
-samples/python/sql/...
-samples/xsql/scripts/...

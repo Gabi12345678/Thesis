@@ -1,5 +1,0 @@
--include $(call mco_makefile_file, \
-persistent/makefile.project.persistent \
-persistent-cache/makefile.project.persistent-cache \
-transient/makefile.project.transient \
-)

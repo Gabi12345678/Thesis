@@ -1,0 +1,17 @@
+dbrp "master"."autogen"
+
+batch
+	|query('SELECT * FROM "master"."autogen"."puncte"')
+		.every(4000d)
+		.period(4000d)
+	@cartesian()
+	|eval(lambda: sqrt(<distance_exp>))
+		.as('dist')
+		.keep('original_time', 'dist', 'label')
+	@knn()
+	|influxDBOut()
+		.database('master')
+		.retentionPolicy('autogen')
+		.measurement('output')
+	
+	

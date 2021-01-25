@@ -1,0 +1,141 @@
+import subprocess
+from datetime import datetime
+from tqdm import tqdm
+from influxdb import InfluxDBClient
+import influxdb
+import argparse
+import os
+import time
+import socket
+import sys
+
+def get_datetime(s):
+    from datetime import datetime
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M:%S"), "seconds")
+    except ValueError:
+        pass
+    try:
+        return (datetime.strptime(s, "%Y-%m-%dT%H:%M"), "minutes")
+    except ValueError:
+        pass
+    return (datetime.strptime(s, "%Y-%m-%d"), "days")
+
+# Arguments
+parser = argparse.ArgumentParser(description = 'Script to run Queries in Influx')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/alabama_weather.txt')
+parser.add_argument('--lines', nargs='*', type=int, default=[100],
+        help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 4" will try (20, 4)')
+parser.add_argument('--column', nargs='*', type=int, default=38,
+        help='list of integers representing the number of columns to try out. Used together with --lines. For example "--lines 20 --columns 4" will try (20, 4)')
+parser.add_argument('--start_time', nargs='?', type=str, default='2014-01-01', help='')
+parser.add_argument('--end_time', nargs='?', type=str, default='2019-01-01', help='')
+parser.add_argument('--moving_average_hours', nargs='?', type=int, default=24, help='')
+args = parser.parse_args()
+
+args.file = os.path.abspath(args.file)
+args.home_path = os.path.expanduser("~")
+args.db_directory = os.path.abspath(args.home_path + '/.influxdb')
+args.kapacitor_path = os.path.abspath('../kapacitor-1.5.4-1/usr/bin/kapacitor')
+args.kapacitord_path = os.path.abspath('../kapacitor-1.5.4-1/usr/bin/kapacitord')
+args.influxd_path = os.path.abspath('../influxdb-1.7.10-1/usr/bin/influxd')
+args.tick_path = os.path.abspath('udf.tick')
+
+influx = subprocess.Popen([args.influxd_path], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+while True:
+	try:
+		subprocess.check_output("curl localhost:8086", shell=True, stderr = subprocess.DEVNULL)
+	except subprocess.CalledProcessError:
+		print("Influx is not yet ready. Checking again in 10 seconds.")
+		time.sleep(10)
+		continue
+	break
+print("Influx is ready to accept data.")
+kapacitor = subprocess.Popen([args.kapacitord_path], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+while True:
+	try:
+		subprocess.check_output("curl localhost:9092", shell=True, stderr = subprocess.DEVNULL)
+	except subprocess.CalledProcessError:
+		print("Kapacitor is not yet ready. Checking again in 10 seconds.")
+		time.sleep(10)
+		continue
+	break
+print("Kapacitor is ready to accept data.")
+
+for line in args.lines:
+	print("Running UDF for (" + str(line) + ")")
+
+	client = InfluxDBClient(database = 'master')
+	client.drop_database('master')
+		
+	client.create_database('master')
+
+	f = open(args.file, "r")
+	l = []
+	bucket_size = 100
+	if line > 10000:
+		bucket_size = 10
+	for x in tqdm(range(line)):
+		s = f.readline()[:-1].split(" ")
+		v = {}
+		v["v"] = float(s[args.column + 1])
+		time = (get_datetime(s[0])[0] - datetime(1970, 1, 1)).total_seconds() * 1000000000
+		time = int(time)
+		body = {"measurement": "puncte", "time": time, "fields": v }
+		l.append(body)
+		if len(l) == bucket_size:
+			while True:
+				try:
+					client.write_points(l)
+				except influxdb.exceptions.InfluxDBServerError:
+					continue
+				break
+			l = []
+	client.write_points(l)
+
+
+	subprocess.run([args.kapacitor_path, "define", "udf", "-tick", "udf.tick"])
+	subprocess.run([args.kapacitor_path, "enable", "udf"])
+	subprocess.run([args.kapacitor_path, "delete", "replays", "udf-replay"])
+	subprocess.run([args.kapacitor_path, "delete", "recordings", "udf-recording"])
+	subprocess.run([args.kapacitor_path, "record", "batch", "-past", "4000d", "-recording-id", "udf-recording", "-task", "udf"])
+	t1 = datetime.now()
+	subprocess.run([args.kapacitor_path, "replay", "-recording", "udf-recording", "-replay-id", "udf-replay", "-task", "udf"])
+	t2 = datetime.now()
+	print("Total sum time: ", (t2 - t1).total_seconds())
+
+	f = open("template_udf_interval.tick", "r")
+	g = open("udf_interval.tick", "w")
+	for l in f:
+		g.write( l.replace("<start_time>", args.start_time).replace("<end_time>", args.end_time) )
+	g.close()
+	subprocess.run([args.kapacitor_path, "define", "udf", "-tick", "udf_interval.tick"])
+	subprocess.run([args.kapacitor_path, "enable", "udf"])
+	subprocess.run([args.kapacitor_path, "delete", "replays", "udf-replay"])
+	subprocess.run([args.kapacitor_path, "delete", "recordings", "udf-recording"])
+	subprocess.run([args.kapacitor_path, "record", "batch", "-past", "4000d", "-recording-id", "udf-recording", "-task", "udf"])
+	t1 = datetime.now()
+	subprocess.run([args.kapacitor_path, "replay", "-recording", "udf-recording", "-replay-id", "udf-replay", "-task", "udf"])
+	t2 = datetime.now()
+	print("Total interval time: ", (t2 - t1).total_seconds())
+
+	f = open("template_udf_moving.tick", "r")
+	g = open("udf_moving.tick", "w")
+	for l in f:
+		g.write( l.replace("<moving_average_rows>", str(args.moving_average_hours * 60)) )
+	g.close()
+	subprocess.run([args.kapacitor_path, "define", "udf", "-tick", "udf_moving.tick"])
+	subprocess.run([args.kapacitor_path, "enable", "udf"])
+	subprocess.run([args.kapacitor_path, "delete", "replays", "udf-replay"])
+	subprocess.run([args.kapacitor_path, "delete", "recordings", "udf-recording"])
+	subprocess.run([args.kapacitor_path, "record", "batch", "-past", "4000d", "-recording-id", "udf-recording", "-task", "udf"])
+	t1 = datetime.now()
+	subprocess.run([args.kapacitor_path, "replay", "-recording", "udf-recording", "-replay-id", "udf-replay", "-task", "udf"])
+	t2 = datetime.now()
+	print("Total interval time: ", (t2 - t1).total_seconds())
+
+print("Terminating kapacitor")
+kapacitor.terminate()	
+
+print("Terminating influx")
+influx.terminate()

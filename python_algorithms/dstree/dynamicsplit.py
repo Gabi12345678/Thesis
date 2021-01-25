@@ -409,7 +409,7 @@ class Node:
 		l = 0
 		r = len(points) - 1
 		while l < r:
-			m = int((l + r) / 2)
+			m = (l + r) / 2
 			if points[m] == t:
 				return f
 			if points[m] < t:

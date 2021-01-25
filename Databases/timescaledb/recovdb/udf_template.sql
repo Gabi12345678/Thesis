@@ -6,8 +6,8 @@ DROP TYPE IF EXISTS datapoint CASCADE;
 DROP TYPE IF EXISTS result_type CASCADE;
 DROP FUNCTION IF EXISTS get_size;
 
-CREATE TYPE datapoint AS ( time TIMESTAMP WITHOUT TIME ZONE, <column_types>);
-CREATE TYPE result_type AS (<column_types>);
+CREATE TYPE datapoint AS ( time TIMESTAMP WITHOUT TIME ZONE, d DOUBLE PRECISION ARRAY);
+CREATE TYPE result_type AS ( d DOUBLE PRECISION ARRAY );
 
 CREATE TABLE datapoints OF datapoint;
 CREATE TABLE missing_values OF result_type;
@@ -33,7 +33,7 @@ CREATE OR REPLACE FUNCTION mv() RETURNS SETOF result_type AS $$
 	sys.path.append('<implementation_path>')
 	import recovery
 	
-	a = plpy.execute("SELECT * FROM datapoints;")
+	a = plpy.execute("SELECT * FROM datapoints ORDER BY time ASC;")
 
 	lines = <lines> 
 	columns = <columns>
@@ -42,19 +42,19 @@ CREATE OR REPLACE FUNCTION mv() RETURNS SETOF result_type AS $$
 	for i in range(lines):
 		current_row = []
 		for j in range(columns):
-			if a[i]['d' + str(j)] == None:
+			if a[i]['d'][j] == None:
 				current_row.append( np.nan )
 			else:
-				current_row.append( a[i]['d'+str(j)] )
+				current_row.append( a[i]['d'][j] )
 		current_row = np.array(current_row)
 		matrix.append( current_row )
 	matrix = np.array( matrix )
 	
-	rec_time,iterations,rmse,rec_mat = recovery.recovery(matrix, lines, columns, columns - 1, 0, 0)
+	rec_time,iterations,rmse,rec_mat = recovery.recovery(matrix, lines, columns, 3, 0.2, 10)
 	
 	result = []
 	for i in range(lines):
-		result.append( rec_mat[i].tolist() )
+		result.append( [ rec_mat[i].tolist() ] )
 	return result
 $$ LANGUAGE plpythonu;
 

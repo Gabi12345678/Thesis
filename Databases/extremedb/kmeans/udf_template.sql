@@ -1,5 +1,5 @@
-CREATE TABLE datapoints (t TIMESTAMP, <column_types>);
-CREATE TABLE clusters (t TIMESTAMP, <column_types>);
+CREATE TABLE datapoints (t TIMESTAMP, d ARRAY(DOUBLE));
+CREATE TABLE clusters (t TIMESTAMP, d ARRAY(DOUBLE));
 CREATE TABLE metrics_insert (current_time DOUBLE, disk_usage INTEGER);
 CREATE TABLE metrics_udf (current_time DOUBLE);
 
@@ -32,40 +32,40 @@ create function udf() RETURNS string in 'python' as '
 	exdb.init_runtime(skip_load=True)
 	
 	cur = current_session.cursor()
-	cur.execute("SELECT * FROM datapoints")
+	cur.execute("SELECT t, d FROM datapoints")
 	results = cur.fetchall()
 	
 	lines = <lines>
 	columns = <columns>
 	matrix = []
-	
+	timestamps = []
 	for i in range(lines):
-		current_line = []
-		for j in range(columns):
-			current_line.append(results[i][j+1])
-		current_line = np.array(current_line)
-		matrix.append(current_line)
+		matrix.append( np.array( results[i][1] ))
+		timestamps.append( results[i][0] )
+
 	matrix = np.array(matrix)
 
 	clusters = kmeans.kmeans(matrix, 10, 20)
 
-	start_epoch = <start_time>
 	for i in range(len(clusters)):
-		time = datetime.fromtimestamp(start_epoch + i * 10)
-		cur.execute("INSERT INTO clusters(t) VALUES (?)", (time,) )
-		for j in range(0, columns, 50):
-			start_interval = j
-			end_interval = min(columns, start_interval + 50)
-			update_sql = "UPDATE clusters SET"
-			for t in range(start_interval, end_interval):
-				update_sql = update_sql + " d" + str(t) + " = ?,"
-			update_sql = update_sql[:-1] + " WHERE t = ?"
-			cur.execute(update_sql, tuple(clusters[i][start_interval:end_interval]) + (time,))
+		cur.execute("INSERT INTO clusters(t, d) VALUES (?, ?)", (timestamps[i], tuple(clusters[i])))
 
-	return "success"
+	return "udf"
 ';
 
 create function import_data() RETURNS string in 'python' as '
+	def get_datetime(s):
+		from datetime import datetime
+		try:
+			return (datetime.strptime(s, "%Y-%m-%dT%H:%M:%S"), "seconds")
+		except ValueError:
+			pass
+		try:
+			return (datetime.strptime(s, "%Y-%m-%dT%H:%M"), "minutes")
+		except ValueError:
+			pass
+		return (datetime.strptime(s, "%Y-%m-%d"), "days")
+
 	import datetime
 	exdb.init_runtime(skip_load = True)
 	cur = current_session.cursor()
@@ -76,22 +76,11 @@ create function import_data() RETURNS string in 'python' as '
 	columns = <columns>
 	for i in range(lines):
 		line = f.readline()[:-1].split(",")
-		time = datetime.datetime.strptime(line[0], "%Y-%m-%d %H:%M:%S")
-		current_line = []
-		for j in range(columns):
-			current_line.append( float(line[j + 1]) )
-		cur.execute("INSERT INTO datapoints(t) VALUES (?)", (time, ))
-		
-		for j in range(0, columns, 50):
-			start_interval = j
-			end_interval = min(columns, start_interval + 50)
-			update_sql = "UPDATE datapoints SET"
-			for t in range(start_interval, end_interval):
-				update_sql = update_sql + " d" + str(t) + " = ?,"
-			update_sql = update_sql[:-1] + " WHERE t = ?"
-			cur.execute(update_sql, tuple(current_line[start_interval:end_interval]) + (time, ) )
-	
-	return "success"
+		time = get_datetime(line[0])[0]
+		data = [float(x) for x in line[1:]]
+		cur.execute("INSERT INTO datapoints(t, d) VALUES (?, ?)", (time, data))
+
+	return "insert_data"
 ';
 
 INSERT INTO metrics_insert VALUES (current_time(), disk_usage());

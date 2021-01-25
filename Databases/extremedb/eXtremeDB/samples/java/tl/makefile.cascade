@@ -1,7 +1,0 @@
--include $(call mco_makefile_file, \
-tlogcheckpoint/makefile.project.TLogCheckpoint \
-tlogdynamicpipe/makefile.project.TLogDynamicPipe \
-tlogiterpipe/makefile.project.TLogDBSource \
-tlogiterpipe/makefile.project.TLogIterPipe_Native \
-makefile.project.Ttl \
-)
