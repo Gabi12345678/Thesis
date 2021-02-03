@@ -38,8 +38,8 @@ CREATE OR REPLACE FUNCTION knn() RETURNS SETOF result_type AS $$
 	
 	a = plpy.execute("SELECT * FROM datapoints ORDER BY time ASC;")
 
-	lines = 1000
-	columns = 25000	
+	lines = 100
+	columns = 100	
 	matrix = []
 	for i in range(lines):
 		matrix.append( a[i]['d'] )
@@ -68,10 +68,10 @@ DECLARE
 	initial_size DOUBLE PRECISION;
 	final_size DOUBLE PRECISION;
 BEGIN
-	COPY label_datapoints from '/home/gabi/Thesis-master/Datasets/hydraulic.txt_label.csv' DELIMITER ',' CSV;
+	COPY label_datapoints from '/home/gabi/Thesis-master/Datasets/synthetic.txt_label.csv' DELIMITER ',' CSV;
 	initial_size := get_size();
 	start_time := clock_timestamp();
-	COPY datapoints FROM '/home/gabi/Thesis-master/Datasets/hydraulic.txt.csv' DELIMITER ',' CSV;
+	COPY datapoints FROM '/home/gabi/Thesis-master/Datasets/synthetic.txt.csv' DELIMITER ',' CSV;
 	end_time := clock_timestamp();
 	final_size := get_size();
 	delta:= extract(epoch from end_time) - extract(epoch from start_time) ;
@@ -79,8 +79,8 @@ BEGIN
 	RAISE NOTICE 'Total size bytes = %', final_size - initial_size;
 	RAISE NOTICE 'Total size megabytes = %', (final_size - initial_size) / 1024 / 1024;
 	RAISE NOTICE 'Total time seconds = %', delta;
-	RAISE NOTICE 'Throughput inserts per second = %', 1000 / delta;
-	RAISE NOTICE 'Throughput values per second = %', 1000 * 25000 / delta;
+	RAISE NOTICE 'Throughput inserts per second = %', 100 / delta;
+	RAISE NOTICE 'Throughput values per second = %', 100 * 100 / delta;
 END;
 $load_data$;
 

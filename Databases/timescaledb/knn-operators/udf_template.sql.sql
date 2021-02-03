@@ -62,15 +62,15 @@ DECLARE
 	initial_size DOUBLE PRECISION;
 	final_size DOUBLE PRECISION;
 BEGIN
-	COPY label_datapoints from '/home/gabi/Thesis-master/Datasets/alabama_weather.txt_label.csv' DELIMITER ',' CSV;
+	COPY label_datapoints from '/home/gabi/Thesis-master/Datasets/synthetic.txt_label.csv' DELIMITER ',' CSV;
 	start_time := clock_timestamp();
-	COPY datapoints FROM '/home/gabi/Thesis-master/Datasets/alabama_weather.txt.csv' DELIMITER ',' CSV;
+	COPY datapoints FROM '/home/gabi/Thesis-master/Datasets/synthetic.txt.csv' DELIMITER ',' CSV;
 	end_time := clock_timestamp();
 	delta:= extract(epoch from end_time) - extract(epoch from start_time) ;
 	
 	RAISE NOTICE 'Total time seconds = %', delta;
-	RAISE NOTICE 'Throughput inserts per second = %', 10000 / delta;
-	RAISE NOTICE 'Throughput values per second = %', 10000 * 46 / delta;
+	RAISE NOTICE 'Throughput inserts per second = %', 100 / delta;
+	RAISE NOTICE 'Throughput values per second = %', 100 * 100 / delta;
 END;
 $load_data$;
 

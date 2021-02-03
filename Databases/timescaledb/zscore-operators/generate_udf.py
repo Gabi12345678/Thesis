@@ -5,7 +5,7 @@ import os
 
 
 parser = argparse.ArgumentParser(description = 'Script to run Z-Score in TimescaleDB')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/hydraulic.txt')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synthetic.txt')
 parser.add_argument('--lines', nargs='*', type=int, default=[100],
 	help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 30" will try (20, 30)')
 parser.add_argument('--columns', nargs='*', type=int, default=[100],
@@ -30,14 +30,22 @@ for lines in args.lines:
 		f.close()
 		g.close()
 
+		expression_format = "(d[{0}] - (select avg(d[{0}]) from datapoints)) / (select stddev_pop(d[{0}]) from datapoints)"
+		select_expression = expression_format.format(1)
+		for i in range(2, columns + 1):
+			select_expression = select_expression + ",\t" + expression_format.format(i)
 		print("Generating udf")
 		f = open(args.udf_template, "r")
 		g = open(args.udf_template + ".sql", "w")
 		for l in f.readlines():
-			g.write( l.replace("<lines>", str(lines)).replace("<columns>", str(columns)).replace("<data_file>", args.file + ".csv").replace("<implementation_path>", args.implementation_path) )
+			g.write( l.replace("<lines>", str(lines))
+					.replace("<columns>", str(columns))
+					.replace("<data_file>", args.file + ".csv")
+					.replace("<implementation_path>", args.implementation_path)
+					.replace("<select_expression>", select_expression) )
 		f.close()
 		g.close()
 
 		os.system("psql -f " + args.udf_template + ".sql")
-#		os.system("rm " + args.udf_template + ".sql")
+		#os.system("rm " + args.udf_template + ".sql")
 		os.system("rm " + args.file + ".csv")

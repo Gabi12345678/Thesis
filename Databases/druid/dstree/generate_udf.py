@@ -9,9 +9,9 @@ import urllib.request
 from pydruid.client import *
 
 parser = argparse.ArgumentParser(description = 'Script to run DStree in Druid')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/hydraulic.txt')
-parser.add_argument('--lines', nargs='*', type=int, default=[1000], help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 4" will try (20, 4)')
-parser.add_argument('--columns', nargs='*', type=int, default=[100], help='list of integers representing the number of lines to try out. Used together with --lines. For example "--lines 20 --columns 4" will try (20, 4)')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synthetic.txt')
+parser.add_argument('--lines', nargs='*', type=int, default=[100], help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 4" will try (20, 4)')
+parser.add_argument('--columns', nargs='*', type=int, default=[40], help='list of integers representing the number of lines to try out. Used together with --lines. For example "--lines 20 --columns 4" will try (20, 4)')
 parser.add_argument('--start_time', nargs='?', type=int, help='epoch time of the first datasample. All other will be set at 10 seconds intervals', default=1583000000)
 args = parser.parse_args()
 
@@ -121,7 +121,7 @@ for lines in args.lines:
 				intervals = ['2020-01-01/2030-01-01'], 
 				aggregations = { "indexrezult": {"type": "dstreeindex", "datafile": args.file + "_index.txt", "indexfile": args.index_path, "tscount": lines}})
 		final_time_index = get_time()
-		#rint(ts.export_pandas()["indexrezult"][0])
+		print(ts.export_pandas()["indexrezult"][0])
 
 		print("Searching")
 		initial_time_udf = get_time()
@@ -131,7 +131,7 @@ for lines in args.lines:
 					intervals = ['2020-01-01/2030-01-01'],
 					aggregations = { "searchresult": { "type": "dstreesearch", "indexfile": args.index_path + ".idx_dyn_100_1_" + str(lines), "columns": dims, "timeField": "__time"}})
 		final_time_udf = get_time()
-		print(ts.export_pandas())
+		#print(ts.export_pandas()["searchresult"][0])
 
 		print("Terminating druid")
 		druid.terminate()

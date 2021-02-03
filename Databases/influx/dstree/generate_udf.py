@@ -23,10 +23,10 @@ def get_datetime(s):
 
 # Arguments
 parser = argparse.ArgumentParser(description = 'Script to run Similarity Search in Influx')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/hydraulic.txt')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synthetic.txt')
 parser.add_argument('--lines', nargs='*', type=int, default=[100],
         help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 30" (20, 30)')
-parser.add_argument('--columns', nargs='*', type=int, default=[100],
+parser.add_argument('--columns', nargs='*', type=int, default=[10],
         help='list of integers representing the number of columns to try out. Used together with --lines. For example "--lines 20 --columns 30" will try (20, 30)')
 parser.add_argument('--start_time', nargs='?', type=int, help = "Epoch time in second for the first measurement. All others will be 10 seconds apart", default=1583000000)
 

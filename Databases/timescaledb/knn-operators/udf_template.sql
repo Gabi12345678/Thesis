@@ -89,4 +89,4 @@ BEGIN
 END;
 $knn$;
 
-SELECT * FROM result;
+--SELECT * FROM result;

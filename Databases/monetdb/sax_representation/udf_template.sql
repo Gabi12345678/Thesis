@@ -61,4 +61,4 @@ SET final_time_sax_transformation = get_time();
 SELECT final_time_sax_transformation - initial_time_sax_transformation as Time_seconds__sax;
 -- SAX *******************************************************************************************
 
-SELECT * FROM representation;
+--SELECT * FROM representation;

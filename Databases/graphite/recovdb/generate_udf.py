@@ -22,7 +22,7 @@ def get_datetime(s):
         pass
     return (datetime.strptime(s, "%Y-%m-%d"), "days")
 
-parser = argparse.ArgumentParser(description = 'Script to run Zscore in Graphite')
+parser = argparse.ArgumentParser(description = 'Script to run Recov in Graphite')
 parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synthetic.txt')
 parser.add_argument('--lines', nargs='*', type=int, default = [100],
         help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 10 --columns 4" will try (10, 4)')
@@ -118,15 +118,16 @@ for lines in args.lines:
 			'from': t1 - 20,
 			'until': t2 + 20,
 			'format': 'csv',
-			'target': 'zscore(master.' + args.format + '.dim*)',
+			'target': 'recov(master.' + args.format + '.dim*)',
 		}
 		r = requests.get(url = "http://localhost/render", params = params)
+		#print(r.text)
 		if not(r.ok):
 			print(r.text)
 		final_time = (datetime.now() - datetime(1970, 1, 1)).total_seconds()
 
 		print("+" * 100)
-		print("Zscore time: ", final_time - initial_time)
+		print("Recov time: ", final_time - initial_time)
 		print("+" * 100)
 
 print("Cleaning up data")

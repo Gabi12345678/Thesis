@@ -35,8 +35,8 @@ create function udf() RETURNS string in 'python' as '
 	cur.execute("SELECT t, d FROM datapoints")
 	results = cur.fetchall()
 	
-	lines = 1000000
-	columns = 46
+	lines = 100
+	columns = 10
 	matrix = []
 	timestamps = []
 	for i in range(lines):
@@ -70,10 +70,10 @@ create function import_data() RETURNS string in 'python' as '
 	exdb.init_runtime(skip_load = True)
 	cur = current_session.cursor()
 	
-	f = open("/home/gabi/Thesis-master/Datasets/alabama_weather.txt.csv", "r")
+	f = open("/home/gabi/Thesis-master/Datasets/synthetic.txt.csv", "r")
 
-	lines = 1000000
-	columns = 46
+	lines = 100
+	columns = 10
 	for i in range(lines):
 		line = f.readline()[:-1].split(",")
 		time = get_datetime(line[0])[0]
@@ -84,16 +84,18 @@ create function import_data() RETURNS string in 'python' as '
 ';
 
 INSERT INTO metrics_insert VALUES (current_time(), disk_usage());
--- import datapoints /home/gabi/Thesis-master/Datasets/alabama_weather.txt.csv;
+-- import datapoints /home/gabi/Thesis-master/Datasets/synthetic.txt.csv;
 SELECT import_data();
 INSERT INTO metrics_insert VALUES (current_time(), disk_usage());
 SELECT  MAX(disk_usage) - MIN(disk_usage) AS disk_usage, 
 	MAX(current_time) - MIN(current_time) AS insert_time, 
-	1000000.0 / (MAX(current_time) - MIN(current_time)) as Throughput_inserts_per_second,
-	1000000.0 * 46.0 / (MAX(current_time) - MIN(current_time)) as Throughput_values_per_second 
+	100.0 / (MAX(current_time) - MIN(current_time)) as Throughput_inserts_per_second,
+	100.0 * 10.0 / (MAX(current_time) - MIN(current_time)) as Throughput_values_per_second 
 FROM metrics_insert;
+
 
 INSERT INTO metrics_udf VALUES(current_time());
 SELECT udf();
 INSERT INTO metrics_udf VALUES(current_time());
 SELECT MAX(current_time) - MIN (current_time) as kmeans_time FROM metrics_udf;
+

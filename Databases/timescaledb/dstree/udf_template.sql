@@ -119,4 +119,4 @@ $dstree$;
 
 select remove_index();
 
-select * from distances limit 10;
+--select * from distances limit 10;

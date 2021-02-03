@@ -93,7 +93,9 @@ SELECT  MAX(disk_usage) - MIN(disk_usage) AS disk_usage,
 	<lines>.0 * <columns>.0 / (MAX(current_time) - MIN(current_time)) as Throughput_values_per_second 
 FROM metrics_insert;
 
+
 INSERT INTO metrics_udf VALUES(current_time());
 SELECT udf();
 INSERT INTO metrics_udf VALUES(current_time());
 SELECT MAX(current_time) - MIN (current_time) as kmeans_time FROM metrics_udf;
+

@@ -56,7 +56,7 @@ create function udf() RETURNS string in 'python' as '
 		current_line = np.array(current_line)
 		matrix.append(current_line)
 	matrix = np.array(matrix).T
-	
+
 	distances = IndexExactSearcher.search(matrix, "<index_path>.idx_dyn_100_1_<columns>")
 
 	start_epoch = <start_time>

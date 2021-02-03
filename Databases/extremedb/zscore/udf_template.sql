@@ -78,7 +78,7 @@ create function import_data() RETURNS string in 'python' as '
 	columns = <columns>
 	for i in range(lines):
 		line = f.readline()[:-1].split(",")
-		time = datetime.datetime.strptime(line[0], "%Y-%m-%dT%H:%M:%S")
+		time = get_datetime(line[0])[0]
 		data = [float(x) for x in line[1:]]
 		cur.execute("INSERT INTO datapoints(t, d) VALUES (?, ?)", (time, data) )
 

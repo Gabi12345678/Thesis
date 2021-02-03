@@ -15,7 +15,7 @@ LANGUAGE PYTHON
 };
 
 DECLARE lines INTEGER;
-SET lines=10;
+SET lines=100;
 
 -- Writing data *************************************************************************************
 DECLARE initial_time FLOAT;
@@ -23,7 +23,7 @@ DECLARE final_time FLOAT;
 DECLARE total_size INTEGER;
 
 SET initial_time = get_time();
-COPY INTO datapoints FROM '/home/gabi/Thesis-master/Datasets/alabama_weather.txt.csv' USING DELIMITERS ',','\n';
+COPY INTO datapoints FROM '/home/gabi/Thesis-master/Datasets/synthetic.txt.csv' USING DELIMITERS ',','\n';
 SET final_time = get_time();
 
 SELECT
@@ -49,7 +49,7 @@ DECLARE initial_time_interval FLOAT;
 DECLARE final_time_interval FLOAT;
 
 SET initial_time_interval = get_time();
-INSERT INTO result_interval SELECT time, d FROM datapoints WHERE time > str_to_timestamp('2014-01-01', '%Y-%m-%d') and time < str_to_timestamp('2019-01-01', '%Y-%m-%d');
+INSERT INTO result_interval SELECT time, d FROM datapoints WHERE time > str_to_timestamp('2021-01-31', '%Y-%m-%d') and time < str_to_timestamp('2021-02-01', '%Y-%m-%d');
 SET final_time_interval = get_time();
 
 SELECT final_time_interval - initial_time_interval AS time_interval;

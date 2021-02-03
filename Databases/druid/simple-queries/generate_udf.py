@@ -20,11 +20,11 @@ def get_datetime(s):
     return (datetime.strptime(s, "%Y-%m-%d"), "days")
 
 parser = argparse.ArgumentParser(description = 'Script to run simple queries in eXtremeDB')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/alabama_weather.txt')
-parser.add_argument('--lines', nargs='*', type=int, default=[1000], help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 4" will try (20, 4)')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synthetic.txt')
+parser.add_argument('--lines', nargs='*', type=int, default=[100], help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 20 --columns 4" will try (20, 4)')
 parser.add_argument('--column', nargs='?', type=int, default=38, help='list of integers representing the number of lines to try out. Used together with --lines. For example "--lines 20 --columns 4" will try (20, 4)')
-parser.add_argument('--start_time', nargs='?', type=str, default='2014-01-01', help='')
-parser.add_argument('--end_time', nargs='?', type=str, default='2019-01-01', help='')
+parser.add_argument('--start_time', nargs='?', type=str, default='2021-01-31', help='')
+parser.add_argument('--end_time', nargs='?', type=str, default='2021-02-01', help='')
 parser.add_argument('--moving_average_hours', nargs='?', type=int, default=24, help='')
 args = parser.parse_args()
 
@@ -132,29 +132,29 @@ for lines in args.lines:
 	print("Interval time:", final_time_udf - initial_time_udf)
 	print("*" * 100)
 
-	initial_time_udf = get_time()
-	query = PyDruid("http://localhost:8083", 'druid/v2')
-	q = query.query_builder.build_query(
-		query_type = 'movingAverage',
-		args = {
-			"datasource": 'master',
-			"granularity": 'minute',
-			"intervals": [args.start_time + '/' + args.end_time],
-			"aggregations": { "d": { "type": "doubleSum", "fieldName": "dim" } },
+#	initial_time_udf = get_time()
+#	query = PyDruid("http://localhost:8083", 'druid/v2')
+#	q = query.query_builder.build_query(
+#		query_type = 'movingAverage',
+#		args = {
+#			"datasource": 'master',
+#			"granularity": 'minute',
+#			"intervals": [args.start_time + '/' + args.end_time],
+#			"aggregations": { "d": { "type": "doubleSum", "fieldName": "dim" } },
 #			"averagers": [ {
 #				"name": "movingMean",
 #				"fieldName": "d",
 #				"type": "doubleMeanNoNulls",
 #				"buckets": 10
 #			} ] 
-		}
-	)
-	ts = query._post(q)
-	final_time_udf = get_time()
-	print(ts.export_pandas())
-	print("*" * 100)
-	print("Moving time:", final_time_udf - initial_time_udf)
-	print("*" * 100)
+#		}
+#	)
+#	ts = query._post(q)
+#	final_time_udf = get_time()
+#	print(ts.export_pandas())
+#	print("*" * 100)
+#	print("Moving time:", final_time_udf - initial_time_udf)
+#	print("*" * 100)
 
 	print("Terminating druid")
 	druid.terminate()

@@ -1,7 +1,7 @@
 dbrp "master"."autogen"
 
 batch
-	|query('SELECT v FROM "master"."autogen"."puncte" WHERE time > \'2014-01-01\' and time < \'2019-01-01\'')
+	|query('SELECT v FROM "master"."autogen"."puncte" WHERE time > \'2021-01-31\' and time < \'2021-02-01\'')
 		.every(4000d)
 		.period(4000d)
 	|influxDBOut()

@@ -32,19 +32,11 @@ DECLARE
 	delta DOUBLE PRECISION;
 BEGIN
 	start_time := clock_timestamp();
-	INSERT INTO zscore 
-	WITH 	raw_values AS (
-        		SELECT time, nr, elem 
-        		FROM datapoints, UNNEST(d) WITH ORDINALITY a(elem, nr)
-    		),
-		avg_stddev AS ( 
-		        SELECT nr, avg(elem) avg, stddev_pop(elem) stddev
-		        FROM raw_values GROUP BY nr 
-	    	) 
-		SELECT time, array_agg( 
-    			( elem - (SELECT avg FROM avg_stddev WHERE avg_stddev.nr = raw_values.nr) ) / (SELECT stddev FROM avg_stddev WHERE avg_stddev.nr = raw_values.nr) 
-        		ORDER BY nr ) d
-		FROM raw_values GROUP BY time;
+	INSERT INTO zscore
+	SELECT time, array[
+<select_expression>
+	]
+	FROM datapoints;
 	end_time := clock_timestamp();
 	delta = extract(epoch from end_time) - extract(epoch from start_time);
 

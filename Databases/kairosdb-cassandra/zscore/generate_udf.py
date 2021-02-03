@@ -23,7 +23,7 @@ def get_datetime(s):
     return (datetime.strptime(s, "%Y-%m-%d"), "days")
 
 parser = argparse.ArgumentParser(description = 'Script to run ZScore in Kairos')
-parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/hydraulic.txt')
+parser.add_argument('--file', nargs='?', type=str, help='path to the dataset file', default='../../../Datasets/synthetic.txt')
 parser.add_argument('--lines', nargs='*', type=int, default = [100],
         help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 10 --columns 4" will try (10, 4)')
 parser.add_argument('--columns', nargs='*', type=int, default = [100],
@@ -65,7 +65,7 @@ for lines in args.lines:
 		except NoHostAvailable:
 			print("No previous data exists. Skipping delete.")
 		print("Starting Kairosdb")
-		kairos = subprocess.Popen([args.kairos_path, "run"])#, stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
+		kairos = subprocess.Popen([args.kairos_path, "run"], stderr = subprocess.DEVNULL, stdout = subprocess.DEVNULL)
 		time.sleep(4)
 		while True:
 			try:
@@ -102,11 +102,11 @@ for lines in args.lines:
 		session = Cluster(['localhost']).connect('kairosdb')
 		session.default_timeout = 1200
 		cnt = [r for r in session.execute('select count(*) from data_points;')][0].count
-		print(cnt)
+		#print(cnt)
 		while cnt < lines * columns:
 			time.sleep(0.01)
 			cnt = [r for r in session.execute('select count(*) from data_points;')][0].count
-			print(cnt)
+			#print(cnt)
 		final_time = current_time()
 
 		dataSave = {

@@ -23,12 +23,12 @@ DECLARE
 	delta DOUBLE PRECISION;
 BEGIN
 	start_time := clock_timestamp();
-	COPY datapoints FROM '/home/gabi/Thesis-master/Datasets/alabama_weather.txt.csv' DELIMITER ',' CSV;
+	COPY datapoints FROM '/home/gabi/Thesis-master/Datasets/synthetic.txt.csv' DELIMITER ',' CSV;
 	end_time := clock_timestamp();
 	delta:= extract(epoch from end_time) - extract(epoch from start_time) ;
 	
 	RAISE NOTICE 'Total time seconds = %', delta;
-	RAISE NOTICE 'Throughput values per second = %', 10 / delta;
+	RAISE NOTICE 'Throughput values per second = %', 100 / delta;
 END;
 $load_data$;
 
@@ -56,7 +56,7 @@ DECLARE
 	delta DOUBLE PRECISION;
 BEGIN
 	start_time := clock_timestamp();
-	INSERT INTO result_interval_table SELECT time, d FROM datapoints WHERE time > '2014-01-01'::timestamp AND time < '2019-01-01'::timestamp;
+	INSERT INTO result_interval_table SELECT time, d FROM datapoints WHERE time > '2021-01-31'::timestamp AND time < '2021-02-01'::timestamp;
 	end_time := clock_timestamp();
 	delta = extract(epoch from end_time) - extract(epoch from start_time);
 

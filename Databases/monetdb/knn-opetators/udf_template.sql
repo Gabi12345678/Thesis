@@ -6,12 +6,6 @@ CREATE TABLE ldatapoints (time TIMESTAMP, <column_types>, l INTEGER);
 CREATE TABLE udatapoints (time TIMESTAMP, <column_types>);
 CREATE TABLE result (time TIMESTAMP, l INTEGER);
 
-CREATE OR REPLACE FUNCTION get_time() RETURNS FLOAT
-LANGUAGE PYTHON
-{
-        from datetime import datetime
-        return (datetime.now() - datetime(1970, 1, 1)).total_seconds()
-};
 
 CREATE OR REPLACE FUNCTION DIST(<dist_arg>) RETURNS DOUBLE PRECISION
 BEGIN
@@ -61,8 +55,6 @@ COPY INTO udatapoints FROM '<data_file_unlabeled>' USING DELIMITERS ',','\n';
 SET final_time = get_time();
 
 SELECT
-	total_size as Total_size_bytes,
-        CAST( total_size  as FLOAT) / 1024.0 / 1024.0 as Total_size_megabytes,
         final_time - initial_time as Total_time_seconds,
         CAST(lines as FLOAT) / (final_time - initial_time) AS Throughput_inserts_per_second,
         CAST(lines * columns as FLOAT) / (final_time - initial_time) AS Throughput_values_per_second;

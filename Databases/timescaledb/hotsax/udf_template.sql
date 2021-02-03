@@ -88,4 +88,3 @@ BEGIN
 	RAISE NOTICE 'HOT-SAX time seconds = %', delta;
 END;
 $hotsax$;
-
