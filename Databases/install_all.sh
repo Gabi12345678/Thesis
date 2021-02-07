@@ -43,25 +43,41 @@ sudo systemctl start docker
 sudo systemctl enable docker
 
 # Druid
-sh ./druid/install.sh
+cd druid
+sh ./install.sh
+cd ..
 
 # ExtremeDB
-sh ./extremedb/install.sh
+cd extremedb
+sh ./install.sh
+cd ..
 
 # Graphite
-sh ./graphite/install.sh
+cd graphite
+sh ./install.sh
+cd ..
 
 # Influx
-sh ./influx/install.sh
+cd influx
+sh ./install.sh
+cd ..
 
 # KairosDB-Cassandra
-sh ./kairosdb-cassandra/install.sh
+cd kairosdb-cassandra
+sh ./install.sh
+cd ..
 
 # KairosDB-H2
-sh ./kairosdb-h2/install.sh
+cd kairosdb-h2
+sh ./install.sh
+cd ..
 
 # MonetDB
-sh ./monetdb/install.sh
+cd monetdb
+sh ./install.sh
+cd ..
 
 # TimescaleDB
-sh ./timescaledb/install.sh
+cd  timescaledb
+sh ./install.sh
+cd ..
