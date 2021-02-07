@@ -2,15 +2,11 @@
 #sudo rm storage -R
 #sudo rm for-install/udf/* -R
 
-#mkdir docker-graphite-git
+mkdir docker-graphite-git
 cd docker-graphite-git
-#git clone https://github.com/graphite-project/docker-graphite-statsd.git
+git clone https://github.com/graphite-project/docker-graphite-statsd.git
 cd docker-graphite-statsd
 
-sed -i '/LABEL/aENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk' Dockerfile
-sed -i '/LABEL/aENV PATH $PATH:/usr/lib/jvm/java-1.8-openjdk/jre/bin:/usr/lib/jvm/java-1.8-openjdk/bin' Dockerfile
-#sed -i '/FROM base as build/a RUN ls /usr/lib/jvm/' Dockerfile
-sed -i '/jansson/a\ openjdk8\ \\' Dockerfile
 sed -i '/psycopg2/a\ saxpy numpy setuptools\ \\' Dockerfile
 sed -i 's/go==1.13.11-r0/go==1.13.14-r0/' Dockerfile
 
@@ -28,6 +24,7 @@ cp -f ../../../../Algorithms/znormalization/znormalization.py ../../for-install/
 cp -f ../../../../Algorithms/screen_python/screen.py ../../for-install/udf/
 cp -f ../../../../Algorithms/sax/saxtransformation.py ../../for-install/udf/
 cp -f -R ../../../../Algorithms/dstree_python/dstree ../../for-install/udf/
+cp -f ../../../../Algorithms/knn/knn.py ../../for-install/udf/
 
 sudo su <<START
 echo "Building with Docker"

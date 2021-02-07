@@ -7,3 +7,7 @@ mv index.html extremedb.tar.gz
 tar xvzf extremedb.tar.gz
 rm extremedb.tar.gz
 
+cd eXtremeDB/
+make all
+cd target/python/
+python setup.py install --user

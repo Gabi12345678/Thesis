@@ -9,4 +9,7 @@ mvn package
 cp target/udf-1.0-SNAPSHOT.jar ../apache-druid-0.19.0/extensions/udf
 cd ..
 
-cp -f -r for-install/conf apache-druid-0.19.0/
+rm -r apache-druid-0.19.0/conf
+cp -r for-install/conf apache-druid-0.19.0/
+
+pip3 install pydruid
