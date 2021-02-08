@@ -19,7 +19,7 @@ echo "kairosdb.service.udf=master.UdfModule" >> kairosdb/conf/udf.properties
 
 sudo docker stop cassandra
 sudo docker rm cassandra
-sudo docker run --name cassandra -p 9042:9042 -d cassandra:latest
+sudo docker run --name cassandra -p 9042:9042 -d cassandra:3.11.8
 
 rm kairosdb/conf/kairosdb.properties
 cp for-install/kairosdb.properties kairosdb/conf/ 

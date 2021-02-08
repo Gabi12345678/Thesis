@@ -10,7 +10,7 @@ sudo pip install numpy
 sudo pip install pandas
 sudo pip install saxpy
 sudo pip install pydruid
-sudo pip install protobuf
+sudo pip install protobuf==3.13.0
 sudo pip install influxdb
 sudo pip install cassandra-driver
 
@@ -22,7 +22,7 @@ sudo pip3 install saxpy
 sudo pip3 install numpy
 sudo pip3 install pydruid
 sudo pip3 install pandas
-sudo pip3 install protobuf
+sudo pip3 install protobuf==3.13.0
 sudo pip3 install tqdm
 sudo pip3 install influxdb
 sudo pip3 install cassandra-driver
