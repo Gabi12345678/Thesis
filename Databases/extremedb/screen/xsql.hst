@@ -1,6 +1,0 @@
-select count(*) from datapoints;
-select count(*) from distances;
-select * from distances;
-select * from metrics_udfl
-;
-select * from metrics_udf;

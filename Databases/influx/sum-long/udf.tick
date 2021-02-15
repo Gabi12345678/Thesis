@@ -1,0 +1,12 @@
+dbrp "master"."autogen"
+
+batch
+	|query('SELECT sum(*) FROM "master"."autogen"."puncte"')
+		.every(4000d)
+		.period(4000d)
+	|influxDBOut()
+		.database('master')
+		.retentionPolicy('autogen')
+		.measurement('output')
+	
+	
