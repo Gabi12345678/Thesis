@@ -28,8 +28,8 @@ parser.add_argument('--lines', nargs='*', type=int, default = [100],
         help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 10 --columns 4" will try (10, 4)')
 parser.add_argument('--columns', nargs='*', type=int, default = [100],
         help='list of integers representing the number of columns to try out. Used together with --lines. For example "--lines 20 --columns 4" will try (20, 4)')
-parser.add_argument('--start_time', nargs='?', type=str, default='2021-01-31', help='')
-parser.add_argument('--end_time', nargs='?', type=str, default='2021-02-01', help='')
+parser.add_argument('--start_time', nargs='?', type=str, default='2021-01-31T00:00', help='')
+parser.add_argument('--end_time', nargs='?', type=str, default='2021-02-01T00:00', help='')
 args = parser.parse_args()
 args.db_dir = os.path.abspath("../data/data/kairosdb/")
 args.kairos_path = os.path.abspath("../kairosdb/bin/kairosdb.sh")
@@ -138,7 +138,7 @@ for lines in args.lines:
 		print("Total size (MB):", (final_size - initial_size) / 1024.0 / 1024.0)
 		print("Throughput (I/sec):", 1.0 * lines / (final_time - initial_time))
 		print("Throughput (V/sec):", 1.0 * lines * columns / (final_time - initial_time))
-		print("KMeans time:", final_time_udf - initial_time_udf)
+		print("Select time:", final_time_udf - initial_time_udf)
 		print("*" * 100)
 
 		subprocess.check_output("rm " + args.queue_dir + " -R", shell=True)

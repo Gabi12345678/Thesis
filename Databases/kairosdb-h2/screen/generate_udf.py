@@ -58,7 +58,7 @@ for lines in args.lines:
 			print("Error")
 		initial_size = 0
 		print("Starting Kairosdb")
-		kairos = subprocess.Popen([args.kairos_path, "run"], stderr = subprocess.DEVNULL)
+		kairos = subprocess.Popen([args.kairos_path, "run"], stdout = subprocess.DEVNULL)
 		time.sleep(4)
 		while True:
 			try:

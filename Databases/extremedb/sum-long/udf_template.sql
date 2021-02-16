@@ -56,6 +56,6 @@ create function import_data() RETURNS string in 'python' as '
 SELECT import_data();
 
 INSERT INTO metrics_udf VALUES(current_time());
-SELECT [<sum_expr>] FROM datapoints;
+INSERT INTO result SELECT [<sum_expr>] FROM datapoints;
 INSERT INTO metrics_udf VALUES(current_time());
-SELECT MAX(current_time) - MIN (current_time) as kmeans_time FROM metrics_udf;
+SELECT MAX(current_time) - MIN (current_time) as sum_time FROM metrics_udf;

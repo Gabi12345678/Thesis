@@ -109,7 +109,6 @@ for lines in args.lines:
 	r = requests.post("http://localhost:8080/api/v1/datapoints/query", data=json.dumps(dataSave))
 	final_time_udf = current_time()
 	print("*" * 100)
-	print(r.text)
 	print("SUM time:", final_time_udf - initial_time_udf)
 	print("*" * 100)
 

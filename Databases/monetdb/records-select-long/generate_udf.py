@@ -9,8 +9,8 @@ parser.add_argument('--lines', nargs='*', type=int, default = [100],
         help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 10 --columns 4" will try (10, 4)')
 parser.add_argument('--columns', nargs='*', type=int, default = [100],
         help='list of integers representing the number of columns to try out. Used together with --lines. For example "--lines 20 --columns 4" will try (20, 4)')
-parser.add_argument('--start_time', nargs='?', type=str, default='2021-01-31', help='')
-parser.add_argument('--end_time', nargs='?', type=str, default='2021-02-01', help='')
+parser.add_argument('--start_time', nargs='?', type=str, default='2021-01-31T00:00', help='')
+parser.add_argument('--end_time', nargs='?', type=str, default='2021-02-01T00:00', help='')
 args = parser.parse_args()
 
 args.file = os.path.abspath(args.file)

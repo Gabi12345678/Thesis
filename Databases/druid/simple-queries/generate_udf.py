@@ -132,30 +132,6 @@ for lines in args.lines:
 	print("Interval time:", final_time_udf - initial_time_udf)
 	print("*" * 100)
 
-#	initial_time_udf = get_time()
-#	query = PyDruid("http://localhost:8083", 'druid/v2')
-#	q = query.query_builder.build_query(
-#		query_type = 'movingAverage',
-#		args = {
-#			"datasource": 'master',
-#			"granularity": 'minute',
-#			"intervals": [args.start_time + '/' + args.end_time],
-#			"aggregations": { "d": { "type": "doubleSum", "fieldName": "dim" } },
-#			"averagers": [ {
-#				"name": "movingMean",
-#				"fieldName": "d",
-#				"type": "doubleMeanNoNulls",
-#				"buckets": 10
-#			} ] 
-#		}
-#	)
-#	ts = query._post(q)
-#	final_time_udf = get_time()
-#	print(ts.export_pandas())
-#	print("*" * 100)
-#	print("Moving time:", final_time_udf - initial_time_udf)
-#	print("*" * 100)
-
 	print("Terminating druid")
 	druid.terminate()
 	druid.wait()

@@ -153,5 +153,5 @@ for lines in args.lines:
 		print("Total size (MB):", (final_size - initial_size) / 1024.0 / 1024.0)
 		print("Throughput (I/sec):", 1.0 * lines / (final_time - initial_time))
 		print("Throughput (V/sec):", 1.0 * lines * columns / (final_time - initial_time))
-		print("KMeans time:", final_time_udf - initial_time_udf)
+		print("KNN time:", final_time_udf - initial_time_udf)
 		print("*" * 100)

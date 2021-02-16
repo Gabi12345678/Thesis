@@ -139,7 +139,7 @@ for lines in args.lines:
 		q.write(r.text)
 		q.close()
 		print("+" * 100)
-		print("KMeans time: ", final_time - initial_time)
+		print("Dist time: ", final_time - initial_time)
 		print("+" * 100)
 
 print("Cleaning up data")

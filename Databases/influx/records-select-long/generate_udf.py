@@ -109,7 +109,7 @@ for line in args.lines:
 		t1 = datetime.now()
 		subprocess.run([args.kapacitor_path, "replay", "-recording", "udf-recording", "-replay-id", "udf-replay", "-task", "udf"])
 		t2 = datetime.now()
-		print("Total interval time: ", (t2 - t1).total_seconds())
+		print("Total select time: ", (t2 - t1).total_seconds())
 
 print("Terminating kapacitor")
 kapacitor.terminate()	

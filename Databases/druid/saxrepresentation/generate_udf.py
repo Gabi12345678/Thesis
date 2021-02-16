@@ -110,7 +110,7 @@ for lines in args.lines:
 				intervals = ['2010-01-01/2030-01-01'], 
 				aggregations = { "saxrepresentationresult": {"type": "saxrepresentation", "timeField": "__time", "columns": dims}})
 		final_time_udf = get_time()
-		print(ts.export_pandas()["saxrepresentationresult"][0])
+		print(ts.export_pandas())
 
 		print("Terminating druid")
 		druid.terminate()

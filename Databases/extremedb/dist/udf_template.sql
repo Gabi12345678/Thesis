@@ -52,7 +52,7 @@ FROM metrics_insert;
 INSERT INTO metrics_udf VALUES(current_time());
 INSERT INTO result SELECT t, sqrt(<distance_formula>) FROM datapoints;
 INSERT INTO metrics_udf VALUES(current_time());
-SELECT MAX(current_time) - MIN (current_time) as knn_time FROM metrics_udf;
+SELECT MAX(current_time) - MIN (current_time) as dist_time FROM metrics_udf;
 
 --SELECT * FROM datapoints;
 --SELECT * FROM result;

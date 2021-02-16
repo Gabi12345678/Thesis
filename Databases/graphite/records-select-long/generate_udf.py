@@ -28,8 +28,8 @@ parser.add_argument('--lines', nargs='*', type=int, default = [100],
         help='list of integers representing the number of lines to try out. Used together with --columns. For example "--lines 10 --columns 4" will try (10, 4)')
 parser.add_argument('--columns', nargs='*', type=int, default = [10],
         help='list of integers representing the number of columns to try out. Used together with --lines. For example "--lines 20 --columns 4" will try (20, 4)')
-parser.add_argument('--start_time', nargs='?', type=str, default='2021-01-31', help='')
-parser.add_argument('--end_time', nargs='?', type=str, default='2021-02-01', help='')
+parser.add_argument('--start_time', nargs='?', type=str, default='2021-01-31T00:00', help='')
+parser.add_argument('--end_time', nargs='?', type=str, default='2021-02-01T00:00', help='')
 args = parser.parse_args()
 
 args.storage_path = os.path.abspath("../storage/whisper/master")
@@ -91,14 +91,13 @@ for lines in args.lines:
 					except FileNotFoundError:
 						continue
 					break
-				time.sleep(6)
+				time.sleep(60)
 				current_last_modified = os.path.getmtime(args.storage_path + "/" + args.format.replace(".", "/"))
 				print(current_last_modified)
 				while current_last_modified != initial_last_modified:
 					initial_last_modified = current_last_modified
-					time.sleep(6)
+					time.sleep(60)
 					current_last_modified = os.path.getmtime(args.storage_path + "/" + args.format.replace(".", "/"))
-					print(current_last_modified)
 				total_time = total_time + (current_last_modified - initial_time)
 				initial_time = (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
 		sock.close()
@@ -129,7 +128,7 @@ for lines in args.lines:
 		if not(r.ok):
 			print(r.text)
 		print("+" * 100)
-		print("KMeans time: ", final_time - initial_time)
+		print("Select time: ", final_time - initial_time)
 		print("+" * 100)
 
 print("Cleaning up data")

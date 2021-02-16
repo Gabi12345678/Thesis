@@ -157,7 +157,7 @@ for lines in args.lines:
 			print(r.text)
 		final_time = (datetime.now() - datetime(1970, 1, 1)).total_seconds()
 		print("+" * 100)
-		print("KMeans time: ", final_time - initial_time)
+		print("KNN time: ", final_time - initial_time)
 		print("+" * 100)
 
 print("Cleaning up data")

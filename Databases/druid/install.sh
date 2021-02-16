@@ -12,4 +12,9 @@ cd ..
 rm -r apache-druid-0.19.0/conf
 cp -r for-install/conf apache-druid-0.19.0/
 
+cp ~/.m2/repository/org/apache/commons/commons-math/2.1/commons-math-2.1.jar apache-druid-0.19.0/lib/
+cp ~/.m2/repository/de/ruedigermoeller/fst/1.37/fst-1.37.jar apache-druid-0.19.0/lib/
+
+sudo chmod 777 dstree/out
+
 pip3 install pydruid

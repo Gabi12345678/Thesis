@@ -26,6 +26,8 @@ cp -f ../../../../Algorithms/sax/saxtransformation.py ../../for-install/udf/
 cp -f -R ../../../../Algorithms/dstree_python/dstree ../../for-install/udf/
 cp -f ../../../../Algorithms/knn/knn.py ../../for-install/udf/
 
+sudo chmod 777 ../../for-install/log
+
 sudo su <<START
 echo "Building with Docker"
 docker build --tag custom-graphite --build-arg python_binary=python3 .

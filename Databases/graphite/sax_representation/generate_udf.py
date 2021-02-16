@@ -126,7 +126,7 @@ for lines in args.lines:
 		final_time = (datetime.now() - datetime(1970, 1, 1)).total_seconds()
 
 		print("+" * 100)
-		print("HotSax time: ", final_time - initial_time)
+		print("Sax time: ", final_time - initial_time)
 		print("+" * 100)
 
 print("Cleaning up data")

@@ -61,6 +61,6 @@ BEGIN
 	end_time := clock_timestamp();
 	delta = extract(epoch from end_time) - extract(epoch from start_time);
 
-	RAISE NOTICE 'Kmeans time seconds = %', delta;
+	RAISE NOTICE 'Sum time seconds = %', delta;
 END;
 $kmeans$;

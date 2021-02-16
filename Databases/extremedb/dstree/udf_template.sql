@@ -112,4 +112,4 @@ SELECT MAX(current_time) - MIN(current_time) AS index_builder_time FROM metrics_
 INSERT INTO metrics_udf VALUES(current_time());
 SELECT udf();
 INSERT INTO metrics_udf VALUES(current_time());
-SELECT MAX(current_time) - MIN(current_time) AS uds_time FROM metrics_udf;
+SELECT MAX(current_time) - MIN(current_time) AS search_time FROM metrics_udf;

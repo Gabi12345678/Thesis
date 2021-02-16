@@ -64,7 +64,7 @@ for lines in args.lines:
 		subprocess.Popen(["rm", args.storage_dir, "-R"], stdout = subprocess.DEVNULL)
 
 		print("Starting Druid")
-		druid = subprocess.Popen([args.druid_path])#, stdout = subprocess.DEVNULL)
+		druid = subprocess.Popen([args.druid_path], stdout = subprocess.DEVNULL)
 		while True:
 			try:
 				subprocess.check_output("curl localhost:8081", shell=True, stderr = subprocess.DEVNULL)
@@ -110,7 +110,7 @@ for lines in args.lines:
 				intervals = ['2010-01-01/2030-01-01'], 
 				aggregations = { "anomalydetresult": {"type": "anomalydet", "timeField": "__time", "columns": dims}})
 		final_time_udf = get_time()
-		print(ts.export_pandas()['anomalydetresult'][0])
+		print(ts.export_pandas())
 
 		print("Terminating druid")
 		druid.terminate()
