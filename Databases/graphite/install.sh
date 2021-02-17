@@ -2,6 +2,9 @@
 #sudo rm storage -R
 #sudo rm for-install/udf/* -R
 
+mkdir ./for-install/log
+sudo chmod 777 ./for-install/log
+
 mkdir docker-graphite-git
 cd docker-graphite-git
 git clone https://github.com/graphite-project/docker-graphite-statsd.git
@@ -25,8 +28,6 @@ cp -f ../../../../Algorithms/screen_python/screen.py ../../for-install/udf/
 cp -f ../../../../Algorithms/sax/saxtransformation.py ../../for-install/udf/
 cp -f -R ../../../../Algorithms/dstree_python/dstree ../../for-install/udf/
 cp -f ../../../../Algorithms/knn/knn.py ../../for-install/udf/
-
-sudo chmod 777 ../../for-install/log
 
 sudo su <<START
 echo "Building with Docker"

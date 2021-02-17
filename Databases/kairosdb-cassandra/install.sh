@@ -1,3 +1,6 @@
+mkdir dstree/out
+sudo chmod 777 dstree/out
+
 rm kairosdb -R
 rm udf/target -R
 

@@ -1,3 +1,6 @@
+mkdir dstree/out
+sudo chmod 777 dstree/out
+
 sudo apt update && sudo apt -y upgrade
 
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
