@@ -1,7 +1,5 @@
-wget https://drive.switch.ch/index.php/s/evaD2W5SbEqGIWc/download
-unzip download
-rm download
-
-wget https://drive.switch.ch/index.php/s/mhDuBpjm5CydrMm/download
-unzip download
-rm download
+cat splits/datasets_split.* > datasets.tar.gz
+tar -zxvf datasets.tar.gz
+mv datasets/* ./
+rm datasets -r
+rm datasets.tar.gz
